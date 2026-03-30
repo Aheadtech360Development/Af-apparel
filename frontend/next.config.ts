@@ -1,6 +1,16 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
+  // Webpack alias — ensures @/ resolves to src/ during Vercel build
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      "@": path.resolve(__dirname, "src"),
+    };
+    return config;
+  },
+
   // Enable strict mode for React
   reactStrictMode: true,
 
