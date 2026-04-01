@@ -1,8 +1,13 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
   turbopack: {
-    root: __dirname,
+    // Silence the "multiple lockfiles" workspace root warning
+    root: path.resolve(__dirname),
+  },
+  typescript: {
+    ignoreBuildErrors: false,
   },
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000",
