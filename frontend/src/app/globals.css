@@ -6,11 +6,36 @@
 
 @layer base {
   :root {
-    --font-inter: "Inter", system-ui, sans-serif;
+    --font-jakarta: "Plus Jakarta Sans", system-ui, sans-serif;
+    --font-bebas: "Bebas Neue", sans-serif;
+    --af-black: #080808;
+    --af-dark: #111016;
+    --af-mid: #1E1D24;
+    --af-red: #E8242A;
+    --af-blue: #1A5CFF;
+    --af-gold: #C9A84C;
+    --af-offwhite: #F4F3EF;
+    --af-border: #E2E0DA;
+    --af-text: #2A2830;
+    --af-muted: #7A7880;
   }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-jakarta);
+    background: #FAFAFA;
+    color: var(--af-text);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: #f0f0f0; }
+  ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
 }
 
 @layer components {
+  /* Legacy utility classes - keep for compatibility */
   .btn-primary {
     @apply rounded-md bg-blue-600 text-white px-4 py-2 text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60 disabled:cursor-not-allowed transition-colors;
   }
@@ -29,4 +54,26 @@
   .label {
     @apply block text-sm font-medium text-gray-700 mb-1;
   }
+
+  /* AF Design System */
+  .font-bebas { font-family: var(--font-bebas); }
+  .font-jakarta { font-family: var(--font-jakarta); }
+
+  .af-btn-red {
+    @apply inline-flex items-center justify-center font-bold cursor-pointer border-none rounded-[5px] transition-all duration-200 tracking-wide no-underline whitespace-nowrap bg-[#E8242A] text-white px-[22px] py-[10px] text-[13px];
+  }
+  .af-btn-red:hover {
+    background: #c9181e;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(232,36,42,.35);
+  }
+  .af-btn-ghost {
+    @apply inline-flex items-center justify-center font-bold cursor-pointer rounded-[5px] transition-all duration-200 tracking-wide no-underline whitespace-nowrap bg-transparent text-[#888] px-[18px] py-[10px] text-[13px] border-[1.5px] border-[#2a2a2a];
+  }
+  .af-btn-ghost:hover { color: #fff; border-color: #555; }
+
+  .af-btn-blue {
+    @apply inline-flex items-center justify-center font-bold cursor-pointer rounded-[5px] transition-all duration-200 tracking-wide no-underline whitespace-nowrap bg-[#1A5CFF] text-white px-[22px] py-[10px] text-[13px];
+  }
+  .af-btn-blue:hover { background: #0d4ee8; transform: translateY(-1px); }
 }

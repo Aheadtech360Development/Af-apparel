@@ -28,7 +28,7 @@ export function Header() {
     try {
       await authService.logout();
     } catch {
-      // ignore — clear client state regardless
+      // ignore
     }
     clearAuth();
     setCartCount(0);
@@ -36,152 +36,160 @@ export function Header() {
   }
 
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-        {/* Logo */}
-        <Link href="/" className="font-bold text-blue-600 text-xl shrink-0">
-          AF Apparels
-        </Link>
-
-        {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-6 text-sm flex-1">
-          {isAdmin() ? (
-            <Link href="/admin/dashboard" className="text-gray-600 hover:text-gray-900 font-medium">
-              Admin Panel
-            </Link>
-          ) : (
-            <>
-              <Link href="/products" className="text-gray-600 hover:text-gray-900">
-                Products
-              </Link>
-              {isAuthenticated() && (
-                <>
-                  <Link href="/quick-order" className="text-gray-600 hover:text-gray-900">
-                    Quick Order
-                  </Link>
-                  <Link href="/account" className="text-gray-600 hover:text-gray-900">
-                    My Account
-                  </Link>
-                </>
-              )}
-              {!isAuthenticated() && (
-                <Link href="/wholesale/register" className="text-gray-600 hover:text-gray-900">
-                  Apply for Wholesale
-                </Link>
-              )}
-            </>
-          )}
-        </nav>
-
-        {/* Right actions */}
-        <div className="flex items-center gap-3">
-          {/* Cart — customer only */}
-          {isAuthenticated() && !isAdmin() && (
-            <Link href="/cart" className="relative text-gray-600 hover:text-gray-900 p-1">
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-                />
-              </svg>
-              {cartCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 bg-blue-600 text-white text-xs font-bold w-4 h-4 flex items-center justify-center rounded-full">
-                  {cartCount > 9 ? "9+" : cartCount}
-                </span>
-              )}
-            </Link>
-          )}
-
-          {/* Auth buttons */}
-          {isAuthenticated() ? (
-            <div className="flex items-center gap-3">
-              <span className="text-sm text-gray-700 hidden sm:block">
-                {user?.first_name}
-                {isAdmin() && (
-                  <span className="ml-1 text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-medium">
-                    Admin
-                  </span>
-                )}
-              </span>
-              <button
-                onClick={handleLogout}
-                className="text-sm text-gray-500 hover:text-gray-900 border border-gray-200 rounded-md px-3 py-1.5 hover:bg-gray-50 transition-colors"
-              >
-                Sign out
-              </button>
-            </div>
-          ) : (
-            <Link
-              href="/login"
-              className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
-            >
-              Sign in
-            </Link>
-          )}
-
-          {/* Mobile hamburger */}
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden p-1.5 text-gray-600 hover:text-gray-900"
-            aria-label="Toggle menu"
-          >
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              {menuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
-          </button>
-        </div>
+    <>
+      {/* Announcement bar */}
+      <div style={{ background: "#E8242A", color: "#fff", textAlign: "center", fontSize: "12px", fontWeight: 700, letterSpacing: ".06em", padding: "9px 24px", textTransform: "uppercase" }}>
+        🇺🇸 Factory-Direct Wholesale Blanks
+        <span style={{ opacity: .7, margin: "0 12px" }}>·</span>
+        2,000+ American Businesses
+        <span style={{ opacity: .7, margin: "0 12px" }}>·</span>
+        Same-Day Shipping — Dallas, TX
       </div>
 
-      {/* Mobile menu */}
-      {menuOpen && (
-        <div className="md:hidden border-t border-gray-100 bg-white px-4 py-3 space-y-1">
-          {isAdmin() ? (
-            <Link href="/admin/dashboard" onClick={() => setMenuOpen(false)} className="block py-2 text-sm text-gray-700 hover:text-blue-600">
-              Admin Panel
-            </Link>
-          ) : (
-            <>
-              <Link href="/products" onClick={() => setMenuOpen(false)} className="block py-2 text-sm text-gray-700 hover:text-blue-600">
-                Products
+      {/* Main header */}
+      <header style={{ background: "#080808", borderBottom: "1px solid rgba(255,255,255,.06)" }} className="sticky top-0 z-40">
+        <div style={{ maxWidth: "1160px", margin: "0 auto", padding: "0 32px", display: "flex", alignItems: "center", justifyContent: "space-between", height: "68px", gap: "24px" }}>
+
+          {/* Logo */}
+          <Link href="/" style={{ display: "flex", alignItems: "center", gap: "12px", textDecoration: "none" }}>
+            <div style={{ display: "flex", alignItems: "center", lineHeight: 1 }}>
+              <span style={{ fontFamily: "var(--font-bebas)", fontSize: "36px", color: "#1A5CFF", lineHeight: 1, letterSpacing: "-.02em" }}>A</span>
+              <span style={{ fontFamily: "var(--font-bebas)", fontSize: "36px", color: "#E8242A", lineHeight: 1, letterSpacing: "-.02em" }}>F</span>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <span style={{ fontFamily: "var(--font-bebas)", fontSize: "13px", color: "#fff", letterSpacing: ".18em", lineHeight: 1 }}>APPARELS</span>
+              <span style={{ fontSize: "9px", color: "#444", letterSpacing: ".15em", fontWeight: 600, textTransform: "uppercase" }}>Wholesale B2B Platform</span>
+            </div>
+          </Link>
+
+          {/* Desktop Nav */}
+          <nav className="hidden md:flex" style={{ gap: "4px", alignItems: "center" }}>
+            {isAdmin() ? (
+              <Link href="/admin/dashboard" style={{ color: "#888", fontSize: "13px", fontWeight: 600, textDecoration: "none", letterSpacing: ".04em", padding: "8px 14px", borderRadius: "4px", transition: "all .2s", textTransform: "uppercase" }}
+                onMouseEnter={e => { (e.target as HTMLAnchorElement).style.color="#fff"; (e.target as HTMLAnchorElement).style.background="rgba(255,255,255,.06)"; }}
+                onMouseLeave={e => { (e.target as HTMLAnchorElement).style.color="#888"; (e.target as HTMLAnchorElement).style.background="transparent"; }}>
+                Admin Panel
               </Link>
-              {isAuthenticated() && (
-                <>
-                  <Link href="/quick-order" onClick={() => setMenuOpen(false)} className="block py-2 text-sm text-gray-700 hover:text-blue-600">
-                    Quick Order
-                  </Link>
-                  <Link href="/account" onClick={() => setMenuOpen(false)} className="block py-2 text-sm text-gray-700 hover:text-blue-600">
-                    My Account
-                  </Link>
-                  <Link href="/cart" onClick={() => setMenuOpen(false)} className="block py-2 text-sm text-gray-700 hover:text-blue-600">
-                    Cart {cartCount > 0 && `(${cartCount})`}
-                  </Link>
-                </>
-              )}
-              {!isAuthenticated() && (
-                <>
-                  <Link href="/wholesale/register" onClick={() => setMenuOpen(false)} className="block py-2 text-sm text-gray-700 hover:text-blue-600">
-                    Apply for Wholesale
-                  </Link>
-                  <Link href="/login" onClick={() => setMenuOpen(false)} className="block py-2 text-sm font-medium text-blue-600">
-                    Sign in
-                  </Link>
-                </>
-              )}
-            </>
-          )}
-          {isAuthenticated() && (
-            <button onClick={handleLogout} className="block w-full text-left py-2 text-sm text-gray-500 hover:text-gray-900">
-              Sign out
+            ) : (
+              <>
+                <Link href="/products" style={{ color: "#888", fontSize: "13px", fontWeight: 600, textDecoration: "none", letterSpacing: ".04em", padding: "8px 14px", borderRadius: "4px", transition: "all .2s", textTransform: "uppercase" }}>
+                  Shop All
+                </Link>
+                {isAuthenticated() && (
+                  <>
+                    <Link href="/quick-order" style={{ color: "#888", fontSize: "13px", fontWeight: 600, textDecoration: "none", letterSpacing: ".04em", padding: "8px 14px", borderRadius: "4px", transition: "all .2s", textTransform: "uppercase" }}>
+                      Quick Order
+                    </Link>
+                    <Link href="/account" style={{ color: "#888", fontSize: "13px", fontWeight: 600, textDecoration: "none", letterSpacing: ".04em", padding: "8px 14px", borderRadius: "4px", transition: "all .2s", textTransform: "uppercase" }}>
+                      My Account
+                    </Link>
+                  </>
+                )}
+              </>
+            )}
+          </nav>
+
+          {/* Right Actions */}
+          <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+            {/* Cart */}
+            {isAuthenticated() && !isAdmin() && (
+              <Link href="/cart" style={{ position: "relative", background: "transparent", border: "1.5px solid #2a2a2a", color: "#888", padding: "9px 14px", borderRadius: "5px", cursor: "pointer", fontSize: "18px", transition: "all .2s", display: "flex", alignItems: "center" }}>
+                🛒
+                {cartCount > 0 && (
+                  <span style={{ position: "absolute", top: "-6px", right: "-6px", background: "#E8242A", color: "#fff", fontSize: "9px", fontWeight: 800, width: "18px", height: "18px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    {cartCount > 9 ? "9+" : cartCount}
+                  </span>
+                )}
+              </Link>
+            )}
+
+            {isAuthenticated() ? (
+              <>
+                <span style={{ fontSize: "13px", color: "#888" }} className="hidden sm:block">
+                  {user?.first_name}
+                  {isAdmin() && <span style={{ marginLeft: "6px", fontSize: "10px", background: "rgba(26,92,255,.2)", color: "#6B9FFF", padding: "2px 8px", borderRadius: "4px", fontWeight: 700 }}>Admin</span>}
+                </span>
+                <button
+                  onClick={handleLogout}
+                  style={{ background: "transparent", color: "#888", padding: "10px 18px", fontSize: "13px", border: "1.5px solid #2a2a2a", borderRadius: "5px", cursor: "pointer", fontWeight: 700, transition: "all .2s" }}
+                >
+                  Sign out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href="/login" style={{ background: "transparent", color: "#888", padding: "10px 18px", fontSize: "13px", border: "1.5px solid #2a2a2a", borderRadius: "5px", fontWeight: 700, textDecoration: "none", transition: "all .2s" }}>
+                  Log In
+                </Link>
+                <Link href="/wholesale/register" style={{ background: "#E8242A", color: "#fff", padding: "10px 22px", fontSize: "13px", borderRadius: "5px", fontWeight: 700, textDecoration: "none", transition: "all .2s", border: "none" }}>
+                  Apply Now
+                </Link>
+              </>
+            )}
+
+            {/* Mobile hamburger */}
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="md:hidden"
+              style={{ padding: "6px", color: "#888", background: "transparent", border: "1.5px solid #2a2a2a", borderRadius: "5px", cursor: "pointer" }}
+              aria-label="Toggle menu"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                {menuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
             </button>
-          )}
+          </div>
         </div>
-      )}
-    </header>
+
+        {/* Mobile menu */}
+        {menuOpen && (
+          <div style={{ background: "#111016", borderTop: "1px solid rgba(255,255,255,.06)", padding: "12px 20px" }} className="md:hidden">
+            {isAdmin() ? (
+              <Link href="/admin/dashboard" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 0", color: "#888", fontSize: "13px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em" }}>
+                Admin Panel
+              </Link>
+            ) : (
+              <>
+                <Link href="/products" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 0", color: "#888", fontSize: "13px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+                  Shop All
+                </Link>
+                {isAuthenticated() && (
+                  <>
+                    <Link href="/quick-order" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 0", color: "#888", fontSize: "13px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+                      Quick Order
+                    </Link>
+                    <Link href="/account" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 0", color: "#888", fontSize: "13px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+                      My Account
+                    </Link>
+                    <Link href="/cart" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 0", color: "#888", fontSize: "13px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+                      Cart {cartCount > 0 && `(${cartCount})`}
+                    </Link>
+                  </>
+                )}
+                {!isAuthenticated() && (
+                  <>
+                    <Link href="/wholesale/register" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 0", color: "#888", fontSize: "13px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+                      Apply for Wholesale
+                    </Link>
+                    <Link href="/login" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 0", color: "#E8242A", fontSize: "13px", fontWeight: 700, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em" }}>
+                      Log In
+                    </Link>
+                  </>
+                )}
+              </>
+            )}
+            {isAuthenticated() && (
+              <button onClick={handleLogout} style={{ display: "block", width: "100%", textAlign: "left", padding: "10px 0", color: "#888", fontSize: "13px", fontWeight: 600, background: "transparent", border: "none", cursor: "pointer", textTransform: "uppercase", letterSpacing: ".04em", borderTop: "1px solid rgba(255,255,255,.06)" }}>
+                Sign out
+              </button>
+            )}
+          </div>
+        )}
+      </header>
+    </>
   );
 }

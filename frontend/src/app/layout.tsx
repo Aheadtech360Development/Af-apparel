@@ -3,8 +3,8 @@ import "./globals.css";
 import { Providers } from "@/components/providers/Providers";
 
 export const metadata: Metadata = {
-  title: "AF Apparels B2B Wholesale",
-  description: "Wholesale apparel ordering platform",
+  title: "AF Apparels — Premium B2B Wholesale Blanks",
+  description: "Factory-direct wholesale blank apparel. No minimums, same-day shipping from Dallas, TX.",
 };
 
 export default function RootLayout({
@@ -14,7 +14,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="antialiased text-gray-900 bg-gray-50 font-sans">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body className="antialiased" style={{ fontFamily: "var(--font-jakarta)", background: "#FAFAFA", color: "var(--af-text)" }}>
         <Providers>{children}</Providers>
       </body>
     </html>

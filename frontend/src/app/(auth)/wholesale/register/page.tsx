@@ -25,6 +25,29 @@ const VOLUME_OPTIONS = [
   "Over $100,000/month",
 ];
 
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  border: "1px solid #E2E0DA",
+  borderRadius: "6px",
+  padding: "10px 14px",
+  fontSize: "14px",
+  color: "#2A2830",
+  background: "#fff",
+  outline: "none",
+  transition: "border-color .2s",
+  boxSizing: "border-box",
+};
+
+const labelStyle: React.CSSProperties = {
+  display: "block",
+  fontSize: "11px",
+  fontWeight: 700,
+  textTransform: "uppercase",
+  letterSpacing: ".07em",
+  color: "#7A7880",
+  marginBottom: "6px",
+};
+
 export default function WholesaleRegisterPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -71,32 +94,43 @@ export default function WholesaleRegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
-      <div className="max-w-2xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Apply for Wholesale Access</h1>
-          <p className="mt-2 text-gray-600">
-            Fill in your business details to apply for a wholesale account.
-          </p>
-        </div>
+    <div style={{ minHeight: "100vh", background: "#F4F3EF", fontFamily: "var(--font-jakarta)" }}>
+      {/* Page header */}
+      <div style={{ background: "#080808", padding: "32px", textAlign: "center", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+        <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: "10px", textDecoration: "none", marginBottom: "16px" }}>
+          <span style={{ fontFamily: "var(--font-bebas)", fontSize: "30px", color: "#1A5CFF", lineHeight: 1 }}>A</span>
+          <span style={{ fontFamily: "var(--font-bebas)", fontSize: "30px", color: "#E8242A", lineHeight: 1 }}>F</span>
+          <span style={{ fontFamily: "var(--font-bebas)", fontSize: "12px", color: "#fff", letterSpacing: ".18em" }}>APPARELS</span>
+        </Link>
+        <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(28px,3vw,42px)", color: "#fff", letterSpacing: ".02em", lineHeight: 1, marginBottom: "8px" }}>
+          Apply for Wholesale Access
+        </h1>
+        <p style={{ fontSize: "14px", color: "#555", maxWidth: "460px", margin: "0 auto" }}>
+          Free to apply. Approved within 24 hours. No commitment required.
+        </p>
+      </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Content */}
+      <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "48px 32px", display: "grid", gridTemplateColumns: "1fr 340px", gap: "28px", alignItems: "flex-start" }} className="register-grid-responsive">
+
+        {/* Form card */}
+        <div style={{ background: "#fff", border: "1px solid #E2E0DA", borderRadius: "12px", padding: "40px" }}>
+          <form onSubmit={handleSubmit}>
             {error && (
-              <div className="rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700">
+              <div style={{ background: "#FFF0F0", border: "1px solid #fcc", borderRadius: "6px", padding: "12px 16px", fontSize: "13px", color: "#c0392b", marginBottom: "24px" }}>
                 {error}
               </div>
             )}
 
-            {/* Company Information */}
-            <fieldset>
-              <legend className="text-base font-semibold text-gray-900 mb-4">
+            {/* Business Information */}
+            <div style={{ marginBottom: "32px" }}>
+              <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".06em", color: "#2A2830", marginBottom: "20px", paddingBottom: "10px", borderBottom: "1px solid #E2E0DA" }}>
                 Business Information
-              </legend>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="sm:col-span-2">
-                  <label htmlFor="company_name" className="block text-sm font-medium text-gray-700 mb-1">
-                    Company name <span className="text-red-500">*</span>
+              </h3>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                <div style={{ gridColumn: "1 / -1" }}>
+                  <label htmlFor="company_name" style={labelStyle}>
+                    Company Name <span style={{ color: "#E8242A" }}>*</span>
                   </label>
                   <input
                     id="company_name"
@@ -105,13 +139,14 @@ export default function WholesaleRegisterPage() {
                     required
                     value={form.company_name}
                     onChange={handleChange}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    style={inputStyle}
+                    placeholder="Your Company LLC"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="business_type" className="block text-sm font-medium text-gray-700 mb-1">
-                    Business type <span className="text-red-500">*</span>
+                  <label htmlFor="business_type" style={labelStyle}>
+                    Business Type <span style={{ color: "#E8242A" }}>*</span>
                   </label>
                   <select
                     id="business_type"
@@ -119,35 +154,30 @@ export default function WholesaleRegisterPage() {
                     required
                     value={form.business_type}
                     onChange={handleChange}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    style={inputStyle}
                   >
                     <option value="">Select type…</option>
                     {BUSINESS_TYPES.map((t) => (
-                      <option key={t} value={t}>
-                        {t}
-                      </option>
+                      <option key={t} value={t}>{t}</option>
                     ))}
                   </select>
                 </div>
 
                 <div>
-                  <label htmlFor="tax_id" className="block text-sm font-medium text-gray-700 mb-1">
-                    Tax ID / EIN
-                  </label>
+                  <label htmlFor="tax_id" style={labelStyle}>Tax ID / EIN</label>
                   <input
                     id="tax_id"
                     name="tax_id"
                     type="text"
                     value={form.tax_id}
                     onChange={handleChange}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    style={inputStyle}
+                    placeholder="XX-XXXXXXX"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="website" className="block text-sm font-medium text-gray-700 mb-1">
-                    Website
-                  </label>
+                  <label htmlFor="website" style={labelStyle}>Website</label>
                   <input
                     id="website"
                     name="website"
@@ -155,41 +185,39 @@ export default function WholesaleRegisterPage() {
                     value={form.website}
                     onChange={handleChange}
                     placeholder="https://"
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    style={inputStyle}
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="expected_monthly_volume" className="block text-sm font-medium text-gray-700 mb-1">
-                    Expected monthly order volume
+                  <label htmlFor="expected_monthly_volume" style={labelStyle}>
+                    Expected Monthly Volume
                   </label>
                   <select
                     id="expected_monthly_volume"
                     name="expected_monthly_volume"
                     value={form.expected_monthly_volume}
                     onChange={handleChange}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    style={inputStyle}
                   >
                     <option value="">Select range…</option>
                     {VOLUME_OPTIONS.map((v) => (
-                      <option key={v} value={v}>
-                        {v}
-                      </option>
+                      <option key={v} value={v}>{v}</option>
                     ))}
                   </select>
                 </div>
               </div>
-            </fieldset>
+            </div>
 
             {/* Contact Information */}
-            <fieldset>
-              <legend className="text-base font-semibold text-gray-900 mb-4">
+            <div style={{ marginBottom: "32px" }}>
+              <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".06em", color: "#2A2830", marginBottom: "20px", paddingBottom: "10px", borderBottom: "1px solid #E2E0DA" }}>
                 Contact Information
-              </legend>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              </h3>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
                 <div>
-                  <label htmlFor="first_name" className="block text-sm font-medium text-gray-700 mb-1">
-                    First name <span className="text-red-500">*</span>
+                  <label htmlFor="first_name" style={labelStyle}>
+                    First Name <span style={{ color: "#E8242A" }}>*</span>
                   </label>
                   <input
                     id="first_name"
@@ -198,13 +226,13 @@ export default function WholesaleRegisterPage() {
                     required
                     value={form.first_name}
                     onChange={handleChange}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    style={inputStyle}
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="last_name" className="block text-sm font-medium text-gray-700 mb-1">
-                    Last name <span className="text-red-500">*</span>
+                  <label htmlFor="last_name" style={labelStyle}>
+                    Last Name <span style={{ color: "#E8242A" }}>*</span>
                   </label>
                   <input
                     id="last_name"
@@ -213,13 +241,13 @@ export default function WholesaleRegisterPage() {
                     required
                     value={form.last_name}
                     onChange={handleChange}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    style={inputStyle}
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                    Email address <span className="text-red-500">*</span>
+                  <label htmlFor="email" style={labelStyle}>
+                    Email Address <span style={{ color: "#E8242A" }}>*</span>
                   </label>
                   <input
                     id="email"
@@ -228,27 +256,27 @@ export default function WholesaleRegisterPage() {
                     required
                     value={form.email}
                     onChange={handleChange}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    style={inputStyle}
+                    placeholder="you@company.com"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                    Phone number
-                  </label>
+                  <label htmlFor="phone" style={labelStyle}>Phone Number</label>
                   <input
                     id="phone"
                     name="phone"
                     type="tel"
                     value={form.phone}
                     onChange={handleChange}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    style={inputStyle}
+                    placeholder="(214) 000-0000"
                   />
                 </div>
 
-                <div className="sm:col-span-2">
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                    Password <span className="text-red-500">*</span>
+                <div style={{ gridColumn: "1 / -1" }}>
+                  <label htmlFor="password" style={labelStyle}>
+                    Password <span style={{ color: "#E8242A" }}>*</span>
                   </label>
                   <input
                     id="password"
@@ -258,28 +286,80 @@ export default function WholesaleRegisterPage() {
                     minLength={8}
                     value={form.password}
                     onChange={handleChange}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    style={inputStyle}
+                    placeholder="Min. 8 characters"
                   />
-                  <p className="mt-1 text-xs text-gray-500">Minimum 8 characters</p>
+                  <p style={{ marginTop: "5px", fontSize: "12px", color: "#7A7880" }}>Minimum 8 characters</p>
                 </div>
               </div>
-            </fieldset>
+            </div>
 
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full rounded-md bg-brand-600 text-white py-2.5 px-4 text-sm font-medium hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 disabled:opacity-60 disabled:cursor-not-allowed"
+              style={{
+                width: "100%",
+                background: isSubmitting ? "#ccc" : "#E8242A",
+                color: "#fff",
+                padding: "14px",
+                fontSize: "14px",
+                fontWeight: 700,
+                borderRadius: "6px",
+                border: "none",
+                cursor: isSubmitting ? "not-allowed" : "pointer",
+                transition: "all .2s",
+                letterSpacing: ".04em",
+                textTransform: "uppercase",
+              }}
             >
-              {isSubmitting ? "Submitting application…" : "Submit Wholesale Application"}
+              {isSubmitting ? "Submitting Application…" : "Submit Wholesale Application →"}
             </button>
 
-            <p className="text-center text-sm text-gray-600">
+            <p style={{ textAlign: "center", fontSize: "13px", color: "#7A7880", marginTop: "16px" }}>
               Already have an account?{" "}
-              <Link href="/login" className="text-brand-600 hover:text-brand-700 font-medium">
+              <Link href="/login" style={{ color: "#1A5CFF", fontWeight: 600, textDecoration: "none" }}>
                 Sign in
               </Link>
             </p>
           </form>
+        </div>
+
+        {/* Benefits sidebar */}
+        <div style={{ background: "#111016", border: "1px solid rgba(255,255,255,.06)", borderRadius: "12px", padding: "32px", position: "sticky", top: "20px" }}>
+          <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "18px", letterSpacing: ".06em", color: "#fff", marginBottom: "20px" }}>
+            Why Apply?
+          </h3>
+          {[
+            { icon: "🏭", h: "Factory-Direct Pricing", p: "No distributors. Pay factory price — better margins on every order." },
+            { icon: "📦", h: "No Minimums", p: "Order 1 unit or 10,000. In-stock items ship same day from Dallas." },
+            { icon: "⚡", h: "Same-Day Shipping", p: "Orders before 2 PM CT ship the same day. Dallas, TX warehouse." },
+            { icon: "🎨", h: "Print-Optimized Blanks", p: "Every fabric tested for DTF, screen printing, and embroidery." },
+            { icon: "💳", h: "NET 30 Terms Available", p: "Qualifying accounts can access NET 30 payment terms." },
+            { icon: "🤝", h: "Dedicated Support", p: "Real account manager — not a ticket queue. Phone + email." },
+          ].map(item => (
+            <div key={item.h} style={{ display: "flex", gap: "12px", marginBottom: "18px", alignItems: "flex-start" }}>
+              <span style={{ fontSize: "20px", minWidth: "28px" }}>{item.icon}</span>
+              <div>
+                <div style={{ fontFamily: "var(--font-bebas)", fontSize: "13px", letterSpacing: ".04em", color: "#ccc", marginBottom: "3px" }}>{item.h}</div>
+                <div style={{ fontSize: "12px", color: "#444", lineHeight: 1.55 }}>{item.p}</div>
+              </div>
+            </div>
+          ))}
+
+          <div style={{ marginTop: "24px", paddingTop: "20px", borderTop: "1px solid rgba(255,255,255,.06)" }}>
+            <div style={{ fontSize: "11px", color: "#333", textTransform: "uppercase", letterSpacing: ".08em", fontWeight: 700, marginBottom: "10px" }}>Trusted by 2,000+ Businesses</div>
+            <div style={{ fontSize: "12px", color: "#444", lineHeight: 1.6 }}>
+              Printing companies, retailers, corporate buyers, and apparel brands across the US source direct from AF Apparels.
+            </div>
+          </div>
+
+          <div style={{ marginTop: "20px", background: "rgba(26,92,255,.08)", border: "1px solid rgba(26,92,255,.15)", borderRadius: "8px", padding: "14px" }}>
+            <div style={{ fontSize: "12px", color: "#6B9FFF", fontWeight: 600, marginBottom: "4px" }}>Questions?</div>
+            <div style={{ fontSize: "12px", color: "#555" }}>
+              📞 (214) 272-7213<br />
+              ✉️ wholesale@afapparels.com
+            </div>
+          </div>
         </div>
       </div>
     </div>
