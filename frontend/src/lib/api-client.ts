@@ -1,7 +1,7 @@
 // frontend/src/lib/api-client.ts
 const API_BASE =
   typeof window === "undefined"
-    ? (process.env.INTERNAL_API_URL ?? "http://localhost:8000")
+    ? (process.env.INTERNAL_API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000")
     : (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000");
 
 // In-memory token store (never persisted to localStorage for XSS safety)
