@@ -332,7 +332,7 @@ export function ProductListClient({
             )}
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "14px" }} className="prod-grid-responsive">
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "14px" }} className="prod-grid-responsive">
             {initialProducts.map((product) => {
               const primaryImage = product.primary_image;
               const primaryVariant = product.variants?.[0];
