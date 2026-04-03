@@ -39,19 +39,19 @@ export default async function HomePage() {
         <section style={{ background: "#080808", minHeight: "580px", display: "flex", alignItems: "center", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 80% 60% at 70% 50%,rgba(26,92,255,.08) 0%,transparent 70%),radial-gradient(ellipse 40% 40% at 10% 80%,rgba(232,36,42,.06) 0%,transparent 60%)" }} />
           <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px)", backgroundSize: "60px 60px", opacity: .6 }} />
-          <div style={{ maxWidth: "1160px", margin: "0 auto", padding: "80px 32px", display: "grid", gridTemplateColumns: "1.3fr 1fr", gap: "60px", alignItems: "center", position: "relative", zIndex: 1, width: "100%" }} className="hero-inner-grid">
+          <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "80px 32px", display: "grid", gridTemplateColumns: "1.3fr 1fr", gap: "60px", alignItems: "center", position: "relative", zIndex: 1, width: "100%" }} className="hero-inner-grid">
             <div>
               <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(26,92,255,.12)", border: "1px solid rgba(26,92,255,.25)", color: "#6B9FFF", fontSize: "11px", fontWeight: 700, padding: "6px 14px", borderRadius: "20px", letterSpacing: ".08em", textTransform: "uppercase", marginBottom: "22px" }}>
                 <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#1A5CFF", display: "inline-block" }} />
                 Direct From Manufacturer · Dallas, TX
               </div>
               <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(52px,6vw,84px)", color: "#fff", lineHeight: ".95", letterSpacing: ".01em", marginBottom: "20px" }}>
-                PREMIUM<br />
-                <span style={{ color: "#1A5CFF" }}>AMERICAN</span><br />
-                BLANKS AT<br />
+                PREMIUM
+                <span style={{ color: "#1A5CFF" }}>AMERICAN </span>
+                BLANKS AT 
                 <span style={{ color: "#E8242A" }}>WHOLESALE</span>
               </h1>
-              <p style={{ fontSize: "15px", color: "#666", lineHeight: 1.75, marginBottom: "30px", maxWidth: "460px" }}>
+              <p style={{ fontSize: "16px", color: "#666", lineHeight: 1.75, marginBottom: "30px", maxWidth: "530px" }}>
                 Factory-direct blank apparel with <strong style={{ color: "#aaa", fontWeight: 600 }}>no middlemen</strong>, no minimums on in-stock items, and same-day shipping from Dallas. Print-optimized fabrics tested for DTF, screen printing, and embroidery.
               </p>
               <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginBottom: "40px" }}>
@@ -97,7 +97,7 @@ export default async function HomePage() {
 
         {/* ── TRUST STRIP ── */}
         <div style={{ background: "#fff", borderBottom: "1px solid #E2E0DA", padding: "18px 0" }}>
-          <div style={{ maxWidth: "1160px", margin: "0 auto", padding: "0 32px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+          <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 32px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
             {[
               { ico: "🏭", text: "Factory-Direct" },
               { ico: "🗺️", text: "Dallas, TX" },
@@ -116,7 +116,7 @@ export default async function HomePage() {
 
         {/* ── SHOP BY CATEGORY ── */}
         <section style={{ padding: "80px 0", background: "#F4F3EF" }}>
-          <div style={{ maxWidth: "1160px", margin: "0 auto", padding: "0 32px" }}>
+          <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 32px" }}>
             <div style={{ marginBottom: "44px" }}>
               <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(32px,3.5vw,48px)", color: "#2A2830", letterSpacing: ".01em", lineHeight: 1, marginBottom: "10px" }}>Shop by Category</h2>
               <p style={{ fontSize: "14px", color: "#7A7880" }}>Browse our full range of print-ready blank apparel</p>
@@ -161,7 +161,7 @@ export default async function HomePage() {
 
         {/* ── HOW IT WORKS ── */}
         <section style={{ padding: "80px 0", background: "#F4F3EF" }}>
-          <div style={{ maxWidth: "1160px", margin: "0 auto", padding: "0 32px" }}>
+          <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 32px" }}>
             <div style={{ marginBottom: "44px", textAlign: "center" }}>
               <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(32px,3.5vw,48px)", color: "#2A2830", letterSpacing: ".01em", lineHeight: 1, marginBottom: "10px" }}>How It Works</h2>
               <p style={{ fontSize: "14px", color: "#7A7880" }}>Wholesale ordering in 4 simple steps</p>
@@ -186,7 +186,7 @@ export default async function HomePage() {
 
         {/* ── WHO WE SERVE ── */}
         <section style={{ padding: "80px 0", background: "#111016" }}>
-          <div style={{ maxWidth: "1160px", margin: "0 auto", padding: "0 32px" }}>
+          <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 32px" }}>
             <div style={{ marginBottom: "44px", textAlign: "center" }}>
               <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(32px,3.5vw,48px)", color: "#fff", letterSpacing: ".01em", lineHeight: 1, marginBottom: "10px" }}>Who We Serve</h2>
               <p style={{ fontSize: "14px", color: "#555" }}>Built for businesses that move volume</p>
@@ -210,7 +210,7 @@ export default async function HomePage() {
 
         {/* ── WHY CHOOSE US ── */}
         <section style={{ padding: "80px 0", background: "#fff" }}>
-          <div style={{ maxWidth: "1160px", margin: "0 auto", padding: "0 32px" }}>
+          <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 32px" }}>
             <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: "64px", alignItems: "center" }} className="why-grid-responsive">
               <div>
                 <div style={{ marginBottom: "44px" }}>
@@ -243,7 +243,7 @@ export default async function HomePage() {
 
         {/* ── CERTIFICATIONS ── */}
         <section style={{ padding: "52px 0", background: "#F4F3EF" }}>
-          <div style={{ maxWidth: "1160px", margin: "0 auto", padding: "0 32px" }}>
+          <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 32px" }}>
             <div style={{ marginBottom: "44px", textAlign: "center" }}>
               <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(32px,3.5vw,48px)", color: "#2A2830", letterSpacing: ".01em", lineHeight: 1, marginBottom: "10px" }}>Certified Quality</h2>
               <p style={{ fontSize: "14px", color: "#7A7880", maxWidth: "480px", margin: "0 auto" }}>Every blank meets rigorous international manufacturing and safety standards</p>
@@ -267,7 +267,7 @@ export default async function HomePage() {
 
         {/* ── FAQ ── */}
         <section style={{ padding: "80px 0", background: "#fff" }}>
-          <div style={{ maxWidth: "1160px", margin: "0 auto", padding: "0 32px" }}>
+          <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 32px" }}>
             <div style={{ marginBottom: "44px", textAlign: "center" }}>
               <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(32px,3.5vw,48px)", color: "#2A2830", letterSpacing: ".01em", lineHeight: 1 }}>Frequently Asked Questions</h2>
             </div>
@@ -317,7 +317,7 @@ export default async function HomePage() {
 
         {/* ── FOOTER ── */}
         <footer style={{ background: "#040406", borderTop: "1px solid rgba(255,255,255,.04)" }}>
-          <div style={{ maxWidth: "1160px", margin: "0 auto", padding: "52px 32px 40px", display: "grid", gridTemplateColumns: "1.8fr 1fr 1fr 1fr 1fr", gap: "32px" }} className="footer-grid-responsive">
+          <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "52px 32px 40px", display: "grid", gridTemplateColumns: "1.8fr 1fr 1fr 1fr 1fr", gap: "32px" }} className="footer-grid-responsive">
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                 <div style={{ display: "flex", alignItems: "center" }}>
@@ -349,7 +349,7 @@ export default async function HomePage() {
               </div>
             ))}
           </div>
-          <div style={{ borderTop: "1px solid rgba(255,255,255,.04)", padding: "18px 32px", maxWidth: "1160px", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
+          <div style={{ borderTop: "1px solid rgba(255,255,255,.04)", padding: "18px 32px", maxWidth: "1280px", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
             <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", alignItems: "center" }}>
               <span style={{ fontSize: "10px", color: "#2a2a3a", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".07em", marginRight: "6px" }}>Accepted:</span>
               {["VISA", "MC", "AMEX", "ACH", "WIRE", "NET 30"].map(m => (

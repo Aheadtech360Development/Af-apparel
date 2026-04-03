@@ -67,77 +67,159 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <Link href="/" className="inline-block">
-            <h1 className="text-3xl font-bold text-blue-600">AF Apparels</h1>
-          </Link>
-          <p className="mt-2 text-gray-600">Sign in to your wholesale account</p>
-        </div>
+    <div style={{ minHeight: "100vh", background: "#080808", fontFamily: "var(--font-jakarta)", display: "flex", flexDirection: "column" }}>
+      {/* Top bar */}
+      <div style={{ padding: "24px 32px", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+        <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: "10px", textDecoration: "none" }}>
+          <span style={{ fontFamily: "var(--font-bebas)", fontSize: "28px", color: "#1A5CFF", lineHeight: 1 }}>A</span>
+          <span style={{ fontFamily: "var(--font-bebas)", fontSize: "28px", color: "#E8242A", lineHeight: 1 }}>F</span>
+          <span style={{ fontFamily: "var(--font-bebas)", fontSize: "11px", color: "#fff", letterSpacing: ".18em" }}>APPARELS</span>
+        </Link>
+      </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {error && (
-              <div className="rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700">
-                {error}
-              </div>
-            )}
+      {/* Main */}
+      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 16px" }}>
+        <div style={{ width: "100%", maxWidth: "420px" }}>
+          {/* Heading */}
+          <div style={{ textAlign: "center", marginBottom: "32px" }}>
+            <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(28px,4vw,40px)", color: "#fff", letterSpacing: ".02em", lineHeight: 1, marginBottom: "8px" }}>
+              Sign In
+            </h1>
+            <p style={{ fontSize: "14px", color: "#555" }}>
+              Access your wholesale account
+            </p>
+          </div>
 
-            <div>
-              <label htmlFor="email" className="label">
-                Email address
-              </label>
-              <input
-                id="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="input"
-              />
-            </div>
+          {/* Card */}
+          <div style={{ background: "#111016", border: "1px solid rgba(255,255,255,.08)", borderRadius: "12px", padding: "36px" }}>
+            <form onSubmit={handleSubmit}>
+              {error && (
+                <div style={{ background: "rgba(232,36,42,.12)", border: "1px solid rgba(232,36,42,.3)", borderRadius: "6px", padding: "12px 14px", fontSize: "13px", color: "#f87171", marginBottom: "20px" }}>
+                  {error}
+                </div>
+              )}
 
-            <div>
-              <div className="flex justify-between items-center mb-1">
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                  Password
-                </label>
-                <Link
-                  href="/forgot-password"
-                  className="text-sm text-blue-600 hover:text-blue-700"
+              <div style={{ marginBottom: "18px" }}>
+                <label
+                  htmlFor="email"
+                  style={{ display: "block", fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".07em", color: "#7A7880", marginBottom: "6px" }}
                 >
-                  Forgot password?
-                </Link>
+                  Email Address
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@company.com"
+                  style={{
+                    width: "100%",
+                    background: "#1E1D24",
+                    border: "1px solid rgba(255,255,255,.1)",
+                    borderRadius: "6px",
+                    padding: "10px 14px",
+                    fontSize: "14px",
+                    color: "#fff",
+                    outline: "none",
+                    boxSizing: "border-box",
+                    transition: "border-color .2s",
+                  }}
+                />
               </div>
-              <input
-                id="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="input"
-              />
+
+              <div style={{ marginBottom: "24px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                  <label
+                    htmlFor="password"
+                    style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".07em", color: "#7A7880" }}
+                  >
+                    Password
+                  </label>
+                  <Link
+                    href="/forgot-password"
+                    style={{ fontSize: "12px", color: "#1A5CFF", textDecoration: "none", fontWeight: 600 }}
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
+                <input
+                  id="password"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  style={{
+                    width: "100%",
+                    background: "#1E1D24",
+                    border: "1px solid rgba(255,255,255,.1)",
+                    borderRadius: "6px",
+                    padding: "10px 14px",
+                    fontSize: "14px",
+                    color: "#fff",
+                    outline: "none",
+                    boxSizing: "border-box",
+                    transition: "border-color .2s",
+                  }}
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                style={{
+                  width: "100%",
+                  background: isSubmitting ? "#555" : "#E8242A",
+                  color: "#fff",
+                  padding: "13px",
+                  fontSize: "14px",
+                  fontWeight: 700,
+                  borderRadius: "6px",
+                  border: "none",
+                  cursor: isSubmitting ? "not-allowed" : "pointer",
+                  textTransform: "uppercase",
+                  letterSpacing: ".06em",
+                  transition: "background .2s",
+                }}
+              >
+                {isSubmitting ? "Signing in…" : "Sign In →"}
+              </button>
+            </form>
+
+            <div style={{ marginTop: "20px", paddingTop: "20px", borderTop: "1px solid rgba(255,255,255,.06)", textAlign: "center", fontSize: "13px", color: "#555" }}>
+              {"Don't have an account? "}
+              <Link
+                href="/wholesale/register"
+                style={{ color: "#1A5CFF", fontWeight: 700, textDecoration: "none" }}
+              >
+                Apply for Wholesale Access
+              </Link>
             </div>
+          </div>
 
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full btn-primary py-2.5"
-            >
-              {isSubmitting ? "Signing in…" : "Sign in"}
-            </button>
-          </form>
-
-          <div className="mt-6 text-center text-sm text-gray-600">
-            {"Don't have an account? "}
-            <Link href="/wholesale/register" className="text-blue-600 hover:text-blue-700 font-medium">
-              Apply for wholesale access
-            </Link>
+          {/* Benefits */}
+          <div style={{ marginTop: "28px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px" }}>
+            {[
+              { icon: "🏭", text: "Factory-Direct" },
+              { icon: "⚡", text: "Same-Day Ship" },
+              { icon: "💳", text: "NET 30 Terms" },
+            ].map((item) => (
+              <div key={item.text} style={{ textAlign: "center", padding: "12px 8px", background: "#111016", border: "1px solid rgba(255,255,255,.06)", borderRadius: "8px" }}>
+                <div style={{ fontSize: "20px", marginBottom: "4px" }}>{item.icon}</div>
+                <div style={{ fontSize: "11px", fontWeight: 700, color: "#555", textTransform: "uppercase", letterSpacing: ".06em" }}>{item.text}</div>
+              </div>
+            ))}
           </div>
         </div>
+      </div>
+
+      {/* Footer */}
+      <div style={{ padding: "20px 32px", borderTop: "1px solid rgba(255,255,255,.06)", textAlign: "center", fontSize: "12px", color: "#333" }}>
+        © {new Date().getFullYear()} AF Apparels · Dallas, TX ·{" "}
+        <a href="tel:+12142727213" style={{ color: "#555", textDecoration: "none" }}>(214) 272-7213</a>
       </div>
     </div>
   );

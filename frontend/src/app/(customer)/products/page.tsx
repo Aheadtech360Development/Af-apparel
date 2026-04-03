@@ -3,7 +3,6 @@ export const dynamic = "force-dynamic";
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { productsService } from "@/services/products.service";
-import { FilterSidebar } from "@/components/products/FilterSidebar";
 import { ProductListClient } from "./ProductListClient";
 
 export const metadata: Metadata = {
@@ -58,11 +57,11 @@ export default async function ProductsPage({ searchParams }: PageProps) {
     <div style={{ minHeight: "100vh", background: "#fff", fontFamily: "var(--font-jakarta)" }}>
       {/* Banner */}
       <div style={{ background: "#111016", padding: "40px 32px", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
-        <div style={{ maxWidth: "1160px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
           <div style={{ fontSize: "12px", color: "#444", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".1em", marginBottom: "6px" }}>Shop</div>
           <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(36px,4vw,52px)", color: "#fff", letterSpacing: ".01em", marginBottom: "6px" }}>
             {filters.category
-              ? categories.find(c => c.slug === filters.category)?.name ?? "All Products"
+              ? (categories.find(c => c.slug === filters.category)?.name ?? "All Products")
               : "All Products"}
           </h1>
           <p style={{ fontSize: "14px", color: "#555" }}>
@@ -71,26 +70,22 @@ export default async function ProductsPage({ searchParams }: PageProps) {
         </div>
       </div>
 
-      {/* Layout: sidebar + main */}
-      <div style={{ display: "flex", alignItems: "flex-start", minHeight: "600px" }}>
-        {/* Sidebar */}
-        <Suspense fallback={null}>
-          <FilterSidebar categories={categories} sizes={sizes} colors={colors} />
-        </Suspense>
-
-        {/* Main content */}
-        <div style={{ flex: 1, padding: "24px 28px" }}>
-          <ProductListClient
-            initialProducts={productData.items}
-            total={productData.total}
-            currentPage={productData.page}
-            pages={productData.pages}
-            categories={categories}
-            sizes={sizes}
-            colors={colors}
-          />
+      {/* ProductListClient owns the full collection layout (sidebar + grid) */}
+      <Suspense fallback={
+        <div style={{ padding: "40px 32px", textAlign: "center", color: "#aaa", fontSize: "14px" }}>
+          Loading products…
         </div>
-      </div>
+      }>
+        <ProductListClient
+          initialProducts={productData.items}
+          total={productData.total}
+          currentPage={productData.page}
+          pages={productData.pages}
+          categories={categories}
+          sizes={sizes}
+          colors={colors}
+        />
+      </Suspense>
     </div>
   );
 }

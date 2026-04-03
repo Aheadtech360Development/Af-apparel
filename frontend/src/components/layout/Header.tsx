@@ -48,7 +48,7 @@ export function Header() {
 
       {/* Main header */}
       <header style={{ background: "#080808", borderBottom: "1px solid rgba(255,255,255,.06)" }} className="sticky top-0 z-40">
-        <div style={{ maxWidth: "1160px", margin: "0 auto", padding: "0 32px", display: "flex", alignItems: "center", justifyContent: "space-between", height: "68px", gap: "24px" }}>
+        <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 32px", display: "flex", alignItems: "center", justifyContent: "space-between", height: "68px", gap: "24px" }}>
 
           {/* Logo */}
           <Link href="/" style={{ display: "flex", alignItems: "center", gap: "12px", textDecoration: "none" }}>
@@ -111,14 +111,14 @@ export function Header() {
                 </span>
                 <button
                   onClick={handleLogout}
-                  style={{ background: "transparent", color: "#888", padding: "10px 18px", fontSize: "13px", border: "1.5px solid #2a2a2a", borderRadius: "5px", cursor: "pointer", fontWeight: 700, transition: "all .2s" }}
+                  style={{ background: "transparent", color: "#e8242a", padding: "10px 18px", fontSize: "13px", border: "1.5px solid #e8242a", borderRadius: "5px", cursor: "pointer", fontWeight: 700, transition: "all .2s" }}
                 >
                   Sign out
                 </button>
               </>
             ) : (
               <>
-                <Link href="/login" style={{ background: "transparent", color: "#888", padding: "10px 18px", fontSize: "13px", border: "1.5px solid #2a2a2a", borderRadius: "5px", fontWeight: 700, textDecoration: "none", transition: "all .2s" }}>
+                <Link href="/login" style={{ background: "transparent", color: "#2d8cff", padding: "10px 18px", fontSize: "13px", border: "1.5px solid #2d8cff", borderRadius: "5px", fontWeight: 700, textDecoration: "none", transition: "all .2s" }}>
                   Log In
                 </Link>
                 <Link href="/wholesale/register" style={{ background: "#E8242A", color: "#fff", padding: "10px 22px", fontSize: "13px", borderRadius: "5px", fontWeight: 700, textDecoration: "none", transition: "all .2s", border: "none" }}>
@@ -172,10 +172,10 @@ export function Header() {
                 )}
                 {!isAuthenticated() && (
                   <>
-                    <Link href="/wholesale/register" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 0", color: "#888", fontSize: "13px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+                    <Link href="/wholesale/register" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 0", color: "#2d8cff", fontSize: "13px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
                       Apply for Wholesale
                     </Link>
-                    <Link href="/login" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 0", color: "#E8242A", fontSize: "13px", fontWeight: 700, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em" }}>
+                    <Link href="/login" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 0", color: "#2d8cff", fontSize: "13px", fontWeight: 700, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em" }}>
                       Log In
                     </Link>
                   </>
