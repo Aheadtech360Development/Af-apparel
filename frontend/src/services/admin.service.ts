@@ -33,6 +33,10 @@ export const adminService = {
     return apiClient.get<ProductDetail[]>(`/api/v1/admin/products${qs ? `?${qs}` : ""}`);
   },
 
+  async getProduct(slug: string) {
+    return apiClient.get<ProductDetail>(`/api/v1/admin/products/${slug}`);
+  },
+
   async createProduct(data: object) {
     return apiClient.post<ProductDetail>("/api/v1/admin/products", data);
   },
@@ -41,11 +45,19 @@ export const adminService = {
     return apiClient.patch<ProductDetail>(`/api/v1/admin/products/${id}`, data);
   },
 
+  async deleteProduct(id: string) {
+    return apiClient.delete(`/api/v1/admin/products/${id}`);
+  },
+
   async uploadImage(productId: string, file: File, altText?: string) {
     const form = new FormData();
     form.append("file", file);
     if (altText) form.append("alt_text", altText);
     return apiClient.postForm(`/api/v1/admin/products/${productId}/images`, form);
+  },
+
+  async deleteImage(productId: string, imageId: string) {
+    return apiClient.delete(`/api/v1/admin/products/${productId}/images/${imageId}`);
   },
 
   async reorderImages(productId: string, imageIds: string[]) {
@@ -58,6 +70,10 @@ export const adminService = {
 
   async updateVariant(productId: string, variantId: string, data: object) {
     return apiClient.patch(`/api/v1/admin/products/${productId}/variants/${variantId}`, data);
+  },
+
+  async deleteVariant(productId: string, variantId: string) {
+    return apiClient.delete(`/api/v1/admin/products/${productId}/variants/${variantId}`);
   },
 
   async bulkAction(ids: string[], action: string) {

@@ -28,6 +28,7 @@ export interface ProductVariant {
   color: string | null;
   size: string | null;
   retail_price: string;
+  compare_price: string | null;
   effective_price: string | null;
   status: "active" | "discontinued" | "out_of_stock";
   stock_quantity: number;
@@ -59,6 +60,9 @@ export interface ProductDetail {
   assets?: ProductAsset[];
   meta_title: string | null;
   meta_description: string | null;
+  product_type: string | null;
+  vendor: string | null;
+  tags: string[] | null;
   created_at: string;
   updated_at: string;
 }

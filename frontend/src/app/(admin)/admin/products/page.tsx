@@ -1,160 +1,385 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { adminService } from "@/services/admin.service";
 import type { ProductDetail } from "@/types/product.types";
 
-export default function AdminProductsPage() {
-  const [products, setProducts] = useState<ProductDetail[]>([]);
-  const [q, setQ] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
-  const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [isLoading, setIsLoading] = useState(true);
+// ── Style constants ────────────────────────────────────────────────────────
+const thStyle: React.CSSProperties = {
+  padding: "12px 16px", textAlign: "left", fontSize: "11px",
+  textTransform: "uppercase", letterSpacing: ".06em", color: "#7A7880", fontWeight: 700,
+};
+const bulkBtnStyle: React.CSSProperties = {
+  background: "rgba(255,255,255,.15)", color: "#fff", border: "1px solid rgba(255,255,255,.3)",
+  padding: "5px 12px", borderRadius: "5px", fontSize: "12px", fontWeight: 600, cursor: "pointer",
+};
+const pageBtn: React.CSSProperties = {
+  padding: "6px 12px", border: "1px solid #E2E0DA", borderRadius: "6px",
+  background: "#fff", fontSize: "13px", fontWeight: 600, cursor: "pointer",
+};
 
-  async function load() {
+// Bulk edit modal cell label
+const labelStyle: React.CSSProperties = {
+  fontSize: "11px", fontWeight: 700, textTransform: "uppercase",
+  letterSpacing: ".08em", color: "#7A7880", marginBottom: "6px", display: "block",
+};
+
+export default function AdminProductsPage() {
+  const router = useRouter();
+  const [products, setProducts] = useState<ProductDetail[]>([]);
+  const [total, setTotal] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [showBulkEdit, setShowBulkEdit] = useState(false);
+  const [page, setPage] = useState(1);
+  const pageSize = 50;
+
+  // Bulk edit state: productId → partial edits
+  const [bulkEdits, setBulkEdits] = useState<Record<string, Record<string, string>>>({});
+
+  async function load(p = page) {
     setIsLoading(true);
     try {
-      const data = await adminService.listProducts({ q: q || undefined, status: statusFilter || undefined });
-      setProducts(data);
+      const data = await adminService.listProducts({
+        q: search || undefined,
+        status: statusFilter || undefined,
+        page: p,
+      });
+      const items = data ?? [];
+      setProducts(items);
+      setTotal(items.length < pageSize ? (p - 1) * pageSize + items.length : p * pageSize + 1);
     } finally {
       setIsLoading(false);
     }
   }
 
-  useEffect(() => { load(); }, [q, statusFilter]);
+  useEffect(() => { setPage(1); load(1); }, [search, statusFilter]); // eslint-disable-line
+  useEffect(() => { load(page); }, [page]); // eslint-disable-line
 
-  function toggleSelect(id: string) {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
-    });
-  }
+  const selectedProducts = useMemo(
+    () => products.filter(p => selectedIds.includes(p.id)),
+    [products, selectedIds]
+  );
 
   async function handleBulkAction(action: string) {
-    if (!selected.size) return;
-    await adminService.bulkAction(Array.from(selected), action);
-    setSelected(new Set());
+    if (!selectedIds.length) return;
+    await adminService.bulkAction(selectedIds, action);
+    setSelectedIds([]);
     load();
   }
 
+  async function handleBulkDelete() {
+    if (!selectedIds.length) return;
+    if (!confirm(`Archive ${selectedIds.length} product(s)?`)) return;
+    await adminService.bulkAction(selectedIds, "archived");
+    setSelectedIds([]);
+    load();
+  }
+
+  async function handleBulkSave() {
+    await Promise.all(
+      Object.entries(bulkEdits).map(([id, changes]) =>
+        Object.keys(changes).length > 0
+          ? adminService.updateProduct(id, changes)
+          : Promise.resolve()
+      )
+    );
+    setBulkEdits({});
+    setShowBulkEdit(false);
+    load();
+  }
+
+  function setBulkEdit(productId: string, field: string, value: string) {
+    setBulkEdits(prev => ({
+      ...prev,
+      [productId]: { ...(prev[productId] ?? {}), [field]: value },
+    }));
+  }
+
+  function initBulkEdits() {
+    const initial: Record<string, Record<string, string>> = {};
+    selectedProducts.forEach(p => {
+      initial[p.id] = {
+        status: p.status,
+        vendor: p.vendor ?? "",
+        product_type: p.product_type ?? "",
+      };
+    });
+    setBulkEdits(initial);
+  }
+
+  const totalInventory = (p: ProductDetail) =>
+    p.variants.reduce((s, v) => s + (v.stock_quantity ?? 0), 0);
+
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold text-gray-900">Products</h1>
-        <div className="flex gap-2">
-          <a
-            href={`${process.env.NEXT_PUBLIC_API_URL}/api/v1/admin/products/export-csv`}
-            className="px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50"
-          >
-            Export CSV
-          </a>
-          <Link
-            href="/admin/products/new"
-            className="px-4 py-2 text-sm bg-brand-600 text-white rounded-md hover:bg-brand-700"
-          >
-            + New Product
-          </Link>
+    <div style={{ fontFamily: "var(--font-jakarta)" }}>
+      {/* Header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+        <div>
+          <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "32px", color: "#2A2830", letterSpacing: ".02em", lineHeight: 1 }}>PRODUCTS</h1>
+          <p style={{ fontSize: "13px", color: "#7A7880", marginTop: "4px" }}>Manage your product catalog · {products.length} items</p>
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="flex gap-3 mb-4">
-        <input
-          type="text"
-          placeholder="Search products…"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
-        />
+      {/* Top Bar */}
+      <div style={{ display: "flex", gap: "10px", alignItems: "center", marginBottom: "16px", flexWrap: "wrap" }}>
+        {/* Search */}
+        <div style={{ flex: 1, minWidth: "240px", position: "relative" }}>
+          <span style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "#aaa", fontSize: "14px" }}>🔍</span>
+          <input
+            placeholder="Search products..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            style={{ width: "100%", padding: "10px 12px 10px 36px", border: "1.5px solid #E2E0DA", borderRadius: "8px", fontSize: "14px", fontFamily: "var(--font-jakarta)", boxSizing: "border-box", outline: "none" }}
+          />
+        </div>
+
+        {/* Filters */}
         <select
           value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+          onChange={e => setStatusFilter(e.target.value)}
+          style={{ padding: "10px 14px", border: "1.5px solid #E2E0DA", borderRadius: "8px", fontSize: "13px", fontFamily: "var(--font-jakarta)", background: "#fff", cursor: "pointer" }}
         >
-          <option value="">All statuses</option>
+          <option value="">Status</option>
           <option value="active">Active</option>
           <option value="draft">Draft</option>
           <option value="archived">Archived</option>
         </select>
+
+        <div style={{ marginLeft: "auto", display: "flex", gap: "8px" }}>
+          <button
+            onClick={() => adminService.exportProductsCsv()}
+            style={{ padding: "10px 16px", border: "1px solid #E2E0DA", borderRadius: "8px", background: "#fff", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}
+          >
+            ↓ Export
+          </button>
+          <button
+            onClick={() => router.push("/admin/products/new")}
+            style={{ padding: "10px 20px", background: "#1A5CFF", color: "#fff", border: "none", borderRadius: "8px", fontSize: "13px", fontWeight: 700, cursor: "pointer" }}
+          >
+            + Add Product
+          </button>
+        </div>
       </div>
 
-      {/* Bulk actions */}
-      {selected.size > 0 && (
-        <div className="flex items-center gap-3 mb-4 p-3 bg-brand-50 border border-brand-200 rounded-md">
-          <span className="text-sm text-brand-700 font-medium">{selected.size} selected</span>
-          <button onClick={() => handleBulkAction("publish")} className="text-sm text-brand-600 hover:text-brand-800">Publish</button>
-          <button onClick={() => handleBulkAction("unpublish")} className="text-sm text-brand-600 hover:text-brand-800">Unpublish</button>
-          <button onClick={() => handleBulkAction("delete")} className="text-sm text-red-600 hover:text-red-800">Archive</button>
+      {/* Bulk Toolbar */}
+      {selectedIds.length > 0 && (
+        <div style={{ background: "#1A5CFF", color: "#fff", padding: "10px 16px", borderRadius: "8px", marginBottom: "12px", display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+          <span style={{ fontWeight: 700, marginRight: "4px" }}>{selectedIds.length} selected</span>
+          <button onClick={() => handleBulkAction("active")} style={bulkBtnStyle}>Set Active</button>
+          <button onClick={() => handleBulkAction("draft")} style={bulkBtnStyle}>Set Draft</button>
+          <button onClick={() => handleBulkAction("archived")} style={bulkBtnStyle}>Archive</button>
+          <button
+            onClick={() => { initBulkEdits(); setShowBulkEdit(true); }}
+            style={{ ...bulkBtnStyle, background: "rgba(255,255,255,.2)" }}
+          >
+            ✏️ Bulk Edit
+          </button>
+          <button
+            onClick={handleBulkDelete}
+            style={{ ...bulkBtnStyle, background: "rgba(232,36,42,.4)" }}
+          >
+            🗑️ Delete
+          </button>
+          <button
+            onClick={() => setSelectedIds([])}
+            style={{ marginLeft: "auto", background: "none", border: "none", color: "#fff", cursor: "pointer", fontSize: "18px" }}
+          >
+            ✕
+          </button>
         </div>
       )}
 
       {/* Table */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 border-b border-gray-200">
-            <tr>
-              <th className="w-10 px-4 py-3">
+      <div style={{ background: "#fff", border: "1px solid #E2E0DA", borderRadius: "10px", overflow: "hidden" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead>
+            <tr style={{ background: "#F4F3EF", borderBottom: "2px solid #E2E0DA" }}>
+              <th style={{ width: "40px", padding: "12px 16px" }}>
                 <input
                   type="checkbox"
-                  onChange={(e) => {
-                    if (e.target.checked) setSelected(new Set(products.map((p) => p.id)));
-                    else setSelected(new Set());
-                  }}
+                  checked={selectedIds.length === products.length && products.length > 0}
+                  onChange={e => setSelectedIds(e.target.checked ? products.map(p => p.id) : [])}
                 />
               </th>
-              <th className="text-left px-4 py-3 text-gray-600 font-medium">Name</th>
-              <th className="text-left px-4 py-3 text-gray-600 font-medium">Status</th>
-              <th className="text-left px-4 py-3 text-gray-600 font-medium">Variants</th>
-              <th className="text-left px-4 py-3 text-gray-600 font-medium">MOQ</th>
-              <th className="px-4 py-3" />
+              <th style={{ width: "60px", ...thStyle }} />
+              {["Product", "Status", "Inventory", "Category", "Type", "Vendor"].map(col => (
+                <th key={col} style={thStyle}>{col}</th>
+              ))}
             </tr>
           </thead>
           <tbody>
             {isLoading ? (
-              <tr><td colSpan={6} className="py-8 text-center text-gray-400 text-sm">Loading…</td></tr>
+              <tr><td colSpan={9} style={{ padding: "48px", textAlign: "center", color: "#aaa", fontSize: "14px" }}>Loading…</td></tr>
             ) : products.length === 0 ? (
-              <tr><td colSpan={6} className="py-8 text-center text-gray-400 text-sm">No products found</td></tr>
-            ) : (
-              products.map((product) => (
-                <tr key={product.id} className="border-b border-gray-100 last:border-0 hover:bg-gray-50">
-                  <td className="px-4 py-3">
-                    <input
-                      type="checkbox"
-                      checked={selected.has(product.id)}
-                      onChange={() => toggleSelect(product.id)}
-                    />
-                  </td>
-                  <td className="px-4 py-3">
-                    <p className="font-medium text-gray-900">{product.name}</p>
-                    <p className="text-xs text-gray-400">{product.slug}</p>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${
-                      product.status === "active" ? "bg-green-100 text-green-700" :
-                      product.status === "draft" ? "bg-yellow-100 text-yellow-700" :
-                      "bg-gray-100 text-gray-600"
-                    }`}>
-                      {product.status}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-gray-600">{product.variants?.length ?? 0}</td>
-                  <td className="px-4 py-3 text-gray-600">{product.moq}</td>
-                  <td className="px-4 py-3">
-                    <Link
-                      href={`/admin/products/${product.id}/edit`}
-                      className="text-xs text-brand-600 hover:text-brand-800"
-                    >
-                      Edit
-                    </Link>
-                  </td>
-                </tr>
-              ))
-            )}
+              <tr>
+                <td colSpan={9} style={{ padding: "56px", textAlign: "center" }}>
+                  <div style={{ fontSize: "32px", marginBottom: "10px" }}>👕</div>
+                  <div style={{ fontSize: "14px", color: "#aaa", fontWeight: 600 }}>No products found</div>
+                </td>
+              </tr>
+            ) : products.map(product => (
+              <tr
+                key={product.id}
+                style={{ borderBottom: "1px solid #F4F3EF", cursor: "pointer", transition: "background .15s" }}
+                onMouseEnter={e => (e.currentTarget.style.background = "#FAFAFA")}
+                onMouseLeave={e => (e.currentTarget.style.background = "#fff")}
+              >
+                {/* Checkbox */}
+                <td style={{ padding: "14px 16px" }} onClick={e => e.stopPropagation()}>
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.includes(product.id)}
+                    onChange={e => {
+                      if (e.target.checked) setSelectedIds(prev => [...prev, product.id]);
+                      else setSelectedIds(prev => prev.filter(id => id !== product.id));
+                    }}
+                  />
+                </td>
+
+                {/* Image */}
+                <td style={{ padding: "10px 16px" }} onClick={() => router.push(`/admin/products/${product.slug}/edit`)}>
+                  <div style={{ width: "48px", height: "48px", borderRadius: "8px", overflow: "hidden", background: "linear-gradient(135deg,#f0ede8,#e8e4df)", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid #E2E0DA", flexShrink: 0 }}>
+                    {product.images?.[0] ? (
+                      <img src={product.images[0].url_thumbnail} alt={product.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    ) : (
+                      <span style={{ fontSize: "20px", opacity: 0.4 }}>👕</span>
+                    )}
+                  </div>
+                </td>
+
+                {/* Product */}
+                <td style={{ padding: "14px 16px" }} onClick={() => router.push(`/admin/products/${product.slug}/edit`)}>
+                  <div style={{ fontWeight: 700, fontSize: "14px", color: "#2A2830", marginBottom: "2px" }}>{product.name}</div>
+                  <div style={{ fontSize: "11px", color: "#aaa" }}>
+                    {product.variants?.length || 0} variants · MOQ: {product.moq}
+                  </div>
+                </td>
+
+                {/* Status */}
+                <td style={{ padding: "14px 16px" }} onClick={() => router.push(`/admin/products/${product.slug}/edit`)}>
+                  <span style={{
+                    padding: "4px 10px", borderRadius: "20px", fontSize: "11px", fontWeight: 700,
+                    background: product.status === "active" ? "rgba(5,150,105,.1)" : product.status === "draft" ? "rgba(156,163,175,.15)" : "rgba(232,36,42,.1)",
+                    color: product.status === "active" ? "#059669" : product.status === "draft" ? "#9CA3AF" : "#E8242A",
+                  }}>
+                    {product.status === "active" ? "● Active" : product.status === "draft" ? "○ Draft" : "✕ Archived"}
+                  </span>
+                </td>
+
+                {/* Inventory */}
+                <td style={{ padding: "14px 16px" }} onClick={() => router.push(`/admin/products/${product.slug}/edit`)}>
+                  <div style={{ fontSize: "13px", fontWeight: 600, color: "#2A2830" }}>{totalInventory(product)} in stock</div>
+                  <div style={{ fontSize: "11px", color: "#aaa" }}>{product.variants?.length || 0} variants</div>
+                </td>
+
+                {/* Category */}
+                <td style={{ padding: "14px 16px" }} onClick={() => router.push(`/admin/products/${product.slug}/edit`)}>
+                  <div style={{ fontSize: "13px", color: "#2A2830" }}>{product.categories?.[0]?.name || "—"}</div>
+                </td>
+
+                {/* Type */}
+                <td style={{ padding: "14px 16px" }} onClick={() => router.push(`/admin/products/${product.slug}/edit`)}>
+                  <div style={{ fontSize: "13px", color: "#7A7880" }}>{product.product_type || "—"}</div>
+                </td>
+
+                {/* Vendor */}
+                <td style={{ padding: "14px 16px" }} onClick={() => router.push(`/admin/products/${product.slug}/edit`)}>
+                  <div style={{ fontSize: "13px", color: "#7A7880" }}>{product.vendor || "—"}</div>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
+
+        {/* Pagination */}
+        <div style={{ padding: "14px 20px", borderTop: "1px solid #E2E0DA", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span style={{ fontSize: "13px", color: "#7A7880" }}>{products.length} products</span>
+          <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+            <button disabled={page === 1} onClick={() => setPage(p => p - 1)} style={{ ...pageBtn, opacity: page === 1 ? 0.4 : 1 }}>← Prev</button>
+            <span style={{ padding: "6px 12px", fontSize: "13px", fontWeight: 600 }}>Page {page}</span>
+            <button disabled={products.length < pageSize} onClick={() => setPage(p => p + 1)} style={{ ...pageBtn, opacity: products.length < pageSize ? 0.4 : 1 }}>Next →</button>
+          </div>
+        </div>
       </div>
+
+      {/* Bulk Edit Modal */}
+      {showBulkEdit && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.5)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ background: "#fff", borderRadius: "12px", width: "90%", maxWidth: "960px", maxHeight: "80vh", overflow: "auto", boxShadow: "0 20px 60px rgba(0,0,0,.2)" }}>
+            <div style={{ padding: "20px 24px", borderBottom: "1px solid #E2E0DA", display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, background: "#fff", zIndex: 1 }}>
+              <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "24px", color: "#2A2830", letterSpacing: ".04em" }}>
+                BULK EDIT — {selectedIds.length} PRODUCTS
+              </h2>
+              <button onClick={() => setShowBulkEdit(false)} style={{ background: "none", border: "none", fontSize: "22px", cursor: "pointer", color: "#aaa" }}>✕</button>
+            </div>
+
+            <div style={{ padding: "20px 24px" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
+                <thead>
+                  <tr style={{ background: "#F4F3EF", borderBottom: "2px solid #E2E0DA" }}>
+                    {["Product", "Status", "Vendor", "Type"].map(h => (
+                      <th key={h} style={thStyle}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {selectedProducts.map(p => (
+                    <tr key={p.id} style={{ borderBottom: "1px solid #F4F3EF" }}>
+                      <td style={{ padding: "10px 12px", fontWeight: 600, fontSize: "13px", color: "#2A2830" }}>{p.name}</td>
+                      <td style={{ padding: "10px 12px" }}>
+                        <select
+                          value={bulkEdits[p.id]?.status ?? p.status}
+                          onChange={e => setBulkEdit(p.id, "status", e.target.value)}
+                          style={{ padding: "6px 10px", border: "1px solid #E2E0DA", borderRadius: "5px", fontSize: "12px" }}
+                        >
+                          <option value="active">Active</option>
+                          <option value="draft">Draft</option>
+                          <option value="archived">Archived</option>
+                        </select>
+                      </td>
+                      <td style={{ padding: "10px 12px" }}>
+                        <input
+                          value={bulkEdits[p.id]?.vendor ?? (p.vendor ?? "")}
+                          onChange={e => setBulkEdit(p.id, "vendor", e.target.value)}
+                          placeholder="Vendor"
+                          style={{ padding: "6px 8px", border: "1px solid #E2E0DA", borderRadius: "5px", fontSize: "12px", width: "120px" }}
+                        />
+                      </td>
+                      <td style={{ padding: "10px 12px" }}>
+                        <input
+                          value={bulkEdits[p.id]?.product_type ?? (p.product_type ?? "")}
+                          onChange={e => setBulkEdit(p.id, "product_type", e.target.value)}
+                          placeholder="Type"
+                          style={{ padding: "6px 8px", border: "1px solid #E2E0DA", borderRadius: "5px", fontSize: "12px", width: "120px" }}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div style={{ padding: "16px 24px", borderTop: "1px solid #E2E0DA", display: "flex", gap: "10px", justifyContent: "flex-end", position: "sticky", bottom: 0, background: "#fff" }}>
+              <button
+                onClick={() => setShowBulkEdit(false)}
+                style={{ padding: "10px 20px", border: "1px solid #E2E0DA", borderRadius: "6px", background: "#fff", cursor: "pointer", fontWeight: 600, fontSize: "13px" }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleBulkSave}
+                style={{ padding: "10px 20px", background: "#1A5CFF", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: 700, fontSize: "13px" }}
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

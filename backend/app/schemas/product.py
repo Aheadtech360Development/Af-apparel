@@ -50,6 +50,7 @@ class VariantOut(BaseModel):
     color: str | None
     size: str | None
     retail_price: Decimal
+    compare_price: Decimal | None = None
     effective_price: Decimal | None = None  # populated by pricing layer
     stock_quantity: int = 0               # summed across warehouses
     status: str
@@ -90,6 +91,9 @@ class ProductDetail(BaseModel):
     categories: list[CategoryOut]
     meta_title: str | None
     meta_description: str | None
+    product_type: str | None = None
+    vendor: str | None = None
+    tags: list[str] | None = None
     created_at: datetime
     updated_at: datetime
 
@@ -123,6 +127,9 @@ class ProductCreate(BaseModel):
     status: str = "draft"
     meta_title: str | None = None
     meta_description: str | None = None
+    product_type: str | None = None
+    vendor: str | None = None
+    tags: list[str] | None = None
     category_ids: list[UUID] = []
 
 
@@ -133,6 +140,9 @@ class ProductUpdate(BaseModel):
     status: str | None = None
     meta_title: str | None = None
     meta_description: str | None = None
+    product_type: str | None = None
+    vendor: str | None = None
+    tags: list[str] | None = None
     category_ids: list[UUID] | None = None
 
 

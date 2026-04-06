@@ -213,6 +213,72 @@ async def export_products_csv(db: AsyncSession = Depends(get_db)):
     )
 
 
+@router.get("/{slug}", response_model=ProductDetail)
+async def get_admin_product(slug: str, db: AsyncSession = Depends(get_db)):
+    """Fetch single product by slug (or UUID string). Defined after /export-csv to avoid conflict."""
+    from sqlalchemy.orm import selectinload
+    import uuid as _uuid
+
+    try:
+        uid = _uuid.UUID(slug)
+        query = select(Product).where(Product.id == uid)
+    except ValueError:
+        query = select(Product).where(Product.slug == slug)
+
+    query = query.options(
+        selectinload(Product.variants),
+        selectinload(Product.images),
+        selectinload(Product.category_links).selectinload(ProductCategory.category),
+    )
+    result = await db.execute(query)
+    product = result.scalar_one_or_none()
+    if not product:
+        raise NotFoundError(f"Product '{slug}' not found")
+    return product
+
+
+@router.delete("/{product_id}", status_code=204)
+async def delete_product(product_id: UUID, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(Product).where(Product.id == product_id))
+    product = result.scalar_one_or_none()
+    if not product:
+        raise NotFoundError(f"Product {product_id} not found")
+    await db.delete(product)
+    await db.commit()
+
+
+@router.delete("/{product_id}/images/{image_id}", status_code=204)
+async def delete_product_image(
+    product_id: UUID, image_id: UUID, db: AsyncSession = Depends(get_db)
+):
+    result = await db.execute(
+        select(ProductImage).where(
+            ProductImage.id == image_id, ProductImage.product_id == product_id
+        )
+    )
+    image = result.scalar_one_or_none()
+    if not image:
+        raise NotFoundError("Image not found")
+    await db.delete(image)
+    await db.commit()
+
+
+@router.delete("/{product_id}/variants/{variant_id}", status_code=204)
+async def delete_product_variant(
+    product_id: UUID, variant_id: UUID, db: AsyncSession = Depends(get_db)
+):
+    result = await db.execute(
+        select(ProductVariant).where(
+            ProductVariant.id == variant_id, ProductVariant.product_id == product_id
+        )
+    )
+    variant = result.scalar_one_or_none()
+    if not variant:
+        raise NotFoundError("Variant not found")
+    variant.status = "discontinued"
+    await db.commit()
+
+
 # ---------------------------------------------------------------------------
 # Image processing helper
 # ---------------------------------------------------------------------------

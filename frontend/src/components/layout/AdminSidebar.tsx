@@ -25,17 +25,12 @@ const SUB_LINK_BASE: React.CSSProperties = {
 export function AdminSidebar() {
   const pathname = usePathname();
   const isOrdersActive = pathname.startsWith("/admin/orders") || pathname === "/admin/abandoned-carts";
+  const isProductsActive = pathname.startsWith("/admin/products") || pathname.startsWith("/admin/inventory");
   const [ordersOpen, setOrdersOpen] = useState(isOrdersActive);
+  const [productsOpen, setProductsOpen] = useState(isProductsActive);
 
-  // Keep open when navigating within orders section
-  useEffect(() => {
-    if (isOrdersActive) setOrdersOpen(true);
-  }, [isOrdersActive]);
-
-  function navLink(href: string, label: string, icon: string): React.CSSProperties & { active: boolean } {
-    const active = pathname === href || (href !== "/admin" && pathname.startsWith(href + "/"));
-    return { active };
-  }
+  useEffect(() => { if (isOrdersActive) setOrdersOpen(true); }, [isOrdersActive]);
+  useEffect(() => { if (isProductsActive) setProductsOpen(true); }, [isProductsActive]);
 
   function NavLink({ href, label, icon }: { href: string; label: string; icon: string }) {
     const active = pathname === href || (href !== "/admin" && pathname.startsWith(href + "/"));
@@ -120,8 +115,35 @@ export function AdminSidebar() {
 
       {/* ── CATALOG ── */}
       <div style={SECTION_HEAD}>Catalog</div>
-      <NavLink href="/admin/products" label="Products" icon="👕" />
-      <NavLink href="/admin/inventory" label="Inventory" icon="🗄️" />
+
+      {/* Products dropdown */}
+      <div
+        onClick={() => setProductsOpen(!productsOpen)}
+        style={{
+          ...NAV_LINK_BASE,
+          justifyContent: "space-between",
+          background: isProductsActive ? "rgba(26,92,255,.08)" : "transparent",
+          color: isProductsActive ? "#1A5CFF" : "#555",
+          userSelect: "none",
+        }}
+        onMouseEnter={e => { if (!isProductsActive) (e.currentTarget as HTMLElement).style.background = "#F4F3EF"; }}
+        onMouseLeave={e => { if (!isProductsActive) (e.currentTarget as HTMLElement).style.background = isProductsActive ? "rgba(26,92,255,.08)" : "transparent"; }}
+      >
+        <span style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <span style={{ fontSize: "15px" }}>👕</span>
+          <span>Products</span>
+        </span>
+        <span style={{ fontSize: "10px", color: "#aaa", transition: "transform .2s", transform: productsOpen ? "rotate(180deg)" : "rotate(0deg)", display: "inline-block" }}>▼</span>
+      </div>
+
+      {productsOpen && (
+        <div style={{ paddingLeft: "18px", marginTop: "3px", marginBottom: "3px" }}>
+          <SubLink href="/admin/products" label="All Products" />
+          <SubLink href="/admin/products/collections" label="Collections" />
+          <SubLink href="/admin/inventory" label="Inventory" />
+          <SubLink href="/admin/products/purchase-orders" label="Purchase Orders" />
+        </div>
+      )}
 
       {/* ── ANALYTICS ── */}
       <div style={SECTION_HEAD}>Analytics</div>
