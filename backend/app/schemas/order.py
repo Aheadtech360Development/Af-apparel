@@ -131,6 +131,9 @@ class AdminOrderDetail(OrderOut):
     company_id: UUID
     company_name: str
     tracking_number: str | None
+    courier: str | None = None
+    courier_service: str | None = None
+    shipped_at: datetime | None = None
     qb_invoice_id: str | None
 
     model_config = {"from_attributes": True}
@@ -139,6 +142,15 @@ class AdminOrderDetail(OrderOut):
 class OrderUpdateRequest(BaseModel):
     status: str | None = None
     tracking_number: str | None = None
+    courier: str | None = None
+    courier_service: str | None = None
+
+
+class OrderStatusUpdate(BaseModel):
+    status: str
+    tracking_number: str | None = None
+    courier: str | None = None
+    courier_service: str | None = None
 
 
 class CancelOrderRequest(BaseModel):
