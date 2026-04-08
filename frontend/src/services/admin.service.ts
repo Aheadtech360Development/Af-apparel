@@ -171,11 +171,13 @@ export const adminService = {
   },
 
   // Orders
-  async listOrders(params?: { q?: string; status?: string; page?: number }) {
+  async listOrders(params?: { q?: string; status?: string; page?: number; company_id?: string; page_size?: number }) {
     const query = new URLSearchParams();
     if (params?.q) query.set("q", params.q);
     if (params?.status) query.set("status", params.status);
     if (params?.page) query.set("page", String(params.page));
+    if (params?.company_id) query.set("company_id", params.company_id);
+    if (params?.page_size) query.set("page_size", String(params.page_size));
     const qs = query.toString();
     return apiClient.get(`/api/v1/admin/orders${qs ? `?${qs}` : ""}`);
   },

@@ -4,65 +4,78 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { adminService } from "@/services/admin.service";
 
-interface CompanyDetail {
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+interface Customer {
   id: string;
   name: string;
   status: string;
+  phone: string | null;
+  website: string | null;
   tax_id: string | null;
   business_type: string | null;
-  website: string | null;
   pricing_tier_id: string | null;
   shipping_tier_id: string | null;
   shipping_override_amount: string | null;
   stripe_customer_id: string | null;
   qb_customer_id: string | null;
+  admin_notes: string | null;
+  tags: string[];
   created_at: string;
   updated_at: string;
-  // enriched fields
+  // enriched (may be missing)
   contact_name?: string;
   email?: string;
-  phone?: string;
-  notes?: string;
-  tags?: string[];
-  order_count?: number;
-  total_spend?: string;
-  last_order_date?: string;
+}
+
+interface OrderRow {
+  id: string;
+  order_number: string;
+  company_name: string;
+  status: string;
+  payment_status: string;
+  po_number: string | null;
+  total: string | number;
+  item_count: number;
+  created_at: string;
 }
 
 interface PricingTier { id: string; name: string; }
 interface ShippingTier { id: string; name: string; }
 
-interface OrderRow {
-  id: string;
-  order_number: string;
-  status: string;
-  total_amount: string;
-  created_at: string;
-  items_count?: number;
-}
+// ─── RFM ─────────────────────────────────────────────────────────────────────
 
-interface RFMGroup { label: string; color: string; bg: string }
-
-function getRFMGroup(c: CompanyDetail): RFMGroup {
-  const orders = c.order_count || 0;
-  const days = c.last_order_date
-    ? Math.floor((Date.now() - new Date(c.last_order_date).getTime()) / 86400000)
+function getRFMGroup(orderCount: number, lastOrderDate: string | null): { label: string; color: string; bg: string } {
+  const days = lastOrderDate
+    ? Math.floor((Date.now() - new Date(lastOrderDate).getTime()) / 86400000)
     : 999;
-  if (orders >= 10 && days < 30) return { label: "Champions", color: "#059669", bg: "rgba(5,150,105,.1)" };
-  if (orders >= 5  && days < 60) return { label: "Loyal",     color: "#1A5CFF", bg: "rgba(26,92,255,.1)" };
-  if (days > 90 && orders > 2)   return { label: "At Risk",   color: "#D97706", bg: "rgba(217,119,6,.1)" };
-  if (days > 180)                 return { label: "Lost",      color: "#E8242A", bg: "rgba(232,36,42,.1)" };
-  if (orders <= 1)                return { label: "New",       color: "#7C3AED", bg: "rgba(124,58,237,.1)" };
-  return                                  { label: "Potential", color: "#0891B2", bg: "rgba(8,145,178,.1)" };
+  if (orderCount >= 10 && days < 30) return { label: "Champions", color: "#059669", bg: "rgba(5,150,105,.12)" };
+  if (orderCount >= 5  && days < 60) return { label: "Loyal",     color: "#1A5CFF", bg: "rgba(26,92,255,.1)" };
+  if (days > 90 && orderCount > 2)   return { label: "At Risk",   color: "#D97706", bg: "rgba(217,119,6,.1)" };
+  if (days > 180)                    return { label: "Lost",       color: "#E8242A", bg: "rgba(232,36,42,.1)" };
+  if (orderCount <= 1)               return { label: "New",        color: "#7C3AED", bg: "rgba(124,58,237,.1)" };
+  return                                      { label: "Potential", color: "#0891B2", bg: "rgba(8,145,178,.1)" };
 }
 
-const STATUS_BADGE: Record<string, { bg: string; color: string }> = {
+// ─── Status configs ───────────────────────────────────────────────────────────
+
+const ORDER_STATUS: Record<string, { bg: string; color: string }> = {
+  pending:    { bg: "rgba(217,119,6,.1)",   color: "#D97706" },
+  confirmed:  { bg: "rgba(26,92,255,.1)",   color: "#1A5CFF" },
+  processing: { bg: "rgba(8,145,178,.1)",   color: "#0891B2" },
+  shipped:    { bg: "rgba(124,58,237,.1)",  color: "#7C3AED" },
+  delivered:  { bg: "rgba(5,150,105,.1)",   color: "#059669" },
+  completed:  { bg: "rgba(5,150,105,.1)",   color: "#059669" },
+  cancelled:  { bg: "rgba(232,36,42,.1)",   color: "#E8242A" },
+};
+
+const COMPANY_STATUS: Record<string, { bg: string; color: string }> = {
   active:    { bg: "rgba(5,150,105,.1)",  color: "#059669" },
   suspended: { bg: "rgba(232,36,42,.1)",  color: "#E8242A" },
   pending:   { bg: "rgba(217,119,6,.1)",  color: "#D97706" },
-  cancelled: { bg: "rgba(156,163,175,.15)", color: "#9CA3AF" },
-  completed: { bg: "rgba(26,92,255,.1)",  color: "#1A5CFF" },
 };
+
+// ─── Shared styles ────────────────────────────────────────────────────────────
 
 const card: React.CSSProperties = {
   background: "#fff",
@@ -74,14 +87,14 @@ const card: React.CSSProperties = {
 
 const sectionTitle: React.CSSProperties = {
   fontWeight: 700,
-  fontSize: "12px",
+  fontSize: "11px",
   textTransform: "uppercase",
   letterSpacing: ".07em",
   color: "#7A7880",
   marginBottom: "14px",
 };
 
-const inputStyle: React.CSSProperties = {
+const inp: React.CSSProperties = {
   width: "100%",
   padding: "8px 11px",
   border: "1.5px solid #E2E0DA",
@@ -90,131 +103,135 @@ const inputStyle: React.CSSProperties = {
   fontFamily: "var(--font-jakarta)",
   outline: "none",
   boxSizing: "border-box",
-};
-
-const selectStyle: React.CSSProperties = {
-  ...inputStyle,
   background: "#fff",
-  cursor: "pointer",
 };
 
-export default function AdminCompanyDetailPage() {
+const thSt: React.CSSProperties = {
+  padding: "10px 14px",
+  textAlign: "left",
+  fontSize: "10px",
+  textTransform: "uppercase",
+  letterSpacing: ".07em",
+  color: "#7A7880",
+  fontWeight: 700,
+};
+
+// ─── Component ────────────────────────────────────────────────────────────────
+
+export default function CustomerDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
 
-  const [company, setCompany]           = useState<CompanyDetail | null>(null);
+  const [customer, setCustomer]         = useState<Customer | null>(null);
   const [orders, setOrders]             = useState<OrderRow[]>([]);
   const [pricingTiers, setPricingTiers] = useState<PricingTier[]>([]);
   const [shippingTiers, setShippingTiers] = useState<ShippingTier[]>([]);
+  const [loading, setLoading]           = useState(true);
 
-  // editable tiers
-  const [editPricingTier, setEditPricingTier]     = useState("");
-  const [editShippingTier, setEditShippingTier]   = useState("");
-  const [shippingOverride, setShippingOverride]   = useState("");
-
-  // suspend flow
-  const [showSuspendForm, setShowSuspendForm] = useState(false);
-  const [suspendReason, setSuspendReason]     = useState("");
-  const [isSuspending, setIsSuspending]       = useState(false);
-
-  // save tiers
-  const [isSaving, setIsSaving] = useState(false);
+  // tiers
+  const [editPricing, setEditPricing]   = useState("");
+  const [editShipping, setEditShipping] = useState("");
+  const [editOverride, setEditOverride] = useState("");
+  const [savingTiers, setSavingTiers]   = useState(false);
 
   // tags
   const [tags, setTags]       = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
-  const [isSavingTags, setIsSavingTags] = useState(false);
+  const [savingTags, setSavingTags] = useState(false);
 
   // notes
-  const [notes, setNotes]       = useState("");
-  const [editNotes, setEditNotes] = useState(false);
-  const [isSavingNotes, setIsSavingNotes] = useState(false);
+  const [note, setNote]           = useState("");
+  const [noteText, setNoteText]   = useState("");
+  const [editingNote, setEditingNote] = useState(false);
+  const [savingNote, setSavingNote]   = useState(false);
+
+  // suspend
+  const [showSuspend, setShowSuspend] = useState(false);
+  const [suspendReason, setSuspendReason] = useState("");
+  const [suspending, setSuspending] = useState(false);
 
   // feedback
-  const [error, setError]       = useState<string | null>(null);
-  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null);
+
+  function showToast(msg: string, ok = true) {
+    setToast({ msg, ok });
+    setTimeout(() => setToast(null), 3000);
+  }
+
+  // ── Load ──────────────────────────────────────────────────────────────────
 
   useEffect(() => {
     async function load() {
-      const [co, pt, st] = await Promise.all([
-        adminService.getCompany(id) as Promise<CompanyDetail>,
-        adminService.listPricingTiers() as Promise<PricingTier[]>,
-        adminService.listShippingTiers() as Promise<ShippingTier[]>,
-      ]);
-      setCompany(co);
-      setPricingTiers(pt);
-      setShippingTiers(st);
-      setEditPricingTier(co.pricing_tier_id ?? "");
-      setEditShippingTier(co.shipping_tier_id ?? "");
-      setShippingOverride(co.shipping_override_amount ?? "");
-      setTags(co.tags ?? []);
-      setNotes(co.notes ?? "");
+      setLoading(true);
+      try {
+        const [co, pt, st] = await Promise.all([
+          adminService.getCompany(id) as Promise<Customer>,
+          adminService.listPricingTiers() as Promise<PricingTier[]>,
+          adminService.listShippingTiers() as Promise<ShippingTier[]>,
+        ]);
+        setCustomer(co);
+        setPricingTiers(pt);
+        setShippingTiers(st);
+        setEditPricing(co.pricing_tier_id ?? "");
+        setEditShipping(co.shipping_tier_id ?? "");
+        setEditOverride(co.shipping_override_amount ?? "");
+        setTags(co.tags ?? []);
+        setNote(co.admin_notes ?? "");
+        setNoteText(co.admin_notes ?? "");
+      } finally {
+        setLoading(false);
+      }
     }
     load();
   }, [id]);
 
   useEffect(() => {
-    // Load orders separately so it doesn't block the main load
     async function loadOrders() {
       try {
-        const data = await adminService.listOrders({ q: id }) as { items?: OrderRow[] } | OrderRow[];
+        const data = await adminService.listOrders({ company_id: id, page_size: 50 }) as { items?: OrderRow[] } | OrderRow[];
         const items = Array.isArray(data) ? data : (data.items ?? []);
-        // Filter client-side by company_id since the API may not support it directly
         setOrders(items);
       } catch {
-        // orders load failure is non-fatal
+        // non-fatal
       }
     }
     if (id) loadOrders();
   }, [id]);
 
-  const rfm = useMemo(() => company ? getRFMGroup(company) : null, [company]);
+  // ── Derived ──────────────────────────────────────────────────────────────
+
+  const totalSpend = useMemo(
+    () => orders.reduce((s, o) => s + Number(o.total || 0), 0),
+    [orders]
+  );
+
+  const lastOrderDate = useMemo(
+    () => orders.length > 0 && orders[0] ? orders[0].created_at : null,
+    [orders]
+  );
+
+  const rfm = useMemo(
+    () => getRFMGroup(orders.length, lastOrderDate),
+    [orders.length, lastOrderDate]
+  );
+
+  // ── Actions ───────────────────────────────────────────────────────────────
 
   async function handleSaveTiers() {
-    setIsSaving(true);
-    setError(null);
-    setSuccessMsg(null);
+    setSavingTiers(true);
     try {
       await adminService.updateCompany(id, {
-        pricing_tier_id: editPricingTier || null,
-        shipping_tier_id: editShippingTier || null,
-        shipping_override_amount: shippingOverride ? Number(shippingOverride) : null,
+        pricing_tier_id: editPricing || null,
+        shipping_tier_id: editShipping || null,
+        shipping_override_amount: editOverride ? Number(editOverride) : null,
       });
-      setSuccessMsg("Tiers updated");
-      const co = await adminService.getCompany(id) as CompanyDetail;
-      setCompany(co);
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Failed to update");
+      const co = await adminService.getCompany(id) as Customer;
+      setCustomer(co);
+      showToast("Tiers saved");
+    } catch {
+      showToast("Failed to save tiers", false);
     } finally {
-      setIsSaving(false);
-    }
-  }
-
-  async function handleSuspend() {
-    if (!suspendReason.trim()) return;
-    setIsSuspending(true);
-    setError(null);
-    try {
-      await adminService.suspendCompany(id, suspendReason);
-      setCompany(c => c ? { ...c, status: "suspended" } : c);
-      setShowSuspendForm(false);
-      setSuspendReason("");
-      setSuccessMsg("Company suspended");
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Failed to suspend");
-    } finally {
-      setIsSuspending(false);
-    }
-  }
-
-  async function handleReactivate() {
-    setError(null);
-    try {
-      await adminService.reactivateCompany(id);
-      setCompany(c => c ? { ...c, status: "active" } : c);
-      setSuccessMsg("Company reactivated");
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Failed to reactivate");
+      setSavingTiers(false);
     }
   }
 
@@ -222,267 +239,367 @@ export default function AdminCompanyDetailPage() {
     const t = tagInput.trim();
     if (!t || tags.includes(t)) { setTagInput(""); return; }
     const next = [...tags, t];
-    setTags(next);
-    setTagInput("");
-    setIsSavingTags(true);
+    setSavingTags(true);
     try {
       await adminService.updateCompany(id, { tags: next });
+      setTags(next);
+      setTagInput("");
+    } catch {
+      showToast("Failed to save tag", false);
     } finally {
-      setIsSavingTags(false);
+      setSavingTags(false);
     }
   }
 
   async function handleRemoveTag(tag: string) {
     const next = tags.filter(t => t !== tag);
-    setTags(next);
-    await adminService.updateCompany(id, { tags: next });
-  }
-
-  async function handleSaveNotes() {
-    setIsSavingNotes(true);
     try {
-      await adminService.updateCompany(id, { notes });
-      setEditNotes(false);
-      setSuccessMsg("Notes saved");
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Failed to save notes");
-    } finally {
-      setIsSavingNotes(false);
+      await adminService.updateCompany(id, { tags: next });
+      setTags(next);
+    } catch {
+      showToast("Failed to remove tag", false);
     }
   }
 
-  function clearMsg() { setSuccessMsg(null); setError(null); }
+  async function handleSaveNote() {
+    setSavingNote(true);
+    try {
+      await adminService.updateCompany(id, { admin_notes: noteText });
+      setNote(noteText);
+      setEditingNote(false);
+      showToast("Notes saved");
+    } catch {
+      showToast("Failed to save notes", false);
+    } finally {
+      setSavingNote(false);
+    }
+  }
 
-  if (!company) {
+  async function handleSuspend() {
+    if (!suspendReason.trim()) return;
+    setSuspending(true);
+    try {
+      await adminService.suspendCompany(id, suspendReason);
+      setCustomer(c => c ? { ...c, status: "suspended" } : c);
+      setShowSuspend(false);
+      setSuspendReason("");
+      showToast("Company suspended");
+    } catch {
+      showToast("Failed to suspend", false);
+    } finally {
+      setSuspending(false);
+    }
+  }
+
+  async function handleReactivate() {
+    try {
+      await adminService.reactivateCompany(id);
+      setCustomer(c => c ? { ...c, status: "active" } : c);
+      showToast("Company reactivated");
+    } catch {
+      showToast("Failed to reactivate", false);
+    }
+  }
+
+  // ── Render ────────────────────────────────────────────────────────────────
+
+  if (loading) {
     return (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "200px", color: "#bbb", fontSize: "14px", fontFamily: "var(--font-jakarta)" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "220px", color: "#bbb", fontSize: "14px", fontFamily: "var(--font-jakarta)" }}>
         Loading…
       </div>
     );
   }
 
-  const statusCfg = STATUS_BADGE[company.status] ?? { bg: "rgba(156,163,175,.15)", color: "#9CA3AF" };
-  const totalSpend = Number(company.total_spend || 0);
-  const orderCount = company.order_count || 0;
+  if (!customer) {
+    return (
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "220px", gap: "12px", fontFamily: "var(--font-jakarta)" }}>
+        <div style={{ fontSize: "14px", color: "#E8242A" }}>Customer not found</div>
+        <button onClick={() => router.back()} style={{ fontSize: "13px", color: "#1A5CFF", background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}>← Back</button>
+      </div>
+    );
+  }
 
-  const thStyle: React.CSSProperties = {
-    padding: "10px 14px", textAlign: "left", fontSize: "10px",
-    textTransform: "uppercase", letterSpacing: ".07em", color: "#7A7880", fontWeight: 700,
-  };
+  const statusCfg = COMPANY_STATUS[customer.status] ?? { bg: "rgba(156,163,175,.15)", color: "#9CA3AF" };
+  const pricingTierName = pricingTiers.find(t => t.id === customer.pricing_tier_id)?.name;
+  const shippingTierName = shippingTiers.find(t => t.id === customer.shipping_tier_id)?.name;
+  const initials = customer.name.split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase() || "?";
 
   return (
     <div style={{ fontFamily: "var(--font-jakarta)" }}>
 
+      {/* Toast */}
+      {toast && (
+        <div style={{
+          position: "fixed", top: "20px", right: "20px", zIndex: 9999,
+          background: toast.ok ? "#059669" : "#E8242A", color: "#fff",
+          padding: "10px 18px", borderRadius: "8px", fontSize: "13px", fontWeight: 600,
+          boxShadow: "0 4px 16px rgba(0,0,0,.15)", transition: "opacity .2s",
+        }}>
+          {toast.msg}
+        </div>
+      )}
+
       {/* Back */}
       <button
         onClick={() => router.back()}
-        style={{ fontSize: "13px", color: "#1A5CFF", fontWeight: 600, background: "none", border: "none", cursor: "pointer", padding: 0, marginBottom: "18px", display: "flex", alignItems: "center", gap: "4px" }}
+        style={{ fontSize: "13px", color: "#1A5CFF", fontWeight: 600, background: "none", border: "none", cursor: "pointer", padding: 0, marginBottom: "18px" }}
       >
         ← Back to Customers
       </button>
 
-      {/* Feedback banners */}
-      {error && (
-        <div style={{ background: "rgba(232,36,42,.07)", border: "1px solid rgba(232,36,42,.2)", borderRadius: "8px", padding: "10px 14px", marginBottom: "14px", fontSize: "13px", color: "#E8242A", display: "flex", justifyContent: "space-between" }}>
-          {error} <button onClick={clearMsg} style={{ background: "none", border: "none", cursor: "pointer", color: "#E8242A", fontWeight: 700 }}>✕</button>
-        </div>
-      )}
-      {successMsg && (
-        <div style={{ background: "rgba(5,150,105,.07)", border: "1px solid rgba(5,150,105,.2)", borderRadius: "8px", padding: "10px 14px", marginBottom: "14px", fontSize: "13px", color: "#059669", display: "flex", justifyContent: "space-between" }}>
-          {successMsg} <button onClick={clearMsg} style={{ background: "none", border: "none", cursor: "pointer", color: "#059669", fontWeight: 700 }}>✕</button>
-        </div>
-      )}
+      {/* ── HEADER ────────────────────────────────────────────────────────── */}
+      <div style={{ background: "#fff", border: "1px solid #E2E0DA", borderRadius: "12px", padding: "20px 24px", marginBottom: "20px" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px", flexWrap: "wrap" }}>
 
-      {/* HEADER */}
-      <div style={{ background: "#fff", border: "1px solid #E2E0DA", borderRadius: "12px", padding: "22px 24px", marginBottom: "20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "20px", flexWrap: "wrap" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          <div style={{ width: "52px", height: "52px", borderRadius: "50%", background: "#1A5CFF", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontFamily: "var(--font-bebas)", fontSize: "24px", flexShrink: 0 }}>
-            {company.name[0]?.toUpperCase()}
-          </div>
-          <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-              <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "28px", color: "#2A2830", letterSpacing: ".02em", lineHeight: 1 }}>{company.name}</h1>
-              <span style={{ padding: "3px 10px", borderRadius: "20px", fontSize: "11px", fontWeight: 700, background: statusCfg.bg, color: statusCfg.color, textTransform: "capitalize" }}>
-                {company.status}
-              </span>
+          {/* Avatar + info */}
+          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+            <div style={{
+              width: "56px", height: "56px", borderRadius: "50%",
+              background: "linear-gradient(135deg,#1A5CFF,#7C3AED)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              color: "#fff", fontFamily: "var(--font-bebas)", fontSize: "22px", flexShrink: 0,
+            }}>
+              {initials}
             </div>
-            <div style={{ fontSize: "13px", color: "#7A7880", marginTop: "4px", display: "flex", gap: "16px", flexWrap: "wrap" }}>
-              {company.contact_name && <span>{company.contact_name}</span>}
-              {company.email && <span>{company.email}</span>}
-              {company.phone && <span>{company.phone}</span>}
-              {!company.contact_name && !company.email && (
-                <span>Joined {new Date(company.created_at).toLocaleDateString()}</span>
-              )}
-            </div>
-          </div>
-        </div>
-        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-          {company.status === "active" ? (
-            <button
-              onClick={() => setShowSuspendForm(true)}
-              style={{ padding: "9px 16px", border: "1px solid rgba(232,36,42,.3)", borderRadius: "8px", background: "rgba(232,36,42,.05)", color: "#E8242A", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}>
-              Suspend
-            </button>
-          ) : (
-            <button
-              onClick={handleReactivate}
-              style={{ padding: "9px 16px", border: "1px solid rgba(5,150,105,.3)", borderRadius: "8px", background: "rgba(5,150,105,.05)", color: "#059669", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}>
-              Reactivate
-            </button>
-          )}
-          <button
-            onClick={() => router.push(`/admin/orders?company=${id}`)}
-            style={{ padding: "9px 16px", border: "1px solid #E2E0DA", borderRadius: "8px", background: "#fff", fontSize: "13px", fontWeight: 600, cursor: "pointer", color: "#2A2830" }}>
-            View Orders
-          </button>
-        </div>
-      </div>
-
-      {/* Suspend form modal (inline) */}
-      {showSuspendForm && (
-        <div style={{ background: "rgba(232,36,42,.04)", border: "1px solid rgba(232,36,42,.2)", borderRadius: "10px", padding: "16px 20px", marginBottom: "16px" }}>
-          <div style={{ fontWeight: 700, fontSize: "13px", color: "#E8242A", marginBottom: "10px" }}>Suspend Company</div>
-          <textarea
-            rows={2}
-            value={suspendReason}
-            onChange={e => setSuspendReason(e.target.value)}
-            placeholder="Reason for suspension (required)"
-            style={{ ...inputStyle, resize: "vertical", marginBottom: "10px", borderColor: "rgba(232,36,42,.4)" }}
-          />
-          <div style={{ display: "flex", gap: "8px" }}>
-            <button
-              onClick={handleSuspend}
-              disabled={isSuspending || !suspendReason.trim()}
-              style={{ padding: "8px 16px", background: "#E8242A", color: "#fff", border: "none", borderRadius: "7px", fontSize: "13px", fontWeight: 700, cursor: isSuspending || !suspendReason.trim() ? "not-allowed" : "pointer", opacity: isSuspending || !suspendReason.trim() ? 0.5 : 1 }}>
-              {isSuspending ? "Suspending…" : "Confirm Suspend"}
-            </button>
-            <button
-              onClick={() => { setShowSuspendForm(false); setSuspendReason(""); }}
-              style={{ padding: "8px 16px", border: "1px solid #E2E0DA", borderRadius: "7px", background: "#fff", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}>
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* TOP STATS ROW */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "12px", marginBottom: "20px" }}>
-        {[
-          { label: "Amount Spent", value: `$${totalSpend.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, icon: "💰", color: "#D97706" },
-          { label: "Total Orders", value: orderCount.toString(), icon: "📦", color: "#1A5CFF" },
-          { label: "Customer Since", value: new Date(company.created_at).toLocaleDateString("en-US", { month: "short", year: "numeric" }), icon: "📅", color: "#2A2830" },
-          rfm ? { label: "RFM Group", value: rfm.label, icon: "📊", color: rfm.color } : { label: "RFM Group", value: "—", icon: "📊", color: "#7A7880" },
-        ].map(s => (
-          <div key={s.label} style={{ background: "#fff", border: "1px solid #E2E0DA", borderRadius: "10px", padding: "14px 16px", display: "flex", alignItems: "center", gap: "12px" }}>
-            <span style={{ fontSize: "20px" }}>{s.icon}</span>
             <div>
-              <div style={{ fontFamily: s.label === "Customer Since" ? "var(--font-jakarta)" : "var(--font-bebas)", fontSize: s.label === "Customer Since" ? "14px" : "22px", color: s.color, lineHeight: 1, fontWeight: s.label === "Customer Since" ? 700 : undefined }}>{s.value}</div>
-              <div style={{ fontSize: "10px", color: "#7A7880", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".05em", marginTop: "2px" }}>{s.label}</div>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+                <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "30px", color: "#2A2830", letterSpacing: ".02em", lineHeight: 1 }}>
+                  {customer.name}
+                </h1>
+                <span style={{ padding: "3px 10px", borderRadius: "20px", fontSize: "11px", fontWeight: 700, background: statusCfg.bg, color: statusCfg.color, textTransform: "capitalize" }}>
+                  {customer.status}
+                </span>
+              </div>
+              <div style={{ fontSize: "13px", color: "#7A7880", marginTop: "5px", display: "flex", gap: "14px", flexWrap: "wrap" }}>
+                {customer.email && <span>✉ {customer.email}</span>}
+                {customer.phone && <span>📞 {customer.phone}</span>}
+                {customer.contact_name && <span>👤 {customer.contact_name}</span>}
+                <span>📅 Since {new Date(customer.created_at).toLocaleDateString("en-US", { month: "short", year: "numeric" })}</span>
+              </div>
             </div>
           </div>
-        ))}
+
+          {/* Action buttons */}
+          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+            <button
+              onClick={() => { window.location.href = `mailto:${customer.email ?? ""}`; }}
+              style={{ padding: "9px 16px", border: "1px solid #E2E0DA", borderRadius: "8px", background: "#fff", fontSize: "13px", fontWeight: 600, cursor: "pointer", color: "#2A2830" }}>
+              ✉ Send Email
+            </button>
+            <button
+              onClick={() => router.push(`/admin/orders/new?company_id=${id}`)}
+              style={{ padding: "9px 16px", border: "1px solid #1A5CFF", borderRadius: "8px", background: "rgba(26,92,255,.06)", fontSize: "13px", fontWeight: 600, cursor: "pointer", color: "#1A5CFF" }}>
+              + Create Order
+            </button>
+            {customer.status === "active" ? (
+              <button
+                onClick={() => setShowSuspend(true)}
+                style={{ padding: "9px 16px", border: "1px solid rgba(232,36,42,.3)", borderRadius: "8px", background: "rgba(232,36,42,.05)", fontSize: "13px", fontWeight: 600, cursor: "pointer", color: "#E8242A" }}>
+                Suspend
+              </button>
+            ) : (
+              <button
+                onClick={handleReactivate}
+                style={{ padding: "9px 16px", border: "1px solid rgba(5,150,105,.3)", borderRadius: "8px", background: "rgba(5,150,105,.05)", fontSize: "13px", fontWeight: 600, cursor: "pointer", color: "#059669" }}>
+                Reactivate
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Suspend form */}
+        {showSuspend && (
+          <div style={{ marginTop: "16px", paddingTop: "16px", borderTop: "1px solid #F4F3EF" }}>
+            <div style={{ fontSize: "13px", fontWeight: 700, color: "#E8242A", marginBottom: "8px" }}>Suspend Company</div>
+            <textarea
+              rows={2}
+              value={suspendReason}
+              onChange={e => setSuspendReason(e.target.value)}
+              placeholder="Reason for suspension (required)"
+              style={{ ...inp, resize: "vertical", borderColor: "rgba(232,36,42,.4)", marginBottom: "8px" }}
+            />
+            <div style={{ display: "flex", gap: "8px" }}>
+              <button
+                onClick={handleSuspend}
+                disabled={suspending || !suspendReason.trim()}
+                style={{ padding: "8px 18px", background: "#E8242A", color: "#fff", border: "none", borderRadius: "7px", fontSize: "13px", fontWeight: 700, cursor: !suspendReason.trim() ? "not-allowed" : "pointer", opacity: !suspendReason.trim() ? 0.5 : 1 }}>
+                {suspending ? "Suspending…" : "Confirm Suspend"}
+              </button>
+              <button
+                onClick={() => { setShowSuspend(false); setSuspendReason(""); }}
+                style={{ padding: "8px 14px", border: "1px solid #E2E0DA", borderRadius: "7px", background: "#fff", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* 2-COLUMN LAYOUT */}
+      {/* ── TOP STATS ────────────────────────────────────────────────────── */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "12px", marginBottom: "20px" }}>
+        <div style={{ background: "#fff", border: "1px solid #E2E0DA", borderRadius: "10px", padding: "16px 18px" }}>
+          <div style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", color: "#059669", marginBottom: "6px" }}>Amount Spent</div>
+          <div style={{ fontFamily: "var(--font-bebas)", fontSize: "28px", color: "#059669", lineHeight: 1 }}>
+            ${totalSpend.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+          </div>
+        </div>
+        <div style={{ background: "#fff", border: "1px solid #E2E0DA", borderRadius: "10px", padding: "16px 18px" }}>
+          <div style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", color: "#1A5CFF", marginBottom: "6px" }}>Total Orders</div>
+          <div style={{ fontFamily: "var(--font-bebas)", fontSize: "28px", color: "#1A5CFF", lineHeight: 1 }}>
+            {orders.length}
+          </div>
+        </div>
+        <div style={{ background: "#fff", border: "1px solid #E2E0DA", borderRadius: "10px", padding: "16px 18px" }}>
+          <div style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", color: "#7A7880", marginBottom: "6px" }}>Customer Since</div>
+          <div style={{ fontFamily: "var(--font-bebas)", fontSize: "28px", color: "#2A2830", lineHeight: 1 }}>
+            {new Date(customer.created_at).toLocaleDateString("en-US", { month: "short", year: "numeric" })}
+          </div>
+        </div>
+        <div style={{ background: "#fff", border: "1px solid #E2E0DA", borderRadius: "10px", padding: "16px 18px" }}>
+          <div style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", color: rfm.color, marginBottom: "6px" }}>RFM Group</div>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span style={{ padding: "4px 12px", borderRadius: "20px", fontSize: "13px", fontWeight: 700, background: rfm.bg, color: rfm.color }}>
+              {rfm.label}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* ── 2-COLUMN LAYOUT ─────────────────────────────────────────────── */}
       <div style={{ display: "grid", gridTemplateColumns: "65% 35%", gap: "14px", alignItems: "start" }}>
 
-        {/* LEFT COLUMN */}
+        {/* ── LEFT ─────────────────────────────────────────────────────── */}
         <div>
+
           {/* Last Order */}
-          {orders.length > 0 && orders[0] && (
-            <div style={card}>
-              <div style={sectionTitle}>Last Order</div>
-              {(() => {
-                const last = orders[0]!;
-                const oCfg = STATUS_BADGE[last.status] ?? { bg: "rgba(156,163,175,.15)", color: "#9CA3AF" };
-                return (
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <div>
-                      <div style={{ fontWeight: 700, fontSize: "14px", color: "#2A2830" }}>#{last.order_number}</div>
-                      <div style={{ fontSize: "12px", color: "#7A7880", marginTop: "2px" }}>{new Date(last.created_at).toLocaleDateString()}</div>
-                    </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                      <span style={{ fontFamily: "var(--font-bebas)", fontSize: "20px", color: "#2A2830" }}>
-                        ${Number(last.total_amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
-                      </span>
-                      <span style={{ padding: "3px 9px", borderRadius: "20px", fontSize: "11px", fontWeight: 700, background: oCfg.bg, color: oCfg.color, textTransform: "capitalize" }}>
-                        {last.status}
-                      </span>
-                      <button
-                        onClick={() => router.push(`/admin/orders/${last.id}`)}
-                        style={{ padding: "5px 12px", border: "1px solid #E2E0DA", borderRadius: "6px", background: "#fff", fontSize: "12px", fontWeight: 600, cursor: "pointer" }}>
-                        View
-                      </button>
+          {orders.length > 0 && orders[0] && (() => {
+            const last = orders[0]!;
+            const oCfg = ORDER_STATUS[last.status] ?? { bg: "rgba(156,163,175,.15)", color: "#9CA3AF" };
+            return (
+              <div style={card}>
+                <div style={sectionTitle}>Last Order</div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px" }}>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: "15px", color: "#2A2830" }}>#{last.order_number}</div>
+                    {last.po_number && <div style={{ fontSize: "11px", color: "#7A7880" }}>PO: {last.po_number}</div>}
+                    <div style={{ fontSize: "12px", color: "#7A7880", marginTop: "2px" }}>
+                      {new Date(last.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                      {last.item_count > 0 && ` · ${last.item_count} item${last.item_count !== 1 ? "s" : ""}`}
                     </div>
                   </div>
-                );
-              })()}
-            </div>
-          )}
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                    <span style={{ fontFamily: "var(--font-bebas)", fontSize: "22px", color: "#2A2830" }}>
+                      ${Number(last.total).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                    </span>
+                    <span style={{ padding: "3px 9px", borderRadius: "20px", fontSize: "11px", fontWeight: 700, background: oCfg.bg, color: oCfg.color, textTransform: "capitalize" }}>
+                      {last.status}
+                    </span>
+                    <button
+                      onClick={() => router.push(`/admin/orders/${last.id}`)}
+                      style={{ padding: "5px 12px", border: "1px solid #E2E0DA", borderRadius: "6px", background: "#fff", fontSize: "12px", fontWeight: 600, cursor: "pointer" }}>
+                      View
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
 
-          {/* Orders History */}
+          {/* Order History */}
           <div style={card}>
-            <div style={sectionTitle}>Order History</div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
+              <div style={sectionTitle}>Order History</div>
+              <span style={{ fontSize: "12px", color: "#7A7880" }}>{orders.length} order{orders.length !== 1 ? "s" : ""}</span>
+            </div>
             {orders.length === 0 ? (
-              <div style={{ textAlign: "center", padding: "24px", color: "#bbb", fontSize: "13px" }}>No orders yet</div>
+              <div style={{ textAlign: "center", padding: "28px", color: "#bbb", fontSize: "13px" }}>No orders yet</div>
             ) : (
-              <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                <thead>
-                  <tr style={{ background: "#F4F3EF", borderBottom: "1.5px solid #E2E0DA" }}>
-                    <th style={thStyle}>Order #</th>
-                    <th style={thStyle}>Date</th>
-                    <th style={{ ...thStyle, textAlign: "right" }}>Amount</th>
-                    <th style={thStyle}>Status</th>
-                    <th style={thStyle}></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {orders.map(o => {
-                    const oCfg = STATUS_BADGE[o.status] ?? { bg: "rgba(156,163,175,.15)", color: "#9CA3AF" };
-                    return (
-                      <tr key={o.id} style={{ borderBottom: "1px solid #F4F3EF" }}>
-                        <td style={{ padding: "11px 14px", fontWeight: 700, fontSize: "13px", color: "#2A2830" }}>#{o.order_number}</td>
-                        <td style={{ padding: "11px 14px", fontSize: "12px", color: "#7A7880" }}>{new Date(o.created_at).toLocaleDateString()}</td>
-                        <td style={{ padding: "11px 14px", textAlign: "right", fontFamily: "var(--font-bebas)", fontSize: "16px", color: "#2A2830" }}>
-                          ${Number(o.total_amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
-                        </td>
-                        <td style={{ padding: "11px 14px" }}>
-                          <span style={{ padding: "3px 9px", borderRadius: "20px", fontSize: "11px", fontWeight: 700, background: oCfg.bg, color: oCfg.color, textTransform: "capitalize" }}>
-                            {o.status}
-                          </span>
-                        </td>
-                        <td style={{ padding: "11px 14px" }}>
-                          <button
-                            onClick={() => router.push(`/admin/orders/${o.id}`)}
-                            style={{ padding: "4px 10px", border: "1px solid #E2E0DA", borderRadius: "6px", background: "#fff", fontSize: "11px", fontWeight: 600, cursor: "pointer" }}>
-                            View
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+              <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr style={{ background: "#F4F3EF", borderBottom: "1.5px solid #E2E0DA" }}>
+                      <th style={thSt}>Order #</th>
+                      <th style={thSt}>Date</th>
+                      <th style={{ ...thSt, textAlign: "right" }}>Items</th>
+                      <th style={{ ...thSt, textAlign: "right" }}>Total</th>
+                      <th style={thSt}>Status</th>
+                      <th style={thSt}></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {orders.map(o => {
+                      const oCfg = ORDER_STATUS[o.status] ?? { bg: "rgba(156,163,175,.15)", color: "#9CA3AF" };
+                      return (
+                        <tr key={o.id}
+                          style={{ borderBottom: "1px solid #F4F3EF", cursor: "pointer", transition: "background .1s" }}
+                          onMouseEnter={e => (e.currentTarget.style.background = "#FAFAF8")}
+                          onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                          onClick={() => router.push(`/admin/orders/${o.id}`)}>
+                          <td style={{ padding: "11px 14px", fontWeight: 700, fontSize: "13px", color: "#2A2830" }}>
+                            #{o.order_number}
+                            {o.po_number && <div style={{ fontSize: "10px", color: "#7A7880", fontWeight: 400 }}>PO: {o.po_number}</div>}
+                          </td>
+                          <td style={{ padding: "11px 14px", fontSize: "12px", color: "#7A7880", whiteSpace: "nowrap" }}>
+                            {new Date(o.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                          </td>
+                          <td style={{ padding: "11px 14px", textAlign: "right", fontSize: "13px", color: "#2A2830", fontWeight: 600 }}>{o.item_count}</td>
+                          <td style={{ padding: "11px 14px", textAlign: "right", fontFamily: "var(--font-bebas)", fontSize: "16px", color: "#2A2830" }}>
+                            ${Number(o.total).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                          </td>
+                          <td style={{ padding: "11px 14px" }}>
+                            <span style={{ padding: "3px 8px", borderRadius: "20px", fontSize: "11px", fontWeight: 700, background: oCfg.bg, color: oCfg.color, textTransform: "capitalize", whiteSpace: "nowrap" }}>
+                              {o.status}
+                            </span>
+                          </td>
+                          <td style={{ padding: "11px 14px" }} onClick={e => e.stopPropagation()}>
+                            <button
+                              onClick={() => router.push(`/admin/orders/${o.id}`)}
+                              style={{ padding: "4px 10px", border: "1px solid #E2E0DA", borderRadius: "6px", background: "#fff", fontSize: "11px", fontWeight: 600, cursor: "pointer" }}>
+                              View
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
 
           {/* Timeline */}
           <div style={card}>
             <div style={sectionTitle}>Timeline</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
+            <div style={{ display: "flex", flexDirection: "column" }}>
               {[
-                { date: company.updated_at, label: "Profile last updated", color: "#7C3AED" },
-                ...(company.last_order_date ? [{ date: company.last_order_date, label: "Last order placed", color: "#1A5CFF" }] : []),
-                { date: company.created_at, label: "Account created", color: "#059669" },
-              ].map((ev, i) => (
-                <div key={i} style={{ display: "flex", gap: "14px", alignItems: "flex-start" }}>
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                    <div style={{ width: "10px", height: "10px", borderRadius: "50%", background: ev.color, flexShrink: 0, marginTop: "4px" }} />
-                    {i < 2 && <div style={{ width: "2px", flex: 1, background: "#E2E0DA", minHeight: "24px" }} />}
+                ...orders.slice(0, 5).map((o, i) => ({
+                  date: o.created_at,
+                  label: `Order #${o.order_number} placed`,
+                  sub: `${o.item_count} item${o.item_count !== 1 ? "s" : ""} · $${Number(o.total).toLocaleString("en-US", { minimumFractionDigits: 2 })}`,
+                  color: ORDER_STATUS[o.status]?.color ?? "#7A7880",
+                  key: `order-${i}`,
+                })),
+                {
+                  date: customer.created_at,
+                  label: "Account created",
+                  sub: "Wholesale account registered",
+                  color: "#059669",
+                  key: "created",
+                },
+              ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+               .map((ev, i, arr) => (
+                <div key={ev.key} style={{ display: "flex", gap: "14px", alignItems: "flex-start" }}>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0 }}>
+                    <div style={{ width: "10px", height: "10px", borderRadius: "50%", background: ev.color, marginTop: "4px" }} />
+                    {i < arr.length - 1 && <div style={{ width: "2px", background: "#E2E0DA", flexGrow: 1, minHeight: "20px" }} />}
                   </div>
                   <div style={{ paddingBottom: "16px" }}>
                     <div style={{ fontSize: "13px", fontWeight: 600, color: "#2A2830" }}>{ev.label}</div>
-                    <div style={{ fontSize: "11px", color: "#7A7880" }}>{new Date(ev.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</div>
+                    <div style={{ fontSize: "11px", color: "#7A7880", marginTop: "1px" }}>{ev.sub}</div>
+                    <div style={{ fontSize: "11px", color: "#9CA3AF", marginTop: "1px" }}>
+                      {new Date(ev.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -490,76 +607,81 @@ export default function AdminCompanyDetailPage() {
           </div>
         </div>
 
-        {/* RIGHT COLUMN */}
+        {/* ── RIGHT ────────────────────────────────────────────────────── */}
         <div>
+
           {/* Customer Details */}
           <div style={card}>
             <div style={sectionTitle}>Customer Details</div>
-            <dl style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "6px 16px", fontSize: "13px" }}>
+
+            {/* Contact info */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "14px" }}>
               {[
-                { label: "Tax ID",        value: company.tax_id },
-                { label: "Business Type", value: company.business_type },
-                { label: "Website",       value: company.website },
-                { label: "Stripe ID",     value: company.stripe_customer_id },
-                { label: "QB Customer",   value: company.qb_customer_id },
-                { label: "Joined",        value: new Date(company.created_at).toLocaleDateString() },
-              ].map(row => (
-                row.value ? (
-                  <>
-                    <dt key={`dt-${row.label}`} style={{ color: "#7A7880", whiteSpace: "nowrap", lineHeight: "1.7" }}>{row.label}</dt>
-                    <dd key={`dd-${row.label}`} style={{ color: "#2A2830", fontWeight: 600, wordBreak: "break-all", lineHeight: "1.7", margin: 0 }}>{row.value}</dd>
-                  </>
-                ) : null
+                { icon: "✉", label: "Email",    val: customer.email },
+                { icon: "📞", label: "Phone",    val: customer.phone },
+                { icon: "👤", label: "Contact",  val: customer.contact_name },
+                { icon: "🏢", label: "Type",     val: customer.business_type },
+                { icon: "🌐", label: "Website",  val: customer.website },
+                { icon: "🪪", label: "Tax ID",   val: customer.tax_id },
+                { icon: "💳", label: "Stripe",   val: customer.stripe_customer_id },
+                { icon: "📒", label: "QB ID",    val: customer.qb_customer_id },
+              ].filter(r => r.val).map(r => (
+                <div key={r.label} style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "13px" }}>
+                  <span style={{ fontSize: "13px", flexShrink: 0, marginTop: "1px" }}>{r.icon}</span>
+                  <div style={{ minWidth: "56px", color: "#7A7880", flexShrink: 0 }}>{r.label}</div>
+                  <div style={{ color: "#2A2830", fontWeight: 600, wordBreak: "break-all" }}>{r.val}</div>
+                </div>
               ))}
-            </dl>
+            </div>
 
             {/* Pricing & Shipping Tiers */}
-            <div style={{ marginTop: "16px", paddingTop: "14px", borderTop: "1px solid #F4F3EF" }}>
+            <div style={{ borderTop: "1px solid #F4F3EF", paddingTop: "14px" }}>
               <div style={{ ...sectionTitle, marginBottom: "10px" }}>Pricing &amp; Shipping</div>
-              <div style={{ marginBottom: "10px" }}>
+              <div style={{ marginBottom: "8px" }}>
                 <label style={{ fontSize: "11px", color: "#7A7880", fontWeight: 700, display: "block", marginBottom: "4px" }}>Pricing Tier</label>
-                <select value={editPricingTier} onChange={e => setEditPricingTier(e.target.value)} style={selectStyle}>
+                <select value={editPricing} onChange={e => setEditPricing(e.target.value)} style={{ ...inp, cursor: "pointer" }}>
                   <option value="">None</option>
                   {pricingTiers.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
                 </select>
               </div>
-              <div style={{ marginBottom: "10px" }}>
+              <div style={{ marginBottom: "8px" }}>
                 <label style={{ fontSize: "11px", color: "#7A7880", fontWeight: 700, display: "block", marginBottom: "4px" }}>Shipping Tier</label>
-                <select value={editShippingTier} onChange={e => setEditShippingTier(e.target.value)} style={selectStyle}>
+                <select value={editShipping} onChange={e => setEditShipping(e.target.value)} style={{ ...inp, cursor: "pointer" }}>
                   <option value="">None</option>
                   {shippingTiers.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
                 </select>
               </div>
-              <div style={{ marginBottom: "12px" }}>
+              <div style={{ marginBottom: "10px" }}>
                 <label style={{ fontSize: "11px", color: "#7A7880", fontWeight: 700, display: "block", marginBottom: "4px" }}>Shipping Override ($)</label>
-                <input
-                  type="number"
-                  value={shippingOverride}
-                  onChange={e => setShippingOverride(e.target.value)}
-                  placeholder="Leave blank to use tier"
-                  style={inputStyle}
-                />
+                <input type="number" value={editOverride} onChange={e => setEditOverride(e.target.value)} placeholder="Leave blank to use tier" style={inp} />
               </div>
               <button
                 onClick={handleSaveTiers}
-                disabled={isSaving}
-                style={{ width: "100%", padding: "9px", background: "#1A5CFF", color: "#fff", border: "none", borderRadius: "7px", fontSize: "13px", fontWeight: 700, cursor: isSaving ? "not-allowed" : "pointer", opacity: isSaving ? 0.6 : 1 }}>
-                {isSaving ? "Saving…" : "Save Changes"}
+                disabled={savingTiers}
+                style={{ width: "100%", padding: "9px", background: "#1A5CFF", color: "#fff", border: "none", borderRadius: "7px", fontSize: "13px", fontWeight: 700, cursor: savingTiers ? "not-allowed" : "pointer", opacity: savingTiers ? 0.6 : 1 }}>
+                {savingTiers ? "Saving…" : "Save Tiers"}
               </button>
+              {(pricingTierName || shippingTierName) && (
+                <div style={{ marginTop: "8px", fontSize: "11px", color: "#7A7880" }}>
+                  {pricingTierName && <span>Pricing: <strong>{pricingTierName}</strong></span>}
+                  {pricingTierName && shippingTierName && " · "}
+                  {shippingTierName && <span>Shipping: <strong>{shippingTierName}</strong></span>}
+                </div>
+              )}
             </div>
           </div>
 
           {/* Tags */}
           <div style={card}>
             <div style={sectionTitle}>Tags</div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "10px" }}>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", minHeight: "28px", marginBottom: "10px" }}>
               {tags.length === 0 && <span style={{ fontSize: "12px", color: "#bbb" }}>No tags yet</span>}
               {tags.map(tag => (
-                <span key={tag} style={{ display: "inline-flex", alignItems: "center", gap: "5px", padding: "3px 9px", background: "rgba(26,92,255,.08)", color: "#1A5CFF", borderRadius: "20px", fontSize: "12px", fontWeight: 600 }}>
+                <span key={tag} style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "3px 10px", background: "rgba(26,92,255,.08)", color: "#1A5CFF", borderRadius: "20px", fontSize: "12px", fontWeight: 600 }}>
                   {tag}
                   <button
                     onClick={() => handleRemoveTag(tag)}
-                    style={{ background: "none", border: "none", cursor: "pointer", color: "#1A5CFF", padding: 0, fontSize: "13px", lineHeight: 1 }}>
+                    style={{ background: "none", border: "none", cursor: "pointer", color: "#1A5CFF", padding: 0, fontSize: "14px", lineHeight: 1, marginLeft: "2px" }}>
                     ×
                   </button>
                 </span>
@@ -569,14 +691,14 @@ export default function AdminCompanyDetailPage() {
               <input
                 value={tagInput}
                 onChange={e => setTagInput(e.target.value)}
-                onKeyDown={e => e.key === "Enter" && handleAddTag()}
-                placeholder="Add tag…"
-                style={{ ...inputStyle, flex: 1 }}
+                onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); handleAddTag(); } }}
+                placeholder="Add tag… (Enter to save)"
+                style={{ ...inp, flex: 1 }}
               />
               <button
                 onClick={handleAddTag}
-                disabled={isSavingTags || !tagInput.trim()}
-                style={{ padding: "8px 12px", background: "#1A5CFF", color: "#fff", border: "none", borderRadius: "7px", fontSize: "13px", fontWeight: 700, cursor: !tagInput.trim() ? "not-allowed" : "pointer", opacity: !tagInput.trim() ? 0.5 : 1 }}>
+                disabled={savingTags || !tagInput.trim()}
+                style={{ padding: "8px 13px", background: "#1A5CFF", color: "#fff", border: "none", borderRadius: "7px", fontSize: "16px", fontWeight: 700, cursor: !tagInput.trim() ? "not-allowed" : "pointer", opacity: !tagInput.trim() ? 0.4 : 1 }}>
                 +
               </button>
             </div>
@@ -585,42 +707,45 @@ export default function AdminCompanyDetailPage() {
           {/* Notes */}
           <div style={card}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
-              <div style={sectionTitle}>Notes</div>
-              {!editNotes && (
-                <button onClick={() => setEditNotes(true)} style={{ fontSize: "12px", color: "#1A5CFF", fontWeight: 600, background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+              <div style={sectionTitle}>Admin Notes</div>
+              {!editingNote && (
+                <button
+                  onClick={() => { setNoteText(note); setEditingNote(true); }}
+                  style={{ fontSize: "12px", color: "#1A5CFF", fontWeight: 600, background: "none", border: "none", cursor: "pointer", padding: 0 }}>
                   Edit
                 </button>
               )}
             </div>
-            {editNotes ? (
+            {editingNote ? (
               <>
                 <textarea
                   rows={5}
-                  value={notes}
-                  onChange={e => setNotes(e.target.value)}
+                  value={noteText}
+                  onChange={e => setNoteText(e.target.value)}
                   placeholder="Add internal notes about this customer…"
-                  style={{ ...inputStyle, resize: "vertical", marginBottom: "8px" }}
+                  style={{ ...inp, resize: "vertical", marginBottom: "8px" }}
                 />
                 <div style={{ display: "flex", gap: "8px" }}>
                   <button
-                    onClick={handleSaveNotes}
-                    disabled={isSavingNotes}
-                    style={{ flex: 1, padding: "8px", background: "#1A5CFF", color: "#fff", border: "none", borderRadius: "7px", fontSize: "13px", fontWeight: 700, cursor: isSavingNotes ? "not-allowed" : "pointer", opacity: isSavingNotes ? 0.6 : 1 }}>
-                    {isSavingNotes ? "Saving…" : "Save"}
+                    onClick={handleSaveNote}
+                    disabled={savingNote}
+                    style={{ flex: 1, padding: "8px", background: "#1A5CFF", color: "#fff", border: "none", borderRadius: "7px", fontSize: "13px", fontWeight: 700, cursor: savingNote ? "not-allowed" : "pointer", opacity: savingNote ? 0.6 : 1 }}>
+                    {savingNote ? "Saving…" : "Save Notes"}
                   </button>
                   <button
-                    onClick={() => setEditNotes(false)}
+                    onClick={() => { setEditingNote(false); setNoteText(note); }}
                     style={{ padding: "8px 14px", border: "1px solid #E2E0DA", borderRadius: "7px", background: "#fff", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}>
                     Cancel
                   </button>
                 </div>
               </>
             ) : (
-              <p style={{ fontSize: "13px", color: notes ? "#2A2830" : "#bbb", lineHeight: 1.6, margin: 0, whiteSpace: "pre-wrap" }}>
-                {notes || "No notes yet. Click Edit to add internal notes."}
+              <p style={{ fontSize: "13px", color: note ? "#2A2830" : "#bbb", lineHeight: 1.7, margin: 0, whiteSpace: "pre-wrap" }}>
+                {note || "No notes yet. Click Edit to add internal notes."}
               </p>
             )}
           </div>
+
         </div>
       </div>
     </div>
