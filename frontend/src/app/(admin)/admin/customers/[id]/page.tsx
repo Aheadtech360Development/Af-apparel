@@ -40,7 +40,7 @@ interface OrderRow {
   created_at: string;
 }
 
-interface PricingTier { id: string; name: string; }
+interface PricingTierFull { id: string; name: string; discount_percent?: number; discount_percentage?: number; }
 interface ShippingTier { id: string; name: string; }
 
 // ─── RFM ─────────────────────────────────────────────────────────────────────
@@ -124,7 +124,7 @@ export default function CustomerDetailPage() {
 
   const [customer, setCustomer]         = useState<Customer | null>(null);
   const [orders, setOrders]             = useState<OrderRow[]>([]);
-  const [pricingTiers, setPricingTiers] = useState<PricingTier[]>([]);
+  const [pricingTiers, setPricingTiers] = useState<PricingTierFull[]>([]);
   const [shippingTiers, setShippingTiers] = useState<ShippingTier[]>([]);
   const [loading, setLoading]           = useState(true);
 
@@ -166,7 +166,7 @@ export default function CustomerDetailPage() {
       try {
         const [co, pt, st] = await Promise.all([
           adminService.getCompany(id) as Promise<Customer>,
-          adminService.listPricingTiers() as Promise<PricingTier[]>,
+          adminService.listPricingTiers() as Promise<PricingTierFull[]>,
           adminService.listShippingTiers() as Promise<ShippingTier[]>,
         ]);
         setCustomer(co);
@@ -640,8 +640,11 @@ export default function CustomerDetailPage() {
               <div style={{ marginBottom: "8px" }}>
                 <label style={{ fontSize: "11px", color: "#7A7880", fontWeight: 700, display: "block", marginBottom: "4px" }}>Pricing Tier</label>
                 <select value={editPricing} onChange={e => setEditPricing(e.target.value)} style={{ ...inp, cursor: "pointer" }}>
-                  <option value="">None</option>
-                  {pricingTiers.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                  <option value="">No tier assigned</option>
+                  {pricingTiers.map(t => {
+                    const disc = t.discount_percentage ?? t.discount_percent ?? 0;
+                    return <option key={t.id} value={t.id}>{t.name}{disc ? ` — ${disc}% off` : ""}</option>;
+                  })}
                 </select>
               </div>
               <div style={{ marginBottom: "8px" }}>

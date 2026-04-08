@@ -26,11 +26,14 @@ export function AdminSidebar() {
   const pathname = usePathname();
   const isOrdersActive = pathname.startsWith("/admin/orders") || pathname === "/admin/abandoned-carts";
   const isProductsActive = pathname.startsWith("/admin/products") || pathname.startsWith("/admin/inventory");
+  const isCustomersActive = pathname.startsWith("/admin/customers");
   const [ordersOpen, setOrdersOpen] = useState(isOrdersActive);
   const [productsOpen, setProductsOpen] = useState(isProductsActive);
+  const [customersOpen, setCustomersOpen] = useState(isCustomersActive);
 
   useEffect(() => { if (isOrdersActive) setOrdersOpen(true); }, [isOrdersActive]);
   useEffect(() => { if (isProductsActive) setProductsOpen(true); }, [isProductsActive]);
+  useEffect(() => { if (isCustomersActive) setCustomersOpen(true); }, [isCustomersActive]);
 
   function NavLink({ href, label, icon }: { href: string; label: string; icon: string }) {
     const active = pathname === href || (href !== "/admin" && pathname.startsWith(href + "/"));
@@ -110,8 +113,34 @@ export function AdminSidebar() {
 
       {/* ── CUSTOMERS ── */}
       <div style={SECTION_HEAD}>Customers</div>
-      <NavLink href="/admin/customers" label="All Customers" icon="🏢" />
-      <NavLink href="/admin/customers/applications" label="Applications" icon="📋" />
+
+      {/* Customers dropdown */}
+      <div
+        onClick={() => setCustomersOpen(!customersOpen)}
+        style={{
+          ...NAV_LINK_BASE,
+          justifyContent: "space-between",
+          background: isCustomersActive ? "rgba(26,92,255,.08)" : "transparent",
+          color: isCustomersActive ? "#1A5CFF" : "#555",
+          userSelect: "none",
+        }}
+        onMouseEnter={e => { if (!isCustomersActive) (e.currentTarget as HTMLElement).style.background = "#F4F3EF"; }}
+        onMouseLeave={e => { if (!isCustomersActive) (e.currentTarget as HTMLElement).style.background = isCustomersActive ? "rgba(26,92,255,.08)" : "transparent"; }}
+      >
+        <span style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <span style={{ fontSize: "15px" }}>🏢</span>
+          <span>Customers</span>
+        </span>
+        <span style={{ fontSize: "10px", color: "#aaa", transition: "transform .2s", transform: customersOpen ? "rotate(180deg)" : "rotate(0deg)", display: "inline-block" }}>▼</span>
+      </div>
+
+      {customersOpen && (
+        <div style={{ paddingLeft: "18px", marginTop: "3px", marginBottom: "3px" }}>
+          <SubLink href="/admin/customers" label="All Customers" />
+          <SubLink href="/admin/customers/applications" label="Applications" />
+          <SubLink href="/admin/customers/tiers" label="Pricing Tiers" />
+        </div>
+      )}
 
       {/* ── CATALOG ── */}
       <div style={SECTION_HEAD}>Catalog</div>

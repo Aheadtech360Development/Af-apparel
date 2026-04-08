@@ -117,9 +117,21 @@ export const adminService = {
     return apiClient.post("/api/v1/admin/warehouses", data);
   },
 
-  // Pricing / Shipping tiers (read-only for selects)
+  // Pricing / Shipping tiers
   async listPricingTiers() {
     return apiClient.get("/api/v1/admin/pricing-tiers");
+  },
+
+  async createPricingTier(data: object) {
+    return apiClient.post("/api/v1/admin/pricing-tiers", data);
+  },
+
+  async updatePricingTier(id: string, data: object) {
+    return apiClient.patch(`/api/v1/admin/pricing-tiers/${id}`, data);
+  },
+
+  async deletePricingTier(id: string) {
+    return apiClient.delete(`/api/v1/admin/pricing-tiers/${id}`);
   },
 
   async listShippingTiers() {
