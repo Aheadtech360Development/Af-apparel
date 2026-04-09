@@ -2,15 +2,19 @@
 
 import { useRef, useState } from "react";
 import { adminService } from "@/services/admin.service";
+import { productsService } from "@/services/products.service";
 import { ApiClientError } from "@/lib/api-client";
 
 // ── CSV template ──────────────────────────────────────────────────────────────
-const SAMPLE_CSV = `name,category,description,base_price,moq,vendor,product_type,colors,sizes,status
-Classic Tee,T-Shirts,Premium cotton blank tee,8.99,6,Gildan,Blank,White;Black;Red;Navy,XS;S;M;L;XL;2XL,active
-Sport Polo,Polo Shirts,Performance polo shirt,24.99,12,Port Authority,Polo,White;Black;Navy;Royal,S;M;L;XL;2XL,active
-Heavy Hoodie,Hoodies,Midweight pullover hoodie,28.00,6,Gildan,Hoodie,White;Black;Charcoal;Navy,S;M;L;XL;2XL,draft`;
+// Colors/sizes are comma-separated inside quoted fields.
+// Images format: "Color:https://url.jpg,Color2:https://url2.jpg"
+// If no color prefix just use the URL directly — it will apply to all colors.
+const SAMPLE_CSV = `name,slug,description,category,product_type,vendor,base_price,moq,status,colors,sizes,sku_prefix,images
+Classic T-Shirt,classic-t-shirt,100% cotton ring-spun tee,T-Shirts,Blank,Gildan,8.99,12,active,"White,Black,Navy,Red","S,M,L,XL,2XL",CTS,"White:https://example.com/white.jpg,Black:https://example.com/black.jpg"
+Premium Hoodie,premium-hoodie,80/20 cotton-poly fleece,Hoodies,Blank,AF Apparels,32.00,6,draft,"Black,Grey,Navy","S,M,L,XL",PMH,"Black:https://example.com/black-hoodie.jpg"
+Polo Shirt,polo-shirt,CVC performance fabric polo,Polo Shirts,Blank,AF Apparels,18.99,12,active,"White,Black,Navy","S,M,L,XL",POL,`;
 
-// ── CSV parser (handles quoted fields with commas) ────────────────────────────
+// ── CSV parser (handles quoted fields with embedded commas) ───────────────────
 function parseCsv(text: string): Record<string, string>[] {
   const lines = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n").trim().split("\n");
   if (lines.length < 2) return [];
@@ -51,9 +55,30 @@ function parseRow(line: string): string[] {
   return result;
 }
 
+// ── Image map parser: "White:https://...,Black:https://..." ──────────────────
+function parseImageMap(raw: string, colors: string[]): Record<string, string> {
+  const map: Record<string, string> = {};
+  if (!raw.trim()) return map;
+
+  raw.split(",").forEach(part => {
+    part = part.trim();
+    const colonHttpIdx = part.indexOf(":http");
+    if (colonHttpIdx > 0) {
+      const color = part.slice(0, colonHttpIdx).trim();
+      const url = part.slice(colonHttpIdx + 1).trim();
+      map[color] = url;
+    } else if (part.startsWith("http")) {
+      // No color prefix — apply URL to all colors
+      colors.forEach(c => { map[c] = part; });
+    }
+  });
+  return map;
+}
+
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface PreviewRow {
   name: string;
+  slug: string;
   category: string;
   description: string;
   base_price: number;
@@ -63,7 +88,8 @@ interface PreviewRow {
   colors: string[];
   sizes: string[];
   status: string;
-  _raw: Record<string, string>;
+  sku_prefix: string;
+  images_raw: string; // raw string from CSV, used for display + parsing at import time
 }
 
 interface ImportResult {
@@ -110,16 +136,19 @@ export function ImportProductsModal({ onClose, onSuccess }: Props) {
       const parsed = parseCsv(text);
       const preview: PreviewRow[] = parsed.map(row => ({
         name: row["name"] ?? "",
+        slug: row["slug"] ?? "",
         category: row["category"] ?? "",
         description: row["description"] ?? "",
         base_price: parseFloat(row["base_price"] ?? "0") || 0,
         moq: parseInt(row["moq"] ?? "6", 10) || 6,
         vendor: row["vendor"] ?? "",
         product_type: row["product_type"] ?? "",
-        colors: (row["colors"] ?? "").split(";").map(s => s.trim()).filter(Boolean),
-        sizes: (row["sizes"] ?? "").split(";").map(s => s.trim()).filter(Boolean),
+        // Colors and sizes are comma-separated inside quoted CSV fields
+        colors: (row["colors"] ?? "").split(",").map(s => s.trim()).filter(Boolean),
+        sizes: (row["sizes"] ?? "").split(",").map(s => s.trim()).filter(Boolean),
         status: row["status"] ?? "draft",
-        _raw: row,
+        sku_prefix: row["sku_prefix"] ?? "",
+        images_raw: row["images"] ?? "",
       })).filter(r => r.name);
       setRows(preview);
       setStep("preview");
@@ -139,27 +168,42 @@ export function ImportProductsModal({ onClose, onSuccess }: Props) {
     if (f) handleFile(f);
   }
 
-  // ── Import ──────────────────────────────────────────────────────────────────
+  // ── Helpers ─────────────────────────────────────────────────────────────────
   function generateSlug(name: string): string {
     const base = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-    const suffix = Date.now().toString().slice(-5);
-    return `${base}-${suffix}`;
+    return `${base}-${Date.now().toString().slice(-5)}`;
   }
 
+  function buildSku(prefix: string, name: string, color: string, size: string): string {
+    const p = prefix.trim() ||
+      name.split(" ").map(w => w[0] ?? "").join("").toUpperCase().slice(0, 4);
+    const c = color.replace(/\s+/g, "").slice(0, 3).toUpperCase();
+    return `${p}-${c}-${size}`;
+  }
+
+  // ── Import ──────────────────────────────────────────────────────────────────
   async function runImport() {
     setStep("importing");
     setImportProgress(0);
     const res: ImportResult = { success: 0, failed: 0, created: [], errors: [] };
 
+    // Pre-load category list once for all rows
+    let categoryList: { id: string; name: string }[] = [];
+    try {
+      const cats = await productsService.getCategories();
+      categoryList = (cats ?? []).map(c => ({ id: (c as { id: string }).id, name: c.name }));
+    } catch {/* non-fatal */}
+
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i]!;
       setImportProgress(Math.round(((i + 0.5) / rows.length) * 100));
+
       try {
-        // ProductCreate schema: name, slug, description, moq, status, product_type, vendor, tags, category_ids
-        // base_price is NOT in ProductCreate — pricing lives on variants (retail_price)
+        // ── Step 1: Create product ───────────────────────────────────────────
+        const slug = row.slug.trim() || generateSlug(row.name);
         const product = await adminService.createProduct({
           name: row.name,
-          slug: generateSlug(row.name),
+          slug,
           description: row.description || undefined,
           moq: row.moq,
           vendor: row.vendor || undefined,
@@ -168,19 +212,73 @@ export function ImportProductsModal({ onClose, onSuccess }: Props) {
           category_ids: [],
         });
 
-        // Generate variants if colors + sizes provided
-        // BulkGenerateRequest: colors, sizes, base_retail_price (required)
-        if (product && (product as { id?: string }).id && row.colors.length > 0 && row.sizes.length > 0) {
-          const productId = (product as { id: string }).id;
-          await adminService.bulkGenerateVariants(productId, {
-            colors: row.colors,
-            sizes: row.sizes,
-            base_retail_price: row.base_price,
-          }).catch(() => {/* non-fatal */});
+        const productId = (product as { id: string }).id;
+
+        // ── Step 2: Assign category if found ────────────────────────────────
+        if (row.category.trim() && categoryList.length > 0) {
+          const match = categoryList.find(
+            c => c.name.toLowerCase() === row.category.toLowerCase().trim()
+          );
+          if (match) {
+            await adminService.updateProduct(productId, {
+              category_ids: [match.id],
+            }).catch(() => {/* non-fatal */});
+          }
+        }
+
+        // ── Step 3: Add images per color ────────────────────────────────────
+        const imageMap = parseImageMap(row.images_raw, row.colors);
+        let imagesAdded = 0;
+        for (const [color, url] of Object.entries(imageMap)) {
+          if (!url) continue;
+          await adminService.addImageFromUrl(
+            productId,
+            url,
+            color,
+            imagesAdded === 0,
+          ).catch(() => {/* non-fatal */});
+          imagesAdded++;
+        }
+
+        // ── Step 4: Bulk-generate variants ──────────────────────────────────
+        const colors = row.colors.length > 0 ? row.colors : ["Default"];
+        const sizes = row.sizes.length > 0 ? row.sizes : ["S", "M", "L", "XL"];
+        let variantsCreated = 0;
+
+        if (colors.length > 0 && sizes.length > 0) {
+          try {
+            await adminService.bulkGenerateVariants(productId, {
+              colors,
+              sizes,
+              base_retail_price: row.base_price,
+            });
+            variantsCreated = colors.length * sizes.length;
+          } catch {
+            // Fall back to individual variant creation
+            const { apiClient } = await import("@/lib/api-client");
+            for (const color of colors) {
+              for (const size of sizes) {
+                try {
+                  const sku = buildSku(row.sku_prefix, row.name, color, size);
+                  await apiClient.post(`/api/v1/admin/products/${productId}/variants`, {
+                    sku,
+                    color,
+                    size,
+                    retail_price: row.base_price,
+                    status: "active",
+                  });
+                  variantsCreated++;
+                } catch {/* skip this variant */}
+              }
+            }
+          }
         }
 
         res.success++;
-        res.created.push(row.name);
+        const imageCount = Object.keys(imageMap).length;
+        res.created.push(
+          `${row.name} (${variantsCreated} variants${imageCount > 0 ? `, ${imageCount} images` : ""})`
+        );
       } catch (err) {
         res.failed++;
         let msg = "Unknown error";
@@ -191,6 +289,7 @@ export function ImportProductsModal({ onClose, onSuccess }: Props) {
         }
         res.errors.push(`${row.name}: ${msg}`);
       }
+
       setImportProgress(Math.round(((i + 1) / rows.length) * 100));
     }
 
@@ -200,9 +299,14 @@ export function ImportProductsModal({ onClose, onSuccess }: Props) {
   }
 
   // ── Render ──────────────────────────────────────────────────────────────────
+  const thStyle: React.CSSProperties = {
+    padding: "10px 12px", textAlign: "left", fontWeight: 700, color: "#7A7880",
+    textTransform: "uppercase", letterSpacing: ".05em", whiteSpace: "nowrap", fontSize: "11px",
+  };
+
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.55)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
-      <div style={{ background: "#fff", borderRadius: "14px", width: "100%", maxWidth: "860px", maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 24px 72px rgba(0,0,0,.25)" }}>
+      <div style={{ background: "#fff", borderRadius: "14px", width: "100%", maxWidth: "980px", maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 24px 72px rgba(0,0,0,.25)" }}>
 
         {/* Header */}
         <div style={{ padding: "20px 24px", borderBottom: "1px solid #E2E0DA", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
@@ -211,7 +315,7 @@ export function ImportProductsModal({ onClose, onSuccess }: Props) {
               📥 IMPORT PRODUCTS
             </h2>
             <p style={{ fontSize: "12px", color: "#7A7880", margin: "4px 0 0" }}>
-              Upload a CSV to bulk-create products with variants
+              Bulk-create products with variants and images from CSV
             </p>
           </div>
           {step !== "importing" && (
@@ -224,7 +328,8 @@ export function ImportProductsModal({ onClose, onSuccess }: Props) {
           {(["upload", "preview", "importing", "done"] as Step[]).map((s, idx) => {
             const labels: Record<Step, string> = { upload: "1. Upload", preview: "2. Preview", importing: "3. Importing", done: "4. Done" };
             const active = s === step;
-            const past = ["upload", "preview", "importing", "done"].indexOf(s) < ["upload", "preview", "importing", "done"].indexOf(step);
+            const stepOrder = ["upload", "preview", "importing", "done"];
+            const past = stepOrder.indexOf(s) < stepOrder.indexOf(step);
             return (
               <div key={s} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                 <span style={{ fontSize: "12px", fontWeight: 700, color: active ? "#1A5CFF" : past ? "#059669" : "#bbb", letterSpacing: ".04em" }}>
@@ -239,7 +344,7 @@ export function ImportProductsModal({ onClose, onSuccess }: Props) {
         {/* Body */}
         <div style={{ flex: 1, overflow: "auto", padding: "24px" }}>
 
-          {/* STEP 1: Upload */}
+          {/* ── STEP 1: Upload ─────────────────────────────────────────────── */}
           {step === "upload" && (
             <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
               {/* Template download */}
@@ -259,18 +364,23 @@ export function ImportProductsModal({ onClose, onSuccess }: Props) {
               {/* Column guide */}
               <div style={{ border: "1px solid #E2E0DA", borderRadius: "10px", overflow: "hidden" }}>
                 <div style={{ padding: "12px 16px", background: "#F4F3EF", borderBottom: "1px solid #E2E0DA" }}>
-                  <span style={{ fontSize: "12px", fontWeight: 700, color: "#7A7880", textTransform: "uppercase", letterSpacing: ".06em" }}>Required Columns</span>
+                  <span style={{ fontSize: "12px", fontWeight: 700, color: "#7A7880", textTransform: "uppercase", letterSpacing: ".06em" }}>CSV Column Reference</span>
                 </div>
                 <div style={{ padding: "12px 16px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 24px" }}>
                   {[
                     ["name", "Product name (required)"],
-                    ["category", "Category name"],
-                    ["base_price", "Price per unit (e.g. 8.99)"],
+                    ["slug", "URL slug — auto-generated if empty"],
+                    ["category", "Category name (matched by name)"],
+                    ["description", "Product description"],
+                    ["base_price", "Price per unit, e.g. 8.99"],
                     ["moq", "Min order quantity (default: 6)"],
-                    ["colors", "Semicolon-separated (e.g. White;Black)"],
-                    ["sizes", "Semicolon-separated (e.g. S;M;L;XL)"],
-                    ["vendor", "Brand/manufacturer"],
+                    ["colors", 'Comma-separated inside quotes: "White,Black"'],
+                    ["sizes", 'Comma-separated inside quotes: "S,M,L,XL"'],
+                    ["sku_prefix", "SKU prefix, e.g. CTS → CTS-WHI-M"],
+                    ["vendor", "Brand / manufacturer"],
+                    ["product_type", "e.g. Blank, Screen Print"],
                     ["status", "active, draft, or archived"],
+                    ["images", '"Color:https://url.jpg,Color2:https://url2.jpg"'],
                   ].map(([col, desc]) => (
                     <div key={col} style={{ display: "flex", gap: "8px", alignItems: "flex-start" }}>
                       <code style={{ background: "#EEF2FF", color: "#1A5CFF", padding: "2px 6px", borderRadius: "4px", fontSize: "11px", fontWeight: 700, flexShrink: 0 }}>{col}</code>
@@ -312,7 +422,7 @@ export function ImportProductsModal({ onClose, onSuccess }: Props) {
             </div>
           )}
 
-          {/* STEP 2: Preview */}
+          {/* ── STEP 2: Preview ────────────────────────────────────────────── */}
           {step === "preview" && (
             <div>
               <div style={{ marginBottom: "14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -333,42 +443,57 @@ export function ImportProductsModal({ onClose, onSuccess }: Props) {
                   <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px" }}>
                     <thead>
                       <tr style={{ background: "#F4F3EF", borderBottom: "2px solid #E2E0DA" }}>
-                        {["Name", "Category", "Price", "MOQ", "Colors", "Sizes", "Status"].map(h => (
-                          <th key={h} style={{ padding: "10px 12px", textAlign: "left", fontWeight: 700, color: "#7A7880", textTransform: "uppercase", letterSpacing: ".05em", whiteSpace: "nowrap" }}>{h}</th>
+                        {["#", "Name", "Category", "Type", "Vendor", "Price", "MOQ", "Colors", "Sizes", "Images", "Status"].map(h => (
+                          <th key={h} style={thStyle}>{h}</th>
                         ))}
                       </tr>
                     </thead>
                     <tbody>
-                      {rows.map((row, i) => (
-                        <tr key={i} style={{ borderBottom: "1px solid #F4F3EF" }}>
-                          <td style={{ padding: "10px 12px", fontWeight: 600, color: "#2A2830" }}>{row.name || <span style={{ color: "#E8242A" }}>Missing!</span>}</td>
-                          <td style={{ padding: "10px 12px", color: "#7A7880" }}>{row.category || "—"}</td>
-                          <td style={{ padding: "10px 12px", color: "#2A2830" }}>${row.base_price.toFixed(2)}</td>
-                          <td style={{ padding: "10px 12px", color: "#2A2830" }}>{row.moq}</td>
-                          <td style={{ padding: "10px 12px" }}>
-                            <div style={{ display: "flex", gap: "3px", flexWrap: "wrap" }}>
-                              {row.colors.length > 0
-                                ? row.colors.slice(0, 4).map(c => (
-                                  <span key={c} style={{ background: "#EEF2FF", color: "#1A5CFF", padding: "2px 6px", borderRadius: "3px", fontSize: "10px", fontWeight: 600 }}>{c}</span>
-                                ))
-                                : <span style={{ color: "#bbb" }}>—</span>}
-                              {row.colors.length > 4 && <span style={{ color: "#7A7880", fontSize: "10px" }}>+{row.colors.length - 4}</span>}
-                            </div>
-                          </td>
-                          <td style={{ padding: "10px 12px", color: "#7A7880" }}>
-                            {row.sizes.length > 0 ? row.sizes.join(", ") : "—"}
-                          </td>
-                          <td style={{ padding: "10px 12px" }}>
-                            <span style={{
-                              padding: "3px 8px", borderRadius: "12px", fontSize: "10px", fontWeight: 700,
-                              background: row.status === "active" ? "rgba(5,150,105,.1)" : "rgba(156,163,175,.15)",
-                              color: row.status === "active" ? "#059669" : "#9CA3AF",
-                            }}>
-                              {row.status || "draft"}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
+                      {rows.map((row, i) => {
+                        const imgCount = row.images_raw.trim()
+                          ? row.images_raw.split(",").filter(p => p.includes(":http") || p.trim().startsWith("http")).length
+                          : 0;
+                        return (
+                          <tr key={i} style={{ borderBottom: "1px solid #F4F3EF" }}>
+                            <td style={{ padding: "10px 12px", color: "#aaa", fontWeight: 600 }}>{i + 1}</td>
+                            <td style={{ padding: "10px 12px", fontWeight: 600, color: "#2A2830" }}>
+                              {row.name || <span style={{ color: "#E8242A" }}>Missing!</span>}
+                            </td>
+                            <td style={{ padding: "10px 12px", color: "#7A7880" }}>{row.category || "—"}</td>
+                            <td style={{ padding: "10px 12px", color: "#7A7880" }}>{row.product_type || "—"}</td>
+                            <td style={{ padding: "10px 12px", color: "#7A7880" }}>{row.vendor || "—"}</td>
+                            <td style={{ padding: "10px 12px", color: "#2A2830", fontWeight: 600 }}>${row.base_price.toFixed(2)}</td>
+                            <td style={{ padding: "10px 12px", color: "#2A2830" }}>{row.moq}</td>
+                            <td style={{ padding: "10px 12px" }}>
+                              <div style={{ display: "flex", gap: "3px", flexWrap: "wrap" }}>
+                                {row.colors.length > 0
+                                  ? row.colors.slice(0, 3).map(c => (
+                                    <span key={c} style={{ background: "#F4F3EF", padding: "2px 5px", borderRadius: "3px", fontSize: "10px", fontWeight: 600, color: "#2A2830" }}>{c}</span>
+                                  ))
+                                  : <span style={{ color: "#bbb" }}>—</span>}
+                                {row.colors.length > 3 && <span style={{ color: "#7A7880", fontSize: "10px" }}>+{row.colors.length - 3}</span>}
+                              </div>
+                            </td>
+                            <td style={{ padding: "10px 12px", color: "#7A7880" }}>
+                              {row.sizes.length > 0 ? `${row.sizes.length} sizes` : "—"}
+                            </td>
+                            <td style={{ padding: "10px 12px" }}>
+                              {imgCount > 0
+                                ? <span style={{ color: "#059669", fontWeight: 600 }}>{imgCount} 🖼️</span>
+                                : <span style={{ color: "#bbb", fontSize: "11px" }}>None</span>}
+                            </td>
+                            <td style={{ padding: "10px 12px" }}>
+                              <span style={{
+                                padding: "3px 8px", borderRadius: "12px", fontSize: "10px", fontWeight: 700,
+                                background: row.status === "active" ? "rgba(5,150,105,.1)" : "rgba(156,163,175,.15)",
+                                color: row.status === "active" ? "#059669" : "#9CA3AF",
+                              }}>
+                                {row.status || "draft"}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
@@ -376,7 +501,7 @@ export function ImportProductsModal({ onClose, onSuccess }: Props) {
             </div>
           )}
 
-          {/* STEP 3: Importing */}
+          {/* ── STEP 3: Importing ──────────────────────────────────────────── */}
           {step === "importing" && (
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "48px 24px", textAlign: "center" }}>
               <div style={{ width: "56px", height: "56px", border: "4px solid #EEF2FF", borderTop: "4px solid #1A5CFF", borderRadius: "50%", animation: "spin 1s linear infinite", marginBottom: "24px" }} />
@@ -392,10 +517,10 @@ export function ImportProductsModal({ onClose, onSuccess }: Props) {
             </div>
           )}
 
-          {/* STEP 4: Done */}
+          {/* ── STEP 4: Done ───────────────────────────────────────────────── */}
           {step === "done" && (
             <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-              {/* Summary */}
+              {/* Summary cards */}
               <div style={{ display: "flex", gap: "12px" }}>
                 <div style={{ flex: 1, background: "rgba(5,150,105,.08)", border: "1px solid rgba(5,150,105,.2)", borderRadius: "10px", padding: "16px 20px", textAlign: "center" }}>
                   <div style={{ fontFamily: "var(--font-bebas)", fontSize: "36px", color: "#059669", lineHeight: 1 }}>{result.success}</div>
@@ -415,11 +540,12 @@ export function ImportProductsModal({ onClose, onSuccess }: Props) {
                   <div style={{ padding: "10px 14px", background: "#F4F3EF", borderBottom: "1px solid #E2E0DA" }}>
                     <span style={{ fontSize: "11px", fontWeight: 700, color: "#7A7880", textTransform: "uppercase", letterSpacing: ".06em" }}>Created Products</span>
                   </div>
-                  <div style={{ padding: "12px 14px", display: "flex", flexWrap: "wrap", gap: "6px" }}>
-                    {result.created.map(name => (
-                      <span key={name} style={{ background: "rgba(5,150,105,.1)", color: "#059669", padding: "4px 10px", borderRadius: "20px", fontSize: "12px", fontWeight: 600 }}>
-                        ✓ {name}
-                      </span>
+                  <div style={{ padding: "12px 14px", display: "flex", flexDirection: "column", gap: "6px" }}>
+                    {result.created.map((name, idx) => (
+                      <div key={idx} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        <span style={{ color: "#059669", fontSize: "14px" }}>✓</span>
+                        <span style={{ fontSize: "13px", color: "#2A2830" }}>{name}</span>
+                      </div>
                     ))}
                   </div>
                 </div>

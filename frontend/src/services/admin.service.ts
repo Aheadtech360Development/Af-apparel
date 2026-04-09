@@ -49,6 +49,14 @@ export const adminService = {
     return apiClient.delete(`/api/v1/admin/products/${id}`);
   },
 
+  async addImageFromUrl(productId: string, url: string, altText?: string, isPrimary?: boolean) {
+    return apiClient.post(`/api/v1/admin/products/${productId}/images/from-url`, {
+      url,
+      alt_text: altText,
+      is_primary: isPrimary ?? false,
+    });
+  },
+
   async uploadImage(productId: string, file: File, altText?: string) {
     const form = new FormData();
     form.append("file", file);
