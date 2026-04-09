@@ -1,10 +1,11 @@
 export const dynamic = "force-dynamic";
 
-import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import HeroSection from "@/components/home/HeroSection";
 import TrustStrip from "@/components/home/TrustStrip";
+import { BrandLogos } from "@/components/home/BrandLogos";
 import CategoryGrid from "@/components/home/CategoryGrid";
+import { BestSellers } from "@/components/home/BestSellers";
 import HowItWorks from "@/components/home/HowItWorks";
 import WhoWeServe from "@/components/home/WhoWeServe";
 import WhyChooseUs from "@/components/home/WhyChooseUs";
@@ -23,11 +24,12 @@ export default async function HomePage() {
 
   return (
     <>
-      <Header />
       <main style={{ fontFamily: "var(--font-jakarta)" }}>
         <HeroSection />
         <TrustStrip />
+        <BrandLogos />
         <CategoryGrid categories={categories} />
+        <BestSellers />
         <HowItWorks />
         <WhoWeServe />
         <WhyChooseUs />

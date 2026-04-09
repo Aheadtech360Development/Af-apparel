@@ -45,37 +45,51 @@ export function Header() {
         <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 32px", display: "flex", alignItems: "center", justifyContent: "space-between", height: "68px", gap: "24px" }}>
 
           {/* Logo */}
-<Link href="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
-  <img 
-    src="/Af-apparel logo.jpeg" 
-    alt="AF Apparels Logo" 
-    style={{ height: "48px", width: "auto", objectFit: "contain" }} 
-  />
-</Link>
+          <Link href="/" style={{ display: "flex", alignItems: "center", gap: "8px", textDecoration: "none" }}>
+            <span style={{ fontFamily: "var(--font-bebas)", fontSize: "32px", color: "#1A5CFF", lineHeight: 1 }}>A</span>
+            <span style={{ fontFamily: "var(--font-bebas)", fontSize: "32px", color: "#E8242A", lineHeight: 1 }}>F</span>
+            <div style={{ marginLeft: "4px" }}>
+              <span style={{ fontFamily: "var(--font-bebas)", fontSize: "13px", color: "#fff", letterSpacing: ".18em", display: "block", lineHeight: 1 }}>APPARELS</span>
+              <span style={{ fontSize: "8px", color: "#444", letterSpacing: ".12em", textTransform: "uppercase" }}>Wholesale B2B</span>
+            </div>
+          </Link>
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex" style={{ gap: "4px", alignItems: "center" }}>
-            {isAdmin() ? (
+            {/* Shop nav — always visible */}
+            {([
+              { href: "/products",                  label: "Shop All"  },
+              { href: "/products?category=mens",    label: "Men's"     },
+              { href: "/products?category=womens",  label: "Women's"   },
+              { href: "/products?category=youth",   label: "Youth"     },
+            ] as { href: string; label: string }[]).map(({ href, label }) => (
+              <Link key={href} href={href} style={{ color: "#888", fontSize: "13px", fontWeight: 600, textDecoration: "none", letterSpacing: ".04em", padding: "8px 14px", borderRadius: "4px", transition: "all .2s", textTransform: "uppercase" }}
+                onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#fff"; (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,.06)"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#888"; (e.currentTarget as HTMLAnchorElement).style.background = "transparent"; }}>
+                {label}
+              </Link>
+            ))}
+            {/* Admin link */}
+            {isAdmin() && (
               <Link href="/admin/dashboard" style={{ color: "#888", fontSize: "13px", fontWeight: 600, textDecoration: "none", letterSpacing: ".04em", padding: "8px 14px", borderRadius: "4px", transition: "all .2s", textTransform: "uppercase" }}
-                onMouseEnter={e => { (e.target as HTMLAnchorElement).style.color="#fff"; (e.target as HTMLAnchorElement).style.background="rgba(255,255,255,.06)"; }}
-                onMouseLeave={e => { (e.target as HTMLAnchorElement).style.color="#888"; (e.target as HTMLAnchorElement).style.background="transparent"; }}>
+                onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#fff"; (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,.06)"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#888"; (e.currentTarget as HTMLAnchorElement).style.background = "transparent"; }}>
                 Admin Panel
               </Link>
-            ) : (
+            )}
+            {/* Authenticated non-admin links */}
+            {isAuthenticated() && !isAdmin() && (
               <>
-                <Link href="/products" style={{ color: "#888", fontSize: "13px", fontWeight: 600, textDecoration: "none", letterSpacing: ".04em", padding: "8px 14px", borderRadius: "4px", transition: "all .2s", textTransform: "uppercase" }}>
-                  Shop All
+                <Link href="/quick-order" style={{ color: "#888", fontSize: "13px", fontWeight: 600, textDecoration: "none", letterSpacing: ".04em", padding: "8px 14px", borderRadius: "4px", transition: "all .2s", textTransform: "uppercase" }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#fff"; (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,.06)"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#888"; (e.currentTarget as HTMLAnchorElement).style.background = "transparent"; }}>
+                  Quick Order
                 </Link>
-                {isAuthenticated() && (
-                  <>
-                    <Link href="/quick-order" style={{ color: "#888", fontSize: "13px", fontWeight: 600, textDecoration: "none", letterSpacing: ".04em", padding: "8px 14px", borderRadius: "4px", transition: "all .2s", textTransform: "uppercase" }}>
-                      Quick Order
-                    </Link>
-                    <Link href="/account" style={{ color: "#888", fontSize: "13px", fontWeight: 600, textDecoration: "none", letterSpacing: ".04em", padding: "8px 14px", borderRadius: "4px", transition: "all .2s", textTransform: "uppercase" }}>
-                      My Account
-                    </Link>
-                  </>
-                )}
+                <Link href="/account" style={{ color: "#888", fontSize: "13px", fontWeight: 600, textDecoration: "none", letterSpacing: ".04em", padding: "8px 14px", borderRadius: "4px", transition: "all .2s", textTransform: "uppercase" }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#fff"; (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,.06)"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#888"; (e.currentTarget as HTMLAnchorElement).style.background = "transparent"; }}>
+                  My Account
+                </Link>
               </>
             )}
           </nav>
@@ -141,38 +155,43 @@ export function Header() {
         {/* Mobile menu */}
         {menuOpen && (
           <div style={{ background: "#111016", borderTop: "1px solid rgba(255,255,255,.06)", padding: "12px 20px" }} className="md:hidden">
-            {isAdmin() ? (
-              <Link href="/admin/dashboard" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 0", color: "#888", fontSize: "13px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em" }}>
+            {/* Shop links — always visible */}
+            {[
+              { href: "/products",                  label: "Shop All"  },
+              { href: "/products?category=mens",    label: "Men's"     },
+              { href: "/products?category=womens",  label: "Women's"   },
+              { href: "/products?category=youth",   label: "Youth"     },
+            ].map(({ href, label }) => (
+              <Link key={href} href={href} onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 0", color: "#888", fontSize: "13px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+                {label}
+              </Link>
+            ))}
+            {isAdmin() && (
+              <Link href="/admin/dashboard" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 0", color: "#888", fontSize: "13px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
                 Admin Panel
               </Link>
-            ) : (
+            )}
+            {isAuthenticated() && !isAdmin() && (
               <>
-                <Link href="/products" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 0", color: "#888", fontSize: "13px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
-                  Shop All
+                <Link href="/quick-order" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 0", color: "#888", fontSize: "13px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+                  Quick Order
                 </Link>
-                {isAuthenticated() && (
-                  <>
-                    <Link href="/quick-order" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 0", color: "#888", fontSize: "13px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
-                      Quick Order
-                    </Link>
-                    <Link href="/account" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 0", color: "#888", fontSize: "13px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
-                      My Account
-                    </Link>
-                    <Link href="/cart" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 0", color: "#888", fontSize: "13px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
-                      Cart {cartCount > 0 && `(${cartCount})`}
-                    </Link>
-                  </>
-                )}
-                {!isAuthenticated() && (
-                  <>
-                    <Link href="/wholesale/register" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 0", color: "#2d8cff", fontSize: "13px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
-                      Apply for Wholesale
-                    </Link>
-                    <Link href="/login" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 0", color: "#2d8cff", fontSize: "13px", fontWeight: 700, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em" }}>
-                      Log In
-                    </Link>
-                  </>
-                )}
+                <Link href="/account" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 0", color: "#888", fontSize: "13px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+                  My Account
+                </Link>
+                <Link href="/cart" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 0", color: "#888", fontSize: "13px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+                  Cart {cartCount > 0 && `(${cartCount})`}
+                </Link>
+              </>
+            )}
+            {!isAuthenticated() && (
+              <>
+                <Link href="/wholesale/register" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 0", color: "#2d8cff", fontSize: "13px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+                  Apply for Wholesale
+                </Link>
+                <Link href="/login" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 0", color: "#2d8cff", fontSize: "13px", fontWeight: 700, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em" }}>
+                  Log In
+                </Link>
               </>
             )}
             {isAuthenticated() && (

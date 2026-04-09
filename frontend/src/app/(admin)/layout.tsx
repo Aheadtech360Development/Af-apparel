@@ -3,7 +3,6 @@
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/auth.store";
-import { Header } from "@/components/layout/Header";
 import { AdminSidebar } from "@/components/layout/AdminSidebar";
 import { Footer } from "@/components/layout/Footer";
 
@@ -43,13 +42,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <>
-      <Header />
-      <div className="flex min-h-[calc(100vh-4rem)]">
-        <AdminSidebar />
-        <main className="flex-1 p-6 overflow-auto">{children}</main>
-      </div>
-      <Footer />
-    </>
+    <div className="flex min-h-[calc(100vh-4rem)]">
+      <AdminSidebar />
+      <main className="flex-1 p-6 overflow-auto">{children}</main>
+    </div>
   );
 }

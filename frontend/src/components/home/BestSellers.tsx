@@ -1,0 +1,118 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { productsService } from "@/services/products.service";
+
+interface ProductItem {
+  id: string;
+  name: string;
+  slug: string;
+  base_price?: number;
+  primary_image?: string | null;
+  moq?: number;
+  categories?: { name: string }[];
+}
+
+const FALLBACK: ProductItem[] = [
+  { id: "1", name: "Classic White T-Shirt",  slug: "classic-white-t-shirt",  base_price: 8.99,  categories: [{ name: "T-Shirts" }] },
+  { id: "2", name: "Business Polo Shirt",    slug: "business-polo-shirt",    base_price: 28.00, categories: [{ name: "Polo Shirts" }] },
+  { id: "3", name: "Sport Hoodie",           slug: "sport-hoodie",           base_price: 32.00, categories: [{ name: "Hoodies" }] },
+  { id: "4", name: "Casual Denim Jacket",    slug: "casual-denim-jacket",    base_price: 65.00, categories: [{ name: "Jackets" }] },
+];
+
+const BADGES: Record<number, { label: string; bg: string }> = {
+  0: { label: "BEST SELLER", bg: "#E8242A" },
+  1: { label: "POPULAR",     bg: "#1A5CFF" },
+};
+
+export function BestSellers() {
+  const [products, setProducts] = useState<ProductItem[]>([]);
+
+  useEffect(() => {
+    productsService
+      .listProducts({ page_size: 4 })
+      .then(res => {
+        const items = (res?.items ?? []) as ProductItem[];
+        setProducts(items.length > 0 ? items : FALLBACK);
+      })
+      .catch(() => setProducts(FALLBACK));
+  }, []);
+
+  return (
+    <section style={{ padding: "80px 0", background: "#fff" }}>
+      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 32px" }}>
+
+        {/* Section header */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "40px" }}>
+          <div>
+            <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(32px,3.5vw,48px)", color: "#2A2830", letterSpacing: ".01em", lineHeight: 1, marginBottom: "8px" }}>
+              Best Sellers
+            </h2>
+            <p style={{ fontSize: "14px", color: "#7A7880", margin: 0 }}>
+              Most ordered styles by our wholesale customers
+            </p>
+          </div>
+          <Link href="/products" style={{ fontSize: "13px", fontWeight: 700, color: "#1A5CFF", textDecoration: "none", display: "flex", alignItems: "center", gap: "4px" }}>
+            View All Products →
+          </Link>
+        </div>
+
+        {/* Grid */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "16px" }} className="best-sellers-grid">
+          {products.map((product, i) => (
+            <Link key={product.id} href={`/products/${product.slug}`} style={{ textDecoration: "none", display: "block" }}>
+              <div
+                style={{ background: "#fff", border: "1px solid #E2E0DA", borderRadius: "10px", overflow: "hidden", transition: "all .25s" }}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLDivElement).style.boxShadow = "0 8px 30px rgba(0,0,0,.1)";
+                  (e.currentTarget as HTMLDivElement).style.transform = "translateY(-2px)";
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
+                  (e.currentTarget as HTMLDivElement).style.transform = "translateY(0)";
+                }}
+              >
+                {/* Image */}
+                <div style={{ height: "220px", background: "linear-gradient(135deg,#f0ede8 0%,#e8e4df 100%)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden" }}>
+                  {product.primary_image ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={product.primary_image} alt={product.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  ) : (
+                    <span style={{ fontSize: "52px", opacity: 0.25 }}>👕</span>
+                  )}
+                  {BADGES[i] && (
+                    <div style={{ position: "absolute", top: "12px", left: "12px", background: BADGES[i]!.bg, color: "#fff", fontFamily: "var(--font-bebas)", fontSize: "11px", letterSpacing: ".08em", padding: "4px 10px", borderRadius: "4px" }}>
+                      {BADGES[i]!.label}
+                    </div>
+                  )}
+                </div>
+
+                {/* Info */}
+                <div style={{ padding: "16px 18px" }}>
+                  <div style={{ fontSize: "11px", color: "#7A7880", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: "5px", fontWeight: 600 }}>
+                    {product.categories?.[0]?.name ?? "Apparel"}
+                  </div>
+                  <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "17px", letterSpacing: ".03em", marginBottom: "8px", color: "#2A2830", lineHeight: 1.2 }}>
+                    {product.name}
+                  </h4>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                      <span style={{ fontFamily: "var(--font-bebas)", fontSize: "20px", color: "#1A5CFF" }}>
+                        ${(product.base_price ?? 0).toFixed(2)}
+                      </span>
+                      <span style={{ fontSize: "11px", color: "#aaa", marginLeft: "4px" }}>/ unit</span>
+                    </div>
+                    <div style={{ fontSize: "11px", color: "#7A7880", fontWeight: 600 }}>
+                      MOQ: {product.moq ?? 6}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}

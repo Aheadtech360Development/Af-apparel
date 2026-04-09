@@ -220,3 +220,15 @@
 .rich-editor-content .ProseMirror strong { font-weight: 700; }
 .rich-editor-content .ProseMirror em { font-style: italic; }
 .rich-editor-content .ProseMirror s { text-decoration: line-through; }
+
+/* Best Sellers responsive grid */
+@media (max-width: 768px) {
+  .best-sellers-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+@media (max-width: 480px) {
+  .best-sellers-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
