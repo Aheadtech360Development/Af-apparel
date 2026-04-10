@@ -31,6 +31,7 @@ export default function AdminProductsPage() {
   const [products, setProducts] = useState<ProductDetail[]>([]);
   const [total, setTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -45,6 +46,7 @@ export default function AdminProductsPage() {
 
   async function load(p = page) {
     setIsLoading(true);
+    setLoadError(null);
     try {
       const data = await adminService.listProducts({
         q: search || undefined,
@@ -54,6 +56,10 @@ export default function AdminProductsPage() {
       const items = data ?? [];
       setProducts(items);
       setTotal(items.length < pageSize ? (p - 1) * pageSize + items.length : p * pageSize + 1);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to load products";
+      setLoadError(msg);
+      setProducts([]);
     } finally {
       setIsLoading(false);
     }
@@ -223,6 +229,14 @@ export default function AdminProductsPage() {
           <tbody>
             {isLoading ? (
               <tr><td colSpan={9} style={{ padding: "48px", textAlign: "center", color: "#aaa", fontSize: "14px" }}>Loading…</td></tr>
+            ) : loadError ? (
+              <tr>
+                <td colSpan={9} style={{ padding: "48px", textAlign: "center" }}>
+                  <div style={{ fontSize: "14px", color: "#E8242A", fontWeight: 600, marginBottom: "8px" }}>Failed to load products</div>
+                  <div style={{ fontSize: "12px", color: "#aaa", marginBottom: "16px", maxWidth: "480px", margin: "0 auto 16px" }}>{loadError}</div>
+                  <button onClick={() => load()} style={{ padding: "8px 20px", background: "#1A5CFF", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: 600, fontSize: "13px" }}>Retry</button>
+                </td>
+              </tr>
             ) : products.length === 0 ? (
               <tr>
                 <td colSpan={9} style={{ padding: "56px", textAlign: "center" }}>

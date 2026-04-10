@@ -194,14 +194,6 @@ export function ImportProductsModal({ onClose, onSuccess }: Props) {
       categoryList = (cats ?? []).map(c => ({ id: (c as { id: string }).id, name: c.name }));
     } catch {/* non-fatal */}
 
-    let defaultWarehouseId: string | null = null;
-    try {
-      const warehouses = await adminService.listWarehouses() as { id: string }[] | null;
-      if (warehouses && warehouses.length > 0) {
-        defaultWarehouseId = warehouses[0]!.id;
-      }
-    } catch {/* non-fatal */}
-
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i]!;
       setImportProgress(Math.round(((i + 0.5) / rows.length) * 100));
@@ -253,18 +245,14 @@ export function ImportProductsModal({ onClose, onSuccess }: Props) {
         const sizes = row.sizes.length > 0 ? row.sizes : ["S", "M", "L", "XL"];
         let variantsCreated = 0;
 
-        const createdVariantIds: string[] = [];
         if (colors.length > 0 && sizes.length > 0) {
           try {
             const bulkRes = await adminService.bulkGenerateVariants(productId, {
               colors,
               sizes,
               base_retail_price: row.base_price,
-            }) as { generated: number; variants: { id: string }[] } | null;
-            if (bulkRes?.variants) {
-              bulkRes.variants.forEach(v => createdVariantIds.push(v.id));
-            }
-            variantsCreated = colors.length * sizes.length;
+            }) as { generated: number } | null;
+            variantsCreated = bulkRes?.generated ?? (colors.length * sizes.length);
           } catch {
             // Fall back to individual variant creation
             const { apiClient } = await import("@/lib/api-client");
@@ -272,31 +260,17 @@ export function ImportProductsModal({ onClose, onSuccess }: Props) {
               for (const size of sizes) {
                 try {
                   const sku = buildSku(row.sku_prefix, row.name, color, size);
-                  const v = await apiClient.post<{ id: string }>(`/api/v1/admin/products/${productId}/variants`, {
+                  await apiClient.post(`/api/v1/admin/products/${productId}/variants`, {
                     sku,
                     color,
                     size,
                     retail_price: row.base_price,
                     status: "active",
                   });
-                  if (v?.id) createdVariantIds.push(v.id);
                   variantsCreated++;
                 } catch {/* skip this variant */}
               }
             }
-          }
-        }
-
-        // ── Step 5: Create inventory records so variants appear in Inventory ──
-        if (defaultWarehouseId && createdVariantIds.length > 0) {
-          for (const vid of createdVariantIds) {
-            await adminService.adjustStock({
-              variant_id: vid,
-              warehouse_id: defaultWarehouseId,
-              quantity_delta: 0,
-              reason: "migration",
-              notes: "Created via CSV import",
-            }).catch(() => {/* non-fatal */});
           }
         }
 
