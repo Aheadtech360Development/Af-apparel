@@ -240,37 +240,41 @@ export function ImportProductsModal({ onClose, onSuccess }: Props) {
           imagesAdded++;
         }
 
-        // ── Step 4: Bulk-generate variants ──────────────────────────────────
+        // ── Step 4: Bulk-create variants in one batch call ──────────────────
         const colors = row.colors.length > 0 ? row.colors : ["Default"];
         const sizes = row.sizes.length > 0 ? row.sizes : ["S", "M", "L", "XL"];
         let variantsCreated = 0;
 
         if (colors.length > 0 && sizes.length > 0) {
+          // Build all variants upfront with correct SKUs from sku_prefix
+          const allVariants = colors.flatMap(color =>
+            sizes.map(size => ({
+              sku: buildSku(row.sku_prefix, row.name, color, size),
+              color,
+              size,
+              retail_price: row.base_price,
+              status: "active",
+            }))
+          );
+
+          const { apiClient: client } = await import("@/lib/api-client");
           try {
-            const bulkRes = await adminService.bulkGenerateVariants(productId, {
-              colors,
-              sizes,
-              base_retail_price: row.base_price,
-            }) as { generated: number } | null;
-            variantsCreated = bulkRes?.generated ?? (colors.length * sizes.length);
+            // Primary: single batch call with explicit SKUs
+            const batchRes = await client.post<{ created: number }>(
+              `/api/v1/admin/products/${productId}/variants/batch`,
+              { variants: allVariants },
+            );
+            variantsCreated = batchRes?.created ?? allVariants.length;
           } catch {
-            // Fall back to individual variant creation
-            const { apiClient } = await import("@/lib/api-client");
-            for (const color of colors) {
-              for (const size of sizes) {
-                try {
-                  const sku = buildSku(row.sku_prefix, row.name, color, size);
-                  await apiClient.post(`/api/v1/admin/products/${productId}/variants`, {
-                    sku,
-                    color,
-                    size,
-                    retail_price: row.base_price,
-                    status: "active",
-                  });
-                  variantsCreated++;
-                } catch {/* skip this variant */}
-              }
-            }
+            // Fallback: bulkGenerateVariants (SKUs auto-generated from slug)
+            try {
+              const bulkRes = await adminService.bulkGenerateVariants(productId, {
+                colors,
+                sizes,
+                base_retail_price: row.base_price,
+              }) as { generated: number } | null;
+              variantsCreated = bulkRes?.generated ?? allVariants.length;
+            } catch {/* variants skipped — product still created */}
           }
         }
 

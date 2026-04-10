@@ -18,6 +18,7 @@ interface ProductItem {
   primary_image?: ProductImageOut | string | null;
   moq?: number;
   categories?: { name: string }[];
+  variants?: { retail_price: number | string }[];
 }
 
 function imageUrl(img: ProductImageOut | string | null | undefined): string | null {
@@ -110,10 +111,17 @@ export function BestSellers() {
                   </h4>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div>
-                      <span style={{ fontFamily: "var(--font-bebas)", fontSize: "20px", color: "#1A5CFF" }}>
-                        ${(product.base_price ?? 0).toFixed(2)}
-                      </span>
-                      <span style={{ fontSize: "11px", color: "#aaa", marginLeft: "4px" }}>/ unit</span>
+                      {(() => {
+                        const price = Number(product.base_price) || Number(product.variants?.[0]?.retail_price) || 0;
+                        return price > 0 ? (
+                          <>
+                            <span style={{ fontFamily: "var(--font-bebas)", fontSize: "20px", color: "#1A5CFF" }}>${price.toFixed(2)}</span>
+                            <span style={{ fontSize: "11px", color: "#aaa", marginLeft: "4px" }}>/ unit</span>
+                          </>
+                        ) : (
+                          <span style={{ fontSize: "12px", color: "#7A7880", fontWeight: 600 }}>Login for pricing</span>
+                        );
+                      })()}
                     </div>
                     <div style={{ fontSize: "11px", color: "#7A7880", fontWeight: 600 }}>
                       MOQ: {product.moq ?? 6}
