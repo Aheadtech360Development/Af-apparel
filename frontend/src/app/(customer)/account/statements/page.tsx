@@ -1,3 +1,4 @@
+// frontend/src/app/(customer)/account/statements/page.tsx
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -107,7 +108,10 @@ export default function StatementsPage() {
       const a = document.createElement("a");
       a.href = url;
       a.download = `Statement_${dateFrom || "All"}.pdf`;
+      a.style.display = "none";
+      document.body.appendChild(a);
       a.click();
+      document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch {
       setMessage({ type: "error", text: "Failed to download PDF." });
@@ -165,11 +169,10 @@ export default function StatementsPage() {
       {/* Message banner */}
       {message && (
         <div
-          className={`px-4 py-3 rounded-md text-sm font-medium ${
-            message.type === "success"
+          className={`px-4 py-3 rounded-md text-sm font-medium ${message.type === "success"
               ? "bg-green-50 text-green-700 border border-green-200"
               : "bg-red-50 text-red-700 border border-red-200"
-          }`}
+            }`}
         >
           {message.text}
         </div>
@@ -191,17 +194,15 @@ export default function StatementsPage() {
             </p>
           </div>
           <div
-            className={`border rounded-lg p-5 ${
-              data.summary.current_balance > 0
+            className={`border rounded-lg p-5 ${data.summary.current_balance > 0
                 ? "bg-orange-50 border-orange-200"
                 : "bg-green-50 border-green-200"
-            }`}
+              }`}
           >
             <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Current Balance</p>
             <p
-              className={`text-2xl font-bold mt-1 ${
-                data.summary.current_balance > 0 ? "text-orange-600" : "text-green-600"
-              }`}
+              className={`text-2xl font-bold mt-1 ${data.summary.current_balance > 0 ? "text-orange-600" : "text-green-600"
+                }`}
             >
               ${data.summary.current_balance.toLocaleString("en-US", { minimumFractionDigits: 2 })}
             </p>
@@ -298,11 +299,10 @@ export default function StatementsPage() {
                     </td>
                     <td className="px-4 py-3">
                       <span
-                        className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                          txn.type === "charge"
+                        className={`text-xs font-medium px-2 py-0.5 rounded-full ${txn.type === "charge"
                             ? "bg-red-50 text-red-600"
                             : "bg-green-50 text-green-600"
-                        }`}
+                          }`}
                       >
                         {TYPE_LABELS[txn.type] ?? txn.type}
                       </span>
@@ -317,9 +317,8 @@ export default function StatementsPage() {
                       {txn.type !== "charge" ? `$${txn.amount.toFixed(2)}` : ""}
                     </td>
                     <td
-                      className={`px-4 py-3 text-right font-medium text-sm ${
-                        txn.running_balance > 0 ? "text-orange-600" : "text-green-600"
-                      }`}
+                      className={`px-4 py-3 text-right font-medium text-sm ${txn.running_balance > 0 ? "text-orange-600" : "text-green-600"
+                        }`}
                     >
                       ${txn.running_balance.toFixed(2)}
                     </td>

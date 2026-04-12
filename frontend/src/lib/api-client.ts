@@ -15,6 +15,13 @@ export function getAccessToken() {
   return accessToken;
 }
 
+// Callback to update sessionStorage when token is silently refreshed
+let onTokenRefreshed: ((token: string) => void) | null = null;
+
+export function setTokenRefreshCallback(cb: (token: string) => void) {
+  onTokenRefreshed = cb;
+}
+
 // ── Refresh logic ─────────────────────────────────────────────────────────────
 
 let refreshPromise: Promise<string | null> | null = null;
@@ -33,6 +40,7 @@ async function refreshAccessToken(): Promise<string | null> {
       }
       const data = (await res.json()) as { access_token: string };
       setAccessToken(data.access_token);
+      if (onTokenRefreshed) onTokenRefreshed(data.access_token);
       return data.access_token;
     })
     .catch(() => {

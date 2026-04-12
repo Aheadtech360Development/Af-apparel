@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useAuthStore } from "@/stores/auth.store";
 import { apiClient, setAccessToken } from "@/lib/api-client";
 import type { UserProfile } from "@/types/user.types";
+import { setTokenRefreshCallback } from "@/lib/api-client";
 
 function decodeJwtPayload(token: string): Record<string, unknown> {
   try {
@@ -18,6 +19,12 @@ function decodeJwtPayload(token: string): Record<string, unknown> {
 
 export function AuthInitializer() {
   useEffect(() => {
+    setTokenRefreshCallback((newToken) => {
+      const store = useAuthStore.getState();
+      if (store.user) {
+        store.setAuth(newToken, store.user); // sessionStorage bhi update hogi
+      }
+    });
     const found = useAuthStore.getState().initAuth();
     if (!found) {
       // No session in sessionStorage — try to restore from httpOnly refresh cookie.

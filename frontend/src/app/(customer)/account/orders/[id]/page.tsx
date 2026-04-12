@@ -1,3 +1,4 @@
+// frontend/src/app/(customer)/account/orders/[id]/page.tsx
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -87,13 +88,12 @@ function StatusTimeline({ status }: { status: string }) {
           <div key={step} className="flex items-center gap-1 shrink-0">
             <div className="flex flex-col items-center gap-1">
               <div
-                className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
-                  done
-                    ? active
-                      ? "bg-brand-600 text-white ring-2 ring-brand-300"
-                      : "bg-brand-100 text-brand-700"
-                    : "bg-gray-100 text-gray-400"
-                }`}
+                className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${done
+                  ? active
+                    ? "bg-brand-600 text-white ring-2 ring-brand-300"
+                    : "bg-brand-100 text-brand-700"
+                  : "bg-gray-100 text-gray-400"
+                  }`}
               >
                 {done && !active ? (
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -173,28 +173,31 @@ export default function OrderDetailPage() {
   }
 
   async function downloadPdf(type: "confirmation" | "invoice" | "ship-confirmation" | "pack-slip") {
-  try {
-    const session = sessionStorage.getItem("af_session");
-    const token = session ? JSON.parse(session).token : null;
-    if (!token) return;
+    try {
+      const session = sessionStorage.getItem("af_session");
+      const token = session ? JSON.parse(session).token : null;
+      if (!token) return;
 
-    const resp = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/orders/${id}/pdf/${type}`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    if (!resp.ok) throw new Error("Failed");
+      const resp = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/orders/${id}/pdf/${type}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (!resp.ok) throw new Error("Failed");
 
-    const blob = await resp.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${type}-${order?.order_number}.pdf`;
-    a.click();
-    URL.revokeObjectURL(url);
-  } catch {
-    alert("Failed to download PDF. Please try again.");
+      const blob = await resp.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${type}-${order?.order_number}.pdf`;
+      a.style.display = "none";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch {
+      alert("Failed to download PDF. Please try again.");
+    }
   }
-}
 
   if (loading || !order) {
     return <div className="py-12 text-center text-gray-400">Loading order…</div>;
@@ -379,11 +382,10 @@ export default function OrderDetailPage() {
             {comments.map((c) => (
               <div
                 key={c.id}
-                className={`rounded-lg p-3 text-sm ${
-                  c.is_admin
-                    ? "bg-blue-50 border border-blue-100"
-                    : "bg-gray-50 border border-gray-100"
-                }`}
+                className={`rounded-lg p-3 text-sm ${c.is_admin
+                  ? "bg-blue-50 border border-blue-100"
+                  : "bg-gray-50 border border-gray-100"
+                  }`}
               >
                 <div className="flex items-center gap-2 mb-1">
                   {c.is_admin && (

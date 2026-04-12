@@ -1,3 +1,4 @@
+// frontend/src/app/(customer)/account/inventory/page.tsx
 "use client";
 import React from "react";
 import { useEffect, useRef, useState } from "react";
@@ -98,10 +99,14 @@ export default function InventoryListingPage() {
       .join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
+    // importProductsModal - downloadTemplate  
     const a = document.createElement("a");
     a.href = url;
-    a.download = `inventory-report-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = "af-apparel-import-template.csv";
+    a.style.display = "none";
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
     URL.revokeObjectURL(url);
   }
 
@@ -275,20 +280,18 @@ export default function InventoryListingPage() {
                   {group.variants.map((item, idx) => (
                     <tr
                       key={`${item.variant_id}-${item.warehouse_id}-${idx}`}
-                      className={`border-b border-gray-100 hover:bg-blue-50 ${
-                        idx % 2 === 0 ? "bg-white" : "bg-gray-50"
-                      }`}
+                      className={`border-b border-gray-100 hover:bg-blue-50 ${idx % 2 === 0 ? "bg-white" : "bg-gray-50"
+                        }`}
                     >
                       <td className="px-4 py-2.5 font-mono text-xs text-gray-500">{item.sku}</td>
                       <td className="px-4 py-2.5 text-gray-700">{item.color}</td>
                       <td className="px-4 py-2.5 text-gray-700">{item.size}</td>
-                      <td className={`px-4 py-2.5 text-right font-semibold ${
-                        item.available === 0
-                          ? "text-red-500"
-                          : item.available < 10
+                      <td className={`px-4 py-2.5 text-right font-semibold ${item.available === 0
+                        ? "text-red-500"
+                        : item.available < 10
                           ? "text-orange-500"
                           : "text-gray-900"
-                      }`}>
+                        }`}>
                         {item.available.toLocaleString()}
                       </td>
                       <td className="px-4 py-2.5 text-gray-500 text-xs">{item.warehouse_name}</td>

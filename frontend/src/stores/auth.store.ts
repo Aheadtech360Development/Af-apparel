@@ -78,19 +78,28 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   setLoading: (loading) => set({ isLoading: loading }),
 
   initAuth: () => {
-    const session = readSession();
-    if (session) {
-      // Re-decode JWT so is_admin is always correct, even if stored session predates the fix.
-      const payload = decodeJwtPayload(session.token);
-      const user = { ...session.user, is_admin: !!payload.is_admin };
-      setAccessToken(session.token);
-      set({ accessToken: session.token, user, isLoading: false });
-      return true;
+  const session = readSession();
+  if (session) {
+    const payload = decodeJwtPayload(session.token);
+    const user = { ...session.user, is_admin: !!payload.is_admin };
+    
+    // ✅ NEW: Token expire check
+    const exp = payload.exp as number | undefined;
+    const isExpired = exp ? (Date.now() / 1000) > exp - 30 : false; // 30s buffer
+    
+    if (isExpired) {
+      try { sessionStorage.removeItem(SESSION_KEY); } catch {}
+      set({ isLoading: true });
+      return false; // AuthInitializer will try refresh cookie
     }
-    // No session in sessionStorage — keep isLoading: true while AuthInitializer tries refresh cookie.
-    set({ isLoading: true });
-    return false;
-  },
+    
+    setAccessToken(session.token);
+    set({ accessToken: session.token, user, isLoading: false });
+    return true;
+  }
+  set({ isLoading: true });
+  return false;
+},
 
   isAuthenticated: () => get().accessToken !== null,
   isAdmin: () => get().user?.is_admin === true,

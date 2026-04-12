@@ -131,7 +131,12 @@
       "Bash(curl -s http://localhost/api/v1/health)",
       "Bash(curl -s --connect-timeout 5 http://127.0.0.1:8000/health)",
       "Bash(curl -s --connect-timeout 5 http://127.0.0.1:3000/login)",
-      "Bash(curl -s -X OPTIONS \"http://127.0.0.1:8000/api/v1/login\" -H \"Origin: http://localhost:3000\" -H \"Access-Control-Request-Method: POST\" -D - -o /dev/null)"
+      "Bash(curl -s -X OPTIONS \"http://127.0.0.1:8000/api/v1/login\" -H \"Origin: http://localhost:3000\" -H \"Access-Control-Request-Method: POST\" -D - -o /dev/null)",
+      "Bash(cp migrations/versions/a1b2c3d4e5f6_add_category_image_url.py /tmp/cat_img_backup.py)",
+      "Bash(rm migrations/versions/a1b2c3d4e5f6_add_category_image_url.py)",
+      "Bash(grep -rh \"revision\" \"C:/Users/RT/Desktop/AF Apparel/backend/migrations/versions/\"*.py)",
+      "Bash(grep -h \"^revision\\\\|^revision:\\\\|^down_revision\\\\|^down_revision:\" \"C:/Users/RT/Desktop/AF Apparel/backend/migrations/versions/\"*.py)",
+      "Bash(sort -t'\"' -k2)"
     ]
   }
 }
