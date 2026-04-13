@@ -125,9 +125,9 @@ export default function CollectionsPage() {
       </div>
 
       {/* Content */}
-      {isLoading ? (
-        <div style={{ textAlign: "center", padding: "60px", color: "#aaa", fontSize: "14px" }}>Loading…</div>
-      ) : collections.length === 0 ? (
+      {isLoading && collections.length === 0 ? (
+  <tr><td colSpan={8} style={{ padding: "40px", textAlign: "center", color: "#bbb", fontSize: "14px" }}>Loading…</td></tr>
+) : collections.length === 0 ? (
         <div style={{ background: "#fff", border: "1px solid #E2E0DA", borderRadius: "10px", padding: "60px", textAlign: "center" }}>
           <div style={{ fontSize: "48px", marginBottom: "12px" }}>🗂️</div>
           <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "22px", color: "#2A2830", marginBottom: "8px" }}>NO COLLECTIONS YET</h3>

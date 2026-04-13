@@ -17,9 +17,9 @@ interface DraftOrder {
 }
 
 const STATUS_STYLE: Record<string, { bg: string; color: string }> = {
-  pending:    { bg: "rgba(217,119,6,.1)",  color: "#D97706" },
-  confirmed:  { bg: "rgba(26,92,255,.1)", color: "#1A5CFF" },
-  cancelled:  { bg: "rgba(232,36,42,.1)", color: "#E8242A" },
+  pending: { bg: "rgba(217,119,6,.1)", color: "#D97706" },
+  confirmed: { bg: "rgba(26,92,255,.1)", color: "#1A5CFF" },
+  cancelled: { bg: "rgba(232,36,42,.1)", color: "#E8242A" },
 };
 
 function StatusBadge({ status }: { status: string }) {
@@ -84,8 +84,8 @@ export default function DraftOrdersPage() {
             </tr>
           </thead>
           <tbody>
-            {isLoading ? (
-              <tr><td colSpan={8} style={{ padding: "48px", textAlign: "center" as const, color: "#aaa", fontSize: "14px" }}>Loading…</td></tr>
+            {isLoading && orders.length === 0 ? (
+              <tr><td colSpan={8} style={{ padding: "40px", textAlign: "center", color: "#bbb", fontSize: "14px" }}>Loading…</td></tr>
             ) : orders.length === 0 ? (
               <tr>
                 <td colSpan={8} style={{ padding: "56px", textAlign: "center" as const }}>

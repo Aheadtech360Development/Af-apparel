@@ -227,7 +227,7 @@ export default function AdminProductsPage() {
             </tr>
           </thead>
           <tbody>
-            {isLoading ? (
+            {isLoading && products.length === 0 ? (
               <tr><td colSpan={9} style={{ padding: "48px", textAlign: "center", color: "#aaa", fontSize: "14px" }}>Loading…</td></tr>
             ) : loadError ? (
               <tr>

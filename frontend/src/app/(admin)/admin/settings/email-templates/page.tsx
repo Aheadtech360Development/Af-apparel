@@ -74,8 +74,8 @@ export default function AdminEmailTemplatesPage() {
             </tr>
           </thead>
           <tbody>
-            {isLoading ? (
-              <tr><td colSpan={5} className="py-8 text-center text-gray-400">Loading…</td></tr>
+            {isLoading && templates.length === 0 ? (
+              <tr><td colSpan={8} style={{ padding: "40px", textAlign: "center", color: "#bbb", fontSize: "14px" }}>Loading…</td></tr>
             ) : templates.length === 0 ? (
               <tr><td colSpan={5} className="py-8 text-center text-gray-400">No templates found</td></tr>
             ) : (

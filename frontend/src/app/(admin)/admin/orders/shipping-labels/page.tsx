@@ -24,10 +24,10 @@ interface ShippingLabel {
 const COURIERS = ["FedEx", "UPS", "USPS", "DHL", "Other"];
 
 const LABEL_STYLE: Record<string, { bg: string; color: string }> = {
-  printed:    { bg: "rgba(5,150,105,.1)",   color: "#059669" },
-  pending:    { bg: "rgba(217,119,6,.1)",   color: "#D97706" },
-  in_transit: { bg: "rgba(26,92,255,.1)",   color: "#1A5CFF" },
-  delivered:  { bg: "rgba(5,150,105,.1)",   color: "#059669" },
+  printed: { bg: "rgba(5,150,105,.1)", color: "#059669" },
+  pending: { bg: "rgba(217,119,6,.1)", color: "#D97706" },
+  in_transit: { bg: "rgba(26,92,255,.1)", color: "#1A5CFF" },
+  delivered: { bg: "rgba(5,150,105,.1)", color: "#059669" },
 };
 
 function Badge({ label, type }: { label: string; type: string }) {
@@ -170,8 +170,8 @@ export default function ShippingLabelsPage() {
             </tr>
           </thead>
           <tbody>
-            {isLoading ? (
-              <tr><td colSpan={10} style={{ padding: "48px", textAlign: "center" as const, color: "#aaa", fontSize: "14px" }}>Loading…</td></tr>
+            {isLoading && filtered.length === 0 ? (
+              <tr><td colSpan={8} style={{ padding: "40px", textAlign: "center", color: "#bbb", fontSize: "14px" }}>Loading…</td></tr>
             ) : filtered.length === 0 ? (
               <tr>
                 <td colSpan={10} style={{ padding: "56px", textAlign: "center" as const }}>

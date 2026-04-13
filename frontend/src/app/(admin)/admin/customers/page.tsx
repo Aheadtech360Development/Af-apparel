@@ -28,17 +28,17 @@ function getRFMGroup(c: CompanyRow): RFMGroup {
     ? Math.floor((Date.now() - new Date(c.last_order_date).getTime()) / 86400000)
     : 999;
   if (orders >= 10 && days < 30) return { label: "Champions", color: "#059669", bg: "rgba(5,150,105,.1)" };
-  if (orders >= 5 && days < 60)  return { label: "Loyal",     color: "#1A5CFF", bg: "rgba(26,92,255,.1)" };
-  if (days > 90 && orders > 2)   return { label: "At Risk",   color: "#D97706", bg: "rgba(217,119,6,.1)" };
-  if (days > 180)                 return { label: "Lost",      color: "#E8242A", bg: "rgba(232,36,42,.1)" };
-  if (orders <= 1)                return { label: "New",       color: "#7C3AED", bg: "rgba(124,58,237,.1)" };
-  return                                  { label: "Potential", color: "#0891B2", bg: "rgba(8,145,178,.1)" };
+  if (orders >= 5 && days < 60) return { label: "Loyal", color: "#1A5CFF", bg: "rgba(26,92,255,.1)" };
+  if (days > 90 && orders > 2) return { label: "At Risk", color: "#D97706", bg: "rgba(217,119,6,.1)" };
+  if (days > 180) return { label: "Lost", color: "#E8242A", bg: "rgba(232,36,42,.1)" };
+  if (orders <= 1) return { label: "New", color: "#7C3AED", bg: "rgba(124,58,237,.1)" };
+  return { label: "Potential", color: "#0891B2", bg: "rgba(8,145,178,.1)" };
 }
 
 const STATUS_BADGE: Record<string, { bg: string; color: string }> = {
-  active:    { bg: "rgba(5,150,105,.1)",  color: "#059669" },
-  suspended: { bg: "rgba(232,36,42,.1)",  color: "#E8242A" },
-  pending:   { bg: "rgba(217,119,6,.1)",  color: "#D97706" },
+  active: { bg: "rgba(5,150,105,.1)", color: "#059669" },
+  suspended: { bg: "rgba(232,36,42,.1)", color: "#E8242A" },
+  pending: { bg: "rgba(217,119,6,.1)", color: "#D97706" },
 };
 
 export default function AdminCustomersPage() {
@@ -120,10 +120,10 @@ export default function AdminCustomersPage() {
       {/* Stats */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "12px", marginBottom: "20px" }}>
         {[
-          { label: "Total Customers",    value: stats.total,                                                             icon: "👥", color: "#2A2830" },
-          { label: "Active Accounts",    value: stats.active,                                                            icon: "✅", color: "#059669" },
-          { label: "Avg Order Value",    value: `$${stats.avg_spend.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, icon: "📊", color: "#1A5CFF" },
-          { label: "Total Revenue",      value: `$${stats.total_revenue.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, icon: "💰", color: "#D97706" },
+          { label: "Total Customers", value: stats.total, icon: "👥", color: "#2A2830" },
+          { label: "Active Accounts", value: stats.active, icon: "✅", color: "#059669" },
+          { label: "Avg Order Value", value: `$${stats.avg_spend.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, icon: "📊", color: "#1A5CFF" },
+          { label: "Total Revenue", value: `$${stats.total_revenue.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, icon: "💰", color: "#D97706" },
         ].map(s => (
           <div key={s.label} style={{ background: "#fff", border: "1px solid #E2E0DA", borderRadius: "10px", padding: "16px 18px", display: "flex", alignItems: "center", gap: "12px" }}>
             <span style={{ fontSize: "22px" }}>{s.icon}</span>
@@ -152,7 +152,7 @@ export default function AdminCustomersPage() {
         <select value={rfmFilter} onChange={e => setRfmFilter(e.target.value)}
           style={{ padding: "9px 12px", border: "1.5px solid #E2E0DA", borderRadius: "8px", fontSize: "13px", fontFamily: "var(--font-jakarta)", background: "#fff", cursor: "pointer" }}>
           <option value="">All RFM Groups</option>
-          {["Champions","Loyal","At Risk","Lost","New","Potential"].map(g => <option key={g}>{g}</option>)}
+          {["Champions", "Loyal", "At Risk", "Lost", "New", "Potential"].map(g => <option key={g}>{g}</option>)}
         </select>
         <select value={sortBy} onChange={e => setSortBy(e.target.value)}
           style={{ padding: "9px 12px", border: "1.5px solid #E2E0DA", borderRadius: "8px", fontSize: "13px", fontFamily: "var(--font-jakarta)", background: "#fff", cursor: "pointer" }}>
@@ -181,7 +181,7 @@ export default function AdminCustomersPage() {
             </tr>
           </thead>
           <tbody>
-            {isLoading ? (
+            {isLoading && filtered.length === 0 ? (
               <tr><td colSpan={8} style={{ padding: "40px", textAlign: "center", color: "#bbb", fontSize: "14px" }}>Loading…</td></tr>
             ) : filtered.length === 0 ? (
               <tr><td colSpan={8} style={{ padding: "40px", textAlign: "center", color: "#bbb", fontSize: "14px" }}>No customers found</td></tr>
