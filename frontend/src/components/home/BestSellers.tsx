@@ -19,6 +19,9 @@ interface ProductItem {
   moq?: number;
   categories?: { name: string }[];
   variants?: { retail_price: number | string }[];
+  fabric?: string | null;
+  product_code?: string | null;
+  weight?: string | null;
 }
 
 function imageUrl(img: ProductImageOut | string | null | undefined): string | null {

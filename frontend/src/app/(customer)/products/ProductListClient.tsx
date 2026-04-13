@@ -423,12 +423,6 @@ export function ProductListClient({
                           🔒 Login for pricing
                         </div>
                       )}
-
-                      {product.moq > 1 && (
-                        <div style={{ fontSize: "10px", color: "#7A7880", marginTop: "4px" }}>
-                          MOQ: {product.moq} units
-                        </div>
-                      )}
                     </div>
                   </Link>
                 </div>

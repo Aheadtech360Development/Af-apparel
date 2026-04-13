@@ -277,9 +277,6 @@ export default function AdminProductsPage() {
                 {/* Product */}
                 <td style={{ padding: "14px 16px" }} onClick={() => router.push(`/admin/products/${product.slug}/edit`)}>
                   <div style={{ fontWeight: 700, fontSize: "14px", color: "#2A2830", marginBottom: "2px" }}>{product.name}</div>
-                  <div style={{ fontSize: "11px", color: "#aaa" }}>
-                    {product.variants?.length || 0} variants · MOQ: {product.moq}
-                  </div>
                 </td>
 
                 {/* Status */}
@@ -301,7 +298,7 @@ export default function AdminProductsPage() {
 
                 {/* Category */}
                 <td style={{ padding: "14px 16px" }} onClick={() => router.push(`/admin/products/${product.slug}/edit`)}>
-                  <div style={{ fontSize: "13px", color: "#2A2830" }}>{product.categories?.[0]?.name || "—"}</div>
+                  <div style={{ fontSize: "13px", color: "#2A2830" }}>{[product.fabric, product.product_code, product.weight].filter(Boolean).join(" · ") || product.categories?.[0]?.name || "Apparel"}</div>
                 </td>
 
                 {/* Type */}
