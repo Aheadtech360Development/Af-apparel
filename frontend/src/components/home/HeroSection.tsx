@@ -24,7 +24,7 @@ export default function HeroSection() {
             <Link href="/wholesale/register" style={{ background: "#E8242A", color: "#fff", padding: "15px 36px", fontSize: "15px", borderRadius: "6px", fontWeight: 700, textDecoration: "none", transition: "all .2s", display: "inline-flex", alignItems: "center" }}>
               Apply for Wholesale →
             </Link>
-            <Link href="/products" style={{ background: "transparent", color: "#888", padding: "15px 36px", fontSize: "15px", borderRadius: "6px", fontWeight: 700, textDecoration: "none", border: "1.5px solid #2a2a2a", transition: "all .2s", display: "inline-flex", alignItems: "center" }}>
+            <Link href="/products" style={{ background: "transparent", color: "#1a5cff", padding: "15px 36px", fontSize: "15px", borderRadius: "6px", fontWeight: 700, textDecoration: "none", border: "1.5px solid #1a5cff", transition: "all .2s", display: "inline-flex", alignItems: "center" }}>
               Browse Catalog
             </Link>
           </div>

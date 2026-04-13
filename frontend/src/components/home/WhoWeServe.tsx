@@ -18,7 +18,7 @@ export default function WhoWeServe() {
             <div key={card.h} style={{ background: "#1E1D24", border: "1px solid rgba(255,255,255,.06)", borderRadius: "10px", padding: "28px 22px", transition: "all .2s" }}>
               <span style={{ fontSize: "32px", marginBottom: "14px", display: "block" }}>{card.icon}</span>
               <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "17px", letterSpacing: ".04em", color: "#fff", marginBottom: "10px" }}>{card.h}</h4>
-              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.65 }}>{card.p}</p>
+              <p style={{ fontSize: "13px", color: "##d3d0d0", lineHeight: 1.65 }}>{card.p}</p>
             </div>
           ))}
         </div>

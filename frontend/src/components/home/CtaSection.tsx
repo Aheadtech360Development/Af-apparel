@@ -7,7 +7,7 @@ export default function CtaSection() {
       <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(40px,3vw,68px)", color: "#fff", lineHeight: 1, marginBottom: "14px", letterSpacing: ".01em", position: "relative" }}>
         READY TO STOCK PREMIUM BLANKS?
       </h2>
-      <p style={{ fontSize: "15px", color: "#888888", marginBottom: "36px", maxWidth: "440px", marginLeft: "auto", marginRight: "auto", position: "relative" }}>
+      <p style={{ fontSize: "15px", color: "#d3d0d0", marginBottom: "36px", maxWidth: "440px", marginLeft: "auto", marginRight: "auto", position: "relative" }}>
         Join 2,000+ printing companies, retailers, and brands sourcing direct from American Fashion. Apply free — approved in 24 hours.
       </p>
       <div style={{ display: "flex", gap: "14px", justifyContent: "center", flexWrap: "wrap", position: "relative", marginBottom: "18px" }}>
@@ -18,7 +18,7 @@ export default function CtaSection() {
           Browse Catalog
         </Link>
       </div>
-      <div style={{ fontSize: "12px", color: "#888888", fontWeight: 500, letterSpacing: ".03em", position: "relative" }}>
+      <div style={{ fontSize: "12px", color: "#d3d0d0", fontWeight: 500, letterSpacing: ".03em", position: "relative" }}>
         No fees · No minimums · Approved within 24 hours · (214) 272-7213
       </div>
     </div>
