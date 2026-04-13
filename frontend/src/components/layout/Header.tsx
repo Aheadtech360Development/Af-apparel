@@ -42,7 +42,7 @@ export function Header() {
 
       {/* Main header */}
       <header style={{ background: "#080808", borderBottom: "1px solid rgba(255,255,255,.06)" }} className="sticky top-0 z-40">
-        <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 32px", display: "flex", alignItems: "center", justifyContent: "space-between", height: "85px", gap: "24px" }}>
+        <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 32px", display: "flex", alignItems: "center", justifyContent: "space-between", height: "100px", gap: "24px" }}>
 
 
           {/* Logo */}
@@ -50,7 +50,7 @@ export function Header() {
             <img
               src="/Af-apparel logo.jpeg"
               alt="AF Apparels Logo"
-              style={{ height: "60px", width: "auto", objectFit: "contain" }}
+              style={{ height: "70px", width: "auto", objectFit: "contain" }}
             />
           </Link>
 
