@@ -198,7 +198,7 @@ export default function AdminDashboard() {
     } catch { /* ignore */ }
   }
 
-  if (loading) {
+  if (loading && !AdminDashboard) {
     return (
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "320px" }}>
         <div style={{ fontSize: "13px", color: "#aaa" }}>Loading dashboard…</div>

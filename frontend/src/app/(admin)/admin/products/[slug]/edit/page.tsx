@@ -1,3 +1,4 @@
+// frontend/src/app/(admin)/admin/products/[slug]/edit/page.tsx
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -268,7 +269,7 @@ export default function AdminProductEditPage() {
     setProduct(p => p ? { ...p, tags: (p.tags ?? []).filter(t => t !== tag) } : p);
   }
 
-  if (isLoading) {
+  if (isLoading  && !product) {
     return (
       <div style={{ fontFamily: "var(--font-jakarta)", display: "flex", alignItems: "center", justifyContent: "center", height: "300px", color: "#aaa", fontSize: "14px" }}>
         Loading product…

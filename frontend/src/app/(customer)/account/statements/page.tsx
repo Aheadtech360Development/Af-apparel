@@ -136,7 +136,7 @@ export default function StatementsPage() {
     loadStatements(dateFrom || undefined, dateTo || undefined);
   }
 
-  if (loading) return <div className="py-12 text-center text-gray-400">Loading…</div>;
+  if (loading && !data) return <div className="py-12 text-center text-gray-400">Loading…</div>;
 
   return (
     <div className="space-y-6 max-w-5xl">

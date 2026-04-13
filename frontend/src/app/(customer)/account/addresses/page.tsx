@@ -173,7 +173,7 @@ export default function AddressBookPage() {
     }
   }
 
-  if (loading) return <div className="py-12 text-center text-gray-400">Loading...</div>;
+  if (loading && !message) return <div className="py-12 text-center text-gray-400">Loading...</div>;
 
   return (
     <div className="space-y-6 max-w-3xl">

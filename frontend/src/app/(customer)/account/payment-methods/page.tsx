@@ -63,7 +63,7 @@ export default function PaymentMethodsPage() {
     }
   }
 
-  if (loading) return <div className="py-12 text-center text-gray-400">Loading...</div>;
+  if (loading && !methods) return <div className="py-12 text-center text-gray-400">Loading...</div>;
 
   return (
     <div className="space-y-6 max-w-3xl">

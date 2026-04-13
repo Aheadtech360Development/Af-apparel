@@ -303,7 +303,7 @@ export default function CustomerDetailPage() {
 
   // ── Render ────────────────────────────────────────────────────────────────
 
-  if (loading) {
+  if (loading && !customer) {
     return (
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "220px", color: "#bbb", fontSize: "14px", fontFamily: "var(--font-jakarta)" }}>
         Loading…

@@ -92,7 +92,7 @@ export default function AbandonedCartsPage() {
     }
   }
 
-  if (loading) return <div className="py-12 text-center text-gray-400">Loading…</div>;
+  if (loading && !carts) return <div className="py-12 text-center text-gray-400">Loading…</div>;
 
   return (
     <div className="space-y-6 max-w-4xl">
