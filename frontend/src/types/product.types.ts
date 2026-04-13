@@ -44,6 +44,9 @@ export interface ProductListItem {
   primary_image: ProductImage | null;
   variants: ProductVariant[];
   categories: Pick<Category, "id" | "name" | "slug">[];
+  fabric?: string | null;
+  product_code?: string | null;
+  weight?: string | null;
 }
 
 /** Full product detail — matches backend ProductDetail schema. */
