@@ -55,11 +55,11 @@ export function Header() {
 
       {/* Main header */}
       <header style={{ background: "#080808", borderBottom: "1px solid rgba(255,255,255,.06)" }} className="sticky top-0 z-40">
-        <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 32px", display: "flex", alignItems: "center", justifyContent: "space-between", height: "100px", gap: "24px" }}>
+        <div className="header-inner" style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 32px", display: "flex", alignItems: "center", justifyContent: "space-between", height: "100px", gap: "24px" }}>
 
 
           {/* Logo */}
-          <Link href="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
+          <Link href="/" className="header-logo" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
             <img
               src="/Af-apparel logo.jpeg"
               alt="AF Apparels Logo"

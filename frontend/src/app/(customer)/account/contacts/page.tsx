@@ -620,10 +620,34 @@ export default function ManageContactsPage() {
                     {contact.phone && (
                       <p>{contact.phone}{contact.phone_ext ? ` ext. ${contact.phone_ext}` : ""}</p>
                     )}
+                    {contact.fax && <p className="text-xs">Fax: {contact.fax}</p>}
+                    {contact.web_address && (
+                      <p className="text-xs">
+                        <a href={contact.web_address} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">{contact.web_address}</a>
+                      </p>
+                    )}
                     {contact.time_zone && (
                       <p className="text-xs text-gray-400">
                         {US_TIMEZONES.find(tz => tz.value === contact.time_zone)?.label || contact.time_zone}
                       </p>
+                    )}
+                    {/* Home / alternate contact info */}
+                    {contact.home_email && contact.home_email !== contact.email && (
+                      <p className="text-xs text-gray-400">Home email: {contact.home_email}</p>
+                    )}
+                    {contact.home_phone && (
+                      <p className="text-xs text-gray-400">Home: {contact.home_phone}</p>
+                    )}
+                    {contact.home_address1 && (
+                      <p className="text-xs text-gray-400">
+                        {[contact.home_address1, contact.home_city, contact.home_state, contact.home_country].filter(Boolean).join(", ")}
+                      </p>
+                    )}
+                    {contact.alt_contacts && (
+                      <p className="text-xs text-gray-400 italic">{contact.alt_contacts}</p>
+                    )}
+                    {contact.notes && (
+                      <p className="text-xs text-gray-400 italic">Note: {contact.notes}</p>
                     )}
                   </div>
                   <div className="flex gap-1 mt-2 flex-wrap">

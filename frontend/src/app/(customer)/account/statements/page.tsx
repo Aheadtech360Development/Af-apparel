@@ -42,6 +42,8 @@ export default function StatementsPage() {
   const [syncing, setSyncing] = useState(false);
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
+  const [typeFilter, setTypeFilter] = useState("");
+  const [refSearch, setRefSearch] = useState("");
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   useEffect(() => {
@@ -136,6 +138,17 @@ export default function StatementsPage() {
     loadStatements(dateFrom || undefined, dateTo || undefined);
   }
 
+  const filteredItems = (data?.items ?? []).filter(txn => {
+    if (typeFilter && txn.type !== typeFilter) return false;
+    if (refSearch) {
+      const q = refSearch.toLowerCase();
+      const matchRef = txn.reference?.toLowerCase().includes(q);
+      const matchDesc = txn.description?.toLowerCase().includes(q);
+      if (!matchRef && !matchDesc) return false;
+    }
+    return true;
+  });
+
   if (loading && !data) return <div className="py-12 text-center text-gray-400">Loading…</div>;
 
   return (
@@ -228,6 +241,30 @@ export default function StatementsPage() {
               className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1">Transaction Type</label>
+            <select
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value)}
+              className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Types</option>
+              <option value="charge">Invoice</option>
+              <option value="payment">Payment</option>
+              <option value="credit">Credit</option>
+              <option value="refund">Refund</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1">Reference / Description</label>
+            <input
+              type="text"
+              value={refSearch}
+              onChange={(e) => setRefSearch(e.target.value)}
+              placeholder="Search by ref or description…"
+              className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-52"
+            />
+          </div>
           <button
             type="submit"
             className="px-4 py-2 bg-gray-800 text-white rounded-md text-sm font-medium hover:bg-gray-900"
@@ -239,27 +276,36 @@ export default function StatementsPage() {
             onClick={() => {
               setDateFrom("");
               setDateTo("");
+              setTypeFilter("");
+              setRefSearch("");
               loadStatements();
             }}
             className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-50"
           >
-            Clear
+            Clear All
           </button>
         </div>
       </form>
 
       {/* Transactions table */}
       <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-100">
+        <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
           <h2 className="text-sm font-semibold text-gray-700">
-            Transactions {data ? `(${data.items.length})` : ""}
+            Transactions {data ? `(${filteredItems.length}${filteredItems.length !== data.items.length ? ` of ${data.items.length}` : ""})` : ""}
           </h2>
+          {(typeFilter || refSearch) && (
+            <span className="text-xs text-blue-600">Filtered</span>
+          )}
         </div>
 
-        {!data || data.items.length === 0 ? (
+        {!data || filteredItems.length === 0 ? (
           <div className="py-12 text-center text-gray-400">
             <p>No transactions found.</p>
-            <p className="text-xs mt-1">Place an order or sync QB payments to see transactions.</p>
+            {(typeFilter || refSearch) ? (
+              <p className="text-xs mt-1">Try adjusting your filters.</p>
+            ) : (
+              <p className="text-xs mt-1">Place an order or sync QB payments to see transactions.</p>
+            )}
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -276,7 +322,7 @@ export default function StatementsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {data.items.map((txn) => (
+                {filteredItems.map((txn) => (
                   <tr key={txn.id} className="hover:bg-gray-50">
                     <td className="px-4 py-3 text-gray-600 whitespace-nowrap text-xs">{txn.date}</td>
                     <td className="px-4 py-3 text-gray-800">

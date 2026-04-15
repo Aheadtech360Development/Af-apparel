@@ -455,7 +455,7 @@ export default function CustomerDetailPage() {
       </div>
 
       {/* ── TOP STATS ────────────────────────────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "12px", marginBottom: "20px" }}>
+      <div className="admin-stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "12px", marginBottom: "20px" }}>
         <div style={{ background: "#fff", border: "1px solid #E2E0DA", borderRadius: "10px", padding: "16px 18px" }}>
           <div style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", color: "#059669", marginBottom: "6px" }}>Amount Spent</div>
           <div style={{ fontFamily: "var(--font-bebas)", fontSize: "28px", color: "#059669", lineHeight: 1 }}>
@@ -485,7 +485,7 @@ export default function CustomerDetailPage() {
       </div>
 
       {/* ── 2-COLUMN LAYOUT ─────────────────────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "65% 35%", gap: "14px", alignItems: "start" }}>
+      <div className="admin-two-col" style={{ display: "grid", gridTemplateColumns: "65% 35%", gap: "14px", alignItems: "start" }}>
 
         {/* ── LEFT ─────────────────────────────────────────────────────── */}
         <div>
@@ -635,21 +635,55 @@ export default function CustomerDetailPage() {
             {/* Contact info */}
             <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "14px" }}>
               {[
-                { icon: <MailIcon size={13} color="#7A7880" />, label: "Email",    val: customer.email },
-                { icon: <PhoneIcon size={13} color="#7A7880" />, label: "Phone",    val: customer.phone },
-                { icon: <UserIcon size={13} color="#7A7880" />, label: "Contact",  val: customer.contact_name },
-                { icon: <BuildingIcon size={13} color="#7A7880" />, label: "Type",     val: customer.business_type },
-                { icon: <GlobeIcon size={13} color="#7A7880" />, label: "Website",  val: customer.website },
-                { icon: <TagIcon size={13} color="#7A7880" />, label: "Tax ID",   val: customer.tax_id },
-                { icon: <CreditCardIcon size={13} color="#7A7880" />, label: "Stripe",   val: customer.stripe_customer_id },
-                { icon: <BookIcon size={13} color="#7A7880" />, label: "QB ID",    val: customer.qb_customer_id },
+                { icon: <MailIcon size={13} color="#7A7880" />, label: "Email",       val: customer.email },
+                { icon: <MailIcon size={13} color="#7A7880" />, label: "Co. Email",   val: customer.company_email },
+                { icon: <PhoneIcon size={13} color="#7A7880" />, label: "Phone",       val: customer.phone },
+                { icon: <PhoneIcon size={13} color="#7A7880" />, label: "Fax",         val: customer.fax },
+                { icon: <UserIcon size={13} color="#7A7880" />, label: "Contact",     val: customer.contact_name },
+                { icon: <BuildingIcon size={13} color="#7A7880" />, label: "Biz Type",   val: customer.business_type },
+                { icon: <BuildingIcon size={13} color="#7A7880" />, label: "Secondary",  val: customer.secondary_business },
+                { icon: <GlobeIcon size={13} color="#7A7880" />, label: "Website",    val: customer.website },
+                { icon: <TagIcon size={13} color="#7A7880" />, label: "Tax ID",      val: customer.tax_id },
+                { icon: <TagIcon size={13} color="#7A7880" />, label: "Est. Volume", val: customer.estimated_annual_volume },
+                { icon: <CreditCardIcon size={13} color="#7A7880" />, label: "Stripe",    val: customer.stripe_customer_id },
               ].filter(r => r.val).map(r => (
                 <div key={r.label} style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "13px" }}>
                   <span style={{ flexShrink: 0, marginTop: "1px" }}>{r.icon}</span>
-                  <div style={{ minWidth: "56px", color: "#7A7880", flexShrink: 0 }}>{r.label}</div>
+                  <div style={{ minWidth: "72px", color: "#7A7880", flexShrink: 0 }}>{r.label}</div>
                   <div style={{ color: "#2A2830", fontWeight: 600, wordBreak: "break-all" }}>{r.val}</div>
                 </div>
               ))}
+              {/* Address block */}
+              {(customer.address_line1 || customer.city) && (
+                <div style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "13px" }}>
+                  <span style={{ flexShrink: 0, marginTop: "1px" }}><BuildingIcon size={13} color="#7A7880" /></span>
+                  <div style={{ minWidth: "72px", color: "#7A7880", flexShrink: 0 }}>Address</div>
+                  <div style={{ color: "#2A2830", fontWeight: 600, lineHeight: 1.5 }}>
+                    {customer.address_line1 && <div>{customer.address_line1}</div>}
+                    {customer.address_line2 && <div>{customer.address_line2}</div>}
+                    {[customer.city, customer.state_province, customer.postal_code].filter(Boolean).length > 0 && (
+                      <div>{[customer.city, customer.state_province, customer.postal_code].filter(Boolean).join(", ")}</div>
+                    )}
+                    {customer.country && <div>{customer.country}</div>}
+                  </div>
+                </div>
+              )}
+              {/* Trade association numbers */}
+              {(customer.ppac_number || customer.ppai_number || customer.asi_number) && (
+                <div style={{ display: "flex", gap: "14px", flexWrap: "wrap", paddingLeft: "21px", fontSize: "13px" }}>
+                  {customer.ppac_number && <span style={{ color: "#7A7880" }}>PPAC: <strong style={{ color: "#2A2830" }}>{customer.ppac_number}</strong></span>}
+                  {customer.ppai_number && <span style={{ color: "#7A7880" }}>PPAI: <strong style={{ color: "#2A2830" }}>{customer.ppai_number}</strong></span>}
+                  {customer.asi_number && <span style={{ color: "#7A7880" }}>ASI: <strong style={{ color: "#2A2830" }}>{customer.asi_number}</strong></span>}
+                </div>
+              )}
+              {/* Staff size + how heard */}
+              {(customer.num_employees || customer.num_sales_reps || customer.how_heard) && (
+                <div style={{ display: "flex", gap: "14px", flexWrap: "wrap", paddingLeft: "21px", fontSize: "12px", color: "#7A7880" }}>
+                  {customer.num_employees && <span>Employees: <strong style={{ color: "#2A2830" }}>{customer.num_employees}</strong></span>}
+                  {customer.num_sales_reps && <span>Sales Reps: <strong style={{ color: "#2A2830" }}>{customer.num_sales_reps}</strong></span>}
+                  {customer.how_heard && <span>Heard via: <strong style={{ color: "#2A2830" }}>{customer.how_heard}</strong></span>}
+                </div>
+              )}
             </div>
 
             {/* Pricing & Shipping Tiers */}
@@ -725,9 +759,8 @@ export default function CustomerDetailPage() {
             </div>
           </div>
 
-          {/* Registration Info */}
-          {(customer.company_email || customer.address_line1 || customer.city || customer.how_heard || customer.num_employees || customer.secondary_business || customer.ppac_number || customer.ppai_number || customer.asi_number) && (
-            <div style={card}>
+          {/* Registration Info — always shown, fields render only when populated */}
+          <div style={card}>
               <div style={sectionTitle}>Registration Information</div>
               <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                 {customer.company_email && (
@@ -807,7 +840,6 @@ export default function CustomerDetailPage() {
                 )}
               </div>
             </div>
-          )}
 
           {/* Notes */}
           <div style={card}>

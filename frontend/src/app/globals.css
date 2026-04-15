@@ -139,10 +139,34 @@
   .register-grid-responsive { grid-template-columns: 1fr !important; padding: 32px 20px !important; }
 }
 
-/* Product detail grid already handled inline; ensure tab bar scrolls */
+/* Product detail page — responsive layout */
+.product-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: flex-start; }
+.pd-image-col { width: 100% !important; }
+@media (max-width: 900px) {
+  .product-detail-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+  .pd-breadcrumb { padding-left: 16px !important; padding-right: 16px !important; }
+  .pd-main-pad { padding: 24px 16px !important; }
+}
+@media (max-width: 600px) {
+  .pd-main-pad { padding: 20px 12px !important; }
+  .pd-breadcrumb { padding: 10px 12px !important; }
+  .pd-print-grid { grid-template-columns: 1fr 1fr !important; }
+  .pd-trust-grid { grid-template-columns: 1fr 1fr !important; }
+}
+@media (max-width: 400px) {
+  .pd-print-grid { grid-template-columns: 1fr !important; }
+}
+
+/* Product detail tab bar */
 .pd-tab-bar { display: flex; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
 .pd-tab-bar::-webkit-scrollbar { display: none; }
 .pd-tab-bar button { flex-shrink: 0; }
+
+/* Header: tighter padding on small screens */
+@media (max-width: 640px) {
+  .header-inner { padding-left: 16px !important; padding-right: 16px !important; height: 72px !important; }
+  .header-logo img { height: 50px !important; }
+}
 
 /* Quick order page: stack header on mobile */
 @media (max-width: 640px) {
@@ -228,6 +252,17 @@
 .rich-editor-content .ProseMirror strong { font-weight: 700; }
 .rich-editor-content .ProseMirror em { font-style: italic; }
 .rich-editor-content .ProseMirror s { text-decoration: line-through; }
+
+/* Quick order: column header labels hide on narrow screens */
+@media (max-width: 480px) {
+  .qo-col-labels { display: none !important; }
+}
+
+/* Admin customer stats grid: 2x2 on mobile */
+@media (max-width: 640px) {
+  .admin-stats-grid { grid-template-columns: 1fr 1fr !important; }
+  .admin-two-col { grid-template-columns: 1fr !important; }
+}
 
 /* Best Sellers responsive grid */
 @media (max-width: 768px) {

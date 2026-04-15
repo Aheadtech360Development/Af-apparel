@@ -160,8 +160,8 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
     <div style={{ minHeight: "100vh", background: "#fff", fontFamily: "var(--font-jakarta)" }}>
 
       {/* Breadcrumb */}
-      <div style={{ background: "#F4F3EF", borderBottom: "1px solid #E2E0DA", padding: "12px 32px" }}>
-        <div style={{ maxWidth: "1280px", margin: "0 auto", display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#7A7880" }}>
+      <div className="pd-breadcrumb" style={{ background: "#F4F3EF", borderBottom: "1px solid #E2E0DA", padding: "12px 32px" }}>
+        <div style={{ maxWidth: "1280px", margin: "0 auto", display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#7A7880", flexWrap: "wrap" }}>
           <Link href="/" style={{ color: "#7A7880", textDecoration: "none" }}>Home</Link>
           <span>/</span>
           <Link href="/products" style={{ color: "#7A7880", textDecoration: "none" }}>Products</Link>
@@ -179,11 +179,11 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
       </div>
 
       {/* Main content */}
-      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "40px 32px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "48px", alignItems: "flex-start" }} className="product-detail-grid">
+      <div className="pd-main-pad" style={{ maxWidth: "1280px", margin: "0 auto", padding: "40px 32px" }}>
+        <div className="product-detail-grid" style={{}}>
 
           {/* ── LEFT: Image Gallery ─────────────────────────────────────── */}
-          <div style={{ width: "650px" }}>
+          <div className="pd-image-col" style={{ width: "100%", minWidth: 0 }}>
             {/* Main image */}
             <div style={{ aspectRatio: "1", borderRadius: "12px", overflow: "hidden", background: "#F4F3EF", marginBottom: "12px", border: "1px solid #E2E0DA", position: "relative" }}>
               {images[activeImageIdx] ? (
@@ -491,22 +491,20 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 
                 {/* Order summary box */}
                 <div style={{ background: "#F4F3EF", borderRadius: "10px", padding: "18px 20px", marginBottom: "16px", border: "1px solid #E2E0DA" }}>
-                  <div style={{ background: "#F4F3EF", borderRadius: "10px", padding: "18px 20px", marginBottom: "16px", border: "1px solid #E2E0DA" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
-                      <span style={{ fontSize: "13px", color: "#7A7880", fontWeight: 500 }}>Total Units</span>
-                      <span style={{ fontFamily: "var(--font-bebas)", fontSize: "20px", color: "#2A2830" }}>{totalUnits} units</span>
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
-                      <span style={{ fontSize: "13px", color: "#7A7880", fontWeight: 500 }}>Price Per Unit</span>
-                      <span style={{ fontWeight: 700, fontSize: "15px", color: "#2A2830" }}>${pricePerUnit.toFixed(2)}</span>
-                    </div>
-                    <div style={{ fontSize: "11px", color: "#aaa", marginBottom: "12px", fontStyle: "italic" }}>
-                      Tier pricing applies at checkout
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "space-between", borderTop: "1px solid #E2E0DA", paddingTop: "12px" }}>
-                      <span style={{ fontSize: "14px", fontWeight: 700, color: "#2A2830" }}>Order Total</span>
-                      <span style={{ fontFamily: "var(--font-bebas)", fontSize: "24px", color: "#1A5CFF" }}>${orderTotal.toFixed(2)}</span>
-                    </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
+                    <span style={{ fontSize: "13px", color: "#7A7880", fontWeight: 500 }}>Total Units</span>
+                    <span style={{ fontFamily: "var(--font-bebas)", fontSize: "20px", color: "#2A2830" }}>{totalUnits} units</span>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
+                    <span style={{ fontSize: "13px", color: "#7A7880", fontWeight: 500 }}>Price Per Unit</span>
+                    <span style={{ fontWeight: 700, fontSize: "15px", color: "#2A2830" }}>${pricePerUnit.toFixed(2)}</span>
+                  </div>
+                  <div style={{ fontSize: "11px", color: "#aaa", marginBottom: "12px", fontStyle: "italic" }}>
+                    Tier pricing applies at checkout
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", borderTop: "1px solid #E2E0DA", paddingTop: "12px" }}>
+                    <span style={{ fontSize: "14px", fontWeight: 700, color: "#2A2830" }}>Order Total</span>
+                    <span style={{ fontFamily: "var(--font-bebas)", fontSize: "24px", color: "#1A5CFF" }}>${orderTotal.toFixed(2)}</span>
                   </div>
                 </div>
 
@@ -590,7 +588,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
             )}
 
             {/* Trust badges */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "20px" }}>
+            <div className="pd-trust-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "20px" }}>
               {[
                 { icon: <FactoryIcon size={16} color="#2A2830" />, text: "Factory-Direct Pricing" },
                 { icon: <ZapIcon size={16} color="#2A2830" />, text: "Same-Day Shipping" },
@@ -637,7 +635,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
         </div>
 
         {/* ── Product Tabs ───────────────────────────────────────────────── */}
-        <div style={{ marginTop: "56px", borderTop: "1px solid #E2E0DA" }}>
+        <div style={{ marginTop: "40px", borderTop: "1px solid #E2E0DA" }}>
           <div className="pd-tab-bar" style={{ gap: "0", borderBottom: "1px solid #E2E0DA" }}>
             {TABS.map(tab => (
               <button
@@ -702,7 +700,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                   return (
                     <div style={{ background: "#F4F3EF", border: "1px solid #E2E0DA", borderRadius: "10px", padding: "24px" }}>
                       <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "18px", letterSpacing: ".04em", color: "#2A2830", marginBottom: "16px" }}>Print Compatibility</h3>
-                      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "12px" }}>
+                      <div className="pd-print-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "12px" }}>
                         {methods.map(method => (
                           <div key={method} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: "#2A2830" }}>
                             <span style={{ width: "18px", height: "18px", borderRadius: "50%", background: "#E8242A", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
