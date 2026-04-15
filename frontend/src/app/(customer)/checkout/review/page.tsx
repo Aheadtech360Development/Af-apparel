@@ -2,188 +2,154 @@
 
 export const dynamic = "force-dynamic";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { formatCurrency } from "@/lib/utils";
-import { cartService } from "@/services/cart.service";
-import { ordersService } from "@/services/orders.service";
+import { useRouter } from "next/navigation";
 import { useCheckoutStore } from "@/stores/checkout.store";
-import { useCartStore } from "@/stores/cart.store";
-import type { Cart } from "@/types/order.types";
+import { formatCurrency } from "@/lib/utils";
+
+const SHIPPING_LABELS: Record<string, string> = {
+  standard: "Standard Ground — FREE",
+  expedited: "Expedited (2-Day) — $45.00",
+  freight: "Freight / LTL — Quoted",
+};
 
 export default function CheckoutReviewPage() {
   const router = useRouter();
   const {
-    addressId,
-    shippingAddress,
-    poNumber,
-    orderNotes,
-    qbToken,
-    savedCardId,
-    paymentIntentId,
-    reset,
+    confirmedOrderId,
+    confirmedOrderNumber,
+    confirmedOrderTotal,
+    confirmedUnits,
+    confirmedColorSummary,
+    confirmedProductName,
+    confirmedShippingMethod,
   } = useCheckoutStore();
-  const clearCart = useCartStore((s) => s.clearCart);
-  const [isPlacing, setIsPlacing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [cart, setCart] = useState<Cart | null>(null);
 
-  // Load cart summary on mount
-  useState(() => {
-    cartService.getCart().then(setCart).catch(console.error);
-  });
-
-  async function handlePlaceOrder() {
-    if (!qbToken && !savedCardId && !paymentIntentId) {
-      setError("Payment not completed. Please go back to the payment step.");
-      return;
+  // If no confirmed order (e.g. direct nav), redirect to cart
+  useEffect(() => {
+    if (!confirmedOrderId && !confirmedOrderNumber) {
+      router.replace("/cart");
     }
+  }, [confirmedOrderId, confirmedOrderNumber, router]);
 
-    setIsPlacing(true);
-    setError(null);
-
-    try {
-      const order = await ordersService.confirmOrder({
-        qb_token: qbToken ?? undefined,
-        saved_card_id: savedCardId ?? undefined,
-        payment_intent_id: paymentIntentId ?? undefined,
-        address_id: addressId ?? undefined,
-        shipping_address: shippingAddress ?? undefined,
-        po_number: poNumber || undefined,
-        order_notes: orderNotes || undefined,
-      });
-
-      clearCart();
-      reset();
-      router.push(`/orders/confirmation/${order.id}`);
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Failed to place order");
-      setIsPlacing(false);
-    }
+  if (!confirmedOrderNumber) {
+    return (
+      <div style={{ textAlign: "center", padding: "60px 0", color: "#aaa", fontSize: "14px" }}>
+        Redirecting…
+      </div>
+    );
   }
 
+  const orderNum = confirmedOrderNumber.startsWith("AF-")
+    ? confirmedOrderNumber
+    : `AF-${confirmedOrderNumber}`;
+
+  const shippingLabel = SHIPPING_LABELS[confirmedShippingMethod] ?? "Standard Ground";
+
   return (
-    <div>
-      <h1 className="text-xl font-bold text-gray-900 mb-6">Step 4 — Review Order</h1>
+    <div style={{ textAlign: "center" }}>
 
-      <div className="space-y-4 mb-6">
-        {/* Shipping address summary */}
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="text-sm font-semibold text-gray-900">Shipping Address</h2>
-            <Link href="/checkout/address" className="text-xs text-brand-600 hover:text-brand-700">
-              Edit
-            </Link>
-          </div>
-          {shippingAddress ? (
-            <p className="text-sm text-gray-600">
-              {shippingAddress.line1}{shippingAddress.line2 ? `, ${shippingAddress.line2}` : ""}
-              <br />
-              {shippingAddress.city}, {shippingAddress.state} {shippingAddress.postal_code}
-            </p>
-          ) : (
-            <p className="text-sm text-gray-500">Saved address #{addressId?.slice(0, 8)}</p>
-          )}
+      {/* ── Success icon ── */}
+      <div style={{ marginBottom: "20px" }}>
+        <div style={{
+          width: "72px", height: "72px", borderRadius: "50%",
+          background: "rgba(5,150,105,.1)", border: "2px solid rgba(5,150,105,.3)",
+          display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px",
+        }}>
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
         </div>
 
-        {/* Order details summary */}
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="text-sm font-semibold text-gray-900">Order Details</h2>
-            <Link href="/checkout/details" className="text-xs text-brand-600 hover:text-brand-700">
-              Edit
-            </Link>
-          </div>
-          <p className="text-sm text-gray-600">
-            PO Number: <span className="font-medium">{poNumber || "—"}</span>
-          </p>
-          {orderNotes && (
-            <p className="text-sm text-gray-600 mt-1">Notes: {orderNotes}</p>
-          )}
+        <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(28px,5vw,44px)", color: "#2A2830", letterSpacing: ".03em", lineHeight: 1, marginBottom: "10px" }}>
+          Order Confirmed!
+        </h1>
+
+        <div style={{ fontFamily: "var(--font-bebas)", fontSize: "20px", color: "#7A7880", letterSpacing: ".06em", marginBottom: "14px" }}>
+          Order {orderNum}
         </div>
 
-        {/* Payment summary */}
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="text-sm font-semibold text-gray-900">Payment</h2>
-            <Link href="/checkout/payment" className="text-xs text-brand-600 hover:text-brand-700">
-              Edit
-            </Link>
-          </div>
-          <p className="text-sm text-gray-600">
-            {savedCardId
-              ? "Saved card selected"
-              : qbToken
-              ? "New card tokenized via QuickBooks Payments"
-              : paymentIntentId
-              ? "Payment authorized via Stripe"
-              : "No payment on file"}
-          </p>
-        </div>
-
-        {/* Cart items */}
-        {cart && (
-          <div className="bg-white rounded-lg border border-gray-200 p-4">
-            <h2 className="text-sm font-semibold text-gray-900 mb-3">
-              Items ({cart.item_count})
-            </h2>
-            <div className="space-y-2">
-              {cart.items.map((item) => (
-                <div key={item.id} className="flex justify-between text-sm">
-                  <span className="text-gray-700">
-                    {item.product_name} — {item.color} / {item.size} × {item.quantity}
-                  </span>
-                  <span className="text-gray-900 font-medium">
-                    {formatCurrency(Number(item.line_total))}
-                  </span>
-                </div>
-              ))}
-            </div>
-            <div className="mt-3 pt-3 border-t border-gray-100 space-y-1 text-sm">
-              <div className="flex justify-between text-gray-600">
-                <span>Subtotal</span>
-                <span>{formatCurrency(Number(cart.subtotal))}</span>
-              </div>
-              <div className="flex justify-between text-gray-600">
-                <span>Shipping</span>
-                <span>
-                  {formatCurrency(Number(cart.validation?.estimated_shipping ?? 0))}
-                </span>
-              </div>
-              <div className="flex justify-between font-semibold text-gray-900 text-base">
-                <span>Total</span>
-                <span>
-                  {formatCurrency(
-                    Number(cart.subtotal) + Number(cart.validation?.estimated_shipping ?? 0)
-                  )}
-                </span>
-              </div>
-            </div>
-          </div>
-        )}
+        <p style={{ fontSize: "14px", color: "#7A7880", lineHeight: 1.7, maxWidth: "480px", margin: "0 auto" }}>
+          Your order of <strong style={{ color: "#2A2830" }}>{confirmedUnits.toLocaleString()} units</strong> is confirmed and will be processed for same-day shipping from our Dallas, TX warehouse.
+          A confirmation email has been sent to your account address.
+        </p>
       </div>
 
-      {error && (
-        <div className="mb-4 p-3 rounded-md bg-red-50 border border-red-200 text-sm text-red-700">
-          {error}
+      {/* ── Order detail box ── */}
+      <div style={{
+        background: "#fff", border: "1.5px solid #E2E0DA", borderRadius: "12px",
+        padding: "22px 24px", textAlign: "left", margin: "28px 0",
+      }}>
+        <div style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em", color: "#7A7880", marginBottom: "14px" }}>
+          Order Details
         </div>
-      )}
 
-      <div className="flex gap-3">
-        <button
-          onClick={() => router.push("/checkout/payment")}
-          className="flex-1 rounded-md border border-gray-300 bg-white text-gray-700 py-3 text-sm font-medium hover:bg-gray-50"
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          {/* Product name */}
+          <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", alignItems: "flex-start", fontSize: "13px" }}>
+            <span style={{ color: "#7A7880", flexShrink: 0 }}>Product</span>
+            <span style={{ fontWeight: 700, color: "#2A2830", textAlign: "right" }}>{confirmedProductName}</span>
+          </div>
+
+          {/* Color breakdown */}
+          {confirmedColorSummary && (
+            <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", alignItems: "flex-start", fontSize: "13px" }}>
+              <span style={{ color: "#7A7880", flexShrink: 0 }}>Colors</span>
+              <span style={{ fontWeight: 600, color: "#2A2830", textAlign: "right" }}>{confirmedColorSummary}</span>
+            </div>
+          )}
+
+          {/* Divider */}
+          <div style={{ borderTop: "1px solid #F0EEE9" }} />
+
+          {/* Shipping */}
+          <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", fontSize: "13px" }}>
+            <span style={{ color: "#7A7880" }}>Shipping</span>
+            <span style={{ fontWeight: 600, color: "#2A2830" }}>{shippingLabel}</span>
+          </div>
+
+          {/* Payment */}
+          <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", fontSize: "13px" }}>
+            <span style={{ color: "#7A7880" }}>Payment</span>
+            <span style={{ fontWeight: 600, color: "#2A2830" }}>Credit Card</span>
+          </div>
+
+          {/* Divider */}
+          <div style={{ borderTop: "1.5px solid #E2E0DA" }} />
+
+          {/* Total */}
+          <div style={{ display: "flex", justifyContent: "space-between", gap: "12px" }}>
+            <span style={{ fontSize: "14px", fontWeight: 700, color: "#2A2830" }}>Total Charged</span>
+            <span style={{ fontFamily: "var(--font-bebas)", fontSize: "20px", color: "#E8242A", letterSpacing: ".02em" }}>
+              {formatCurrency(confirmedOrderTotal)}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Actions ── */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+        <Link
+          href="/account/orders"
+          style={{
+            display: "block", padding: "14px", background: "#E8242A", color: "#fff",
+            borderRadius: "8px", textDecoration: "none", fontFamily: "var(--font-bebas)",
+            fontSize: "17px", letterSpacing: ".08em", transition: "background .2s",
+          }}
         >
-          Back
-        </button>
-        <button
-          onClick={handlePlaceOrder}
-          disabled={isPlacing}
-          className="flex-1 rounded-md bg-brand-600 text-white py-3 text-sm font-medium hover:bg-brand-700 disabled:opacity-50"
+          View My Orders
+        </Link>
+        <Link
+          href="/products"
+          style={{
+            display: "block", padding: "14px", background: "#fff", color: "#2A2830",
+            border: "1.5px solid #E2E0DA", borderRadius: "8px", textDecoration: "none",
+            fontFamily: "var(--font-bebas)", fontSize: "17px", letterSpacing: ".08em",
+          }}
         >
-          {isPlacing ? "Placing order…" : "Place Order"}
-        </button>
+          Continue Shopping
+        </Link>
       </div>
     </div>
   );

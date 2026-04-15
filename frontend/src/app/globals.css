@@ -258,6 +258,11 @@
   .qo-col-labels { display: none !important; }
 }
 
+/* Cart page: single column on narrow screens */
+@media (max-width: 768px) {
+  .cart-grid-responsive { grid-template-columns: 1fr !important; }
+}
+
 /* Admin customer stats grid: 2x2 on mobile */
 @media (max-width: 640px) {
   .admin-stats-grid { grid-template-columns: 1fr 1fr !important; }

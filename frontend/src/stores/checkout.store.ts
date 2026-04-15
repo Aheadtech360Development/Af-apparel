@@ -9,48 +9,105 @@ interface ShippingAddress {
   country: string;
 }
 
+export type ShippingMethod = "standard" | "expedited" | "freight";
+
 interface CheckoutState {
+  // Step 1 — shipping
   addressId: string | null;
   shippingAddress: ShippingAddress | null;
+  companyName: string;
+  contactName: string;
+  shippingPhone: string;
+  shippingMethod: ShippingMethod;
+
+  // Step 1 extras (PO + notes kept for backward compat)
   poNumber: string;
   orderNotes: string;
-  // QB Payments
+
+  // Step 2 — payment (QB Payments)
   qbToken: string | null;
   savedCardId: string | null;
-  // Stripe (legacy — kept for backward compatibility)
+  // Stripe (legacy)
   paymentIntentId: string | null;
   clientSecret: string | null;
 
+  // Step 3 — confirmed order data
+  confirmedOrderId: string | null;
+  confirmedOrderNumber: string | null;
+  confirmedOrderTotal: number;
+  confirmedUnits: number;
+  confirmedColorSummary: string;
+  confirmedProductName: string;
+  confirmedShippingMethod: ShippingMethod;
+
+  // Actions
   setAddressId: (id: string | null) => void;
   setShippingAddress: (address: ShippingAddress | null) => void;
+  setCompanyName: (v: string) => void;
+  setContactName: (v: string) => void;
+  setShippingPhone: (v: string) => void;
+  setShippingMethod: (m: ShippingMethod) => void;
   setPoNumber: (po: string) => void;
   setOrderNotes: (notes: string) => void;
   setQbToken: (token: string | null) => void;
   setSavedCardId: (id: string | null) => void;
   setPaymentIntent: (id: string, secret: string) => void;
+  setConfirmedOrder: (order: {
+    id: string;
+    number: string;
+    total: number;
+    units: number;
+    colorSummary: string;
+    productName: string;
+    shippingMethod: ShippingMethod;
+  }) => void;
   reset: () => void;
 }
 
 const initialState = {
   addressId: null,
   shippingAddress: null,
+  companyName: "",
+  contactName: "",
+  shippingPhone: "",
+  shippingMethod: "standard" as ShippingMethod,
   poNumber: "",
   orderNotes: "",
   qbToken: null,
   savedCardId: null,
   paymentIntentId: null,
   clientSecret: null,
+  confirmedOrderId: null,
+  confirmedOrderNumber: null,
+  confirmedOrderTotal: 0,
+  confirmedUnits: 0,
+  confirmedColorSummary: "",
+  confirmedProductName: "",
+  confirmedShippingMethod: "standard" as ShippingMethod,
 };
 
 export const useCheckoutStore = create<CheckoutState>((set) => ({
   ...initialState,
   setAddressId: (id) => set({ addressId: id }),
   setShippingAddress: (address) => set({ shippingAddress: address }),
+  setCompanyName: (v) => set({ companyName: v }),
+  setContactName: (v) => set({ contactName: v }),
+  setShippingPhone: (v) => set({ shippingPhone: v }),
+  setShippingMethod: (m) => set({ shippingMethod: m }),
   setPoNumber: (po) => set({ poNumber: po }),
   setOrderNotes: (notes) => set({ orderNotes: notes }),
   setQbToken: (token) => set({ qbToken: token, savedCardId: null }),
   setSavedCardId: (id) => set({ savedCardId: id, qbToken: null }),
-  setPaymentIntent: (id, secret) =>
-    set({ paymentIntentId: id, clientSecret: secret }),
+  setPaymentIntent: (id, secret) => set({ paymentIntentId: id, clientSecret: secret }),
+  setConfirmedOrder: ({ id, number, total, units, colorSummary, productName, shippingMethod }) =>
+    set({
+      confirmedOrderId: id,
+      confirmedOrderNumber: number,
+      confirmedOrderTotal: total,
+      confirmedUnits: units,
+      confirmedColorSummary: colorSummary,
+      confirmedProductName: productName,
+      confirmedShippingMethod: shippingMethod,
+    }),
   reset: () => set(initialState),
 }));
