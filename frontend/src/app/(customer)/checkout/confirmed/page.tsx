@@ -1,11 +1,10 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCheckoutStore } from "@/stores/checkout.store";
+import type { ShippingMethod } from "@/stores/checkout.store";
 import { formatCurrency } from "@/lib/utils";
 
 const SHIPPING_LABELS: Record<string, string> = {
@@ -24,19 +23,42 @@ export default function CheckoutConfirmedPage() {
     confirmedColorSummary,
     confirmedProductName,
     confirmedShippingMethod,
+    setConfirmedOrder,
   } = useCheckoutStore();
 
-  // Redirect if no confirmed order (e.g. direct navigation)
+  const [ready, setReady] = useState(false);
+
+  // On mount: if Zustand store is empty (e.g. full-page navigation wiped it),
+  // recover from sessionStorage before deciding whether to redirect.
   useEffect(() => {
     if (!confirmedOrderId && !confirmedOrderNumber) {
+      try {
+        const stored = sessionStorage.getItem("af_confirmed_order");
+        if (stored) {
+          const data = JSON.parse(stored) as {
+            id: string; number: string; total: number;
+            units: number; colorSummary: string; productName: string;
+            shippingMethod: ShippingMethod;
+          };
+          setConfirmedOrder(data);
+          setReady(true);
+          return;
+        }
+      } catch {
+        // ignore parse errors
+      }
+      // Nothing in store or sessionStorage — direct navigation, redirect away
       router.replace("/cart");
+    } else {
+      setReady(true);
     }
-  }, [confirmedOrderId, confirmedOrderNumber, router]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  if (!confirmedOrderNumber) {
+  if (!ready || !confirmedOrderNumber) {
     return (
       <div style={{ textAlign: "center", padding: "60px 0", color: "#aaa", fontSize: "14px" }}>
-        Redirecting&hellip;
+        Loading&hellip;
       </div>
     );
   }

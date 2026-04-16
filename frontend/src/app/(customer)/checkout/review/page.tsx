@@ -44,7 +44,7 @@ export default function CheckoutReviewPage() {
     shippingAddress, companyName, contactName, shippingPhone, shippingMethod,
     addressId, poNumber, orderNotes, setPoNumber, setOrderNotes,
     savedCardId, qbToken,
-    setConfirmedOrder, reset,
+    setConfirmedOrder,
   } = useCheckoutStore();
   const clearCart = useCartStore((s) => s.clearCart);
 
@@ -114,7 +114,7 @@ export default function CheckoutReviewPage() {
       const shipping = Number(cart?.validation?.estimated_shipping ?? 0);
       const total = subtotal + shipping;
 
-      setConfirmedOrder({
+      const confirmedData = {
         id: order.id,
         number: order.order_number,
         total,
@@ -122,10 +122,12 @@ export default function CheckoutReviewPage() {
         colorSummary,
         productName,
         shippingMethod,
-      });
+      };
+      setConfirmedOrder(confirmedData);
+      // Persist to sessionStorage so the confirmed page survives any navigation type
+      sessionStorage.setItem("af_confirmed_order", JSON.stringify(confirmedData));
 
       clearCart();
-      reset();
       router.push("/checkout/confirmed");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Failed to place order. Please try again.");
