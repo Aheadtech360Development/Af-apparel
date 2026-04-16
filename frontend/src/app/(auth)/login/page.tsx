@@ -57,6 +57,9 @@ export default function LoginPage() {
       if (err instanceof ApiClientError) {
         if (err.code === "ACCOUNT_SUSPENDED") {
           setError("Your account has been suspended. Please contact support.");
+        } else if (err.code === "UNAUTHORIZED") {
+          // Show the exact backend message — covers wrong password, pending, and rejected cases
+          setError(err.message || "Invalid email or password. Please try again.");
         } else {
           setError("Invalid email or password. Please try again.");
         }

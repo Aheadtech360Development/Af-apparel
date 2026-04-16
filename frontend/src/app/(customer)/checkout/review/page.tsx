@@ -104,6 +104,7 @@ export default function CheckoutReviewPage() {
         saved_card_id: savedCardId ?? undefined,
         address_id: addressId ?? undefined,
         shipping_address: fullAddress,
+        shipping_method: shippingMethod || "standard",
         po_number: poNumber || undefined,
         order_notes: orderNotes || undefined,
       });
@@ -111,8 +112,9 @@ export default function CheckoutReviewPage() {
       const productName = cart?.items[0]?.product_name ?? "Your Order";
       const colorSummary = cart ? buildColorSummary(cart) : "";
       const subtotal = Number(cart?.subtotal ?? 0);
-      const shipping = Number(cart?.validation?.estimated_shipping ?? 0);
-      const total = subtotal + shipping;
+      const baseShipping = Number(cart?.validation?.estimated_shipping ?? 0);
+      const expeditedSurcharge = shippingMethod === "expedited" ? 45 : 0;
+      const total = subtotal + baseShipping + expeditedSurcharge;
 
       const confirmedData = {
         id: order.id,
@@ -143,7 +145,9 @@ export default function CheckoutReviewPage() {
     : "Credit Card";
 
   const subtotal = Number(cart?.subtotal ?? 0);
-  const shipping = Number(cart?.validation?.estimated_shipping ?? 0);
+  const baseShipping = Number(cart?.validation?.estimated_shipping ?? 0);
+  const expeditedSurcharge = shippingMethod === "expedited" ? 45 : 0;
+  const shipping = baseShipping + expeditedSurcharge;
   const total = subtotal + shipping;
   const shippingLabel = SHIPPING_LABELS[shippingMethod] ?? "Standard Ground";
 
@@ -279,8 +283,14 @@ export default function CheckoutReviewPage() {
           )}
           <div style={row}>
             <span style={{ color: "#7A7880" }}>Shipping</span>
-            <span style={{ color: "#7A7880" }}>{shipping > 0 ? formatCurrency(shipping) : "Calculated"}</span>
+            <span style={{ color: "#7A7880" }}>{baseShipping > 0 ? formatCurrency(baseShipping) : "Calculated"}</span>
           </div>
+          {expeditedSurcharge > 0 && (
+            <div style={row}>
+              <span style={{ color: "#7A7880" }}>Expedited (2-Day) Surcharge</span>
+              <span style={{ color: "#2A2830", fontWeight: 600 }}>{formatCurrency(expeditedSurcharge)}</span>
+            </div>
+          )}
           <div style={{ borderTop: "1.5px solid #E2E0DA", paddingTop: "10px", display: "flex", justifyContent: "space-between" }}>
             <span style={{ fontSize: "15px", fontWeight: 800, color: "#2A2830" }}>Total</span>
             <span style={{ fontFamily: "var(--font-bebas)", fontSize: "22px", color: "#E8242A", letterSpacing: ".02em" }}>{formatCurrency(total)}</span>
