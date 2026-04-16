@@ -75,6 +75,16 @@ function brandDisplayName(brand: string): string {
   return brand.charAt(0).toUpperCase() + brand.slice(1);
 }
 
+interface NewCardFields {
+  number: string;
+  expMonth: string;
+  expYear: string;
+  cvc: string;
+  name: string;
+}
+
+const emptyCard: NewCardFields = { number: "", expMonth: "", expYear: "", cvc: "", name: "" };
+
 export default function PaymentMethodsPage() {
   const { isAuthenticated, isLoading } = useAuthStore();
   const [methods, setMethods] = useState<PaymentMethod[]>([]);
@@ -82,6 +92,10 @@ export default function PaymentMethodsPage() {
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [settingDefaultId, setSettingDefaultId] = useState<string | null>(null);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [addingCard, setAddingCard] = useState(false);
+  const [newCard, setNewCard] = useState<NewCardFields>(emptyCard);
+  const [cardErrors, setCardErrors] = useState<Partial<NewCardFields>>({});
   const hasLoaded = useRef(false);
 
   useEffect(() => {
@@ -133,16 +147,74 @@ export default function PaymentMethodsPage() {
     }
   }
 
+  function validateCard(): boolean {
+    const e: Partial<NewCardFields> = {};
+    if (newCard.number.replace(/\s/g, "").length < 13) e.number = "Invalid card number";
+    if (!newCard.expMonth || !/^\d{1,2}$/.test(newCard.expMonth)) e.expMonth = "Required";
+    if (!newCard.expYear || newCard.expYear.length < 4) e.expYear = "Required";
+    if (!newCard.cvc) e.cvc = "Required";
+    setCardErrors(e);
+    return Object.keys(e).length === 0;
+  }
+
+  async function handleAddCard(e: React.FormEvent) {
+    e.preventDefault();
+    if (!validateCard()) return;
+    setAddingCard(true);
+    setMessage(null);
+    try {
+      await apiClient.post("/api/v1/account/payment-methods", {
+        card: {
+          number: newCard.number.replace(/\s/g, ""),
+          expMonth: newCard.expMonth.padStart(2, "0"),
+          expYear: newCard.expYear,
+          cvc: newCard.cvc,
+          name: newCard.name || undefined,
+        },
+      });
+      setMessage({ type: "success", text: "Card added successfully." });
+      setNewCard(emptyCard);
+      setCardErrors({});
+      setShowAddForm(false);
+      await loadMethods();
+    } catch (err: unknown) {
+      setMessage({ type: "error", text: err instanceof Error ? err.message : "Failed to add card." });
+    } finally {
+      setAddingCard(false);
+    }
+  }
+
+  const inp: React.CSSProperties = {
+    width: "100%", padding: "9px 12px", border: "1.5px solid #E2E0DA",
+    borderRadius: "7px", fontSize: "13px", outline: "none",
+    boxSizing: "border-box", color: "#2A2830", background: "#fff",
+    fontFamily: "var(--font-jakarta)",
+  };
+
   return (
     <div style={{ maxWidth: "680px" }}>
       {/* Page heading */}
-      <div style={{ marginBottom: "24px" }}>
-        <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "28px", letterSpacing: ".04em", color: "#2A2830", lineHeight: 1, marginBottom: "4px" }}>
-          Payment Methods
-        </h1>
-        <p style={{ fontSize: "13px", color: "#7A7880" }}>
-          Saved cards are used at checkout. Cards are saved automatically when you complete a purchase.
-        </p>
+      <div style={{ marginBottom: "24px", display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px", flexWrap: "wrap" }}>
+        <div>
+          <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "28px", letterSpacing: ".04em", color: "#2A2830", lineHeight: 1, marginBottom: "4px" }}>
+            Payment Methods
+          </h1>
+          <p style={{ fontSize: "13px", color: "#7A7880" }}>
+            Manage your saved cards for checkout.
+          </p>
+        </div>
+        {!showAddForm && (
+          <button
+            onClick={() => { setShowAddForm(true); setMessage(null); }}
+            style={{
+              padding: "9px 18px", background: "#E8242A", color: "#fff", border: "none",
+              borderRadius: "7px", fontFamily: "var(--font-bebas)", fontSize: "15px",
+              letterSpacing: ".06em", cursor: "pointer", whiteSpace: "nowrap",
+            }}
+          >
+            + Add Card
+          </button>
+        )}
       </div>
 
       {/* Message banner */}
@@ -272,20 +344,106 @@ export default function PaymentMethodsPage() {
         </div>
       )}
 
-      {/* Info note */}
-      {!loading && (
-        <div style={{
-          marginTop: "20px", padding: "12px 16px", borderRadius: "7px",
-          background: "#F4F3EF", border: "1px solid #E2E0DA",
-          display: "flex", alignItems: "flex-start", gap: "10px",
+      {/* Add card form */}
+      {showAddForm && (
+        <form onSubmit={handleAddCard} style={{
+          marginTop: "16px", background: "#fff", border: "1.5px solid #E8242A",
+          borderRadius: "10px", padding: "20px 22px",
         }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7A7880" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: "1px" }}>
-            <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
-          </svg>
-          <p style={{ fontSize: "12px", color: "#7A7880", lineHeight: 1.5 }}>
-            To add a new card, proceed to checkout and enter your card details. Your card will be saved automatically for future orders.
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
+            <span style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".06em", color: "#2A2830" }}>
+              Add New Card
+            </span>
+            <button type="button" onClick={() => { setShowAddForm(false); setNewCard(emptyCard); setCardErrors({}); }}
+              style={{ background: "none", border: "none", cursor: "pointer", color: "#aaa", fontSize: "18px", lineHeight: 1 }}>
+              ✕
+            </button>
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            {/* Cardholder name */}
+            <div>
+              <label style={{ display: "block", fontSize: "11px", fontWeight: 700, color: "#7A7880", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: "4px" }}>
+                Cardholder Name
+              </label>
+              <input
+                type="text"
+                value={newCard.name}
+                onChange={e => setNewCard(p => ({ ...p, name: e.target.value }))}
+                placeholder="Jane Smith"
+                style={inp}
+              />
+            </div>
+
+            {/* Card number */}
+            <div>
+              <label style={{ display: "block", fontSize: "11px", fontWeight: 700, color: "#7A7880", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: "4px" }}>
+                Card Number <span style={{ color: "#E8242A" }}>*</span>
+              </label>
+              <input
+                type="text"
+                inputMode="numeric"
+                maxLength={19}
+                value={newCard.number}
+                onChange={e => {
+                  const raw = e.target.value.replace(/\D/g, "").slice(0, 16);
+                  setNewCard(p => ({ ...p, number: raw.replace(/(.{4})/g, "$1 ").trim() }));
+                }}
+                placeholder="1234 5678 9012 3456"
+                style={{ ...inp, borderColor: cardErrors.number ? "#E8242A" : "#E2E0DA", fontFamily: "monospace", letterSpacing: "0.1em" }}
+              />
+              {cardErrors.number && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "2px" }}>{cardErrors.number}</p>}
+            </div>
+
+            {/* Expiry + CVC */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "10px" }}>
+              <div>
+                <label style={{ display: "block", fontSize: "11px", fontWeight: 700, color: "#7A7880", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: "4px" }}>
+                  Month <span style={{ color: "#E8242A" }}>*</span>
+                </label>
+                <input type="text" inputMode="numeric" maxLength={2} value={newCard.expMonth}
+                  onChange={e => setNewCard(p => ({ ...p, expMonth: e.target.value.replace(/\D/g, "").slice(0, 2) }))}
+                  placeholder="MM" style={{ ...inp, borderColor: cardErrors.expMonth ? "#E8242A" : "#E2E0DA", textAlign: "center" }} />
+              </div>
+              <div>
+                <label style={{ display: "block", fontSize: "11px", fontWeight: 700, color: "#7A7880", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: "4px" }}>
+                  Year <span style={{ color: "#E8242A" }}>*</span>
+                </label>
+                <input type="text" inputMode="numeric" maxLength={4} value={newCard.expYear}
+                  onChange={e => setNewCard(p => ({ ...p, expYear: e.target.value.replace(/\D/g, "").slice(0, 4) }))}
+                  placeholder="YYYY" style={{ ...inp, borderColor: cardErrors.expYear ? "#E8242A" : "#E2E0DA", textAlign: "center" }} />
+              </div>
+              <div>
+                <label style={{ display: "block", fontSize: "11px", fontWeight: 700, color: "#7A7880", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: "4px" }}>
+                  CVC <span style={{ color: "#E8242A" }}>*</span>
+                </label>
+                <input type="text" inputMode="numeric" maxLength={4} value={newCard.cvc}
+                  onChange={e => setNewCard(p => ({ ...p, cvc: e.target.value.replace(/\D/g, "").slice(0, 4) }))}
+                  placeholder="•••" style={{ ...inp, borderColor: cardErrors.cvc ? "#E8242A" : "#E2E0DA", textAlign: "center" }} />
+              </div>
+            </div>
+          </div>
+
+          <p style={{ fontSize: "11px", color: "#aaa", marginTop: "12px" }}>
+            Card details are encrypted and processed securely via QuickBooks Payments.
           </p>
-        </div>
+
+          <div style={{ display: "flex", gap: "10px", marginTop: "14px" }}>
+            <button type="button" onClick={() => { setShowAddForm(false); setNewCard(emptyCard); setCardErrors({}); }}
+              style={{ flex: 1, padding: "10px", border: "1.5px solid #E2E0DA", borderRadius: "7px", background: "#fff", fontSize: "13px", fontWeight: 600, cursor: "pointer", color: "#7A7880" }}>
+              Cancel
+            </button>
+            <button type="submit" disabled={addingCard}
+              style={{
+                flex: 2, padding: "10px", background: addingCard ? "#E2E0DA" : "#E8242A",
+                color: addingCard ? "#aaa" : "#fff", border: "none", borderRadius: "7px",
+                fontFamily: "var(--font-bebas)", fontSize: "15px", letterSpacing: ".06em",
+                cursor: addingCard ? "not-allowed" : "pointer",
+              }}>
+              {addingCard ? "Saving…" : "Save Card"}
+            </button>
+          </div>
+        </form>
       )}
     </div>
   );
