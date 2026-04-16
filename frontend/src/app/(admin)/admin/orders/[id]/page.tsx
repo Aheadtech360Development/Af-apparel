@@ -194,7 +194,7 @@ export default function AdminOrderDetailPage() {
     e.preventDefault();
     setIsSaving(true); setMsg(null);
     try {
-      await adminService.updateOrder(id, { status, tracking_number: tracking || undefined });
+      await adminService.updateOrder(id, { status });
       setMsg({ text: "Order updated successfully.", ok: true });
       setOrder(prev => prev ? { ...prev, status, tracking_number: tracking || null } : prev);
     } catch {
@@ -312,10 +312,7 @@ export default function AdminOrderDetailPage() {
             <StatusBadge status={order.payment_status} />
           </p>
         </div>
-        <button onClick={handleSyncQB} disabled={isSyncing}
-          style={{ background: "#fff", border: "1.5px solid #E2E0DA", borderRadius: "6px", padding: "10px 18px", fontSize: "13px", fontWeight: 700, cursor: "pointer", color: "#2A2830", opacity: isSyncing ? .5 : 1 }}>
-          {isSyncing ? "Syncing…" : "🔄 Sync to QuickBooks"}
-        </button>
+        {/* QB Sync intentionally hidden */}
       </div>
 
       {/* Feedback */}
@@ -413,12 +410,7 @@ export default function AdminOrderDetailPage() {
                   {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
               </div>
-              <div style={{ flex: 1, minWidth: "200px" }}>
-                <label style={LabelStyle}>Tracking #</label>
-                <input type="text" value={tracking} onChange={e => setTracking(e.target.value)}
-                  placeholder="Enter tracking number"
-                  style={{ width: "100%", padding: "10px 14px", border: "1.5px solid #E2E0DA", borderRadius: "6px", fontSize: "14px", fontFamily: "var(--font-jakarta)", boxSizing: "border-box" as const }} />
-              </div>
+              {/* Tracking is managed via Shipping & Courier section above */}
               <button type="submit" disabled={isSaving}
                 style={{ background: "#1A5CFF", color: "#fff", border: "none", padding: "11px 24px", borderRadius: "6px", fontSize: "14px", fontWeight: 700, cursor: "pointer", opacity: isSaving ? .6 : 1 }}>
                 {isSaving ? "Saving…" : "Update Order"}

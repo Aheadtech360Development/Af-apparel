@@ -61,19 +61,6 @@ interface OrderRow {
 interface PricingTierFull { id: string; name: string; discount_percent?: number; discount_percentage?: number; }
 interface ShippingTier { id: string; name: string; }
 
-// ─── RFM ─────────────────────────────────────────────────────────────────────
-
-function getRFMGroup(orderCount: number, lastOrderDate: string | null): { label: string; color: string; bg: string } {
-  const days = lastOrderDate
-    ? Math.floor((Date.now() - new Date(lastOrderDate).getTime()) / 86400000)
-    : 999;
-  if (orderCount >= 10 && days < 30) return { label: "Champions", color: "#059669", bg: "rgba(5,150,105,.12)" };
-  if (orderCount >= 5  && days < 60) return { label: "Loyal",     color: "#1A5CFF", bg: "rgba(26,92,255,.1)" };
-  if (days > 90 && orderCount > 2)   return { label: "At Risk",   color: "#D97706", bg: "rgba(217,119,6,.1)" };
-  if (days > 180)                    return { label: "Lost",       color: "#E8242A", bg: "rgba(232,36,42,.1)" };
-  if (orderCount <= 1)               return { label: "New",        color: "#7C3AED", bg: "rgba(124,58,237,.1)" };
-  return                                      { label: "Potential", color: "#0891B2", bg: "rgba(8,145,178,.1)" };
-}
 
 // ─── Status configs ───────────────────────────────────────────────────────────
 
@@ -228,10 +215,6 @@ export default function CustomerDetailPage() {
     [orders]
   );
 
-  const rfm = useMemo(
-    () => getRFMGroup(orders.length, lastOrderDate),
-    [orders.length, lastOrderDate]
-  );
 
   // ── Actions ───────────────────────────────────────────────────────────────
 
@@ -475,11 +458,9 @@ export default function CustomerDetailPage() {
           </div>
         </div>
         <div style={{ background: "#fff", border: "1px solid #E2E0DA", borderRadius: "10px", padding: "16px 18px" }}>
-          <div style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", color: rfm.color, marginBottom: "6px" }}>RFM Group</div>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <span style={{ padding: "4px 12px", borderRadius: "20px", fontSize: "13px", fontWeight: 700, background: rfm.bg, color: rfm.color }}>
-              {rfm.label}
-            </span>
+          <div style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", color: "#7A7880", marginBottom: "6px" }}>Last Order</div>
+          <div style={{ fontFamily: "var(--font-bebas)", fontSize: "22px", color: "#2A2830", lineHeight: 1 }}>
+            {lastOrderDate ? new Date(lastOrderDate).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "—"}
           </div>
         </div>
       </div>

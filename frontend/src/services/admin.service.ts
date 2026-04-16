@@ -193,16 +193,56 @@ export const adminService = {
     return apiClient.post(`/api/v1/admin/wholesale-applications/${id}/reject`, { reason });
   },
 
+  // Companies
+  async createCompany(data: {
+    name: string;
+    business_type?: string;
+    tax_id?: string;
+    website?: string;
+    phone?: string;
+    company_email?: string;
+    address_line1?: string;
+    city?: string;
+    state_province?: string;
+    postal_code?: string;
+    country?: string;
+    contact_first_name?: string;
+    contact_last_name?: string;
+    contact_email?: string;
+    contact_phone?: string;
+    pricing_tier_id?: string;
+    shipping_tier_id?: string;
+    admin_notes?: string;
+  }) {
+    return apiClient.post("/api/v1/admin/companies", data);
+  },
+
+  async exportCompaniesCsv() {
+    return downloadCsv("/api/v1/admin/companies/export-csv", "customers-export.csv");
+  },
+
   // Orders
-  async listOrders(params?: { q?: string; status?: string; page?: number; company_id?: string; page_size?: number }) {
+  async listOrders(params?: { q?: string; status?: string; page?: number; company_id?: string; page_size?: number; date_from?: string; date_to?: string }) {
     const query = new URLSearchParams();
     if (params?.q) query.set("q", params.q);
     if (params?.status) query.set("status", params.status);
     if (params?.page) query.set("page", String(params.page));
     if (params?.company_id) query.set("company_id", params.company_id);
     if (params?.page_size) query.set("page_size", String(params.page_size));
+    if (params?.date_from) query.set("date_from", params.date_from);
+    if (params?.date_to) query.set("date_to", params.date_to);
     const qs = query.toString();
     return apiClient.get(`/api/v1/admin/orders${qs ? `?${qs}` : ""}`);
+  },
+
+  async exportOrdersCsv(params?: { q?: string; status?: string; date_from?: string; date_to?: string }) {
+    const query = new URLSearchParams();
+    if (params?.q) query.set("q", params.q);
+    if (params?.status) query.set("status", params.status);
+    if (params?.date_from) query.set("date_from", params.date_from);
+    if (params?.date_to) query.set("date_to", params.date_to);
+    const qs = query.toString();
+    return downloadCsv(`/api/v1/admin/orders/export-csv${qs ? `?${qs}` : ""}`, "orders-export.csv");
   },
 
   async getOrder(id: string) {

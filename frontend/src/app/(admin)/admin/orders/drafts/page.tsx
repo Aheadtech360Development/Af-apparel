@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { apiClient } from "@/lib/api-client";
+import { adminService } from "@/services/admin.service";
 import { FileTextIcon } from "@/components/ui/icons";
 
 interface DraftOrder {
@@ -17,10 +19,12 @@ interface DraftOrder {
   created_at: string;
 }
 
+interface CompanyOption { id: string; name: string; }
+
 const STATUS_STYLE: Record<string, { bg: string; color: string }> = {
-  pending: { bg: "rgba(217,119,6,.1)", color: "#D97706" },
-  confirmed: { bg: "rgba(26,92,255,.1)", color: "#1A5CFF" },
-  cancelled: { bg: "rgba(232,36,42,.1)", color: "#E8242A" },
+  pending:   { bg: "rgba(217,119,6,.1)",  color: "#D97706" },
+  confirmed: { bg: "rgba(26,92,255,.1)",  color: "#1A5CFF" },
+  cancelled: { bg: "rgba(232,36,42,.1)",  color: "#E8242A" },
 };
 
 function StatusBadge({ status }: { status: string }) {
@@ -32,10 +36,130 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
+// ── Create Draft Modal ─────────────────────────────────────────────────────────
+
+function CreateDraftModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (id: string) => void }) {
+  const [companies, setCompanies] = useState<CompanyOption[]>([]);
+  const [companyId, setCompanyId] = useState("");
+  const [companySearch, setCompanySearch] = useState("");
+  const [poNumber, setPoNumber] = useState("");
+  const [notes, setNotes] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    adminService.listCompanies({ q: companySearch || undefined, page_size: 50 })
+      .then((d: unknown) => {
+        const data = d as { items: CompanyOption[] };
+        setCompanies(data.items ?? []);
+      })
+      .catch(() => {});
+  }, [companySearch]);
+
+  async function handleCreate() {
+    if (!companyId) { setError("Please select a company."); return; }
+    setSaving(true); setError(null);
+    try {
+      const result = await apiClient.post<{ id: string; order_number: string }>("/api/v1/admin/orders/draft", {
+        company_id: companyId,
+        po_number: poNumber || undefined,
+        notes: notes || undefined,
+      });
+      onSuccess(result.id);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to create draft order");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const inp: React.CSSProperties = {
+    width: "100%", padding: "9px 12px", border: "1.5px solid #E2E0DA",
+    borderRadius: "7px", fontSize: "13px", outline: "none", boxSizing: "border-box",
+    fontFamily: "var(--font-jakarta)",
+  };
+
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,.5)", padding: "16px" }}>
+      <div style={{ background: "#fff", borderRadius: "12px", width: "100%", maxWidth: "480px", boxShadow: "0 20px 60px rgba(0,0,0,.2)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "20px 24px", borderBottom: "1px solid #E2E0DA" }}>
+          <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "22px", color: "#2A2830", letterSpacing: ".04em", margin: 0 }}>CREATE DRAFT ORDER</h2>
+          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", fontSize: "22px", color: "#7A7880", lineHeight: 1 }}>×</button>
+        </div>
+
+        <div style={{ padding: "20px 24px" }}>
+          {error && <div style={{ background: "rgba(232,36,42,.08)", border: "1px solid rgba(232,36,42,.2)", borderRadius: "6px", padding: "10px 14px", fontSize: "13px", color: "#E8242A", marginBottom: "16px" }}>{error}</div>}
+
+          <div style={{ marginBottom: "14px" }}>
+            <label style={{ display: "block", fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", color: "#7A7880", marginBottom: "5px" }}>
+              Company *
+            </label>
+            <input
+              style={inp}
+              placeholder="Search company…"
+              value={companySearch}
+              onChange={e => setCompanySearch(e.target.value)}
+            />
+            {companies.length > 0 && (
+              <div style={{ border: "1.5px solid #E2E0DA", borderTop: "none", borderRadius: "0 0 7px 7px", maxHeight: "160px", overflowY: "auto", background: "#fff" }}>
+                {companies.map(c => (
+                  <div
+                    key={c.id}
+                    onClick={() => { setCompanyId(c.id); setCompanySearch(c.name); setCompanies([]); }}
+                    style={{ padding: "9px 12px", fontSize: "13px", cursor: "pointer", background: companyId === c.id ? "rgba(26,92,255,.07)" : "#fff", color: companyId === c.id ? "#1A5CFF" : "#2A2830", fontWeight: companyId === c.id ? 700 : 400 }}
+                    onMouseEnter={e => (e.currentTarget.style.background = "#F4F3EF")}
+                    onMouseLeave={e => (e.currentTarget.style.background = companyId === c.id ? "rgba(26,92,255,.07)" : "#fff")}
+                  >
+                    {c.name}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div style={{ marginBottom: "14px" }}>
+            <label style={{ display: "block", fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", color: "#7A7880", marginBottom: "5px" }}>
+              PO Number (optional)
+            </label>
+            <input style={inp} value={poNumber} onChange={e => setPoNumber(e.target.value)} placeholder="Customer purchase order #" />
+          </div>
+
+          <div style={{ marginBottom: "20px" }}>
+            <label style={{ display: "block", fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", color: "#7A7880", marginBottom: "5px" }}>
+              Notes (optional)
+            </label>
+            <textarea style={{ ...inp, resize: "vertical", minHeight: "64px" }} value={notes} onChange={e => setNotes(e.target.value)} />
+          </div>
+
+          <p style={{ fontSize: "12px", color: "#7A7880", marginBottom: "16px" }}>
+            A draft order is created with status "pending" and $0 total. You can add items and update pricing from the order detail page.
+          </p>
+
+          <div style={{ display: "flex", gap: "10px" }}>
+            <button type="button" onClick={onClose}
+              style={{ flex: 1, padding: "10px", border: "1.5px solid #E2E0DA", borderRadius: "7px", fontSize: "13px", fontWeight: 600, cursor: "pointer", background: "#fff" }}>
+              Cancel
+            </button>
+            <button
+              onClick={handleCreate} disabled={saving || !companyId}
+              style={{ flex: 2, padding: "10px", background: (saving || !companyId) ? "#E2E0DA" : "#1A5CFF", color: (saving || !companyId) ? "#aaa" : "#fff", border: "none", borderRadius: "7px", fontSize: "13px", fontWeight: 700, cursor: (saving || !companyId) ? "not-allowed" : "pointer" }}>
+              {saving ? "Creating…" : "Create Draft Order"}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Main Page ──────────────────────────────────────────────────────────────────
+
 export default function DraftOrdersPage() {
+  const router = useRouter();
   const [orders, setOrders] = useState<DraftOrder[]>([]);
   const [total, setTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [showCreate, setShowCreate] = useState(false);
 
   async function load() {
     setIsLoading(true);
@@ -61,13 +185,25 @@ export default function DraftOrdersPage() {
 
   return (
     <div style={{ fontFamily: "var(--font-jakarta)" }}>
+      {showCreate && (
+        <CreateDraftModal
+          onClose={() => setShowCreate(false)}
+          onSuccess={(id) => {
+            setShowCreate(false);
+            router.push(`/admin/orders/${id}`);
+          }}
+        />
+      )}
+
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
         <div>
           <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "32px", color: "#2A2830", letterSpacing: ".02em", lineHeight: 1 }}>DRAFT ORDERS</h1>
           <p style={{ fontSize: "13px", color: "#7A7880", marginTop: "4px" }}>Pending orders awaiting confirmation · {total} total</p>
         </div>
-        <button style={{ background: "#1A5CFF", color: "#fff", border: "none", padding: "10px 20px", borderRadius: "6px", fontWeight: 700, cursor: "pointer", fontSize: "13px" }}>
+        <button
+          onClick={() => setShowCreate(true)}
+          style={{ background: "#1A5CFF", color: "#fff", border: "none", padding: "10px 20px", borderRadius: "6px", fontWeight: 700, cursor: "pointer", fontSize: "13px" }}>
           + Create Draft
         </button>
       </div>
