@@ -69,13 +69,12 @@ function ReviewsTab({ productId, isAuthenticated }: { productId: string; isAuthe
   async function fetchReviews() {
     setLoading(true);
     try {
-      const res = await fetch(`/api/v1/products/${productId}/reviews`);
-      if (res.ok) {
-        const data = await res.json();
-        setReviews(data.reviews ?? []);
-        setTotal(data.total ?? 0);
-        setAvgRating(data.avg_rating ?? 0);
-      }
+      const data = await apiClient.get<{ reviews: ReviewData[]; total: number; avg_rating: number }>(
+        `/api/v1/products/${productId}/reviews`
+      );
+      setReviews(data.reviews ?? []);
+      setTotal(data.total ?? 0);
+      setAvgRating(data.avg_rating ?? 0);
     } catch { /* ignore */ }
     finally { setLoading(false); }
   }
@@ -88,22 +87,21 @@ function ReviewsTab({ productId, isAuthenticated }: { productId: string; isAuthe
     setSubmitting(true);
     setSubmitMsg(null);
     try {
-      const res = await fetch(`/api/v1/products/${productId}/reviews`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ rating: form.rating, title: form.title || null, body: form.body, reviewer_name: form.reviewer_name, reviewer_company: form.reviewer_company || null }),
+      await apiClient.post(`/api/v1/products/${productId}/reviews`, {
+        rating: form.rating,
+        title: form.title || null,
+        body: form.body,
+        reviewer_name: form.reviewer_name,
+        reviewer_company: form.reviewer_company || null,
       });
-      if (res.ok) {
-        setSubmitMsg({ type: "success", text: "Review submitted! Thank you." });
-        setForm({ rating: 5, title: "", body: "", reviewer_name: "", reviewer_company: "" });
-        setShowForm(false);
-        await fetchReviews();
-      } else {
-        const err = await res.json().catch(() => ({}));
-        setSubmitMsg({ type: "error", text: err.detail ?? "Failed to submit review." });
-      }
-    } catch { setSubmitMsg({ type: "error", text: "Network error. Please try again." }); }
+      setSubmitMsg({ type: "success", text: "Review submitted! Thank you." });
+      setForm({ rating: 5, title: "", body: "", reviewer_name: "", reviewer_company: "" });
+      setShowForm(false);
+      await fetchReviews();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Failed to submit review.";
+      setSubmitMsg({ type: "error", text: msg });
+    }
     finally { setSubmitting(false); }
   }
 

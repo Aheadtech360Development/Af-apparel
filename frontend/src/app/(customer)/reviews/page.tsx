@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { apiClient } from "@/lib/api-client";
 
 interface Review {
   id: string;
@@ -34,14 +35,8 @@ export default function ReviewsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch recent reviews from all products via the admin/public API
-    // We'll hit the products endpoint to get all products and then fetch their reviews
-    // For now, use a simple approach: store a global reviews list endpoint
-    fetch("/api/v1/reviews/recent?page_size=50")
-      .then(r => r.ok ? r.json() : null)
-      .then(data => {
-        if (data?.reviews) setReviews(data.reviews);
-      })
+    apiClient.get<{ reviews: Review[] }>("/api/v1/reviews/recent?page_size=50")
+      .then(data => { if (data?.reviews) setReviews(data.reviews); })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
