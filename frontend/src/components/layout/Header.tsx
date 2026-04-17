@@ -101,7 +101,6 @@ export function Header() {
                 <div style={{ position: "absolute", top: "100%", left: 0, marginTop: "6px", background: "#1a1a1f", border: "1px solid rgba(255,255,255,.1)", borderRadius: "8px", padding: "6px", minWidth: "200px", boxShadow: "0 8px 24px rgba(0,0,0,.4)", zIndex: 100 }}>
                   {[
                     { href: "/reviews", label: "Customer Reviews", icon: "★" },
-                    { href: "/wholesale/register", label: "Apply for Wholesale", icon: "📋" },
                     { href: "/contact", label: "Contact Us", icon: "✉" },
                   ].map(({ href, label, icon }) => (
                     <Link
