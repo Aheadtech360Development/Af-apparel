@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 
 import { useEffect, useMemo, useState } from "react";
 import { adminService } from "@/services/admin.service";
-import { TagIcon, CheckIcon, TrashIcon } from "@/components/ui/icons";
+import { TagIcon, TrashIcon } from "@/components/ui/icons";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -16,8 +16,6 @@ interface PricingTier {
   discount_percent: number;
   discount_percentage: number;
   moq: number;
-  free_shipping: boolean;
-  shipping_discount_percentage: number;
   tax_exempt: boolean;
   tax_percentage: number;
   payment_terms: string;
@@ -33,8 +31,6 @@ const EMPTY_FORM = {
   description: "",
   discount_percent: 0,
   moq: 0,
-  free_shipping: false,
-  shipping_discount_percentage: 0,
   tax_exempt: false,
   tax_percentage: 0,
   payment_terms: "immediate",
@@ -116,8 +112,6 @@ export default function PricingTiersPage() {
       description: tier.description ?? "",
       discount_percent: tier.discount_percent ?? tier.discount_percentage ?? 0,
       moq: tier.moq ?? 0,
-      free_shipping: tier.free_shipping ?? false,
-      shipping_discount_percentage: tier.shipping_discount_percentage ?? 0,
       tax_exempt: tier.tax_exempt ?? false,
       tax_percentage: tier.tax_percentage ?? 0,
       payment_terms: tier.payment_terms ?? "immediate",
@@ -260,12 +254,6 @@ export default function PricingTiersPage() {
                     <div style={{ fontFamily: "var(--font-bebas)", fontSize: "24px", color: "#2A2830" }}>{tier.moq || 0} units</div>
                   </div>
                   <div style={{ background: "#F4F3EF", borderRadius: "8px", padding: "12px" }}>
-                    <div style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", color: "#aaa", marginBottom: "4px" }}>Shipping</div>
-                    <div style={{ fontSize: "14px", fontWeight: 700, color: "#2A2830" }}>
-                      {tier.free_shipping ? <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><CheckIcon size={12} color="#059669" /> Free</span> : tier.shipping_discount_percentage ? `${tier.shipping_discount_percentage}% off` : "Standard"}
-                    </div>
-                  </div>
-                  <div style={{ background: "#F4F3EF", borderRadius: "8px", padding: "12px" }}>
                     <div style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", color: "#aaa", marginBottom: "4px" }}>Payment Terms</div>
                     <div style={{ fontSize: "14px", fontWeight: 700, color: "#2A2830", textTransform: "uppercase" }}>{tier.payment_terms || "Standard"}</div>
                   </div>
@@ -343,37 +331,7 @@ export default function PricingTiersPage() {
               </div>
             </div>
 
-            {/* Section 2: Shipping */}
-            <div style={sectionBox}>
-              <div style={{ fontFamily: "var(--font-bebas)", fontSize: "13px", letterSpacing: ".1em", color: "#7A7880", marginBottom: "14px" }}>SHIPPING</div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px", background: "#fff", borderRadius: "8px", border: "1px solid #E2E0DA" }}>
-                  <input
-                    type="checkbox" id="free_shipping"
-                    checked={form.free_shipping}
-                    onChange={e => setForm(f => ({ ...f, free_shipping: e.target.checked }))}
-                    style={{ width: "18px", height: "18px", cursor: "pointer", accentColor: "#1A5CFF" }}
-                  />
-                  <div>
-                    <label htmlFor="free_shipping" style={{ fontSize: "14px", fontWeight: 700, cursor: "pointer" }}>Free Shipping</label>
-                    <div style={{ fontSize: "12px", color: "#7A7880" }}>All orders ship free</div>
-                  </div>
-                </div>
-                {!form.free_shipping && (
-                  <div>
-                    <label style={labelStyle}>Shipping Discount %</label>
-                    <input
-                      type="number" min="0" max="100"
-                      value={form.shipping_discount_percentage}
-                      onChange={e => setForm(f => ({ ...f, shipping_discount_percentage: parseFloat(e.target.value) || 0 }))}
-                      style={inputStyle}
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Section 3: Tax & Payment */}
+            {/* Section 2: Tax & Payment */}
             <div style={sectionBox}>
               <div style={{ fontFamily: "var(--font-bebas)", fontSize: "13px", letterSpacing: ".1em", color: "#7A7880", marginBottom: "14px" }}>TAX &amp; PAYMENT</div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "14px" }}>
