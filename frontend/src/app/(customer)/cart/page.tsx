@@ -152,6 +152,7 @@ export default function CartPage() {
   const groups = cart ? groupByProduct(cart.items) : [];
   const subtotal = Number(cart?.subtotal ?? 0);
   const discountPercent = Number(cart?.discount_percent ?? 0);
+  const hasShippingTier = cart?.validation?.has_shipping_tier ?? false;
 
   return (
     <div style={{ minHeight: "100vh", background: "#F4F3EF", fontFamily: "var(--font-jakarta)", paddingBottom: "60px" }}>
@@ -339,6 +340,7 @@ export default function CartPage() {
               <OrderSummary
                 subtotal={subtotal}
                 estimatedShipping={Number(cart?.validation?.estimated_shipping ?? 0)}
+                hasShippingTier={hasShippingTier}
                 discountPercent={discountPercent}
                 isValid={isCheckoutEnabled}
                 disabledReason={disabledReason}
@@ -385,17 +387,18 @@ export default function CartPage() {
 
 // ── Order Summary sidebar component ──────────────────────────────────────────
 function OrderSummary({
-  subtotal, estimatedShipping, discountPercent, isValid, disabledReason, onCheckout,
+  subtotal, estimatedShipping, hasShippingTier, discountPercent, isValid, disabledReason, onCheckout,
 }: {
   subtotal: number;
   estimatedShipping: number;
+  hasShippingTier: boolean;
   discountPercent: number;
   isValid: boolean;
   disabledReason?: string;
   onCheckout: () => void;
 }) {
-  const tax = 0; // shown as "Calculated at checkout"
-  const total = subtotal + estimatedShipping + tax;
+  const tax = 0;
+  const total = subtotal + (hasShippingTier ? estimatedShipping : 0) + tax;
 
   const usp = [
     { icon: "🚚", text: "Orders before 2 PM CT ship same day" },
@@ -425,8 +428,12 @@ function OrderSummary({
         )}
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#7A7880" }}>
           <span>Shipping (Standard Ground)</span>
-          <span style={{ fontWeight: 600, color: estimatedShipping === 0 ? "#059669" : "#2A2830" }}>
-            {estimatedShipping === 0 ? "FREE" : formatCurrency(estimatedShipping)}
+          <span style={{ fontWeight: 600, color: (hasShippingTier && estimatedShipping === 0) ? "#059669" : "#2A2830" }}>
+            {!hasShippingTier
+              ? <span style={{ color: "#7A7880", fontWeight: 400 }}>Calculated at checkout</span>
+              : estimatedShipping === 0
+                ? "FREE"
+                : formatCurrency(estimatedShipping)}
           </span>
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#7A7880" }}>

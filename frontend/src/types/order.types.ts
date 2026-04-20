@@ -28,6 +28,7 @@ export interface CartValidation {
   mov_required: string;
   mov_current: string;
   estimated_shipping: string;
+  has_shipping_tier: boolean;
 }
 
 /** Cart response — matches backend CartResponse schema. */

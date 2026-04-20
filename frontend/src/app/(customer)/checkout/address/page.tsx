@@ -80,9 +80,11 @@ export default function CheckoutAddressPage() {
   useEffect(() => {
     cartService.getCart().then(c => {
       setSubtotal(Number(c.subtotal));
-      setTierShipping(Number(c.validation?.estimated_shipping ?? 0));
+      // Only set tierShipping if company has a tier assigned; null = unknown/not set
+      const hasTier = (c.validation as (typeof c.validation & { has_shipping_tier?: boolean }))?.has_shipping_tier ?? false;
+      setTierShipping(hasTier ? Number(c.validation?.estimated_shipping ?? 0) : null);
     }).catch(() => {
-      setTierShipping(0);
+      setTierShipping(null);
     });
     apiClient.get<SavedAddress[]>("/api/v1/account/addresses").then(addrs => {
       setSavedAddresses(addrs);
@@ -160,24 +162,28 @@ export default function CheckoutAddressPage() {
 
   // Build shipping option display
   function shippingOptionLabel(method: ShippingMethod): { price: string; note?: string } {
-    const base = tierShipping;
-    if (base === null) return { price: "Loading…" };
-
     if (method === "will_call") {
       return { price: "FREE", note: "Pick up from our warehouse — no shipping charge." };
     }
+    // No tier assigned yet
+    if (tierShipping === null) {
+      if (method === "expedited") {
+        return { price: `+ $${EXPEDITED_SURCHARGE} surcharge`, note: "Tier-based base rate + $45 expedited surcharge." };
+      }
+      return { price: "Calculated", note: "Contact us to have a shipping tier assigned to your account." };
+    }
     if (method === "expedited") {
-      const cost = base + EXPEDITED_SURCHARGE;
+      const cost = tierShipping + EXPEDITED_SURCHARGE;
       return {
         price: formatCurrency(cost),
-        note: `Your tier rate ${formatCurrency(base)} + $${EXPEDITED_SURCHARGE} expedited surcharge.`,
+        note: `Your tier rate ${formatCurrency(tierShipping)} + $${EXPEDITED_SURCHARGE} expedited surcharge.`,
       };
     }
     // standard
-    if (base === 0) {
+    if (tierShipping === 0) {
       return { price: "FREE", note: "Free shipping on your account's tier." };
     }
-    return { price: formatCurrency(base), note: "Rate based on your assigned shipping tier." };
+    return { price: formatCurrency(tierShipping), note: "Rate based on your assigned shipping tier." };
   }
 
   const SHIPPING_OPTIONS: { id: ShippingMethod; label: string; sub: string }[] = [
@@ -409,14 +415,20 @@ export default function CheckoutAddressPage() {
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#7A7880" }}>
             <span>Shipping ({SHIPPING_OPTIONS.find(o => o.id === shippingMethod)?.label})</span>
-            <span style={{ fontWeight: 600, color: selectedCost === 0 ? "#059669" : "#2A2830" }}>
-              {tierShipping === null ? "Loading…" : selectedCost === 0 ? "FREE" : formatCurrency(selectedCost)}
+            <span style={{ fontWeight: 600, color: (shippingMethod === "will_call" || (tierShipping !== null && selectedCost === 0)) ? "#059669" : "#2A2830" }}>
+              {shippingMethod === "will_call"
+                ? "FREE"
+                : tierShipping === null
+                  ? <span style={{ color: "#7A7880", fontWeight: 400 }}>Calculated at checkout</span>
+                  : selectedCost === 0
+                    ? "FREE"
+                    : formatCurrency(selectedCost)}
             </span>
           </div>
           <div style={{ borderTop: "1px solid #F0EEE9", paddingTop: "8px", display: "flex", justifyContent: "space-between" }}>
             <span style={{ fontSize: "14px", fontWeight: 800, color: "#2A2830" }}>Total</span>
             <span style={{ fontFamily: "var(--font-bebas)", fontSize: "20px", color: "#E8242A", letterSpacing: ".02em" }}>
-              {tierShipping === null ? "—" : formatCurrency(orderTotal)}
+              {(tierShipping !== null || shippingMethod === "will_call") ? formatCurrency(orderTotal) : `${formatCurrency(subtotal)}+`}
             </span>
           </div>
         </div>
