@@ -229,6 +229,22 @@ export default function AdminProductEditPage() {
     } : prev);
   }
 
+  async function handleSetPrimary(imageId: string) {
+    if (!product) return;
+    const ordered = [imageId, ...product.images.filter(img => img.id !== imageId).map(img => img.id)];
+    await adminService.reorderImages(product.id, ordered);
+    await load();
+  }
+
+  async function handleUpdateImageColor(imageId: string, color: string) {
+    if (!product) return;
+    await apiClient.patch(`/api/v1/admin/products/${product.id}/images/${imageId}`, { alt_text: color || null });
+    setProduct(prev => prev ? {
+      ...prev,
+      images: prev.images.map(img => img.id === imageId ? { ...img, alt_text: color || null } : img),
+    } : prev);
+  }
+
   async function handleSave() {
     if (!product) return;
     setIsSaving(true);
@@ -376,38 +392,82 @@ export default function AdminProductEditPage() {
 
           {/* Media */}
           <div style={sectionCard}>
-            <span style={sectionTitle}>MEDIA</span>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "10px", marginBottom: "8px" }}>
-              {product.images?.map((img, i) => (
-                <div key={img.id} style={{ aspectRatio: "1", borderRadius: "8px", overflow: "hidden", border: "1px solid #E2E0DA", position: "relative", background: "#f5f5f5" }}>
-                  <img src={img.url_medium} alt={img.alt_text ?? product.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                  <button
-                    onClick={() => handleDeleteImage(img.id)}
-                    style={{ position: "absolute", top: "4px", right: "4px", background: "rgba(0,0,0,.6)", color: "#fff", border: "none", borderRadius: "50%", width: "22px", height: "22px", cursor: "pointer", fontSize: "11px", lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center" }}
-                  >✕</button>
-                  {i === 0 && (
-                    <div style={{ position: "absolute", bottom: "4px", left: "4px", background: "#1A5CFF", color: "#fff", fontSize: "9px", fontWeight: 700, padding: "2px 6px", borderRadius: "3px" }}>PRIMARY</div>
-                  )}
-                </div>
-              ))}
-
-              {/* Upload tile */}
-              <div
-                onClick={() => fileInputRef.current?.click()}
-                style={{ aspectRatio: "1", borderRadius: "8px", border: "2px dashed #E2E0DA", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", background: "#FAFAFA", transition: "border-color .2s" }}
-                onMouseEnter={e => (e.currentTarget.style.borderColor = "#1A5CFF")}
-                onMouseLeave={e => (e.currentTarget.style.borderColor = "#E2E0DA")}
-              >
-                <span style={{ fontSize: "24px", marginBottom: "4px", color: "#aaa" }}>+</span>
-                <span style={{ fontSize: "11px", color: "#7A7880" }}>Add media</span>
-              </div>
-              <input ref={fileInputRef} type="file" accept="image/*" multiple style={{ display: "none" }} onChange={handleImageUpload} />
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+              <span style={{ ...sectionTitle, marginBottom: 0 }}>MEDIA</span>
+              <span style={{ fontSize: "11px", color: "#aaa" }}>Click ★ to set primary · select color to link image to variant</span>
             </div>
-            {product.images?.length === 0 && (
-              <p style={{ fontSize: "12px", color: "#aaa", textAlign: "center", padding: "8px 0" }}>
-                No images yet. Click + to upload.
-              </p>
+
+            {/* Image grid with controls */}
+            {(product.images?.length ?? 0) > 0 && (
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "12px" }}>
+                {product.images?.map((img, i) => {
+                  const variantColors = [...new Set(product.variants?.map(v => v.color).filter(Boolean) as string[])];
+                  return (
+                    <div key={img.id} style={{ display: "flex", gap: "12px", alignItems: "center", padding: "10px 12px", border: "1px solid #E2E0DA", borderRadius: "8px", background: i === 0 ? "rgba(26,92,255,.03)" : "#fff" }}>
+                      {/* Thumbnail */}
+                      <div style={{ width: "64px", height: "64px", borderRadius: "6px", overflow: "hidden", flexShrink: 0, border: "1px solid #E2E0DA", background: "#f5f5f5" }}>
+                        <img src={img.url_medium} alt={img.alt_text ?? ""} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      </div>
+
+                      {/* Controls */}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+                          {i === 0 ? (
+                            <span style={{ background: "#1A5CFF", color: "#fff", fontSize: "9px", fontWeight: 700, padding: "2px 8px", borderRadius: "3px" }}>★ PRIMARY</span>
+                          ) : (
+                            <button
+                              onClick={() => handleSetPrimary(img.id)}
+                              style={{ background: "#F4F3EF", border: "1px solid #E2E0DA", color: "#7A7880", fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "3px", cursor: "pointer" }}
+                            >☆ Set Primary</button>
+                          )}
+                          <span style={{ fontSize: "11px", color: "#aaa" }}>Image {i + 1}</span>
+                        </div>
+
+                        {/* Color assignment */}
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                          <label style={{ fontSize: "11px", color: "#7A7880", whiteSpace: "nowrap" }}>Color:</label>
+                          {variantColors.length > 0 ? (
+                            <select
+                              value={img.alt_text ?? ""}
+                              onChange={e => handleUpdateImageColor(img.id, e.target.value)}
+                              style={{ padding: "4px 8px", border: "1px solid #E2E0DA", borderRadius: "5px", fontSize: "12px", background: "#fff", maxWidth: "160px" }}
+                            >
+                              <option value="">— No color —</option>
+                              {variantColors.map(c => <option key={c} value={c}>{c}</option>)}
+                            </select>
+                          ) : (
+                            <input
+                              value={img.alt_text ?? ""}
+                              onChange={e => handleUpdateImageColor(img.id, e.target.value)}
+                              placeholder="e.g. Navy (links to color tab)"
+                              style={{ padding: "4px 8px", border: "1px solid #E2E0DA", borderRadius: "5px", fontSize: "12px", width: "180px" }}
+                            />
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Delete */}
+                      <button
+                        onClick={() => handleDeleteImage(img.id)}
+                        style={{ background: "none", border: "none", cursor: "pointer", color: "#E8242A", padding: "4px", flexShrink: 0 }}
+                      ><TrashIcon size={15} color="#E8242A" /></button>
+                    </div>
+                  );
+                })}
+              </div>
             )}
+
+            {/* Upload tile */}
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              style={{ borderRadius: "8px", border: "2px dashed #E2E0DA", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", cursor: "pointer", background: "#FAFAFA", padding: "16px", transition: "border-color .2s" }}
+              onMouseEnter={e => (e.currentTarget.style.borderColor = "#1A5CFF")}
+              onMouseLeave={e => (e.currentTarget.style.borderColor = "#E2E0DA")}
+            >
+              <span style={{ fontSize: "20px", color: "#aaa" }}>+</span>
+              <span style={{ fontSize: "13px", color: "#7A7880" }}>Add media</span>
+            </div>
+            <input ref={fileInputRef} type="file" accept="image/*" multiple style={{ display: "none" }} onChange={handleImageUpload} />
           </div>
 
           {/* Variants */}
