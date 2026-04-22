@@ -2,6 +2,7 @@
 export const dynamic = "force-dynamic";
 
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { adminService } from "@/services/admin.service";
 import { apiClient } from "@/lib/api-client";
 import { TagIcon, TrashIcon } from "@/components/ui/icons";
@@ -95,7 +96,11 @@ const sectionBox: React.CSSProperties = {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function PricingTiersPage() {
-  const [activeTab, setActiveTab] = useState<"tiers" | "groups" | "variants">("tiers");
+  const searchParams = useSearchParams();
+  const initialTab = searchParams.get("tab");
+  const [activeTab, setActiveTab] = useState<"tiers" | "groups" | "variants">(
+    initialTab === "groups" ? "groups" : initialTab === "variants" ? "variants" : "tiers"
+  );
 
   // ── Tiers state ───────────────────────────────────────────────────────────
   const [tiers, setTiers]           = useState<PricingTier[]>([]);

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import {
   BarChartIcon, PackageIcon, BuildingIcon, ShirtIcon,
@@ -28,6 +28,7 @@ const SUB_LINK_BASE: React.CSSProperties = {
 
 export function AdminSidebar() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const isOrdersActive = pathname.startsWith("/admin/orders") || pathname === "/admin/abandoned-carts";
   const isProductsActive = pathname.startsWith("/admin/products") || pathname.startsWith("/admin/inventory");
   const isCustomersActive = pathname.startsWith("/admin/customers");
@@ -57,7 +58,12 @@ export function AdminSidebar() {
   }
 
   function SubLink({ href, label }: { href: string; label: string }) {
-    const active = pathname === href;
+    const [hrefPath, hrefQuery] = href.split("?");
+    const currentTab = searchParams.get("tab") ?? "";
+    const hrefTab = hrefQuery ? new URLSearchParams(hrefQuery).get("tab") ?? "" : "";
+    const active = hrefQuery
+      ? pathname === hrefPath && currentTab === hrefTab
+      : pathname === href && !currentTab;
     return (
       <Link href={href} style={{
         ...SUB_LINK_BASE,
@@ -143,6 +149,8 @@ export function AdminSidebar() {
           <SubLink href="/admin/customers" label="All Customers" />
           <SubLink href="/admin/customers/applications" label="Applications" />
           <SubLink href="/admin/customers/tiers" label="Customer Tiers" />
+          <SubLink href="/admin/customers/tiers?tab=groups" label="Discount Groups" />
+          <SubLink href="/admin/customers/tiers?tab=variants" label="Individual Variant Pricing" />
         </div>
       )}
 
