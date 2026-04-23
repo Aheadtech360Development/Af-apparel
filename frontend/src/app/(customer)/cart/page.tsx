@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
 import { cartService } from "@/services/cart.service";
+import { apiClient } from "@/lib/api-client";
 import { MOQWarning } from "@/components/cart/MOQWarning";
 import type { Cart, CartItem } from "@/types/order.types";
 
@@ -151,33 +152,31 @@ export default function CartPage() {
     setApplyingCoupon(true);
     setCouponError(null);
     try {
-      const res = await fetch("/api/v1/discounts/validate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          code: couponInput.trim(),
-          cart_total: subtotal,
-          customer_type: "wholesale",
-        }),
+      const data = await apiClient.post<{
+        valid: boolean; message: string; code?: string;
+        discount_type?: string; discount_amount?: number; final_total?: number;
+      }>("/api/v1/discounts/validate", {
+        code: couponInput.trim(),
+        cart_total: subtotal,
+        customer_type: "wholesale",
       });
-      const data = await res.json();
       if (data.valid) {
         const coupon: AppliedCoupon = {
-          code: data.code,
-          discount_type: data.discount_type,
+          code: data.code!,
+          discount_type: data.discount_type!,
           discount_amount: Number(data.discount_amount),
           final_total: Number(data.final_total),
           message: data.message,
         };
         setAppliedCoupon(coupon);
-        if (typeof window !== "undefined") localStorage.setItem("af_coupon", data.code);
+        if (typeof window !== "undefined") localStorage.setItem("af_coupon", data.code!);
       } else {
         setCouponError(data.message || "Invalid discount code.");
         setAppliedCoupon(null);
       }
-    } catch {
-      setCouponError("Failed to validate coupon. Please try again.");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to validate coupon.";
+      setCouponError(msg);
     } finally {
       setApplyingCoupon(false);
     }
