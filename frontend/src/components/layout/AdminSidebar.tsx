@@ -148,7 +148,6 @@ export function AdminSidebar() {
         <div style={{ paddingLeft: "18px", marginTop: "3px", marginBottom: "3px" }}>
           <SubLink href="/admin/customers" label="All Customers" />
           <SubLink href="/admin/customers/applications" label="Applications" />
-          <SubLink href="/admin/customers/tiers" label="Customer Tiers" />
           <SubLink href="/admin/customers/tiers?tab=groups" label="Discount Groups" />
           <SubLink href="/admin/customers/tiers?tab=variants" label="Individual Variant Pricing" />
         </div>
@@ -190,7 +189,6 @@ export function AdminSidebar() {
       {/* ── SETTINGS ── */}
       <div style={SECTION_HEAD}>Settings</div>
       <NavLink href="/admin/settings" label="Settings" icon={<SettingsIcon size={15} color="currentColor" />} />
-      <NavLink href="/admin/settings/shipping-tiers" label="Shipping Tiers" icon={<span style={{ fontSize: "13px" }}>🚚</span>} />
       <NavLink href="/admin/settings/quickbooks" label="QuickBooks" icon={<BookIcon size={15} color="currentColor" />} />
       <NavLink href="/admin/settings/audit-log" label="Audit Log" icon={<SearchIcon size={15} color="currentColor" />} />
     </aside>

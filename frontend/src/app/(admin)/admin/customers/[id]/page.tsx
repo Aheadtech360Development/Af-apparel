@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { adminService } from "@/services/admin.service";
+import { apiClient } from "@/lib/api-client";
 import { MailIcon, PhoneIcon, UserIcon, BuildingIcon, GlobeIcon, CreditCardIcon, BookIcon, TagIcon } from "@/components/ui/icons";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -58,8 +59,7 @@ interface OrderRow {
   created_at: string;
 }
 
-interface PricingTierFull { id: string; name: string; discount_percent?: number; discount_percentage?: number; }
-interface ShippingTier { id: string; name: string; }
+interface DiscountGroup { id: string; title: string; customer_tag: string; applies_to: string; shipping_type: string; status: string; }
 
 
 // ─── Status configs ───────────────────────────────────────────────────────────
@@ -127,17 +127,10 @@ export default function CustomerDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
 
-  const [customer, setCustomer]         = useState<Customer | null>(null);
-  const [orders, setOrders]             = useState<OrderRow[]>([]);
-  const [pricingTiers, setPricingTiers] = useState<PricingTierFull[]>([]);
-  const [shippingTiers, setShippingTiers] = useState<ShippingTier[]>([]);
-  const [loading, setLoading]           = useState(true);
-
-  // tiers
-  const [editPricing, setEditPricing]   = useState("");
-  const [editShipping, setEditShipping] = useState("");
-  const [editOverride, setEditOverride] = useState("");
-  const [savingTiers, setSavingTiers]   = useState(false);
+  const [customer, setCustomer]           = useState<Customer | null>(null);
+  const [orders, setOrders]               = useState<OrderRow[]>([]);
+  const [discountGroups, setDiscountGroups] = useState<DiscountGroup[]>([]);
+  const [loading, setLoading]             = useState(true);
 
   // tags
   const [tags, setTags]       = useState<string[]>([]);
@@ -171,20 +164,12 @@ export default function CustomerDetailPage() {
       try {
         const co = await adminService.getCompany(id) as Customer;
         setCustomer(co);
-        setEditPricing(co.pricing_tier_id ?? "");
-        setEditShipping(co.shipping_tier_id ?? "");
-        setEditOverride(co.shipping_override_amount ?? "");
         setTags(co.tags ?? []);
         setNote(co.admin_notes ?? "");
         setNoteText(co.admin_notes ?? "");
 
-        // Load tiers separately — failure here is non-fatal
-        const [pt, st] = await Promise.all([
-          adminService.listPricingTiers().catch(() => []) as Promise<PricingTierFull[]>,
-          adminService.listShippingTiers().catch(() => []) as Promise<ShippingTier[]>,
-        ]);
-        setPricingTiers(pt);
-        setShippingTiers(st);
+        const groups = await apiClient.get<DiscountGroup[]>("/api/v1/admin/discount-groups").catch(() => []);
+        setDiscountGroups(Array.isArray(groups) ? groups : []);
       } finally {
         setLoading(false);
       }
@@ -219,24 +204,6 @@ export default function CustomerDetailPage() {
 
 
   // ── Actions ───────────────────────────────────────────────────────────────
-
-  async function handleSaveTiers() {
-    setSavingTiers(true);
-    try {
-      await adminService.updateCompany(id, {
-        pricing_tier_id: editPricing || null,
-        shipping_tier_id: editShipping || null,
-        shipping_override_amount: editOverride ? Number(editOverride) : null,
-      });
-      const co = await adminService.getCompany(id) as Customer;
-      setCustomer(co);
-      showToast("Tiers saved");
-    } catch {
-      showToast("Failed to save tiers", false);
-    } finally {
-      setSavingTiers(false);
-    }
-  }
 
   async function handleAddTag() {
     const t = tagInput.trim();
@@ -324,8 +291,6 @@ export default function CustomerDetailPage() {
   }
 
   const statusCfg = COMPANY_STATUS[customer.status] ?? { bg: "rgba(156,163,175,.15)", color: "#9CA3AF" };
-  const pricingTierName = pricingTiers.find(t => t.id === customer.pricing_tier_id)?.name;
-  const shippingTierName = shippingTiers.find(t => t.id === customer.shipping_tier_id)?.name;
   const initials = customer.name.split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase() || "?";
 
   return (
@@ -669,43 +634,34 @@ export default function CustomerDetailPage() {
               )}
             </div>
 
-            {/* Pricing & Shipping Tiers */}
+            {/* Pricing & Shipping — Discount Group */}
             <div style={{ borderTop: "1px solid #F4F3EF", paddingTop: "14px" }}>
               <div style={{ ...sectionTitle, marginBottom: "10px" }}>Pricing &amp; Shipping</div>
-              <div style={{ marginBottom: "8px" }}>
-                <label style={{ fontSize: "11px", color: "#7A7880", fontWeight: 700, display: "block", marginBottom: "4px" }}>Pricing Tier</label>
-                <select value={editPricing} onChange={e => setEditPricing(e.target.value)} style={{ ...inp, cursor: "pointer" }}>
-                  <option value="">No tier assigned</option>
-                  {pricingTiers.map(t => {
-                    const disc = t.discount_percentage ?? t.discount_percent ?? 0;
-                    return <option key={t.id} value={t.id}>{t.name}{disc ? ` — ${disc}% off` : ""}</option>;
-                  })}
-                </select>
-              </div>
-              <div style={{ marginBottom: "8px" }}>
-                <label style={{ fontSize: "11px", color: "#7A7880", fontWeight: 700, display: "block", marginBottom: "4px" }}>Shipping Tier</label>
-                <select value={editShipping} onChange={e => setEditShipping(e.target.value)} style={{ ...inp, cursor: "pointer" }}>
-                  <option value="">None</option>
-                  {shippingTiers.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
-                </select>
-              </div>
-              <div style={{ marginBottom: "10px" }}>
-                <label style={{ fontSize: "11px", color: "#7A7880", fontWeight: 700, display: "block", marginBottom: "4px" }}>Shipping Override ($)</label>
-                <input type="number" value={editOverride} onChange={e => setEditOverride(e.target.value)} placeholder="Leave blank to use tier" style={inp} />
-              </div>
-              <button
-                onClick={handleSaveTiers}
-                disabled={savingTiers}
-                style={{ width: "100%", padding: "9px", background: "#1A5CFF", color: "#fff", border: "none", borderRadius: "7px", fontSize: "13px", fontWeight: 700, cursor: savingTiers ? "not-allowed" : "pointer", opacity: savingTiers ? 0.6 : 1 }}>
-                {savingTiers ? "Saving…" : "Save Tiers"}
-              </button>
-              {(pricingTierName || shippingTierName) && (
-                <div style={{ marginTop: "8px", fontSize: "11px", color: "#7A7880" }}>
-                  {pricingTierName && <span>Pricing: <strong>{pricingTierName}</strong></span>}
-                  {pricingTierName && shippingTierName && " · "}
-                  {shippingTierName && <span>Shipping: <strong>{shippingTierName}</strong></span>}
-                </div>
-              )}
+              {(() => {
+                const matched = discountGroups.filter(g => g.customer_tag && tags.includes(g.customer_tag));
+                if (matched.length === 0) {
+                  return (
+                    <div style={{ fontSize: "12px", color: "#bbb", padding: "8px 0" }}>
+                      No discount group assigned
+                    </div>
+                  );
+                }
+                return matched.map(g => (
+                  <div key={g.id} style={{ padding: "10px 12px", background: "rgba(26,92,255,.05)", border: "1px solid rgba(26,92,255,.15)", borderRadius: "8px", marginBottom: "8px" }}>
+                    <div style={{ fontWeight: 700, fontSize: "13px", color: "#1A5CFF" }}>{g.title}</div>
+                    <div style={{ fontSize: "11px", color: "#7A7880", marginTop: "3px" }}>
+                      Tag: <strong style={{ color: "#2A2830" }}>@{g.customer_tag}</strong>
+                      {" · "}
+                      {g.applies_to === "store" ? "All products" : g.applies_to === "collections" ? "Selected collections" : "Selected products"}
+                    </div>
+                    <div style={{ fontSize: "11px", color: "#7A7880", marginTop: "2px" }}>
+                      Shipping: <strong style={{ color: "#2A2830" }}>{g.shipping_type === "flat_rate" ? "Flat Rate" : "Store Default"}</strong>
+                      {" · "}
+                      Status: <strong style={{ color: g.status === "enabled" ? "#059669" : "#E8242A" }}>{g.status}</strong>
+                    </div>
+                  </div>
+                ));
+              })()}
             </div>
           </div>
 
