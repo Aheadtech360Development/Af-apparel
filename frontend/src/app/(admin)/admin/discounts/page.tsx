@@ -172,7 +172,7 @@ export default function DiscountsPage() {
     };
     try {
       if (editId) {
-        await apiClient.put(`/api/v1/admin/discounts/${editId}`, body);
+        await apiClient.patch(`/api/v1/admin/discounts/${editId}`, body);
       } else {
         await apiClient.post("/api/v1/admin/discounts", body);
       }
