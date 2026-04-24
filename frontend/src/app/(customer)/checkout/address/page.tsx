@@ -1,3 +1,4 @@
+// frontend/src/app/(customer)/checkout/address/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -8,11 +9,13 @@ import { cartService } from "@/services/cart.service";
 import { formatCurrency } from "@/lib/utils";
 
 const US_STATES = [
-  "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA",
-  "KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ",
-  "NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT",
-  "VA","WA","WV","WI","WY",
+  "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA",
+  "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ",
+  "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT",
+  "VA", "WA", "WV", "WI", "WY",
 ];
+
+const [couponDiscount, setCouponDiscount] = useState(0);
 
 interface SavedAddress {
   id: string;
@@ -78,6 +81,10 @@ export default function CheckoutAddressPage() {
 
   // Load saved addresses + cart (subtotal + tier-based shipping)
   useEffect(() => {
+    const saved = localStorage.getItem("af_coupon");
+    if (saved) {
+      try { setCouponDiscount(JSON.parse(saved).discount_amount ?? 0); } catch { }
+    }
     cartService.getCart().then(c => {
       setSubtotal(Number(c.subtotal));
       // Only set tierShipping if company has a tier assigned; null = unknown/not set
@@ -109,7 +116,7 @@ export default function CheckoutAddressPage() {
   }
 
   const selectedCost = methodCost(shippingMethod);
-  const orderTotal = subtotal + selectedCost;
+  const orderTotal = subtotal + selectedCost - couponDiscount;
 
   function validate() {
     const e: Partial<typeof form> = {};
@@ -425,6 +432,12 @@ export default function CheckoutAddressPage() {
                     : formatCurrency(selectedCost)}
             </span>
           </div>
+          {couponDiscount > 0 && (
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#059669" }}>
+              <span style={{ fontWeight: 600 }}>Coupon Applied</span>
+              <span style={{ fontWeight: 700 }}>-{formatCurrency(couponDiscount)}</span>
+            </div>
+          )}
           <div style={{ borderTop: "1px solid #F0EEE9", paddingTop: "8px", display: "flex", justifyContent: "space-between" }}>
             <span style={{ fontSize: "14px", fontWeight: 800, color: "#2A2830" }}>Total</span>
             <span style={{ fontFamily: "var(--font-bebas)", fontSize: "20px", color: "#E8242A", letterSpacing: ".02em" }}>
