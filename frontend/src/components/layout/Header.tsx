@@ -38,6 +38,25 @@ export function Header() {
       .catch(() => { });
   }, [isLoading, user]);
 
+  useEffect(() => {
+    if (isLoading || user) return;
+    function readGuestCount() {
+      try {
+        const entries: { quantity: number }[] = JSON.parse(localStorage.getItem("af_guest_cart") || "[]");
+        setCartCount(entries.reduce((s, i) => s + i.quantity, 0));
+      } catch {
+        setCartCount(0);
+      }
+    }
+    readGuestCount();
+    window.addEventListener("storage", readGuestCount);
+    window.addEventListener("af_guest_cart_updated", readGuestCount);
+    return () => {
+      window.removeEventListener("storage", readGuestCount);
+      window.removeEventListener("af_guest_cart_updated", readGuestCount);
+    };
+  }, [isLoading, user]);
+
   async function handleLogout() {
     try {
       await authService.logout();
@@ -146,7 +165,7 @@ export function Header() {
           {/* Right Actions */}
           <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
             {/* Cart */}
-            {isAuthenticated() && !isAdmin() && (
+            {!isAdmin() && (
               <Link href="/cart" style={{ position: "relative", background: "transparent", border: "1.5px solid #2a2a2a", color: "#d3d0d0", padding: "9px 14px", borderRadius: "5px", cursor: "pointer", fontSize: "18px", transition: "all .2s", display: "flex", alignItems: "center" }}>
                 <ShoppingCartIcon size={18} color="#d3d0d0" />
                 {cartCount > 0 && (
@@ -237,6 +256,9 @@ export function Header() {
             )}
             {!isAuthenticated() && (
               <>
+                <Link href="/cart" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 0", color: "#d3d0d0", fontSize: "13px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+                  Cart {cartCount > 0 && `(${cartCount})`}
+                </Link>
                 <Link href="/wholesale/register" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 0", color: "#2d8cff", fontSize: "13px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
                   Apply for Wholesale
                 </Link>

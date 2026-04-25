@@ -446,10 +446,10 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
         else guestCart.push(entry);
       }
       localStorage.setItem("af_guest_cart", JSON.stringify(guestCart));
+      window.dispatchEvent(new Event("af_guest_cart_updated"));
       setQuantities({});
-      // setCartMsg({ type: "success", text: `${totalUnits} unit${totalUnits !== 1 ? "s" : ""} added! Log in or create an account to checkout.` });
-      // setTimeout(() => setCartMsg(null), 6000);
-      router.push("/checkout/address");
+      setCartMsg({ type: "success", text: `${totalUnits} unit${totalUnits !== 1 ? "s" : ""} added to cart!` });
+      setTimeout(() => setCartMsg(null), 4000);
       return;
     }
 
