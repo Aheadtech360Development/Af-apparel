@@ -368,6 +368,17 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
       .finally(() => setProductLoading(false));
   }, [slug, isAuthenticated]);
 
+  const colorGroups = useMemo(() => groupVariantsByColor(product?.variants ?? []), [product?.variants]);
+  const uniqueColors = colorGroups.map(g => g.color);
+  const uniqueSizes = useMemo(
+    () => Array.from(new Set(product?.variants?.map(v => v.size).filter(Boolean) ?? [])) as string[],
+    [product?.variants]
+  );
+  const totalUnits = useMemo(
+    () => Object.values(quantities).reduce((s, q) => s + (q || 0), 0),
+    [quantities]
+  );
+
   if (productLoading || !product) {
     return (
       <div style={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center", color: "#aaa" }}>
@@ -380,20 +391,8 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
   // ── Derived data ──────────────────────────────────────────────────────────
   const primaryVariant = product.variants?.[0];
   const hasFlyer = product.assets?.some((a: any) => a.asset_type === "flyer");
-  const colorGroups = useMemo(() => groupVariantsByColor(product?.variants ?? []), [product?.variants]);
-  const uniqueColors = colorGroups.map(g => g.color);
-  const uniqueSizes = useMemo(
-    () => Array.from(new Set(product?.variants?.map(v => v.size).filter(Boolean) ?? [])) as string[],
-    [product?.variants]
-  );
-
   const displayColorGroups = showAllColors ? colorGroups : colorGroups.slice(0, 4);
   const filteredGroups = showAllColors ? colorGroups : colorGroups.slice(0, 4);
-
-  const totalUnits = useMemo(
-    () => Object.values(quantities).reduce((s, q) => s + (q || 0), 0),
-    [quantities]
-  );
   const pricePerUnit = Number(primaryVariant?.effective_price ?? primaryVariant?.retail_price ?? 0);
   const orderTotal = totalUnits * pricePerUnit;
 
