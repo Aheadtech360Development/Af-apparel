@@ -94,7 +94,7 @@ interface AppliedCoupon {
   message: string;
 }
 
-type GuestCartEntry = { variant_id: string; quantity: number; product_id: string; product_name: string; slug: string; color: string | null; size: string | null; unit_price: number };
+type GuestCartEntry = { variant_id: string; quantity: number; product_id: string; product_name: string; slug: string; color: string | null; size: string | null; unit_price: number; image_url?: string | null };
 
 function buildGuestCart(entries: GuestCartEntry[]): Cart {
   const items: CartItem[] = entries.map((e, i) => ({
@@ -103,7 +103,7 @@ function buildGuestCart(entries: GuestCartEntry[]): Cart {
     product_id: e.product_id,
     product_name: e.product_name,
     product_slug: e.slug,
-    product_image_url: null,
+    product_image_url: e.image_url ?? null,
     sku: "",
     color: e.color,
     size: e.size,

@@ -29,13 +29,18 @@ export function Header() {
 
   useEffect(() => {
     if (isLoading || !user || user.is_admin) return;
-    apiClient
-      .get<{ items: { quantity: number }[] }>("/api/v1/cart")
-      .then((r) => {
-        const items = r?.items ?? [];
-        setCartCount(items.reduce((sum, i) => sum + i.quantity, 0));
-      })
-      .catch(() => { });
+    function loadCount() {
+      apiClient
+        .get<{ items: { quantity: number }[] }>("/api/v1/cart")
+        .then((r) => {
+          const items = r?.items ?? [];
+          setCartCount(items.reduce((sum, i) => sum + i.quantity, 0));
+        })
+        .catch(() => {});
+    }
+    loadCount();
+    window.addEventListener("cart_updated", loadCount);
+    return () => window.removeEventListener("cart_updated", loadCount);
   }, [isLoading, user]);
 
   useEffect(() => {
@@ -170,7 +175,7 @@ export function Header() {
                 <ShoppingCartIcon size={18} color="#d3d0d0" />
                 {cartCount > 0 && (
                   <span style={{ position: "absolute", top: "-6px", right: "-6px", background: "#E8242A", color: "#fff", fontSize: "9px", fontWeight: 800, width: "18px", height: "18px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    {cartCount > 9 ? "9+" : cartCount}
+                    {cartCount}
                   </span>
                 )}
               </Link>

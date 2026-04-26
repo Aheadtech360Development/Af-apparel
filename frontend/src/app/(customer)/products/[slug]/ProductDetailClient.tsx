@@ -441,7 +441,8 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
         const v = product?.variants?.find(x => x.id === variant_id);
         if (!v) continue;
         const idx = guestCart.findIndex(i => i.variant_id === variant_id);
-        const entry = { variant_id, quantity, product_id: product!.id, product_name: product!.name, slug: product!.slug, color: v.color, size: v.size, unit_price: Number(v.effective_price ?? v.retail_price) };
+        const primaryImg = product?.images?.find(i => i.is_primary) ?? product?.images?.[0];
+        const entry = { variant_id, quantity, product_id: product!.id, product_name: product!.name, slug: product!.slug, color: v.color, size: v.size, unit_price: Number(v.effective_price ?? v.retail_price), image_url: primaryImg?.url_thumbnail ?? null };
         if (idx >= 0) guestCart[idx]!.quantity += quantity;
         else guestCart.push(entry);
       }
@@ -459,6 +460,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
     setCartMsg(null);
     try {
       await cartService.addMatrix(product.id, items);
+      window.dispatchEvent(new Event("cart_updated"));
       setQuantities({});
       setCartMsg({ type: "success", text: `${totalUnits} units added to cart!` });
       setTimeout(() => setCartMsg(null), 4000);
