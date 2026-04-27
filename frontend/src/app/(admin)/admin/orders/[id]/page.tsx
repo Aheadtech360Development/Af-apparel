@@ -50,6 +50,7 @@ interface AdminOrder {
   created_at: string;
   updated_at: string;
   shipping_address?: ShippingAddress;
+  shipping_method?: string | null;
   // Customer fields (may not be present)
   customer_name?: string;
   customer_email?: string;
@@ -83,7 +84,17 @@ interface CompanyRegistration {
   fax: string | null;
 }
 
-const STATUSES = ["pending", "confirmed", "processing", "shipped", "delivered", "cancelled"];
+const STATUSES = ["pending", "confirmed", "processing", "ready_for_pickup", "shipped", "delivered", "cancelled"];
+
+const STATUS_LABEL: Record<string, string> = {
+  pending: "Pending",
+  confirmed: "Confirmed",
+  processing: "Processing",
+  ready_for_pickup: "Ready for Pickup",
+  shipped: "Shipped",
+  delivered: "Delivered",
+  cancelled: "Cancelled",
+};
 
 const COURIERS = [
   { id: "fedex", name: "FedEx",  icon: "FX",  services: ["Ground", "2-Day", "Overnight", "Express Saver"] },
@@ -94,22 +105,24 @@ const COURIERS = [
 ];
 
 const STATUS_STYLE: Record<string, { bg: string; color: string }> = {
-  pending:    { bg: "rgba(217,119,6,.1)",   color: "#D97706" },
-  confirmed:  { bg: "rgba(26,92,255,.1)",   color: "#1A5CFF" },
-  processing: { bg: "rgba(99,102,241,.1)",  color: "#6366F1" },
-  shipped:    { bg: "rgba(139,92,246,.1)",  color: "#8B5CF6" },
-  delivered:  { bg: "rgba(5,150,105,.1)",   color: "#059669" },
-  cancelled:  { bg: "rgba(232,36,42,.1)",   color: "#E8242A" },
-  authorized: { bg: "rgba(245,158,11,.1)",  color: "#D97706" },
-  paid:       { bg: "rgba(5,150,105,.1)",   color: "#059669" },
-  unpaid:     { bg: "rgba(107,114,128,.1)", color: "#6B7280" },
+  pending:           { bg: "rgba(217,119,6,.1)",   color: "#D97706" },
+  confirmed:         { bg: "rgba(26,92,255,.1)",   color: "#1A5CFF" },
+  processing:        { bg: "rgba(99,102,241,.1)",  color: "#6366F1" },
+  ready_for_pickup:  { bg: "rgba(8,145,178,.1)",   color: "#0891B2" },
+  shipped:           { bg: "rgba(139,92,246,.1)",  color: "#8B5CF6" },
+  delivered:         { bg: "rgba(5,150,105,.1)",   color: "#059669" },
+  cancelled:         { bg: "rgba(232,36,42,.1)",   color: "#E8242A" },
+  authorized:        { bg: "rgba(245,158,11,.1)",  color: "#D97706" },
+  paid:              { bg: "rgba(5,150,105,.1)",   color: "#059669" },
+  unpaid:            { bg: "rgba(107,114,128,.1)", color: "#6B7280" },
 };
 
 function StatusBadge({ status }: { status: string }) {
   const s = STATUS_STYLE[status] ?? { bg: "rgba(0,0,0,.06)", color: "#555" };
+  const label = STATUS_LABEL[status] ?? status.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
   return (
-    <span style={{ background: s.bg, color: s.color, padding: "4px 12px", borderRadius: "20px", fontSize: "12px", fontWeight: 700, textTransform: "capitalize" as const }}>
-      {status}
+    <span style={{ background: s.bg, color: s.color, padding: "4px 12px", borderRadius: "20px", fontSize: "12px", fontWeight: 700 }}>
+      {label}
     </span>
   );
 }
@@ -422,8 +435,8 @@ export default function AdminOrderDetailPage() {
 
         {/* ── LEFT: Main content ── */}
         <div>
-          {/* SHIPPING & COURIER */}
-          <div style={{ ...CardStyle, padding: "24px" }}>
+          {/* SHIPPING & COURIER — hidden for Will Call orders */}
+          {order.shipping_method !== "will_call" && <div style={{ ...CardStyle, padding: "24px" }}>
             <h3 style={{ ...SectionHead, fontSize: "18px", letterSpacing: ".05em", marginBottom: "14px" }}>SHIPPING & COURIER</h3>
 
             {order.status === "shipped" && order.courier && (
@@ -476,7 +489,7 @@ export default function AdminOrderDetailPage() {
                 {isShipping ? "Marking shipped…" : `✓ Mark as Shipped via ${courierObj?.name} ${selectedService}`}
               </button>
             )}
-          </div>
+          </div>}
 
           {/* STATUS UPDATE */}
           <div style={{ ...CardStyle, padding: "24px" }}>
@@ -486,7 +499,9 @@ export default function AdminOrderDetailPage() {
                 <label style={LabelStyle}>Status</label>
                 <select value={status} onChange={e => setStatus(e.target.value)}
                   style={{ padding: "10px 14px", border: "1.5px solid #E2E0DA", borderRadius: "6px", fontSize: "14px", fontFamily: "var(--font-jakarta)", background: "#fff" }}>
-                  {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+                  {STATUSES.filter(s => !(s === "shipped" && order.shipping_method === "will_call")).map(s => (
+                    <option key={s} value={s}>{STATUS_LABEL[s] ?? s}</option>
+                  ))}
                 </select>
               </div>
               {/* Tracking is managed via Shipping & Courier section above */}

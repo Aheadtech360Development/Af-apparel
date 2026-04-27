@@ -7,7 +7,7 @@ import Image from "next/image";
 import { apiClient } from "@/lib/api-client";
 import { useAuthStore } from "@/stores/auth.store";
 import type { Category, ProductListItem } from "@/types/product.types";
-import { SearchIcon, ShirtIcon, LockIcon } from "@/components/ui/icons";
+import { SearchIcon, ShirtIcon } from "@/components/ui/icons";
 
 interface ProductListClientProps {
   initialProducts: ProductListItem[];
@@ -642,15 +642,11 @@ export function ProductListClient({
                       )}
 
                       {/* Price */}
-                      {isAuthenticated && price ? (
-                        <div style={{ fontFamily: "var(--font-bebas)", fontSize: "18px", color: "#2A2830", lineHeight: 1 }}>
-                          ${Number(price).toFixed(2)}
+                      {price ? (
+                        <div style={{ fontSize: "13px", color: "#2A2830", fontWeight: 700, lineHeight: 1 }}>
+                          From ${Number(price).toFixed(2)}
                         </div>
-                      ) : (
-                        <div style={{ fontSize: "12px", color: "#1A5CFF", fontWeight: 700, display: "flex", alignItems: "center", gap: "5px" }}>
-                          <LockIcon size={12} color="#1A5CFF" /> Login for pricing
-                        </div>
-                      )}
+                      ) : null}
                     </div>
                   </Link>
                 </div>
