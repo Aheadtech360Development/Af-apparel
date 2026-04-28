@@ -2,7 +2,7 @@
 
 export const dynamic = "force-dynamic";
 
-import dynamic from "next/dynamic";
+import nextDynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import type ReCAPTCHAType from "react-google-recaptcha";
@@ -10,7 +10,7 @@ import { apiClient } from "@/lib/api-client";
 import { useAuthStore } from "@/stores/auth.store";
 import { productsService } from "@/services/products.service";
 
-const ReCAPTCHA = dynamic(() => import("react-google-recaptcha"), {
+const ReCAPTCHA = nextDynamic(() => import("react-google-recaptcha"), {
   ssr: false,
 }) as typeof ReCAPTCHAType;
 
