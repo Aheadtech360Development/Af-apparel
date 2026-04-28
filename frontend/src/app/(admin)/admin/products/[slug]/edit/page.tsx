@@ -116,6 +116,14 @@ export default function AdminProductEditPage() {
     await load();
   }
 
+  async function handleBulkDeleteVariants() {
+    if (!product || selectedVariantIds.size === 0) return;
+    if (!confirm(`Delete ${selectedVariantIds.size} selected variant(s)? This cannot be undone.`)) return;
+    await Promise.all([...selectedVariantIds].map(vid => adminService.deleteVariant(product.id, vid)));
+    setSelectedVariantIds(new Set());
+    await load();
+  }
+
   // Add Variant modal (Shopify-style multi)
   const [showAddVariant, setShowAddVariant] = useState(false);
   const [bulkColors, setBulkColors] = useState("");
@@ -533,6 +541,14 @@ export default function AdminProductEditPage() {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
               <span style={{ ...sectionTitle, marginBottom: 0 }}>VARIANTS</span>
               <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                {selectedVariantIds.size > 0 && (
+                  <button
+                    onClick={handleBulkDeleteVariants}
+                    style={{ padding: "6px 14px", background: "rgba(232,36,42,.08)", color: "#E8242A", border: "1px solid #FECACA", borderRadius: "6px", fontSize: "12px", fontWeight: 700, cursor: "pointer" }}
+                  >
+                    Delete Selected ({selectedVariantIds.size})
+                  </button>
+                )}
                 <button
                   onClick={() => setExpandAll(v => !v)}
                   style={{ padding: "6px 14px", border: "1px solid #E2E0DA", borderRadius: "6px", fontSize: "12px", fontWeight: 600, cursor: "pointer", background: "#fff" }}
