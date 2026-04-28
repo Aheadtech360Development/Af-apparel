@@ -239,7 +239,7 @@ export default function EmailFlyerPage() {
           </button>
           {product.hasFlyer && product.flyerUrl && (
             <a
-              href={`/api/v1/products/${product.id}/download-flyer`}
+              href={`${process.env.NEXT_PUBLIC_API_URL}/api/v1/products/${product.id}/download-flyer`}
               target="_blank"
               rel="noreferrer"
               style={{ flex: 1, minWidth: "120px", padding: "11px 20px", border: "1.5px solid #E2E0DA", borderRadius: "8px", background: "#fff", cursor: "pointer", fontWeight: 600, fontSize: "14px", fontFamily: "var(--font-jakarta)", textDecoration: "none", color: "#2A2830", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "6px" }}
