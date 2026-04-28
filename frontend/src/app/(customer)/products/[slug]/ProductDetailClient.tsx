@@ -478,8 +478,11 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
     window.open(`/api/v1/products/${product?.id}/download-images`, "_blank");
   }
 
-  async function handleDownloadFlyer() {
-    window.open(`/api/v1/products/${product?.id}/download-flyer`, "_blank");
+  function handleDownloadFlyer() {
+    const flyer = product?.assets?.find((a: any) => a.asset_type === "flyer");
+    if (flyer?.url) {
+      window.open(flyer.url, "_blank");
+    }
   }
 
   function handleEmailFlyer() {
