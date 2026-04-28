@@ -63,6 +63,9 @@ export default function AdminProductEditPage() {
   const { slug } = useParams<{ slug: string }>();
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const flyerInputRef = useRef<HTMLInputElement>(null);
+  const [uploadingFlyer, setUploadingFlyer] = useState(false);
+  const [flyerMsg, setFlyerMsg] = useState<string | null>(null);
 
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -268,6 +271,36 @@ export default function AdminProductEditPage() {
       ...prev,
       images: prev.images.map(img => img.id === imageId ? { ...img, alt_text: color || null } : img),
     } : prev);
+  }
+
+  async function handleFlyerUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    if (!product || !e.target.files?.length) return;
+    const file = e.target.files[0]!;
+    setUploadingFlyer(true);
+    setFlyerMsg(null);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      await apiClient.postForm(`/api/v1/admin/products/${product.id}/upload-flyer`, fd);
+      setFlyerMsg("Flyer uploaded successfully.");
+      await load();
+    } catch {
+      setFlyerMsg("Upload failed. Please try again.");
+    } finally {
+      setUploadingFlyer(false);
+      e.target.value = "";
+    }
+  }
+
+  async function handleDeleteFlyer() {
+    if (!product || !confirm("Remove the flyer for this product?")) return;
+    try {
+      await apiClient.delete(`/api/v1/admin/products/${product.id}/flyer`);
+      setFlyerMsg("Flyer removed.");
+      await load();
+    } catch {
+      setFlyerMsg("Failed to remove flyer.");
+    }
   }
 
   async function handleSave() {
@@ -1011,6 +1044,40 @@ export default function AdminProductEditPage() {
                 </div>
               </div>
             )}
+          </div>
+
+          {/* Marketing Flyer */}
+          <div style={sectionCard}>
+            <span style={sectionTitle}>MARKETING FLYER</span>
+            {(() => {
+              const flyer = product?.assets?.find((a: any) => a.asset_type === "flyer");
+              return (
+                <>
+                  {flyer && (
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 12px", border: "1px solid #E2E0DA", borderRadius: "8px", background: "#FAFAFA", marginBottom: "12px" }}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E8242A" strokeWidth={2}><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: "13px", fontWeight: 600, color: "#2A2830", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{flyer.file_name}</div>
+                        <div style={{ fontSize: "11px", color: "#7A7880" }}>PDF Flyer</div>
+                      </div>
+                      <a href={flyer.url} target="_blank" rel="noreferrer" style={{ fontSize: "11px", color: "#1A5CFF", fontWeight: 700, whiteSpace: "nowrap" }}>View</a>
+                      <button onClick={handleDeleteFlyer} style={{ background: "none", border: "none", cursor: "pointer", color: "#E8242A", padding: "2px 4px", fontSize: "16px", lineHeight: 1 }}>×</button>
+                    </div>
+                  )}
+                  <input ref={flyerInputRef} type="file" accept=".pdf,application/pdf" style={{ display: "none" }} onChange={handleFlyerUpload} />
+                  <button
+                    onClick={() => flyerInputRef.current?.click()}
+                    disabled={uploadingFlyer}
+                    style={{ width: "100%", padding: "10px", border: "1.5px dashed #E2E0DA", borderRadius: "8px", background: uploadingFlyer ? "#f9fafb" : "#fff", cursor: uploadingFlyer ? "not-allowed" : "pointer", fontSize: "13px", fontWeight: 600, color: uploadingFlyer ? "#aaa" : "#1A5CFF", fontFamily: "var(--font-jakarta)" }}
+                  >
+                    {uploadingFlyer ? "Uploading…" : flyer ? "Replace Flyer (PDF)" : "Upload Flyer (PDF)"}
+                  </button>
+                  {flyerMsg && (
+                    <p style={{ marginTop: "8px", fontSize: "12px", color: flyerMsg.includes("success") ? "#059669" : "#E8242A" }}>{flyerMsg}</p>
+                  )}
+                </>
+              );
+            })()}
           </div>
 
           {/* Danger Zone */}

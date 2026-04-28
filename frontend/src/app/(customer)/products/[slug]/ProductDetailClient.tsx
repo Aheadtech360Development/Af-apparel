@@ -351,7 +351,6 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
 
   // ── Other state ───────────────────────────────────────────────────────────
   const [assetMsg, setAssetMsg] = useState<string | null>(null);
-  const [emailingFlyer, setEmailingFlyer] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>("Description");
   const [copiedUrl, setCopiedUrl] = useState(false);
   const [showImageLibrary, setShowImageLibrary] = useState(false);
@@ -483,17 +482,8 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
     window.open(`/api/v1/products/${product?.id}/download-flyer`, "_blank");
   }
 
-  async function handleEmailFlyer() {
-    setEmailingFlyer(true);
-    try {
-      await apiClient.post(`/api/v1/products/${product?.id}/email-flyer`, {});
-      setAssetMsg("Flyer sent to your account email.");
-    } catch {
-      setAssetMsg("Failed to send flyer.");
-    } finally {
-      setEmailingFlyer(false);
-      setTimeout(() => setAssetMsg(null), 5000);
-    }
+  function handleEmailFlyer() {
+    router.push(`/products/${slug}/email-flyer`);
   }
 
   // ── Render ────────────────────────────────────────────────────────────────
@@ -599,11 +589,10 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
               )}
               <button
                 onClick={hasFlyer ? handleEmailFlyer : () => setAssetMsg("No flyer available for this product.")}
-                disabled={emailingFlyer}
-                style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", padding: "10px", border: "1px solid #E2E0DA", borderRadius: "8px", fontSize: "12px", fontWeight: 600, color: hasFlyer ? "#2A2830" : "#aaa", background: "#fff", cursor: emailingFlyer ? "not-allowed" : "pointer", opacity: emailingFlyer ? 0.5 : 1 }}
+                style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", padding: "10px", border: "1px solid #E2E0DA", borderRadius: "8px", fontSize: "12px", fontWeight: 600, color: hasFlyer ? "#2A2830" : "#aaa", background: "#fff", cursor: "pointer" }}
               >
                 <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                {emailingFlyer ? "Sending…" : "Email Flyer"}
+                Email Flyer
               </button>
             </div>
             {assetMsg && (
@@ -1000,9 +989,9 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                         <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
                         Download Flyer
                       </button>
-                      <button onClick={handleEmailFlyer} disabled={emailingFlyer} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "8px 14px", border: "1px solid #E2E0DA", borderRadius: "6px", fontSize: "12px", fontWeight: 600, color: "#2A2830", background: "#fff", cursor: emailingFlyer ? "not-allowed" : "pointer", opacity: emailingFlyer ? 0.5 : 1 }}>
+                      <button onClick={handleEmailFlyer} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "8px 14px", border: "1px solid #E2E0DA", borderRadius: "6px", fontSize: "12px", fontWeight: 600, color: "#2A2830", background: "#fff", cursor: "pointer" }}>
                         <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                        {emailingFlyer ? "Sending…" : "Email Flyer"}
+                        Email Flyer
                       </button>
                     </>
                   )}

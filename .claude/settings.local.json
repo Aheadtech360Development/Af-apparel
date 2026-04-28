@@ -139,7 +139,8 @@
       "Bash(sort -t'\"' -k2)",
       "Bash(python \"C:/Users/RT/Desktop/AF Apparel/frontend/src/app/\\(customer\\)/checkout/payment/page.tsx\")",
       "Bash(grep -v \"^$\")",
-      "Bash(python -c ' *)"
+      "Bash(python -c ' *)",
+      "Bash(xargs grep *)"
     ]
   }
 }
