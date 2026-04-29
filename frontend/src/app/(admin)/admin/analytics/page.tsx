@@ -324,8 +324,8 @@ export default function AnalyticsPage() {
               <YAxis yAxisId="left" tick={{ fontSize: 11, fill: "#7A7880" }} tickFormatter={fmtShort} width={56} />
               <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 11, fill: "#7A7880" }} width={36} />
               <Tooltip
-                formatter={(value: number, name: string) =>
-                  name === "revenue" ? [fmt(value), "Revenue"] : [value, "Orders"]
+                formatter={(value, name) =>
+                  name === "revenue" ? [fmt(Number(value)), "Revenue"] : [value, "Orders"]
                 }
                 labelFormatter={l => {
                   const d = new Date(l + "T00:00:00");
@@ -366,7 +366,7 @@ export default function AnalyticsPage() {
                     ))}
                   </Pie>
                   <Tooltip
-                    formatter={(v: number, _n: string, props: { payload?: { status?: string } }) => [v + " orders", props.payload?.status ?? ""]}
+                    formatter={(v, _n, props) => [v + " orders", (props as { payload?: { status?: string } }).payload?.status ?? ""]}
                     contentStyle={{ fontSize: "12px", border: "1px solid #E2E0DA", borderRadius: "6px" }}
                   />
                 </PieChart>
@@ -411,7 +411,7 @@ export default function AnalyticsPage() {
                       <Cell fill="#059669" />
                     </Pie>
                     <Tooltip
-                      formatter={(v: number, n: string) => [`${v} (${total ? ((v / total) * 100).toFixed(1) : 0}%)`, n]}
+                      formatter={(v, n) => [`${v} (${total ? ((Number(v) / total) * 100).toFixed(1) : 0}%)`, String(n)]}
                       contentStyle={{ fontSize: "12px", border: "1px solid #E2E0DA", borderRadius: "6px" }}
                     />
                   </PieChart>
@@ -526,7 +526,7 @@ export default function AnalyticsPage() {
                 <XAxis type="number" tick={{ fontSize: 11, fill: "#7A7880" }} />
                 <YAxis type="category" dataKey="state" tick={{ fontSize: 11, fill: "#7A7880" }} width={36} />
                 <Tooltip
-                  formatter={(v: number) => [v + " orders", "Orders"]}
+                  formatter={(v) => [v + " orders", "Orders"]}
                   contentStyle={{ fontSize: "12px", border: "1px solid #E2E0DA", borderRadius: "6px" }}
                 />
                 <Bar dataKey="orders" fill="#1A5CFF" radius={[0, 4, 4, 0]} />
