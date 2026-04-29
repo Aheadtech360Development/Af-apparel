@@ -1,13 +1,19 @@
 // frontend/src/app/(auth)/login/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import dynamic from "next/dynamic";
+import type ReCAPTCHAType from "react-google-recaptcha";
 import { useAuthStore } from "@/stores/auth.store";
 import { authService } from "@/services/auth.service";
 import { ApiClientError, setAccessToken } from "@/lib/api-client";
 import { FactoryIcon, ZapIcon, CreditCardIcon } from "@/components/ui/icons";
+
+const ReCAPTCHA = dynamic(() => import("react-google-recaptcha"), {
+  ssr: false,
+}) as typeof ReCAPTCHAType;
 
 function decodeJwtPayload(token: string): Record<string, unknown> {
   try {
@@ -23,15 +29,21 @@ function decodeJwtPayload(token: string): Record<string, unknown> {
 export default function LoginPage() {
   const router = useRouter();
   const { setAuth } = useAuthStore();
+  const recaptchaRef = useRef<any>(null);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    if (!recaptchaToken) {
+      setError("Please complete the reCAPTCHA verification.");
+      return;
+    }
     setIsSubmitting(true);
 
     try {
@@ -54,6 +66,8 @@ export default function LoginPage() {
         router.push("/account");
       }
     } catch (err) {
+      recaptchaRef.current?.reset();
+      setRecaptchaToken(null);
       if (err instanceof ApiClientError) {
         if (err.code === "ACCOUNT_SUSPENDED") {
           setError("Your account has been suspended. Please contact support.");
@@ -170,19 +184,33 @@ export default function LoginPage() {
                 />
               </div>
 
+              {/* reCAPTCHA */}
+              <div style={{ marginBottom: "20px" }}>
+                <ReCAPTCHA
+                  ref={recaptchaRef}
+                  sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? ""}
+                  onChange={(token) => setRecaptchaToken(token)}
+                  onExpired={() => setRecaptchaToken(null)}
+                  theme="dark"
+                />
+                {!recaptchaToken && (
+                  <p style={{ fontSize: "11px", color: "#666", marginTop: "6px" }}>Please complete the verification above to sign in.</p>
+                )}
+              </div>
+
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || !recaptchaToken}
                 style={{
                   width: "100%",
-                  background: isSubmitting ? "#555" : "#E8242A",
+                  background: (isSubmitting || !recaptchaToken) ? "#555" : "#E8242A",
                   color: "#fff",
                   padding: "13px",
                   fontSize: "14px",
                   fontWeight: 700,
                   borderRadius: "6px",
                   border: "none",
-                  cursor: isSubmitting ? "not-allowed" : "pointer",
+                  cursor: (isSubmitting || !recaptchaToken) ? "not-allowed" : "pointer",
                   textTransform: "uppercase",
                   letterSpacing: ".06em",
                   transition: "background .2s",
