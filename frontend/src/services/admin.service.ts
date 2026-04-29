@@ -1,6 +1,21 @@
 import { apiClient, getAccessToken } from "@/lib/api-client";
 import type { ProductDetail } from "@/types/product.types";
 
+export interface AdminUser {
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  full_name: string;
+  role: "admin" | "staff" | "customer";
+  is_admin: boolean;
+  is_active: boolean;
+  email_verified: boolean;
+  company_name: string | null;
+  last_login: string | null;
+  created_at: string | null;
+}
+
 const API_BASE =
   typeof window === "undefined"
     ? (process.env.INTERNAL_API_URL ?? "http://localhost:8000")
@@ -374,5 +389,39 @@ export const adminService = {
       `/api/v1/admin/reports/customers/export-csv?period=${period}`,
       `customers-report-${period}.csv`
     );
+  },
+
+  // Users
+  async listUsers(params?: { q?: string; role?: string; status?: string; page?: number; page_size?: number }) {
+    const query = new URLSearchParams();
+    if (params?.q) query.set("q", params.q);
+    if (params?.role) query.set("role", params.role);
+    if (params?.status) query.set("status", params.status);
+    if (params?.page) query.set("page", String(params.page));
+    if (params?.page_size) query.set("page_size", String(params.page_size));
+    const qs = query.toString();
+    return apiClient.get<{ items: AdminUser[]; total: number }>(`/api/v1/admin/users${qs ? `?${qs}` : ""}`);
+  },
+
+  async createUser(data: {
+    email: string; first_name: string; last_name: string;
+    role: string; password?: string; send_welcome_email?: boolean;
+  }) {
+    return apiClient.post<AdminUser>("/api/v1/admin/users", data);
+  },
+
+  async updateUser(id: string, data: {
+    first_name?: string; last_name?: string; email?: string;
+    role?: string; is_active?: boolean;
+  }) {
+    return apiClient.patch<AdminUser>(`/api/v1/admin/users/${id}`, data);
+  },
+
+  async deleteUser(id: string) {
+    return apiClient.delete(`/api/v1/admin/users/${id}`);
+  },
+
+  async resetUserPassword(id: string) {
+    return apiClient.post(`/api/v1/admin/users/${id}/reset-password`, {});
   },
 };
