@@ -72,6 +72,7 @@ export default function AdminProductEditPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState("");
+  const [saveSuccess, setSaveSuccess] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [editSEO, setEditSEO] = useState(false);
 
@@ -340,11 +341,11 @@ export default function AdminProductEditPage() {
       });
       await Promise.all([...variantSaves, productSave]);
       setVariantEdits({});
-      setSaveMsg("Saved!");
-      await load();
+      setSaveSuccess(true);
+      setSaveMsg("Saved! Redirecting to products…");
+      setTimeout(() => router.push("/admin/products"), 1200);
     } finally {
       setIsSaving(false);
-      setTimeout(() => setSaveMsg(""), 2500);
     }
   }
 
@@ -422,10 +423,10 @@ export default function AdminProductEditPage() {
           </button>
           <button
             onClick={handleSave}
-            disabled={isSaving}
-            style={{ padding: "10px 24px", background: "#1A5CFF", color: "#fff", border: "none", borderRadius: "8px", fontWeight: 700, cursor: isSaving ? "not-allowed" : "pointer", opacity: isSaving ? 0.7 : 1, fontSize: "14px" }}
+            disabled={isSaving || saveSuccess}
+            style={{ padding: "10px 24px", background: saveSuccess ? "#059669" : "#1A5CFF", color: "#fff", border: "none", borderRadius: "8px", fontWeight: 700, cursor: (isSaving || saveSuccess) ? "not-allowed" : "pointer", opacity: isSaving ? 0.7 : 1, fontSize: "14px" }}
           >
-            {isSaving ? "Saving…" : "Save"}
+            {isSaving ? "Saving…" : saveSuccess ? "Saved!" : "Save"}
           </button>
         </div>
       </div>
@@ -754,10 +755,10 @@ export default function AdminProductEditPage() {
             <div style={{ marginTop: "12px", display: "flex", gap: "8px" }}>
               <button
                 onClick={handleSave}
-                disabled={isSaving}
-                style={{ flex: 1, padding: "10px", background: "#1A5CFF", color: "#fff", border: "none", borderRadius: "8px", fontWeight: 700, cursor: "pointer", fontSize: "14px", opacity: isSaving ? 0.7 : 1 }}
+                disabled={isSaving || saveSuccess}
+                style={{ flex: 1, padding: "10px", background: saveSuccess ? "#059669" : "#1A5CFF", color: "#fff", border: "none", borderRadius: "8px", fontWeight: 700, cursor: (isSaving || saveSuccess) ? "not-allowed" : "pointer", fontSize: "14px", opacity: isSaving ? 0.7 : 1 }}
               >
-                {isSaving ? "Saving…" : "Save"}
+                {isSaving ? "Saving…" : saveSuccess ? "Saved!" : "Save"}
               </button>
               <button
                 onClick={() => router.push(`/products/${product.slug}`)}

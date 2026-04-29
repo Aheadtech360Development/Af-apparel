@@ -44,6 +44,7 @@ export default function NewProductPage() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [saving, setSaving] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [pendingImages, setPendingImages] = useState<File[]>([]);
@@ -178,7 +179,8 @@ export default function NewProductPage() {
         }).catch(() => {});
       }
 
-      router.push(`/admin/products/${product.slug}/edit`);
+      setSuccess(true);
+      setTimeout(() => router.push("/admin/products"), 1200);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Failed to create product");
       setSaving(false);
@@ -211,13 +213,19 @@ export default function NewProductPage() {
           <button
             form="new-product-form"
             type="submit"
-            disabled={saving || !form.name.trim() || !form.slug.trim()}
-            style={{ padding: "10px 24px", background: "#1A5CFF", color: "#fff", border: "none", borderRadius: "8px", fontWeight: 700, cursor: "pointer", opacity: (saving || !form.name.trim() || !form.slug.trim()) ? 0.6 : 1, fontSize: "14px" }}
+            disabled={saving || success || !form.name.trim() || !form.slug.trim()}
+            style={{ padding: "10px 24px", background: success ? "#059669" : "#1A5CFF", color: "#fff", border: "none", borderRadius: "8px", fontWeight: 700, cursor: "pointer", opacity: (saving || success || !form.name.trim() || !form.slug.trim()) ? 0.6 : 1, fontSize: "14px" }}
           >
-            {saving ? "Creating…" : "Create Product"}
+            {saving ? "Creating…" : success ? "Created!" : "Create Product"}
           </button>
         </div>
       </div>
+
+      {success && (
+        <div style={{ background: "rgba(5,150,105,.08)", border: "1px solid rgba(5,150,105,.3)", borderRadius: "8px", padding: "12px 16px", marginBottom: "16px", fontSize: "13px", color: "#059669", fontWeight: 600 }}>
+          ✓ Product created successfully! Redirecting to product list…
+        </div>
+      )}
 
       {error && (
         <div style={{ background: "rgba(232,36,42,.06)", border: "1px solid #FECACA", borderRadius: "8px", padding: "12px 16px", marginBottom: "16px", fontSize: "13px", color: "#E8242A" }}>

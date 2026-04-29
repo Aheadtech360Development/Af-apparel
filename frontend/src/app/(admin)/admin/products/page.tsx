@@ -40,12 +40,14 @@ export default function AdminProductsPage() {
   const [showImport, setShowImport] = useState(false);
   const [page, setPage] = useState(1);
   const pageSize = 50;
+  const loadSeqRef = useRef(0);
 
   // Bulk edit state: productId → partial edits
   const [bulkEdits, setBulkEdits] = useState<Record<string, Record<string, string>>>({});
   const bulkFields = ["status", "vendor", "product_type"] as const;
 
   async function load(p = page) {
+    const seq = ++loadSeqRef.current;
     setIsLoading(true);
     setLoadError(null);
     try {
@@ -54,19 +56,23 @@ export default function AdminProductsPage() {
         status: statusFilter || undefined,
         page: p,
       });
+      if (seq !== loadSeqRef.current) return; // stale — a newer request is in flight
       const items = data ?? [];
       setProducts(items);
       setTotal(items.length < pageSize ? (p - 1) * pageSize + items.length : p * pageSize + 1);
     } catch (err: unknown) {
+      if (seq !== loadSeqRef.current) return;
       const msg = err instanceof Error ? err.message : "Failed to load products";
       setLoadError(msg);
       setProducts([]);
     } finally {
-      setIsLoading(false);
+      if (seq === loadSeqRef.current) setIsLoading(false);
     }
   }
 
+  // When filters change, reset to page 1 and reload immediately
   useEffect(() => { setPage(1); load(1); }, [search, statusFilter]); // eslint-disable-line
+  // When page changes (pagination), reload with current filters
   useEffect(() => { load(page); }, [page]); // eslint-disable-line
 
   const selectedProducts = useMemo(

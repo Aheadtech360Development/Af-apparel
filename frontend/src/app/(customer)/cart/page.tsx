@@ -194,6 +194,7 @@ export default function CartPage() {
         const updated = entries.filter(e => e.product_id !== group.productId);
         localStorage.setItem("af_guest_cart", JSON.stringify(updated));
         setCart(updated.length > 0 ? buildGuestCart(updated) : null);
+        window.dispatchEvent(new Event("af_guest_cart_updated"));
       } else {
         let updated: Cart | null = null;
         for (const item of group.items) {
@@ -201,6 +202,7 @@ export default function CartPage() {
         }
         if (updated) setCart(updated);
         else setCart(await cartService.getCart());
+        window.dispatchEvent(new Event("cart_updated"));
       }
     } catch (err) {
       console.error(err);

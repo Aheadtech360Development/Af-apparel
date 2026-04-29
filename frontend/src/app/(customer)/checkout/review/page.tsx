@@ -156,6 +156,7 @@ export default function CheckoutReviewPage() {
         sessionStorage.setItem("af_confirmed_order", JSON.stringify(confirmedData));
         localStorage.removeItem("af_guest_cart");
         sessionStorage.removeItem("af_guest_checkout");
+        window.dispatchEvent(new Event("af_guest_cart_updated"));
         router.push("/checkout/confirmed");
         return;
       }
