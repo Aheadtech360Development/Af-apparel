@@ -105,7 +105,7 @@ export default function PrintGuidePage() {
                 <div>
                   <div style={{ fontSize: "11px", fontWeight: 700, color: "#7A7880", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: "8px" }}>Fabric Compatibility</div>
                   {Object.entries(m.fabrics).map(([fab, compat]) => {
-                    const info = COMPAT[compat];
+                    const info = COMPAT[compat] ?? { label: "⚠️ Limited", color: "#d97706", bg: "#fef3c7" };
                     return (
                       <div key={fab} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
                         <span style={{ fontSize: "12px", color: "#7A7880", textTransform: "capitalize" }}>{fab}</span>
@@ -145,7 +145,7 @@ export default function PrintGuidePage() {
                   <tr key={m.name} style={{ borderBottom: i < methods.length - 1 ? "1px solid #F4F3EF" : "none" }}>
                     <td style={{ padding: "12px 16px", fontWeight: 700, color: "#2A2830" }}>{m.icon} {m.name}</td>
                     {[m.fabrics.cotton, m.fabrics.polyester, m.fabrics.blend, m.fabrics.nylon].map((c, j) => {
-                      const info = COMPAT[c];
+                      const info = COMPAT[c] ?? { label: "⚠️ Limited", color: "#d97706", bg: "#fef3c7" };
                       return (
                         <td key={j} style={{ padding: "12px 16px", textAlign: "center" }}>
                           <span style={{ fontSize: "11px", fontWeight: 700, color: info.color, background: info.bg, padding: "3px 8px", borderRadius: "4px", whiteSpace: "nowrap" }}>{info.label}</span>
