@@ -101,7 +101,6 @@ export default function NewProductPage() {
     slug: "",
     description: "",
     status: "draft",
-    moq: 1,
     product_type: "",
     vendor: "",
     gender: "",
@@ -129,9 +128,6 @@ export default function NewProductPage() {
         if (prev.slug === prev.name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")) {
           updated.slug = autoSlug;
         }
-      }
-      if (name === "moq") {
-        updated.moq = Math.max(1, parseInt(value as string) || 1);
       }
       return updated;
     });
@@ -237,7 +233,6 @@ export default function NewProductPage() {
         slug: form.slug.trim(),
         description: form.description || null,
         status: form.status,
-        moq: form.moq,
         product_type: form.product_type || null,
         vendor: form.vendor || null,
         gender: form.gender || null,
@@ -549,10 +544,6 @@ export default function NewProductPage() {
                     <option key={cat.id} value={cat.id}>{cat.name}</option>
                   ))}
                 </select>
-              </div>
-              <div style={{ marginBottom: "14px" }}>
-                <label style={labelStyle}>MOQ (Min. Order Qty)</label>
-                <input type="number" name="moq" min={1} value={form.moq} onChange={handleChange} style={{ ...inputStyle, width: "100px" }} />
               </div>
               <div>
                 <label style={labelStyle}>Tags</label>

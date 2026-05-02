@@ -32,13 +32,16 @@ export function AdminSidebar() {
   const isOrdersActive = pathname.startsWith("/admin/orders") || pathname === "/admin/abandoned-carts";
   const isProductsActive = pathname.startsWith("/admin/products") || pathname.startsWith("/admin/inventory");
   const isCustomersActive = pathname.startsWith("/admin/customers");
+  const isSettingsActive = pathname.startsWith("/admin/settings") || pathname.startsWith("/admin/users") || pathname === "/admin/analytics";
   const [ordersOpen, setOrdersOpen] = useState(isOrdersActive);
   const [productsOpen, setProductsOpen] = useState(isProductsActive);
   const [customersOpen, setCustomersOpen] = useState(isCustomersActive);
+  const [settingsOpen, setSettingsOpen] = useState(isSettingsActive);
 
   useEffect(() => { if (isOrdersActive) setOrdersOpen(true); }, [isOrdersActive]);
   useEffect(() => { if (isProductsActive) setProductsOpen(true); }, [isProductsActive]);
   useEffect(() => { if (isCustomersActive) setCustomersOpen(true); }, [isCustomersActive]);
+  useEffect(() => { if (isSettingsActive) setSettingsOpen(true); }, [isSettingsActive]);
 
   function NavLink({ href, label, icon }: { href: string; label: string; icon: React.ReactNode }) {
     const active = pathname === href || (href !== "/admin" && pathname.startsWith(href + "/"));
@@ -86,7 +89,6 @@ export function AdminSidebar() {
       {/* ── OVERVIEW ── */}
       <div style={SECTION_HEAD}>Overview</div>
       <NavLink href="/admin/dashboard" label="Dashboard" icon={<BarChartIcon size={15} color="currentColor" />} />
-      <NavLink href="/admin/analytics" label="Analytics" icon={<TrendingUpIcon size={15} color="currentColor" />} />
 
       {/* ── ORDERS ── */}
       <div style={SECTION_HEAD}>Orders</div>
@@ -193,10 +195,37 @@ export function AdminSidebar() {
 
       {/* ── SETTINGS ── */}
       <div style={SECTION_HEAD}>Settings</div>
-      <NavLink href="/admin/users" label="Users" icon={<UsersIcon size={15} color="currentColor" />} />
-      <NavLink href="/admin/settings" label="Settings" icon={<SettingsIcon size={15} color="currentColor" />} />
-      <NavLink href="/admin/settings/quickbooks" label="QuickBooks" icon={<BookIcon size={15} color="currentColor" />} />
-      <NavLink href="/admin/settings/audit-log" label="Audit Log" icon={<SearchIcon size={15} color="currentColor" />} />
+
+      {/* Settings dropdown */}
+      <div
+        onClick={() => setSettingsOpen(!settingsOpen)}
+        style={{
+          ...NAV_LINK_BASE,
+          justifyContent: "space-between",
+          background: isSettingsActive ? "rgba(26,92,255,.08)" : "transparent",
+          color: isSettingsActive ? "#1A5CFF" : "#555",
+          userSelect: "none",
+        }}
+        onMouseEnter={e => { if (!isSettingsActive) (e.currentTarget as HTMLElement).style.background = "#F4F3EF"; }}
+        onMouseLeave={e => { if (!isSettingsActive) (e.currentTarget as HTMLElement).style.background = isSettingsActive ? "rgba(26,92,255,.08)" : "transparent"; }}
+      >
+        <span style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <SettingsIcon size={15} color="currentColor" />
+          <span>Settings</span>
+        </span>
+        <span style={{ fontSize: "10px", color: "#aaa", transition: "transform .2s", transform: settingsOpen ? "rotate(180deg)" : "rotate(0deg)", display: "inline-block" }}>▼</span>
+      </div>
+
+      {settingsOpen && (
+        <div style={{ paddingLeft: "18px", marginTop: "3px", marginBottom: "3px" }}>
+          <SubLink href="/admin/settings" label="General" />
+          <SubLink href="/admin/settings/taxes" label="Taxes & Duties" />
+          <SubLink href="/admin/settings/quickbooks" label="QuickBooks" />
+          <SubLink href="/admin/analytics" label="Analytics" />
+          <SubLink href="/admin/users" label="Users" />
+          <SubLink href="/admin/settings/audit-log" label="Audit Log" />
+        </div>
+      )}
     </aside>
   );
 }

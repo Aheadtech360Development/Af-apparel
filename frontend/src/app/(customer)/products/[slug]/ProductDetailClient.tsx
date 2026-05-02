@@ -532,14 +532,6 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                   <span style={{ fontSize: "80px", opacity: 0.2 }}>👕</span>
                 </div>
               )}
-              {/* MOQ badge */}
-              {product.moq > 1 && (
-                <div style={{ position: "absolute", top: "12px", left: "12px" }}>
-                  <span style={{ background: "#111016", color: "#fff", fontSize: "10px", fontWeight: 700, padding: "3px 8px", borderRadius: "4px", textTransform: "uppercase", letterSpacing: ".06em" }}>
-                    Min {product.moq} units
-                  </span>
-                </div>
-              )}
             </div>
 
             {/* Thumbnail slider */}
@@ -690,11 +682,6 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                 ) : (
                   <span style={{ fontFamily: "var(--font-bebas)", fontSize: "28px", color: "#7A7880" }}>Price on request</span>
                 )}
-                {product.moq > 1 && (
-                  <p style={{ fontSize: "12px", color: "#7A7880", marginTop: "6px" }}>
-                    Minimum order quantity: <strong style={{ color: "#2A2830" }}>{product.moq} units</strong>
-                  </p>
-                )}
               </div>
             ) : (
               <div style={{ background: "#111016", border: "1px solid rgba(255,255,255,.08)", borderRadius: "10px", padding: "24px", marginBottom: "20px", textAlign: "center" }}>
@@ -730,11 +717,6 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                 </div>
               ) : (
                 <span style={{ fontFamily: "var(--font-bebas)", fontSize: "28px", color: "#7A7880" }}>Price on request</span>
-              )}
-              {product.moq > 1 && (
-                <p style={{ fontSize: "12px", color: "#7A7880", marginTop: "6px", marginBottom: 0 }}>
-                  Minimum order quantity: <strong style={{ color: "#2A2830" }}>{product.moq} units</strong>
-                </p>
               )}
             </div>
 
@@ -1042,7 +1024,6 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                     {[
                       { label: "Colors Available", value: uniqueColors.join(", ") || "—" },
                       { label: "Sizes Available", value: uniqueSizes.join(", ") || "—" },
-                      { label: "Min Order Qty", value: `${product.moq} units` },
                       { label: "Variants", value: `${product.variants?.length ?? 0} options` },
                       ...(((product as any).fabric) ? [{ label: "Fabric", value: (product as any).fabric }] : []),
                       ...(((product as any).weight) ? [{ label: "Weight", value: (product as any).weight }] : []),

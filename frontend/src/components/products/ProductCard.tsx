@@ -57,10 +57,6 @@ export function ProductCard({ product }: ProductCardProps) {
             )}
         </div>
 
-        {product.moq > 1 && (
-          <p className="mt-1 text-xs text-gray-500">MOQ: {product.moq} units</p>
-        )}
-
         <p className="mt-1 text-xs text-gray-400">
           {product.variants?.length ?? 0} variant{product.variants?.length !== 1 ? "s" : ""}
         </p>

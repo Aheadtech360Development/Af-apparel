@@ -9,12 +9,11 @@ import type { ProductVariant } from "@/types/product.types";
 interface VariantMatrixProps {
   productId: string;
   variants: ProductVariant[];
-  moq: number;
 }
 
 type QuantityMap = Record<string, number>; // variant_id → qty
 
-export function VariantMatrix({ productId, variants, moq }: VariantMatrixProps) {
+export function VariantMatrix({ productId, variants }: VariantMatrixProps) {
   const router = useRouter();
   const [quantities, setQuantities] = useState<QuantityMap>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -72,15 +71,6 @@ export function VariantMatrix({ productId, variants, moq }: VariantMatrixProps) 
     [quantities]
   );
 
-  // MOQ warnings: variants where qty is set but < moq
-  const moqWarnings = useMemo(
-    () =>
-      Object.entries(quantities)
-        .filter(([, qty]) => qty > 0 && qty < moq)
-        .map(([id]) => id),
-    [quantities, moq]
-  );
-
   async function handleAddAllToCart() {
     const items = Object.entries(quantities)
       .filter(([, qty]) => qty > 0)
@@ -116,13 +106,6 @@ export function VariantMatrix({ productId, variants, moq }: VariantMatrixProps) 
   return (
     <div className="mt-6">
       <h2 className="text-sm font-semibold text-gray-900 mb-3">Order Quantities</h2>
-
-      {moqWarnings.length > 0 && (
-        <div className="mb-3 p-3 bg-amber-50 border border-amber-200 rounded text-xs text-amber-800">
-          {moqWarnings.length} variant{moqWarnings.length !== 1 ? "s" : ""} below the minimum
-          order quantity of {moq} units.
-        </div>
-      )}
 
       <div className="overflow-x-auto">
         <table className="text-sm border-collapse w-full min-w-max">
@@ -160,7 +143,6 @@ export function VariantMatrix({ productId, variants, moq }: VariantMatrixProps) 
                     );
                   }
                   const qty = quantities[variant.id] ?? "";
-                  const belowMoq = Number(qty) > 0 && Number(qty) < moq;
                   const outOfStock = (variant.stock_quantity ?? 0) === 0;
                   return (
                     <td key={size} className="py-2 px-2">
@@ -172,11 +154,7 @@ export function VariantMatrix({ productId, variants, moq }: VariantMatrixProps) 
                         onChange={(e) => handleChange(variant.id, e.target.value)}
                         disabled={outOfStock}
                         title={outOfStock ? "Out of stock" : `Stock: ${variant.stock_quantity}`}
-                        className={`w-16 text-center rounded border py-1 text-sm focus:outline-none focus:ring-1 disabled:bg-gray-100 disabled:cursor-not-allowed ${
-                          belowMoq
-                            ? "border-amber-400 focus:ring-amber-400"
-                            : "border-gray-300 focus:ring-brand-500"
-                        }`}
+                        className="w-16 text-center rounded border border-gray-300 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                       />
                     </td>
                   );

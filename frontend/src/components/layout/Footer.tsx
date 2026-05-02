@@ -34,11 +34,11 @@ export function Footer() {
           {
             h: "Resources",
             links: [
-              { label: "Print Guide", href: "#" },
-              { label: "Size Charts", href: "#" },
-              { label: "Product Catalog", href: "#" },
-              { label: "Style Sheets", href: "#" },
-              { label: "Private Label", href: "#" },
+              { label: "Print Guide", href: "/print-guide" },
+              { label: "Size Charts", href: "/product-specs" },
+              { label: "Style Sheets", href: "/style-sheets" },
+              { label: "Private Label", href: "/private-label" },
+              { label: "About Us", href: "/about" },
             ],
           },
           {
@@ -47,18 +47,18 @@ export function Footer() {
               { label: "Apply for Wholesale", href: "/wholesale/register" },
               { label: "Log In", href: "/login" },
               { label: "Order History", href: "/account/orders" },
-              { label: "NET 30 Terms", href: "#" },
+              { label: "NET 30 Terms", href: "/privacy-policy#terms" },
               { label: "Settings", href: "/account/profile" },
             ],
           },
           {
             h: "Support",
             links: [
-              { label: "Contact Us", href: "#" },
-              { label: "Shipping Info", href: "#" },
-              { label: "Returns Policy", href: "#" },
-              { label: "Certifications", href: "#" },
-              { label: "FAQ", href: "#" },
+              { label: "Contact Us", href: "/contact" },
+              { label: "Shipping Info", href: "/privacy-policy#shipping" },
+              { label: "Returns Policy", href: "/privacy-policy#returns" },
+              { label: "Privacy Policy", href: "/privacy-policy#privacy" },
+              { label: "Track Order", href: "/track-order" },
             ],
           },
         ].map(col => (

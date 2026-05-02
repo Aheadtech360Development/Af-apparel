@@ -5,7 +5,6 @@ import { apiClient } from "@/lib/api-client";
 
 const SETTING_FIELDS = [
   { key: "mov", label: "Minimum Order Value ($)", type: "number", placeholder: "e.g. 200" },
-  { key: "moq", label: "Minimum Order Quantity", type: "number", placeholder: "e.g. 12" },
   {
     key: "guest_pricing_mode",
     label: "Guest Pricing Mode",
@@ -16,7 +15,6 @@ const SETTING_FIELDS = [
       { value: "wholesale", label: "Show wholesale price" },
     ],
   },
-  { key: "tax_rate", label: "Tax Rate (%)", type: "number", placeholder: "e.g. 8.5" },
   { key: "low_stock_threshold", label: "Low-Stock Alert Threshold (units)", type: "number", placeholder: "e.g. 10" },
   { key: "notification_email", label: "Notification Email", type: "email", placeholder: "ops@example.com" },
 ];

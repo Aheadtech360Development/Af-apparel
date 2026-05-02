@@ -174,9 +174,6 @@ export function BestSellers() {
                         From ${Number(price).toFixed(2)}
                       </div>
                     ) : null}
-                    <div style={{ fontSize: "11px", color: "#7A7880", fontWeight: 600 }}>
-                      MOQ: {product.moq ?? 6}
-                    </div>
                   </div>
                 </div>
               </Link>

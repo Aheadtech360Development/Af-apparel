@@ -561,11 +561,6 @@ export default function QuickOrderPage() {
                               <span style={{ fontSize: "11px", color: "#aaa", fontFamily: "monospace" }}>
                                 {row.selectedProduct?.variants[0]?.sku ?? row.selectedProduct?.slug}
                               </span>
-                              {row.selectedProduct && row.selectedProduct.moq > 1 && (
-                                <span style={{ fontSize: "10px", fontWeight: 700, padding: "1px 6px", borderRadius: "3px", background: "rgba(201,168,76,.15)", color: "#7a5a00", textTransform: "uppercase", letterSpacing: ".04em" }}>
-                                  Min {row.selectedProduct.moq} units
-                                </span>
-                              )}
                             </div>
                           </div>
                           {hasQty && (

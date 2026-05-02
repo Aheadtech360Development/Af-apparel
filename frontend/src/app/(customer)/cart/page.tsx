@@ -7,7 +7,6 @@ import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
 import { cartService } from "@/services/cart.service";
 import { apiClient } from "@/lib/api-client";
-import { MOQWarning } from "@/components/cart/MOQWarning";
 import { useAuthStore } from "@/stores/auth.store";
 import type { Cart, CartItem } from "@/types/order.types";
 
@@ -269,10 +268,9 @@ export default function CartPage() {
 
   function getCheckoutDisabledReason(): string | undefined {
     if (!cart || !cart.items || cart.items.length === 0) return "Cart is empty";
-    if (isGuest) return undefined; // no MOQ/MOV for guests
+    if (isGuest) return undefined;
     if (!cart.validation) return undefined;
     const v = cart.validation;
-    if (v.moq_violations?.length > 0) return `${v.moq_violations.length} item${v.moq_violations.length !== 1 ? "s" : ""} below minimum order quantity`;
     if (v.mov_violation) return `Minimum order value of ${formatCurrency(Number(v.mov_required))} not met`;
     return undefined;
   }
@@ -338,17 +336,13 @@ export default function CartPage() {
 
               {groups.map((group) => {
                 const isRemoving = removingProductId === group.productId;
-                const hasViolation = cart?.validation?.moq_violations?.some(v =>
-                  group.items.some(i => i.variant_id === v.variant_id)
-                );
-
                 return (
                   <div
                     key={group.productId}
                     style={{
                       background: "#fff",
                       borderRadius: "12px",
-                      border: `1.5px solid ${hasViolation ? "rgba(232,36,42,.3)" : "#E2E0DA"}`,
+                      border: "1.5px solid #E2E0DA",
                       padding: "20px 22px",
                       opacity: isRemoving ? 0.5 : 1,
                       transition: "opacity .2s",
@@ -429,17 +423,6 @@ export default function CartPage() {
                         );
                       })}
                     </div>
-
-                    {/* MOQ warnings */}
-                    {hasViolation && (
-                      <div style={{ marginTop: "10px" }}>
-                        {cart?.validation?.moq_violations
-                          ?.filter(v => group.items.some(i => i.variant_id === v.variant_id))
-                          .map(v => (
-                            <MOQWarning key={v.variant_id} sku={v.sku} required={v.required} current={v.current} />
-                          ))}
-                      </div>
-                    )}
 
                     {divider}
 

@@ -324,7 +324,6 @@ export default function AdminProductEditPage() {
         name: product.name,
         description: product.description,
         status: product.status,
-        moq: product.moq,
         meta_title: product.meta_title,
         meta_description: product.meta_description,
         product_type: product.product_type,
@@ -852,17 +851,6 @@ export default function AdminProductEditPage() {
                   <option key={cat.id} value={cat.id}>{cat.name}</option>
                 ))}
               </select>
-            </div>
-
-            <div style={{ marginBottom: "14px" }}>
-              <label style={labelStyle}>MOQ</label>
-              <input
-                type="number"
-                min={1}
-                value={product.moq}
-                onChange={e => setProduct(p => p ? { ...p, moq: Number(e.target.value) || 1 } : p)}
-                style={{ ...inputStyle, width: "100px" }}
-              />
             </div>
 
             <div>
