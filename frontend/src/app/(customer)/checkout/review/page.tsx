@@ -61,6 +61,7 @@ export default function CheckoutReviewPage() {
   const [isPlacing, setIsPlacing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount_amount: number; discount_type: string } | null>(null);
+  const [taxRate, setTaxRate] = useState<{ region: string; rate: number } | null>(null);
 
   // Guard: must have shipping + payment
   useEffect(() => {
@@ -97,6 +98,18 @@ export default function CheckoutReviewPage() {
       if (parsed?.code) setAppliedCoupon(parsed);
     } catch { /* ignore */ }
   }, [isGuest]);
+
+  useEffect(() => {
+    if (!shippingAddress?.state) return;
+    apiClient.get<{ data: { region: string; rate: number; is_enabled: boolean }[] }>("/api/v1/admin/taxes")
+      .then(res => {
+        const list = (res as any).data ?? res ?? [];
+        const state = shippingAddress.state.toUpperCase();
+        const match = list.find((r: { region: string; is_enabled: boolean }) => r.region === state && r.is_enabled);
+        setTaxRate(match ? { region: match.region, rate: Number(match.rate) } : null);
+      })
+      .catch(() => setTaxRate(null));
+  }, [shippingAddress?.state]);
 
   function buildColorSummary(c: Cart): string {
     const colorMap = new Map<string, number>();
@@ -223,7 +236,8 @@ export default function CheckoutReviewPage() {
   const subtotal = isGuest ? guestSubtotalCalc : Number(cart?.subtotal ?? 0);
   const shipping = shippingCost;
   const couponDiscount = appliedCoupon ? Number(appliedCoupon.discount_amount) : 0;
-  const total = subtotal + shipping - (isGuest ? 0 : couponDiscount);
+  const taxAmount = taxRate ? Math.round(subtotal * taxRate.rate / 100 * 100) / 100 : 0;
+  const total = subtotal + shipping + taxAmount - (isGuest ? 0 : couponDiscount);
   const shippingLabel = SHIPPING_LABELS[shippingMethod] ?? "Standard Ground";
 
   const sectionCard: React.CSSProperties = {
@@ -384,6 +398,14 @@ export default function CheckoutReviewPage() {
             <span style={{ color: "#7A7880" }}>Shipping ({shippingLabel})</span>
             <span style={{ color: shipping === 0 ? "#059669" : "#2A2830", fontWeight: 600 }}>
               {shipping === 0 ? "FREE" : formatCurrency(shipping)}
+            </span>
+          </div>
+          <div style={row}>
+            <span style={{ color: "#7A7880" }}>
+              {taxRate ? `Tax (${taxRate.region} ${taxRate.rate}%)` : "Tax"}
+            </span>
+            <span style={{ color: "#2A2830", fontWeight: 600 }}>
+              {taxRate ? formatCurrency(taxAmount) : "Calculated at checkout"}
             </span>
           </div>
           <div style={{ borderTop: "1.5px solid #E2E0DA", paddingTop: "10px", display: "flex", justifyContent: "space-between" }}>

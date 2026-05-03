@@ -1,4 +1,3 @@
-import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -6,131 +5,195 @@ export const metadata: Metadata = {
   description: "Custom private label blank apparel manufacturing. Your brand, our factory expertise. Starting at 2,500 units per style/color.",
 };
 
-const steps = [
-  { n: 1, title: "Request a Quote", body: "Submit your design specs, quantities, and fabric requirements. We respond within 24 hours." },
-  { n: 2, title: "Design Approval", body: "Our team creates tech packs and samples. You approve colors, construction, labels, and tags." },
-  { n: 3, title: "Production", body: "Your order enters our manufacturing queue. Typical lead time 60–90 days from approval." },
-  { n: 4, title: "QC Inspection", body: "Full quality control inspection before shipment. AQL sampling on every production run." },
-  { n: 5, title: "Delivery", body: "Bulk cartons to your warehouse or direct-to-consumer fulfillment via our 3PL partners." },
-];
-
-const options = [
-  { icon: "🏷️", title: "Custom Labels", body: "Woven neck labels, hang tags, custom heat transfers — your branding, fully applied." },
-  { icon: "🎨", title: "Custom Colors", body: "Pantone-matched dyeing available on most constructions. MOQ 2,500 units per color." },
-  { icon: "🧵", title: "Custom Constructions", body: "Modify fabric weight, blend, thread count, and finish to hit your exact spec." },
-  { icon: "📦", title: "Custom Packaging", body: "Polybag, box, or retail-ready packaging with custom inserts and branding." },
-];
-
-const specs = [
-  ["Minimum Order", "2,500 units per style/color"],
-  ["Lead Time", "60–90 days from approved samples"],
-  ["Fabrics", "100% Cotton, CVC, Tri-Blend, Polyester, Fleece"],
-  ["Weights", "4.5 oz – 12 oz available"],
-  ["Styles", "T-Shirts, Hoodies, Sweatshirts, Polos, Jackets, Bottoms"],
-  ["Label Options", "Woven, Printed, Tear-away, Heat transfer"],
-  ["MOQ per Color", "2,500 units"],
-  ["Sample Cost", "Cost of samples credited against production order"],
-];
-
 export default function PrivateLabelPage() {
   return (
-    <div style={{ background: "#F4F3EF", minHeight: "100vh" }}>
+    <div style={{ background: "#fff", minHeight: "100vh" }}>
+
+      {/* Announce */}
+      <div style={{ background: "#E8242A", color: "#fff", textAlign: "center", padding: "7px 24px", fontSize: "12px", fontWeight: 600, letterSpacing: ".02em" }}>
+        🏷️ Private Label Program — Custom Styles, Your Brand, Factory-Direct | Min. 2,500 Units/Style/Color
+      </div>
+
       {/* Hero */}
-      <div style={{ background: "#111016", color: "#fff", padding: "80px 32px" }}>
-        <div style={{ maxWidth: "1000px", margin: "0 auto", textAlign: "center" }}>
-          <div style={{ fontSize: "11px", fontWeight: 700, letterSpacing: ".14em", color: "#1A5CFF", textTransform: "uppercase", marginBottom: "16px" }}>
-            Private Label Program
-          </div>
-          <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(44px, 7vw, 80px)", lineHeight: 1, letterSpacing: ".02em", marginBottom: "20px" }}>
-            Your Brand.<br />Our Factory.
-          </h1>
-          <p style={{ fontSize: "16px", color: "rgba(255,255,255,.7)", lineHeight: 1.7, maxWidth: "600px", margin: "0 auto 32px" }}>
-            Launch your own apparel line with custom labels, colors, and construction. We handle manufacturing, QC, and logistics — you focus on building your brand.
-          </p>
-          <Link href="/contact?dept=private-label" style={{ background: "#E8242A", color: "#fff", padding: "14px 32px", borderRadius: "8px", fontWeight: 700, textDecoration: "none", fontSize: "14px", textTransform: "uppercase", letterSpacing: ".06em", display: "inline-block" }}>
-            Request a Quote
-          </Link>
-        </div>
-      </div>
-
-      {/* Who it's for */}
-      <div style={{ maxWidth: "1000px", margin: "0 auto", padding: "64px 32px 0" }}>
-        <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "38px", letterSpacing: ".04em", color: "#2A2830", marginBottom: "8px" }}>Who It&apos;s For</h2>
-        <p style={{ fontSize: "14px", color: "#7A7880", marginBottom: "32px" }}>Private label is ideal for established brands ready to own their supply chain.</p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px", marginBottom: "64px" }}>
-          {["Retail Brands", "E-Commerce Labels", "Corporate Merch Teams", "Influencer Brands", "Athletic Brands", "Streetwear Labels"].map(b => (
-            <div key={b} style={{ background: "#fff", border: "1.5px solid #E2E0DA", borderRadius: "10px", padding: "20px 16px", textAlign: "center", fontSize: "13px", fontWeight: 700, color: "#2A2830" }}>
-              {b}
+      <div style={{ background: "#111", padding: "56px 24px" }}>
+        <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "48px", alignItems: "center" }}>
+            <div>
+              <div style={{ display: "inline-block", background: "rgba(45,140,255,.15)", color: "#2D8CFF", fontSize: "12px", fontWeight: 700, padding: "4px 12px", borderRadius: "4px", marginBottom: "12px", letterSpacing: ".04em" }}>
+                🏷️ Private Label Program
+              </div>
+              <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(22px,3vw,36px)", color: "#fff", margin: "12px 0 10px", lineHeight: 1.1, letterSpacing: ".04em" }}>
+                Build Your Brand on<br />Factory-Direct Blanks
+              </h1>
+              <p style={{ color: "#9CA3AF", fontSize: "14px", lineHeight: 1.7, maxWidth: "460px" }}>
+                Custom neck labels, exclusive colorways, unique styles — all manufactured to your spec and delivered direct from our Dallas facility. Your brand, our infrastructure, no middlemen.
+              </p>
+              <div style={{ display: "flex", gap: "10px", marginTop: "22px", flexWrap: "wrap" }}>
+                <a href="/contact?dept=private-label" style={{ display: "inline-flex", alignItems: "center", background: "#E8242A", color: "#fff", padding: "12px 28px", fontFamily: "var(--font-bebas)", fontWeight: 700, fontSize: "15px", letterSpacing: ".05em", borderRadius: "3px", textDecoration: "none" }}>
+                  Request a Quote →
+                </a>
+                <a href="#" style={{ display: "inline-flex", alignItems: "center", background: "none", color: "#ddd", padding: "12px 28px", fontFamily: "var(--font-bebas)", fontWeight: 700, fontSize: "15px", letterSpacing: ".05em", borderRadius: "3px", border: "2px solid #444", textDecoration: "none" }}>
+                  Download Program Guide
+                </a>
+              </div>
+              <div style={{ display: "flex", gap: "24px", marginTop: "22px", flexWrap: "wrap" }}>
+                <div style={{ fontSize: "12px", color: "#6B7280" }}>📦 <span style={{ color: "#9CA3AF", fontWeight: 600 }}>Min. 2,500 units</span> per style/color</div>
+                <div style={{ fontSize: "12px", color: "#6B7280" }}>📅 <span style={{ color: "#9CA3AF", fontWeight: 600 }}>45–60 day</span> lead time</div>
+                <div style={{ fontSize: "12px", color: "#6B7280" }}>🌍 <span style={{ color: "#9CA3AF", fontWeight: 600 }}>WRAP & GOTS</span> certified</div>
+              </div>
             </div>
-          ))}
+            <div style={{ background: "#1a1a1a", border: "1px solid #333", borderRadius: "8px", height: "280px", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", color: "#555", fontSize: "13px" }}>
+              <div style={{ fontSize: "48px", marginBottom: "12px" }}>👕</div>
+              <span>[PRIVATE LABEL PRODUCT PHOTO]</span>
+              <span style={{ fontSize: "10px", marginTop: "4px" }}>Custom neck label / branded hang tag</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* 5-Step Process */}
-      <div style={{ background: "#111016", padding: "64px 32px" }}>
-        <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
-          <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "38px", letterSpacing: ".04em", color: "#fff", marginBottom: "8px", textAlign: "center" }}>The Process</h2>
-          <p style={{ fontSize: "14px", color: "rgba(255,255,255,.5)", marginBottom: "48px", textAlign: "center" }}>5 steps from idea to delivered product</p>
-          <div style={{ display: "flex", gap: "0", alignItems: "stretch", flexWrap: "wrap", justifyContent: "center" }}>
-            {steps.map((s, i) => (
-              <div key={s.n} style={{ display: "flex", alignItems: "stretch" }}>
-                <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: "12px", padding: "28px 20px", width: "160px", textAlign: "center" }}>
-                  <div style={{ width: "44px", height: "44px", borderRadius: "50%", background: "#1A5CFF", color: "#fff", fontFamily: "var(--font-bebas)", fontSize: "22px", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px" }}>{s.n}</div>
-                  <div style={{ fontSize: "11px", fontWeight: 800, color: "#fff", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: "8px" }}>{s.title}</div>
-                  <p style={{ fontSize: "11px", color: "rgba(255,255,255,.5)", lineHeight: 1.5 }}>{s.body}</p>
-                </div>
-                {i < steps.length - 1 && (
-                  <div style={{ display: "flex", alignItems: "center", padding: "0 6px", color: "rgba(255,255,255,.2)", fontSize: "20px" }}>→</div>
-                )}
+      {/* Who Private Label Is For */}
+      <div style={{ background: "#fff", padding: "56px 24px" }}>
+        <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: "32px" }}>
+            <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "26px", letterSpacing: ".04em", color: "#111", marginBottom: "8px" }}>Who Private Label Is For</h2>
+            <p style={{ fontSize: "13.5px", color: "#666" }}>Not every business is ready for private label — here&apos;s who gets the most value</p>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "14px" }}>
+            {[
+              { icon: "👗", title: "Apparel Brands", body: "Building a clothing line and need consistent, branded blanks with your own label at scale." },
+              { icon: "🏪", title: "Retailers", body: "Retailers wanting exclusive styles or house-brand basics that differentiate from standard wholesale." },
+              { icon: "🖨️", title: "Print Shops", body: "High-volume decorators wanting to offer clients a fully branded blank rather than a standard SKU." },
+            ].map(w => (
+              <div key={w.title} style={{ background: "#F7F8FA", border: "1px solid #eee", borderRadius: "6px", padding: "20px", textAlign: "center" }}>
+                <div style={{ fontSize: "28px", marginBottom: "10px" }}>{w.icon}</div>
+                <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "13px", letterSpacing: ".06em", color: "#111", marginBottom: "6px" }}>{w.title}</h4>
+                <p style={{ fontSize: "12px", color: "#666", lineHeight: 1.6 }}>{w.body}</p>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Options + Specs */}
-      <div style={{ maxWidth: "1000px", margin: "0 auto", padding: "64px 32px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "48px" }}>
-          <div>
-            <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "34px", letterSpacing: ".04em", color: "#2A2830", marginBottom: "24px" }}>Customization Options</h2>
-            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-              {options.map(o => (
-                <div key={o.title} style={{ display: "flex", gap: "14px", alignItems: "flex-start" }}>
-                  <span style={{ fontSize: "24px", flexShrink: 0 }}>{o.icon}</span>
-                  <div>
-                    <div style={{ fontWeight: 700, color: "#2A2830", fontSize: "14px", marginBottom: "4px" }}>{o.title}</div>
-                    <p style={{ fontSize: "13px", color: "#7A7880", lineHeight: 1.5 }}>{o.body}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+      {/* How It Works */}
+      <div style={{ background: "#F7F8FA", padding: "56px 24px" }}>
+        <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: "32px" }}>
+            <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "26px", letterSpacing: ".04em", color: "#111", marginBottom: "8px" }}>How It Works</h2>
+            <p style={{ fontSize: "13.5px", color: "#666" }}>From inquiry to your branded product on shelf — a clear, 5-step process</p>
           </div>
-          <div>
-            <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "34px", letterSpacing: ".04em", color: "#2A2830", marginBottom: "24px" }}>Program Specs</h2>
-            <div style={{ background: "#fff", border: "1.5px solid #E2E0DA", borderRadius: "12px", overflow: "hidden" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                <tbody>
-                  {specs.map(([k, v], i) => (
-                    <tr key={k} style={{ borderBottom: i < specs.length - 1 ? "1px solid #F4F3EF" : "none" }}>
-                      <td style={{ padding: "12px 16px", fontSize: "12px", fontWeight: 700, color: "#7A7880", width: "42%", textTransform: "uppercase", letterSpacing: ".04em" }}>{k}</td>
-                      <td style={{ padding: "12px 16px", fontSize: "13px", color: "#2A2830" }}>{v}</td>
-                    </tr>
+          <div style={{ display: "flex", gap: "8px", alignItems: "stretch", flexWrap: "wrap", justifyContent: "center" }}>
+            {[
+              { n: 1, title: "Submit Inquiry", body: "Tell us about your brand, volume targets, and customization needs via our quote form." },
+              { n: 2, title: "Design & Sampling", body: "Our team creates samples based on your spec. You review and approve before production begins." },
+              { n: 3, title: "Production", body: "Your order enters production at our certified facility. 45–60 day lead time from approval." },
+              { n: 4, title: "QA & Inspection", body: "Every unit passes our quality assurance checklist before leaving the facility." },
+              { n: 5, title: "Ship to You", body: "Delivered to your door or facility, packaged and labeled to your spec." },
+            ].map((s, i) => (
+              <div key={s.n} style={{ display: "flex", alignItems: "center" }}>
+                <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: "6px", padding: "24px 16px", width: "170px", textAlign: "center" }}>
+                  <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "#2D8CFF", color: "#fff", fontFamily: "var(--font-bebas)", fontSize: "20px", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px" }}>{s.n}</div>
+                  <div style={{ fontFamily: "var(--font-bebas)", fontSize: "13px", letterSpacing: ".06em", color: "#111", marginBottom: "6px" }}>{s.title}</div>
+                  <p style={{ fontSize: "11px", color: "#555", lineHeight: 1.5 }}>{s.body}</p>
+                </div>
+                {i < 4 && <div style={{ color: "#D1D5DB", fontSize: "20px", padding: "0 4px" }}>→</div>}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Customization Options */}
+      <div style={{ background: "#fff", padding: "56px 24px" }}>
+        <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+          <div style={{ marginBottom: "32px" }}>
+            <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "26px", letterSpacing: ".04em", color: "#111", marginBottom: "8px" }}>Customization Options</h2>
+            <p style={{ fontSize: "13.5px", color: "#666" }}>Everything you need to make the product fully yours</p>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "16px" }}>
+            {[
+              {
+                tag: "Branding", title: "Labels & Tags",
+                body: "Full custom neck labels (woven or printed), hang tags, bag inserts, and care label replacement. Your brand identity on every unit.",
+                items: ["Woven neck labels", "Printed neck labels", "Custom hang tags", "Polybag with logo", "Custom care labels"],
+              },
+              {
+                tag: "Product", title: "Custom Styles & Cuts",
+                body: "Modify existing AF silhouettes or develop entirely new cuts. Drop shoulder, oversized, cropped, extended — your design specifications.",
+                items: ["Modified silhouettes", "Custom fits and cuts", "Unique necklines", "Length modifications", "New style development"],
+              },
+              {
+                tag: "Fabric & Color", title: "Exclusive Colorways",
+                body: "Access custom Pantone color matches not available in our standard catalog. Reserve colorways exclusively for your brand.",
+                items: ["Pantone color matching", "Exclusive color reservations", "Custom fabric blends", "Specialty finishes", "Fabric weight customization"],
+              },
+            ].map(o => (
+              <div key={o.title} style={{ border: "1px solid #E5E7EB", borderRadius: "6px", padding: "20px" }}>
+                <div style={{ display: "inline-block", background: "#dde8ff", color: "#2D8CFF", fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "3px", marginBottom: "10px", textTransform: "uppercase", letterSpacing: ".05em" }}>{o.tag}</div>
+                <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", marginBottom: "8px" }}>{o.title}</h4>
+                <p style={{ fontSize: "12.5px", color: "#555", lineHeight: 1.6, marginBottom: "12px" }}>{o.body}</p>
+                <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+                  {o.items.map(it => (
+                    <li key={it} style={{ fontSize: "12px", color: "#555", padding: "3px 0 3px 14px", position: "relative" }}>
+                      <span style={{ position: "absolute", left: 0, color: "#059669" }}>✓</span>{it}
+                    </li>
                   ))}
-                </tbody>
-              </table>
-            </div>
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Program Specifications */}
+      <div style={{ background: "#F7F8FA", padding: "56px 24px" }}>
+        <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: "32px" }}>
+            <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "26px", letterSpacing: ".04em", color: "#111", marginBottom: "8px" }}>Program Specifications</h2>
+            <p style={{ fontSize: "13.5px", color: "#666" }}>Everything you need to know before starting your private label inquiry</p>
+          </div>
+          <div style={{ maxWidth: "680px", margin: "0 auto", background: "#fff", border: "1px solid #E5E7EB", borderRadius: "6px", overflow: "hidden" }}>
+            {[
+              ["Minimum Order Quantity", "2,500 units per style per color"],
+              ["Standard Lead Time", "45–60 days from approval"],
+              ["Sampling Lead Time", "10–14 business days"],
+              ["Sample Cost", "$75–$150 per sample (credited on order)"],
+              ["Certifications", "WRAP, GOTS, ISO 9000, Oeko-Tex"],
+              ["Color Matching", "Pantone TPG/TPX system"],
+              ["Shipping", "DDP (Delivered Duty Paid) to US destinations"],
+              ["Payment Terms", "50% deposit, 50% on shipment"],
+              ["Accepted Payments", "Wire transfer, ACH, NET 30 (qualified accounts)"],
+              ["Quality Assurance", "100% inspection before shipment"],
+            ].map(([label, val], i) => (
+              <div key={label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 20px", borderBottom: i < 9 ? "1px solid #F7F8FA" : "none" }}>
+                <span style={{ fontSize: "12px", color: "#6B7280", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".04em" }}>{label}</span>
+                <span style={{ fontSize: "13px", color: "#111", fontWeight: 600, textAlign: "right" }}>{val}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
       {/* CTA */}
-      <div style={{ background: "#111016", color: "#fff", padding: "64px 32px", textAlign: "center" }}>
-        <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "48px", letterSpacing: ".04em", marginBottom: "12px" }}>Start Your Private Label Journey</h2>
-        <p style={{ fontSize: "15px", color: "rgba(255,255,255,.6)", marginBottom: "28px" }}>Send us your specs and we&apos;ll get back to you within 24 hours.</p>
-        <Link href="/contact?dept=private-label" style={{ background: "#E8242A", color: "#fff", padding: "16px 36px", borderRadius: "8px", fontWeight: 700, textDecoration: "none", fontSize: "15px", textTransform: "uppercase", letterSpacing: ".06em", display: "inline-block" }}>
-          Request a Quote →
-        </Link>
+      <div style={{ background: "#080808", padding: "56px 24px", textAlign: "center" }}>
+        <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(24px,3.5vw,36px)", color: "#fff", letterSpacing: ".04em", marginBottom: "14px" }}>
+          READY TO BUILD YOUR BRAND?
+        </h2>
+        <p style={{ color: "rgba(255,255,255,.7)", fontSize: "14px", marginBottom: "24px" }}>
+          Tell us about your project and our private label team will respond within 1 business day with pricing, timeline, and next steps.
+        </p>
+        <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap", marginBottom: "14px" }}>
+          <a href="/contact?dept=private-label" style={{ display: "inline-flex", alignItems: "center", background: "#E8242A", color: "#fff", padding: "12px 28px", fontFamily: "var(--font-bebas)", fontWeight: 700, fontSize: "15px", letterSpacing: ".05em", borderRadius: "3px", textDecoration: "none" }}>
+            Request a Private Label Quote →
+          </a>
+          <a href="#" style={{ display: "inline-flex", alignItems: "center", background: "none", color: "#ddd", padding: "12px 28px", fontFamily: "var(--font-bebas)", fontWeight: 700, fontSize: "15px", letterSpacing: ".05em", borderRadius: "3px", border: "2px solid #444", textDecoration: "none" }}>
+            Download Program Guide
+          </a>
+        </div>
+        <div style={{ fontSize: "11px", color: "#374151" }}>
+          📞 (214) 272-7213 &nbsp;·&nbsp; privatelabel@afapparel.com &nbsp;·&nbsp; Response within 1 business day
+        </div>
       </div>
+
     </div>
   );
 }

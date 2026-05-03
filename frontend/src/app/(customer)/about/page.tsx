@@ -1,130 +1,222 @@
-import Link from "next/link";
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "About Us | AF Apparels",
-  description: "Factory-direct wholesale blank apparel serving 2,000+ businesses across the US from our Dallas, TX warehouse.",
+  description: "America's factory-direct blank apparel supplier. Serving 2,000+ wholesale businesses from Dallas, TX since 2010.",
 };
-
-const stats = [
-  { n: "2,000+", l: "Active Clients" },
-  { n: "50,000+", l: "SKUs In Stock" },
-  { n: "1-2 Day", l: "Dallas Shipping" },
-  { n: "15+", l: "Years in Business" },
-];
-
-const values = [
-  { icon: "🏭", title: "Factory-Direct", body: "We cut out the middleman entirely. Every item ships straight from our Dallas warehouse — real stock, real prices." },
-  { icon: "⚡", title: "Speed First", body: "Same-day processing on orders placed before 3 PM CST. Our warehouse team treats every order like it's urgent." },
-  { icon: "🤝", title: "B2B Focused", body: "Built for businesses, not drop-shippers. Volume pricing, NET 30 terms, dedicated account managers." },
-  { icon: "📦", title: "No Minimums", body: "Order one unit or ten thousand. Our pricing scales automatically with volume — no MOQ games." },
-];
-
-const timeline = [
-  { year: "2009", event: "Founded in Dallas, TX as a small blank apparel distributor serving local screen printers." },
-  { year: "2014", event: "Expanded warehouse to 40,000 sq ft. Launched wholesale portal serving 500+ accounts." },
-  { year: "2018", event: "Introduced private label program. Added premium brands to catalog. Crossed 1,000 active accounts." },
-  { year: "2022", event: "Launched B2B e-commerce platform with NET 30 terms, volume pricing tiers, and real-time inventory." },
-  { year: "2024", event: "2,000+ active business accounts. 50,000+ SKUs in stock. Same-day processing from Dallas." },
-];
 
 export default function AboutPage() {
   return (
-    <div style={{ background: "#F4F3EF", minHeight: "100vh" }}>
+    <div style={{ background: "#fff", minHeight: "100vh" }}>
+
+      {/* Announce */}
+      <div style={{ background: "#E8242A", color: "#fff", textAlign: "center", padding: "7px 24px", fontSize: "12px", fontWeight: 600, letterSpacing: ".02em" }}>
+        🇺🇸 Factory-Direct Wholesale Blanks — Serving 2,000+ American Businesses | Same-Day Shipping from Dallas, TX
+      </div>
+
       {/* Hero */}
-      <div style={{ background: "#111016", color: "#fff", padding: "80px 32px" }}>
+      <div style={{ background: "#111", padding: "56px 24px" }}>
         <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "60px", alignItems: "center" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "48px", alignItems: "center" }}>
             <div>
-              <div style={{ fontSize: "11px", fontWeight: 700, letterSpacing: ".14em", color: "#E8242A", textTransform: "uppercase", marginBottom: "16px" }}>
-                About AF Apparels
+              <div style={{ display: "inline-block", background: "rgba(45,140,255,.15)", color: "#2D8CFF", fontSize: "12px", fontWeight: 700, padding: "4px 12px", borderRadius: "4px", marginBottom: "12px", letterSpacing: ".04em" }}>
+                🇺🇸 Dallas, TX — Est. 2010
               </div>
-              <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(40px, 6vw, 72px)", lineHeight: 1, letterSpacing: ".02em", marginBottom: "20px" }}>
-                Wholesale Apparel,<br />Done Right.
+              <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(24px,3.5vw,38px)", color: "#fff", margin: "12px 0 10px", lineHeight: 1.1, letterSpacing: ".04em" }}>
+                America&apos;s Factory-Direct<br />Blank Apparel Supplier
               </h1>
-              <p style={{ fontSize: "16px", color: "rgba(255,255,255,.7)", lineHeight: 1.7, marginBottom: "28px" }}>
-                We&apos;re a Dallas-based wholesale blank apparel distributor serving screen printers, embroiderers, promotional product companies, and retail brands across the US.
+              <p style={{ color: "#9CA3AF", fontSize: "14px", lineHeight: 1.7, maxWidth: "480px" }}>
+                For over a decade, AF Apparels has been the behind-the-scenes supplier for thousands of print shops, retailers, and apparel brands across the United States. No middlemen. No compromises. Just premium blanks, direct from our factory to your door.
               </p>
-              <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
-                <Link href="/products" style={{ background: "#E8242A", color: "#fff", padding: "14px 28px", borderRadius: "8px", fontWeight: 700, textDecoration: "none", fontSize: "14px", textTransform: "uppercase", letterSpacing: ".06em" }}>
-                  Shop Catalog
+              <div style={{ display: "flex", gap: "10px", marginTop: "20px", flexWrap: "wrap" }}>
+                <Link href="/products" style={{ display: "inline-flex", alignItems: "center", background: "#E8242A", color: "#fff", padding: "9px 20px", fontFamily: "var(--font-bebas)", fontWeight: 700, fontSize: "13px", letterSpacing: ".05em", borderRadius: "3px", textDecoration: "none" }}>
+                  Browse Our Catalog →
                 </Link>
-                <Link href="/contact" style={{ background: "transparent", color: "#fff", padding: "14px 28px", borderRadius: "8px", fontWeight: 700, textDecoration: "none", fontSize: "14px", border: "1.5px solid rgba(255,255,255,.25)" }}>
-                  Contact Sales
+                <Link href="/register" style={{ display: "inline-flex", alignItems: "center", background: "none", color: "#ddd", padding: "9px 20px", fontFamily: "var(--font-bebas)", fontWeight: 700, fontSize: "13px", letterSpacing: ".05em", borderRadius: "3px", border: "2px solid #444", textDecoration: "none" }}>
+                  Apply for Wholesale
                 </Link>
               </div>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
-              {stats.map(s => (
-                <div key={s.n} style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: "12px", padding: "24px", textAlign: "center" }}>
-                  <div style={{ fontFamily: "var(--font-bebas)", fontSize: "40px", letterSpacing: ".02em", color: "#E8242A", lineHeight: 1 }}>{s.n}</div>
-                  <div style={{ fontSize: "13px", color: "rgba(255,255,255,.6)", fontWeight: 600, marginTop: "6px", textTransform: "uppercase", letterSpacing: ".06em" }}>{s.l}</div>
+            <div style={{ background: "#1a1a1a", border: "1px solid #333", borderRadius: "8px", height: "260px", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", color: "#555", fontSize: "13px" }}>
+              <div style={{ fontSize: "48px", marginBottom: "12px" }}>🏭</div>
+              <span>[DALLAS FACILITY / TEAM PHOTO]</span>
+              <span style={{ fontSize: "10px", marginTop: "4px" }}>Authentic — not stock</span>
+            </div>
+          </div>
+
+          {/* Stat Bar */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", borderTop: "1px solid #1f2937", marginTop: "40px", paddingTop: "32px" }}>
+            {[
+              { n: "14+", l: "Years in Business" },
+              { n: "2,000+", l: "Active Wholesale Accounts" },
+              { n: "50+", l: "Colors Available" },
+              { n: "4", l: "Industry Certifications" },
+            ].map(s => (
+              <div key={s.l} style={{ textAlign: "center", padding: "16px" }}>
+                <div style={{ fontFamily: "var(--font-bebas)", fontSize: "40px", color: "#2D8CFF", lineHeight: 1 }}>{s.n}</div>
+                <div style={{ fontSize: "12px", color: "#6B7280", marginTop: "4px" }}>{s.l}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Our Story */}
+      <div style={{ background: "#fff", padding: "56px 24px" }}>
+        <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "48px", alignItems: "start" }}>
+            <div>
+              <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "26px", letterSpacing: ".04em", color: "#111", marginBottom: "24px" }}>Our Story</h2>
+              <p style={{ fontSize: "13.5px", color: "#555", lineHeight: 1.8, marginBottom: "14px" }}>
+                American Fashion was founded in Dallas, Texas with one mission: eliminate the layers of markup between the factory and the print decorator. We watched too many small and mid-size print shops overpay for blanks through distributors, only to compress their margins and undercut their own growth.
+              </p>
+              <p style={{ fontSize: "13.5px", color: "#555", lineHeight: 1.8, marginBottom: "14px" }}>
+                By building direct relationships with certified manufacturing partners and operating our own Dallas distribution facility, we&apos;ve been able to deliver factory-grade quality at factory-direct prices to over 2,000 businesses across every state. Our buyers range from single-person DTF studios to regional retail chains — all getting access to the same premium product, the same pricing transparency, and the same same-day service.
+              </p>
+              <p style={{ fontSize: "13.5px", color: "#555", lineHeight: 1.8, marginBottom: "20px" }}>
+                Today, AF Apparels is one of the few remaining wholesale suppliers in the US with ISO 9000, Oeko-Tex, GOTS, and WRAP certifications — meaning every blank you receive meets rigorous quality and ethical manufacturing standards, not just the ones convenient to claim.
+              </p>
+              <div style={{ display: "flex", gap: "14px", flexWrap: "wrap" }}>
+                {[
+                  { title: "ISO 9000", sub: "Certified" },
+                  { title: "Oeko-Tex", sub: "Standard 100" },
+                  { title: "GOTS", sub: "Certified" },
+                  { title: "WRAP", sub: "Certified" },
+                ].map(c => (
+                  <div key={c.title} style={{ textAlign: "center", padding: "12px 20px", background: "#F7F8FA", border: "1px solid #eee", borderRadius: "5px" }}>
+                    <div style={{ fontFamily: "var(--font-bebas)", fontSize: "20px", fontWeight: 700, color: "#111" }}>{c.title}</div>
+                    <div style={{ fontSize: "10px", color: "#888", textTransform: "uppercase", letterSpacing: ".05em" }}>{c.sub}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div>
+              <div style={{ background: "#e8e8e8", borderRadius: "8px", height: "320px", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", color: "#aaa", fontSize: "13px" }}>
+                <div style={{ fontSize: "40px", marginBottom: "10px", color: "#bbb" }}>📦</div>
+                <span>[WAREHOUSE / OPERATIONS IMAGE]</span>
+                <span style={{ fontSize: "10px", marginTop: "4px" }}>Dallas distribution facility</span>
+              </div>
+              <div style={{ marginTop: "12px", background: "#F7F8FA", border: "1px solid #eee", borderRadius: "5px", padding: "14px 16px" }}>
+                <div style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", color: "#555", marginBottom: "8px" }}>Our Facility</div>
+                <div style={{ fontSize: "12.5px", color: "#555", lineHeight: 1.7 }}>
+                  📍 Dallas, TX — 45,000 sq ft distribution center<br />
+                  ⚡ Same-day shipping on orders before 2 PM CT<br />
+                  📦 Deep inventory across all sizes and 50+ colors
                 </div>
-              ))}
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Values */}
-      <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "72px 32px" }}>
-        <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "40px", letterSpacing: ".04em", color: "#2A2830", marginBottom: "8px" }}>How We Work</h2>
-        <p style={{ fontSize: "14px", color: "#7A7880", marginBottom: "40px" }}>The principles that guide every order, every account, every day.</p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "20px" }}>
-          {values.map(v => (
-            <div key={v.title} style={{ background: "#fff", border: "1.5px solid #E2E0DA", borderRadius: "12px", padding: "28px" }}>
-              <div style={{ fontSize: "32px", marginBottom: "14px" }}>{v.icon}</div>
-              <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "22px", letterSpacing: ".04em", color: "#2A2830", marginBottom: "8px" }}>{v.title}</h3>
-              <p style={{ fontSize: "13px", color: "#7A7880", lineHeight: 1.6 }}>{v.body}</p>
-            </div>
-          ))}
+      {/* What We Stand For */}
+      <div style={{ background: "#F7F8FA", padding: "56px 24px" }}>
+        <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: "32px" }}>
+            <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "26px", letterSpacing: ".04em", color: "#111", marginBottom: "8px" }}>What We Stand For</h2>
+            <p style={{ fontSize: "13.5px", color: "#666", maxWidth: "560px", margin: "0 auto" }}>Four principles that shape every product, every shipment, every interaction</p>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: "12px", maxWidth: "780px", margin: "0 auto" }}>
+            {[
+              { icon: "🏭", title: "Factory-Direct Integrity", body: "We never mark up product to cover distributor layers. What you pay reflects the actual cost of premium manufacturing — no inflated margins, no hidden fees." },
+              { icon: "🎨", title: "Print-First Product Development", body: "Every fabric and construction decision is made with the decorator in mind. We test everything against DTF, screen printing, embroidery, and HTV before adding a SKU to our catalog." },
+              { icon: "⚡", title: "Operational Reliability", body: "Same-day shipping, accurate stock counts, and consistent sizing aren't bonuses — they're the baseline. Your business depends on predictability, and so does ours." },
+              { icon: "🌿", title: "Ethical Supply Chain", body: "WRAP, GOTS, and Oeko-Tex certifications aren't marketing badges. They represent our commitment to responsible manufacturing at every level of our supply chain." },
+            ].map(v => (
+              <div key={v.title} style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: "8px", padding: "20px", display: "flex", gap: "14px", alignItems: "flex-start" }}>
+                <div style={{ fontSize: "24px", flexShrink: 0 }}>{v.icon}</div>
+                <div>
+                  <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "14px", letterSpacing: ".06em", color: "#111", marginBottom: "6px" }}>{v.title}</h4>
+                  <p style={{ fontSize: "12.5px", color: "#555", lineHeight: 1.6 }}>{v.body}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Story + Timeline */}
-      <div style={{ background: "#fff", borderTop: "1.5px solid #E2E0DA", borderBottom: "1.5px solid #E2E0DA" }}>
-        <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "72px 32px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1.4fr", gap: "64px", alignItems: "start" }}>
-            <div>
-              <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "40px", letterSpacing: ".04em", color: "#2A2830", marginBottom: "20px" }}>Our Story</h2>
-              <p style={{ fontSize: "14px", color: "#555", lineHeight: 1.75, marginBottom: "16px" }}>
-                AF Apparels was founded in 2009 by a team of apparel industry veterans who were frustrated by the disconnect between manufacturers and the businesses that need blank goods fast.
-              </p>
-              <p style={{ fontSize: "14px", color: "#555", lineHeight: 1.75, marginBottom: "16px" }}>
-                We built our first warehouse in Dallas because it sits at the geographic center of the US — meaning 80% of the country can receive 2-day ground shipping without expedite fees.
-              </p>
-              <p style={{ fontSize: "14px", color: "#555", lineHeight: 1.75 }}>
-                Today we serve over 2,000 active wholesale accounts including screen printing shops, promotional product companies, e-commerce brands, and corporate merchandising teams.
-              </p>
-            </div>
-            <div>
-              <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "24px", letterSpacing: ".04em", color: "#2A2830", marginBottom: "24px" }}>Timeline</h3>
-              <div style={{ position: "relative", paddingLeft: "28px", borderLeft: "2px solid #E2E0DA" }}>
-                {timeline.map((t, i) => (
-                  <div key={t.year} style={{ position: "relative", marginBottom: i < timeline.length - 1 ? "28px" : 0 }}>
-                    <div style={{ position: "absolute", left: "-37px", top: "2px", width: "16px", height: "16px", borderRadius: "50%", background: "#1A5CFF", border: "3px solid #fff", boxShadow: "0 0 0 2px #1A5CFF" }} />
-                    <div style={{ fontSize: "11px", fontWeight: 800, color: "#1A5CFF", letterSpacing: ".08em", textTransform: "uppercase", marginBottom: "4px" }}>{t.year}</div>
-                    <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.6 }}>{t.event}</p>
-                  </div>
-                ))}
+      {/* The Team */}
+      <div style={{ background: "#fff", padding: "56px 24px" }}>
+        <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: "32px" }}>
+            <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "26px", letterSpacing: ".04em", color: "#111", marginBottom: "8px" }}>The Team Behind AF</h2>
+            <p style={{ fontSize: "13.5px", color: "#666" }}>Real people, real accountability — not a faceless wholesale portal</p>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "20px" }}>
+            {[
+              { name: "Michael Chen", role: "Founder & CEO", bio: "14 years in wholesale apparel. Built AF from a single product line to one of the largest factory-direct operations in the South." },
+              { name: "Sarah Williams", role: "Head of Wholesale Accounts", bio: "Your main point of contact for large accounts, private label inquiries, and anything that doesn't fit a standard order." },
+              { name: "James Torres", role: "Operations & Fulfillment", bio: "Runs the Dallas facility. Responsible for same-day shipping accuracy and inventory reliability across all SKUs." },
+            ].map(t => (
+              <div key={t.name} style={{ border: "1px solid #E5E7EB", borderRadius: "8px", overflow: "hidden" }}>
+                <div style={{ background: "#F7F8FA", height: "160px", display: "flex", alignItems: "center", justifyContent: "center", color: "#aaa", fontSize: "12px" }}>
+                  [PHOTO — {t.role.toUpperCase()}]
+                </div>
+                <div style={{ padding: "16px" }}>
+                  <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", marginBottom: "2px" }}>{t.name}</h4>
+                  <div style={{ fontSize: "11px", color: "#2D8CFF", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".04em", marginBottom: "8px" }}>{t.role}</div>
+                  <p style={{ fontSize: "12.5px", color: "#555", lineHeight: 1.6 }}>{t.bio}</p>
+                </div>
               </div>
-            </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Timeline */}
+      <div style={{ background: "#F7F8FA", padding: "56px 24px" }}>
+        <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+          <div style={{ marginBottom: "32px" }}>
+            <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "26px", letterSpacing: ".04em", color: "#111", marginBottom: "8px" }}>Our Journey</h2>
+            <p style={{ fontSize: "13.5px", color: "#666" }}>From a single product line to America&apos;s factory-direct wholesale platform</p>
+          </div>
+          <div style={{ maxWidth: "600px" }}>
+            {[
+              { year: "2010", title: "Founded in Dallas, TX", body: "AF Apparels launched with 3 SKUs and a 5,000 sq ft facility, focused exclusively on ring-spun tees for the Dallas print market." },
+              { year: "2013", title: "ISO 9000 & Oeko-Tex Certification", body: "Achieved first international manufacturing certifications, opening doors to corporate and retail accounts requiring compliance documentation." },
+              { year: "2016", title: "Expanded to 500+ Wholesale Accounts", body: "Grew beyond Texas to serve print shops and retailers across 30+ states. Launched the online wholesale ordering platform." },
+              { year: "2019", title: "Private Label Program Launched", body: "Introduced full private label manufacturing for brands wanting custom styles, neck labels, and exclusive colorways starting at 2,500 units." },
+              { year: "2022", title: "45,000 Sq Ft Facility + GOTS & WRAP", body: "Moved to our current Dallas distribution center. Achieved GOTS and WRAP certifications. Expanded to 50+ colors and 10+ product categories." },
+              { year: "2024", title: "2,000+ Active Wholesale Accounts", body: "Now serving print shops, retailers, apparel brands, and corporate buyers across all 50 states with same-day shipping on every in-stock order." },
+            ].map((t, i) => (
+              <div key={t.year} style={{ display: "flex", gap: "20px", marginBottom: i < 5 ? "28px" : 0 }}>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0 }}>
+                  <div style={{ width: "12px", height: "12px", borderRadius: "50%", background: "#2D8CFF", marginTop: "4px" }} />
+                  {i < 5 && <div style={{ width: "2px", flex: 1, background: "#E5E7EB", marginTop: "4px" }} />}
+                </div>
+                <div style={{ paddingBottom: i < 5 ? "8px" : 0 }}>
+                  <div style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", color: "#2D8CFF", letterSpacing: ".04em" }}>{t.year}</div>
+                  <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "14px", letterSpacing: ".04em", color: "#111", margin: "2px 0 4px" }}>{t.title}</h4>
+                  <p style={{ fontSize: "12.5px", color: "#555", lineHeight: 1.6 }}>{t.body}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
       {/* CTA */}
-      <div style={{ background: "#111016", color: "#fff", padding: "64px 32px", textAlign: "center" }}>
-        <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "48px", letterSpacing: ".04em", marginBottom: "12px" }}>
-          Ready to Open an Account?
+      <div style={{ background: "#080808", padding: "64px 24px", textAlign: "center" }}>
+        <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(28px,4vw,42px)", color: "#fff", letterSpacing: ".04em", marginBottom: "14px" }}>
+          READY TO PARTNER WITH AF?
         </h2>
-        <p style={{ fontSize: "15px", color: "rgba(255,255,255,.6)", marginBottom: "28px" }}>
-          Apply in minutes. Get approved, then access factory-direct pricing on 50,000+ SKUs.
+        <p style={{ color: "rgba(255,255,255,.7)", fontSize: "14px", marginBottom: "28px" }}>
+          Join 2,000+ businesses sourcing factory-direct from American Fashion. Apply free — approved within 24 hours.
         </p>
-        <Link href="/wholesale/register" style={{ background: "#E8242A", color: "#fff", padding: "16px 36px", borderRadius: "8px", fontWeight: 700, textDecoration: "none", fontSize: "15px", textTransform: "uppercase", letterSpacing: ".06em", display: "inline-block" }}>
-          Apply for Wholesale Access →
-        </Link>
+        <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
+          <Link href="/register" style={{ display: "inline-flex", alignItems: "center", background: "#E8242A", color: "#fff", padding: "12px 28px", fontFamily: "var(--font-bebas)", fontWeight: 700, fontSize: "15px", letterSpacing: ".05em", borderRadius: "3px", textDecoration: "none" }}>
+            Apply for Wholesale Access →
+          </Link>
+          <Link href="/contact" style={{ display: "inline-flex", alignItems: "center", background: "none", color: "#ddd", padding: "12px 28px", fontFamily: "var(--font-bebas)", fontWeight: 700, fontSize: "15px", letterSpacing: ".05em", borderRadius: "3px", border: "2px solid #444", textDecoration: "none" }}>
+            Contact Our Team
+          </Link>
+        </div>
+        <div style={{ color: "#374151", fontSize: "11px", marginTop: "16px" }}>
+          No fees · No minimums · Approved within 24 hours · (214) 272-7213
+        </div>
       </div>
+
     </div>
   );
 }
