@@ -25,6 +25,10 @@ interface CheckoutState {
   poNumber: string;
   orderNotes: string;
 
+  // Tax (calculated at address step, persisted to review step)
+  taxRegion: string | null;
+  taxRate: number;
+
   // Step 2 — payment (QB Payments)
   qbToken: string | null;
   savedCardId: string | null;
@@ -49,6 +53,7 @@ interface CheckoutState {
   setShippingPhone: (v: string) => void;
   setShippingMethod: (m: ShippingMethod) => void;
   setShippingCost: (cost: number) => void;
+  setTaxInfo: (region: string | null, rate: number) => void;
   setPoNumber: (po: string) => void;
   setOrderNotes: (notes: string) => void;
   setQbToken: (token: string | null) => void;
@@ -74,6 +79,8 @@ const initialState = {
   shippingPhone: "",
   shippingMethod: "standard" as ShippingMethod,
   shippingCost: 0,
+  taxRegion: null,
+  taxRate: 0,
   poNumber: "",
   orderNotes: "",
   qbToken: null,
@@ -98,6 +105,7 @@ export const useCheckoutStore = create<CheckoutState>((set) => ({
   setShippingPhone: (v) => set({ shippingPhone: v }),
   setShippingMethod: (m) => set({ shippingMethod: m }),
   setShippingCost: (cost) => set({ shippingCost: cost }),
+  setTaxInfo: (region, rate) => set({ taxRegion: region, taxRate: rate }),
   setPoNumber: (po) => set({ poNumber: po }),
   setOrderNotes: (notes) => set({ orderNotes: notes }),
   setQbToken: (token) => set({ qbToken: token, savedCardId: null }),

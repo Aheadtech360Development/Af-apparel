@@ -50,6 +50,8 @@ export default function CheckoutReviewPage() {
     addressId, poNumber, orderNotes, setPoNumber, setOrderNotes,
     savedCardId, qbToken,
     setConfirmedOrder,
+    taxRegion: storedTaxRegion,
+    taxRate: storedTaxRate,
   } = useCheckoutStore();
   const clearCart = useCartStore((s) => s.clearCart);
   const { isAuthenticated, isLoading: authIsLoading } = useAuthStore();
@@ -61,7 +63,10 @@ export default function CheckoutReviewPage() {
   const [isPlacing, setIsPlacing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount_amount: number; discount_type: string } | null>(null);
-  const [taxRate, setTaxRate] = useState<{ region: string; rate: number } | null>(null);
+  // Seed from checkout store; API fetch is a fallback in case user navigated directly here
+  const [taxRate, setTaxRate] = useState<{ region: string; rate: number } | null>(
+    storedTaxRate > 0 && storedTaxRegion ? { region: storedTaxRegion, rate: storedTaxRate } : null
+  );
 
   // Guard: must have shipping + payment
   useEffect(() => {
@@ -100,16 +105,22 @@ export default function CheckoutReviewPage() {
   }, [isGuest]);
 
   useEffect(() => {
+    // Use stored tax rate if available from address step
+    if (storedTaxRate > 0 && storedTaxRegion) {
+      setTaxRate({ region: storedTaxRegion, rate: storedTaxRate });
+      return;
+    }
+    // Fallback: fetch fresh if navigated directly to review
     if (!shippingAddress?.state) return;
     const state = shippingAddress.state.toUpperCase();
-    apiClient.get<{ region: string; rate: number; name: string | null }>(`/api/v1/tax-rate?region=${state}`)
+    apiClient.get<{ region: string; rate: number }>(`/api/v1/tax-rate?region=${state}`)
       .then(res => {
         const r = res as any;
         const rate = Number(r.rate ?? 0);
         setTaxRate(rate > 0 ? { region: r.region, rate } : null);
       })
       .catch(() => setTaxRate(null));
-  }, [shippingAddress?.state]);
+  }, [storedTaxRegion, storedTaxRate, shippingAddress?.state]);
 
   function buildColorSummary(c: Cart): string {
     const colorMap = new Map<string, number>();
@@ -150,6 +161,8 @@ export default function CheckoutReviewPage() {
           qb_token: qbToken,
           order_notes: orderNotes || undefined,
           tax_amount: taxAmount > 0 ? taxAmount : undefined,
+          tax_rate: taxRate?.rate ?? undefined,
+          tax_region: taxRate?.region ?? undefined,
         });
 
         const guestSubtotal = guestEntries.reduce((s, e) => s + e.unit_price * e.quantity, 0);
@@ -199,6 +212,7 @@ export default function CheckoutReviewPage() {
         discount_code: appliedCoupon?.code || undefined,
         tax_amount: taxAmount > 0 ? taxAmount : undefined,
         tax_rate: taxRate?.rate ?? undefined,
+        tax_region: taxRate?.region ?? undefined,
       });
 
       const productName = cart?.items[0]?.product_name ?? "Your Order";

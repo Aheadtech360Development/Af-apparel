@@ -63,6 +63,7 @@ export default function CheckoutAddressPage() {
     setAddressId,
     shippingMethod, setShippingMethod,
     setShippingCost,
+    setTaxInfo,
   } = useCheckoutStore();
 
   const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([]);
@@ -158,14 +159,24 @@ export default function CheckoutAddressPage() {
     : (savedAddresses.find(a => a.id === selectedAddressId)?.state ?? "");
 
   useEffect(() => {
-    if (!activeState) { setTaxRate(null); return; }
+    if (!activeState) {
+      setTaxRate(null);
+      setTaxInfo(null, 0);
+      return;
+    }
     apiClient.get<{ region: string; rate: number }>(`/api/v1/tax-rate?region=${activeState.toUpperCase()}`)
       .then(res => {
         const r = res as any;
         const rate = Number(r.rate ?? 0);
-        setTaxRate(rate > 0 ? { region: r.region, rate } : null);
+        if (rate > 0) {
+          setTaxRate({ region: r.region, rate });
+          setTaxInfo(r.region, rate);
+        } else {
+          setTaxRate(null);
+          setTaxInfo(null, 0);
+        }
       })
-      .catch(() => setTaxRate(null));
+      .catch(() => { setTaxRate(null); setTaxInfo(null, 0); });
   }, [activeState]);
 
   const selectedCost = methodCost(shippingMethod);
