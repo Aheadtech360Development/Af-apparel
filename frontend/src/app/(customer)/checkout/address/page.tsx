@@ -153,34 +153,48 @@ export default function CheckoutAddressPage() {
     return base; // standard
   }
 
-  // Derive the active state for tax lookup
-  const activeState = showNewForm
-    ? form.state
-    : (savedAddresses.find(a => a.id === selectedAddressId)?.state ?? "");
+  // Derive address fields for tax lookup
+  const savedActive = savedAddresses.find(a => a.id === selectedAddressId);
+  const activeState = showNewForm ? form.state : (savedActive?.state ?? "");
+  const activeZip   = showNewForm ? form.zip   : (savedActive?.postal_code ?? "");
+  const activeCity  = showNewForm ? form.city  : (savedActive?.city ?? "");
 
   useEffect(() => {
     if (!activeState) {
       setTaxRate(null);
-      setTaxInfo(null, 0);
+      setApiTaxAmount(0);
+      setTaxInfo(null, 0, 0);
       return;
     }
-    apiClient.get<{ region: string; rate: number }>(`/api/v1/tax-rate?region=${activeState.toUpperCase()}`)
+    const params = new URLSearchParams({
+      region: activeState.toUpperCase(),
+      zip_code: activeZip,
+      city: activeCity,
+      subtotal: String(subtotal),
+      shipping: String(selectedCost),
+    });
+    apiClient.get<{ region: string; rate: number; tax_amount: number }>(`/api/v1/tax-rate?${params}`)
       .then(res => {
         const r = res as any;
-        const rate = Number(r.rate ?? 0);
-        if (rate > 0) {
+        const rate   = Number(r.rate ?? 0);
+        const amount = Number(r.tax_amount ?? 0);
+        if (rate > 0 || amount > 0) {
           setTaxRate({ region: r.region, rate });
-          setTaxInfo(r.region, rate);
+          setApiTaxAmount(amount);
+          setTaxInfo(r.region, rate, amount);
         } else {
           setTaxRate(null);
-          setTaxInfo(null, 0);
+          setApiTaxAmount(0);
+          setTaxInfo(null, 0, 0);
         }
       })
-      .catch(() => { setTaxRate(null); setTaxInfo(null, 0); });
-  }, [activeState]);
+      .catch(() => { setTaxRate(null); setApiTaxAmount(0); setTaxInfo(null, 0, 0); });
+  }, [activeState, activeZip, subtotal]);
 
   const selectedCost = methodCost(shippingMethod);
-  const taxAmount = taxRate ? Math.round(subtotal * taxRate.rate / 100 * 100) / 100 : 0;
+  // Prefer the API-returned tax_amount (TaxJar or manual calc); fall back to rate-based
+  const [apiTaxAmount, setApiTaxAmount] = useState(0);
+  const taxAmount = apiTaxAmount > 0 ? apiTaxAmount : (taxRate ? Math.round(subtotal * taxRate.rate / 100 * 100) / 100 : 0);
   const orderTotal = subtotal + selectedCost + taxAmount - couponDiscount;
 
   function validate() {

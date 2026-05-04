@@ -52,6 +52,7 @@ export default function CheckoutReviewPage() {
     setConfirmedOrder,
     taxRegion: storedTaxRegion,
     taxRate: storedTaxRate,
+    taxAmount: storedTaxAmount,
   } = useCheckoutStore();
   const clearCart = useCartStore((s) => s.clearCart);
   const { isAuthenticated, isLoading: authIsLoading } = useAuthStore();
@@ -110,10 +111,16 @@ export default function CheckoutReviewPage() {
       setTaxRate({ region: storedTaxRegion, rate: storedTaxRate });
       return;
     }
-    // Fallback: fetch fresh if navigated directly to review
+    // Fallback: fetch fresh if navigated directly to review (store empty)
     if (!shippingAddress?.state) return;
-    const state = shippingAddress.state.toUpperCase();
-    apiClient.get<{ region: string; rate: number }>(`/api/v1/tax-rate?region=${state}`)
+    const params = new URLSearchParams({
+      region: shippingAddress.state.toUpperCase(),
+      zip_code: shippingAddress.postal_code ?? "",
+      city: shippingAddress.city ?? "",
+      subtotal: String(subtotal),
+      shipping: String(shipping),
+    });
+    apiClient.get<{ region: string; rate: number; tax_amount: number }>(`/api/v1/tax-rate?${params}`)
       .then(res => {
         const r = res as any;
         const rate = Number(r.rate ?? 0);
@@ -253,7 +260,10 @@ export default function CheckoutReviewPage() {
   const subtotal = isGuest ? guestSubtotalCalc : Number(cart?.subtotal ?? 0);
   const shipping = shippingCost;
   const couponDiscount = appliedCoupon ? Number(appliedCoupon.discount_amount) : 0;
-  const taxAmount = taxRate ? Math.round(subtotal * taxRate.rate / 100 * 100) / 100 : 0;
+  // Prefer TaxJar-calculated amount from store; fall back to rate × subtotal
+  const taxAmount = storedTaxAmount > 0
+    ? storedTaxAmount
+    : (taxRate ? Math.round(subtotal * taxRate.rate / 100 * 100) / 100 : 0);
   const total = subtotal + shipping + taxAmount - (isGuest ? 0 : couponDiscount);
   const shippingLabel = SHIPPING_LABELS[shippingMethod] ?? "Standard Ground";
 
