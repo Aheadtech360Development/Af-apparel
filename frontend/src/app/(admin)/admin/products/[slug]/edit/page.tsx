@@ -251,8 +251,10 @@ export default function AdminProductEditPage() {
 
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
     if (!product || !e.target.files?.length) return;
-    const file = e.target.files[0]!;
-    await adminService.uploadImage(product.id, file);
+    const files = Array.from(e.target.files);
+    for (const file of files) {
+      await adminService.uploadImage(product.id, file);
+    }
     await load();
     e.target.value = "";
   }
