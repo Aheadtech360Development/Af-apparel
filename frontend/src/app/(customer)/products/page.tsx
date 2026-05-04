@@ -61,16 +61,15 @@ export default async function ProductsPage({ searchParams }: PageProps) {
   return (
     <div style={{ minHeight: "100vh", background: "#fff", fontFamily: "var(--font-jakarta)" }}>
       {/* Banner */}
-      <div style={{ background: "#111016", padding: "40px 32px", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+      <div style={{ background: "#1B3A5C", padding: "28px 32px", borderBottom: "3px solid #E8242A" }}>
         <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
-          <div style={{ fontSize: "12px", color: "#444", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".1em", marginBottom: "6px" }}>Shop</div>
-          <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(36px,4vw,52px)", color: "#fff", letterSpacing: ".01em", marginBottom: "6px" }}>
+          <h2 style={{ fontFamily: "'Barlow Semi Condensed', sans-serif", fontSize: "28px", fontWeight: 800, color: "#fff", marginBottom: "4px" }}>
             {filters.category
               ? (categories.find(c => c.slug === filters.category)?.name ?? "All Products")
               : "All Products"}
-          </h1>
-          <p style={{ fontSize: "14px", color: "#555" }}>
-            Factory-direct blank apparel for printing companies, retailers, and brands
+          </h2>
+          <p style={{ fontSize: "13px", color: "rgba(255,255,255,.55)", marginTop: "4px" }}>
+            Factory-direct blank apparel · Same-day shipping on all in-stock
           </p>
         </div>
       </div>

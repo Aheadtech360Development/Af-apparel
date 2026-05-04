@@ -44,9 +44,9 @@ export default function ReviewsPage() {
   return (
     <div style={{ minHeight: "100vh", background: "#F4F3EF", fontFamily: "var(--font-jakarta)" }}>
       {/* Hero */}
-      <div style={{ background: "#080808", padding: "48px 32px 40px" }}>
+      <div style={{ background: "#1B3A5C", padding: "48px 32px 40px" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-          <div style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".12em", color: "#555", marginBottom: "6px" }}>Wholesale Community</div>
+          <div style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".12em", color: "rgba(255,255,255,.5)", marginBottom: "6px" }}>Wholesale Community</div>
           <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(32px,5vw,56px)", color: "#fff", letterSpacing: ".02em", lineHeight: 1, marginBottom: "12px" }}>
             Customer Reviews
           </h1>

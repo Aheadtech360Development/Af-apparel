@@ -86,7 +86,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#080808", fontFamily: "var(--font-jakarta)", display: "flex", flexDirection: "column" }}>
+    <div style={{ minHeight: "100vh", background: "#1B3A5C", fontFamily: "var(--font-jakarta)", display: "flex", flexDirection: "column" }}>
       {/* Top bar */}
       {/* <div style={{ padding: "24px 32px", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
         <Link href="/" style={{ display: "inline-flex", alignItems: "center", textDecoration: "none" }}>
@@ -108,7 +108,7 @@ export default function LoginPage() {
           </div>
 
           {/* Card */}
-          <div style={{ background: "#111016", border: "1px solid rgba(255,255,255,.08)", borderRadius: "12px", padding: "36px" }}>
+          <div style={{ background: "#0F2340", border: "1px solid rgba(255,255,255,.12)", borderRadius: "12px", padding: "36px" }}>
             <form onSubmit={handleSubmit}>
               {error && (
                 <div style={{ background: "rgba(232,36,42,.12)", border: "1px solid rgba(232,36,42,.3)", borderRadius: "6px", padding: "12px 14px", fontSize: "13px", color: "#f87171", marginBottom: "20px" }}>
@@ -238,7 +238,7 @@ export default function LoginPage() {
               { icon: <ZapIcon size={20} color="#aaa" />, text: "Same-Day Ship" },
               { icon: <CreditCardIcon size={20} color="#aaa" />, text: "NET 30 Terms" },
             ].map((item) => (
-              <div key={item.text} style={{ textAlign: "center", padding: "12px 8px", background: "#111016", border: "1px solid rgba(255,255,255,.06)", borderRadius: "8px" }}>
+              <div key={item.text} style={{ textAlign: "center", padding: "12px 8px", background: "#0F2340", border: "1px solid rgba(255,255,255,.1)", borderRadius: "8px" }}>
                 <div style={{ marginBottom: "4px", display: "flex", justifyContent: "center" }}>{item.icon}</div>
                 <div style={{ fontSize: "11px", fontWeight: 700, color: "#aaa", textTransform: "uppercase", letterSpacing: ".06em" }}>{item.text}</div>
               </div>

@@ -175,7 +175,7 @@ export default function PrivateLabelPage() {
       </div>
 
       {/* CTA */}
-      <div style={{ background: "#080808", padding: "56px 24px", textAlign: "center" }}>
+      <div style={{ background: "#1B3A5C", padding: "56px 24px", textAlign: "center" }}>
         <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(24px,3.5vw,36px)", color: "#fff", letterSpacing: ".04em", marginBottom: "14px" }}>
           READY TO BUILD YOUR BRAND?
         </h2>

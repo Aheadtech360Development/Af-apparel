@@ -8,27 +8,28 @@ export default function CtaSection() {
   const loggedIn = isAuthenticated();
 
   return (
-    <div style={{ background: "#080808", padding: "88px 32px", textAlign: "center", position: "relative", overflow: "hidden" }}>
-      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 60% at 50% 50%,rgba(26,92,255,.08) 0%,transparent 70%)" }} />
-      <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(40px,3vw,68px)", color: "#fff", lineHeight: 1, marginBottom: "14px", letterSpacing: ".01em", position: "relative" }}>
-        READY TO STOCK PREMIUM BLANKS?
-      </h2>
-      <p style={{ fontSize: "17px", color: "#d3d0d0", marginBottom: "36px", maxWidth: "440px", marginLeft: "auto", marginRight: "auto", position: "relative", fontWeight: 500 }}>
-        Join 2,000+ printing companies, retailers, and brands sourcing direct from American Fashion. Apply free — approved in 24 hours.
-      </p>
-      <div style={{ display: "flex", gap: "14px", justifyContent: "center", flexWrap: "wrap", position: "relative", marginBottom: "18px" }}>
-        <Link
-          href={loggedIn ? "/account" : "/wholesale/register"}
-          style={{ background: "#E8242A", color: "#fff", padding: "15px 36px", fontSize: "17px", borderRadius: "6px", fontWeight: 700, textDecoration: "none", transition: "all .2s", display: "inline-flex", alignItems: "center" }}
-        >
-          {loggedIn ? "Go to Dashboard →" : "Apply for Wholesale Access →"}
-        </Link>
-        <Link href="/products" style={{ background: "transparent", color: "#d3d0d0", padding: "15px 36px", fontSize: "17px", borderRadius: "6px", fontWeight: 700, textDecoration: "none", border: "1.5px solid #444", transition: "all .2s", display: "inline-flex", alignItems: "center" }}>
-          Browse Catalog
-        </Link>
-      </div>
-      <div style={{ fontSize: "12px", color: "#d3d0d0", fontWeight: 500, letterSpacing: ".03em", position: "relative" }}>
-        No fees · No minimums · Approved within 24 hours · (214) 272-7213
+    <div style={{ background: "#1B3A5C", padding: "52px 0", textAlign: "center" }}>
+      <div style={{ maxWidth: "1140px", margin: "0 auto", padding: "0 24px" }}>
+        <h2 style={{ fontFamily: "'Barlow Semi Condensed', sans-serif", fontSize: "32px", fontWeight: 800, color: "#fff", marginBottom: "10px" }}>
+          Ready to Order at Factory-Direct Prices?
+        </h2>
+        <p style={{ fontSize: "14px", color: "rgba(255,255,255,.55)", marginBottom: "24px", maxWidth: "480px", marginLeft: "auto", marginRight: "auto", lineHeight: 1.6 }}>
+          Join 2,000+ print shops and brands already stocking with AF Apparels. Apply takes 2 minutes. Approval within 1 business day.
+        </p>
+        <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
+          <Link
+            href={loggedIn ? "/account" : "/wholesale/register"}
+            style={{ background: "#E8242A", color: "#fff", padding: "13px 30px", fontSize: "16px", borderRadius: "3px", fontWeight: 700, textDecoration: "none", fontFamily: "'Barlow Semi Condensed', sans-serif", letterSpacing: ".04em" }}
+          >
+            {loggedIn ? "Go to Dashboard" : "Apply for Wholesale Account"}
+          </Link>
+          <Link
+            href="/products"
+            style={{ background: "none", color: "rgba(255,255,255,.8)", padding: "12px 24px", fontSize: "14px", borderRadius: "3px", fontWeight: 700, textDecoration: "none", border: "1.5px solid rgba(255,255,255,.3)" }}
+          >
+            Browse Products First
+          </Link>
+        </div>
       </div>
     </div>
   );

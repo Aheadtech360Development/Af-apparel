@@ -250,11 +250,11 @@ export default function QuickOrderPage() {
       onClick={() => setRows((prev) => prev.map((r) => ({ ...r, showDropdown: false })))}
     >
       {/* ══ PAGE HEADER ══════════════════════════════════════════════════ */}
-      <div style={{ background: "#080808", padding: "32px 32px 28px", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+      <div style={{ background: "#1B3A5C", padding: "32px 32px 28px", borderBottom: "3px solid #E8242A" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "24px", flexWrap: "wrap" }}>
             <div>
-              <div style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".14em", color: "#555", marginBottom: "6px" }}>Wholesale</div>
+              <div style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".14em", color: "rgba(255,255,255,.5)", marginBottom: "6px" }}>Wholesale</div>
               <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(28px,4vw,48px)", color: "#fff", letterSpacing: ".02em", lineHeight: 1, marginBottom: "10px" }}>
                 Quick Order
               </h1>

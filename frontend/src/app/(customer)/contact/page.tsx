@@ -231,7 +231,7 @@ export default function ContactPage() {
       </div>
 
       {/* CTA */}
-      <div style={{ background: "#080808", padding: "56px 24px", textAlign: "center" }}>
+      <div style={{ background: "#1B3A5C", padding: "56px 24px", textAlign: "center" }}>
         <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(28px,4vw,42px)", color: "#fff", letterSpacing: ".04em", marginBottom: "14px" }}>
           NOT SURE WHERE TO START?
         </h2>

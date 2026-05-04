@@ -209,7 +209,7 @@ export default function WholesaleRegisterPage() {
   return (
     <div style={{ minHeight: "100vh", background: "#F4F3EF", fontFamily: "var(--font-jakarta)" }}>
       {/* Page header */}
-      <div style={{ background: "#080808", padding: "32px", textAlign: "center", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+      <div style={{ background: "#1B3A5C", padding: "32px", textAlign: "center", borderBottom: "3px solid #E8242A" }}>
         <Link href="/" style={{ display: "inline-flex", alignItems: "center", textDecoration: "none", marginBottom: "16px" }}>
           <img src="/Af-apparel logo.jpeg" alt="AF Apparels Logo" style={{ height: "55px", width: "auto", objectFit: "contain" }} />
         </Link>
@@ -487,7 +487,7 @@ export default function WholesaleRegisterPage() {
         </div>
 
         {/* Benefits sidebar */}
-        <div style={{ background: "#111016", border: "1px solid rgba(255,255,255,.06)", borderRadius: "12px", padding: "32px", position: "sticky", top: "20px" }}>
+        <div style={{ background: "#0F2340", border: "1px solid rgba(255,255,255,.1)", borderRadius: "12px", padding: "32px", position: "sticky", top: "20px" }}>
           <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "18px", letterSpacing: ".06em", color: "#fff", marginBottom: "20px" }}>
             Why Apply?
           </h3>

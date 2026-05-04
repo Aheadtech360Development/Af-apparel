@@ -78,7 +78,7 @@ export function Header() {
       <AnnouncementBar />
 
       {/* Main header */}
-      <header style={{ background: "#080808", borderBottom: "1px solid rgba(255,255,255,.06)" }} className="sticky top-0 z-40">
+      <header style={{ background: "#1B3A5C", borderBottom: "3px solid #E8242A" }} className="sticky top-0 z-40">
         <div className="header-inner" style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 32px", display: "flex", alignItems: "center", justifyContent: "space-between", height: "100px", gap: "24px" }}>
 
 
@@ -122,7 +122,7 @@ export function Header() {
                 </svg>
               </button>
               {resourcesOpen && (
-                <div style={{ position: "absolute", top: "100%", left: 0, marginTop: "6px", background: "#1a1a1f", border: "1px solid rgba(255,255,255,.1)", borderRadius: "8px", padding: "6px", minWidth: "200px", boxShadow: "0 8px 24px rgba(0,0,0,.4)", zIndex: 100 }}>
+                <div style={{ position: "absolute", top: "100%", left: 0, marginTop: "6px", background: "#0F2340", border: "1px solid rgba(255,255,255,.15)", borderRadius: "8px", padding: "6px", minWidth: "200px", boxShadow: "0 8px 24px rgba(0,0,0,.4)", zIndex: 100 }}>
                   {[
                     { href: "/about", label: "About Us", icon: "🏭" },
                     { href: "/reviews", label: "Customer Reviews", icon: "★" },
@@ -202,8 +202,8 @@ export function Header() {
                 </>
               ) : (
                 <>
-                  <Link href="/login" style={{ background: "transparent", color: "#2d8cff", padding: "10px 18px", fontSize: "13px", border: "1.5px solid #2d8cff", borderRadius: "5px", fontWeight: 700, textDecoration: "none", transition: "all .2s" }}>
-                    Log In
+                  <Link href="/login" style={{ background: "transparent", color: "rgba(255,255,255,.8)", padding: "10px 18px", fontSize: "13px", border: "1.5px solid rgba(255,255,255,.3)", borderRadius: "5px", fontWeight: 700, textDecoration: "none", transition: "all .2s" }}>
+                    Sign In
                   </Link>
                   <Link href="/wholesale/register" style={{ background: "#E8242A", color: "#fff", padding: "10px 22px", fontSize: "13px", borderRadius: "5px", fontWeight: 700, textDecoration: "none", transition: "all .2s", border: "none" }}>
                     Apply Now
@@ -232,7 +232,7 @@ export function Header() {
 
         {/* Mobile menu */}
         {menuOpen && (
-          <div style={{ background: "#111016", borderTop: "1px solid rgba(255,255,255,.06)", padding: "12px 20px" }} className="md:hidden">
+          <div style={{ background: "#0F2340", borderTop: "1px solid rgba(255,255,255,.12)", padding: "12px 20px" }} className="md:hidden">
             {/* Shop links — always visible */}
             {[
               { href: "/products", label: "Shop All" },

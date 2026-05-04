@@ -9,7 +9,7 @@ export default function WhoWeServe() {
   ];
 
   return (
-    <section style={{ padding: "80px 0", background: "#111016" }}>
+    <section style={{ padding: "80px 0", background: "#1B3A5C" }}>
       <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 32px" }}>
         <div style={{ marginBottom: "44px", textAlign: "center" }}>
           <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(32px,3.5vw,48px)", color: "#fff", letterSpacing: ".01em", lineHeight: 1, marginBottom: "10px" }}>Who We Serve</h2>
@@ -17,7 +17,7 @@ export default function WhoWeServe() {
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "12px" }} className="serve-grid-responsive">
           {cards.map(card => (
-            <div key={card.h} style={{ background: "#1E1D24", border: "1px solid rgba(255,255,255,.06)", borderRadius: "10px", padding: "28px 22px", transition: "all .2s" }}>
+            <div key={card.h} style={{ background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", borderRadius: "10px", padding: "28px 22px", transition: "all .2s" }}>
               <div style={{ marginBottom: "14px" }}>{card.icon}</div>
               <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "17px", letterSpacing: ".04em", color: "#fff", marginBottom: "10px" }}>{card.h}</h4>
               <p style={{ fontSize: "15px", color: "#d3d0d0", lineHeight: 1.65, fontWeight: 500 }}>{card.p}</p>

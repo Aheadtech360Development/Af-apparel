@@ -684,7 +684,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                 )}
               </div>
             ) : (
-              <div style={{ background: "#111016", border: "1px solid rgba(255,255,255,.08)", borderRadius: "10px", padding: "24px", marginBottom: "20px", textAlign: "center" }}>
+              <div style={{ background: "#1B3A5C", border: "1px solid rgba(255,255,255,.12)", borderRadius: "10px", padding: "24px", marginBottom: "20px", textAlign: "center" }}>
                 <div style={{ fontSize: "24px", marginBottom: "8px" }}>🔒</div>
                 <div style={{ fontFamily: "var(--font-bebas)", fontSize: "18px", color: "#fff", letterSpacing: ".04em", marginBottom: "6px" }}>
                   Wholesale Pricing Locked
@@ -720,15 +720,23 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
               )}
             </div>
 
-            {/* Wholesale upsell banner — guests only */}
+            {/* Wholesale gate — guests only */}
             {!isAuthenticated && (
-              <div style={{ background: "rgba(26,92,255,.05)", border: "1px solid rgba(26,92,255,.2)", borderRadius: "8px", padding: "10px 16px", marginBottom: "20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", flexWrap: "wrap" }}>
-                <span style={{ fontSize: "13px", color: "#1A5CFF", fontWeight: 600 }}>
-                  🏭 Get factory-direct wholesale pricing — apply for a B2B account
-                </span>
-                <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
-                  <Link href="/login" style={{ background: "#1A5CFF", color: "#fff", padding: "6px 14px", borderRadius: "5px", fontSize: "12px", fontWeight: 700, textDecoration: "none" }}>Log In</Link>
-                  <Link href="/wholesale/register" style={{ background: "none", color: "#1A5CFF", padding: "6px 14px", borderRadius: "5px", fontSize: "12px", fontWeight: 600, textDecoration: "none", border: "1px solid rgba(26,92,255,.3)" }}>Apply</Link>
+              <div style={{ background: "#EEF6FF", border: "1.5px solid #1E90FF", borderRadius: "4px", padding: "24px", marginBottom: "20px", textAlign: "center" }}>
+                <div style={{ fontFamily: "'Barlow Semi Condensed', sans-serif", fontSize: "20px", fontWeight: 800, color: "#1B3A5C", marginBottom: "6px" }}>
+                  Wholesale Pricing Available to Approved Accounts
+                </div>
+                <p style={{ fontSize: "13px", color: "#64748B", marginBottom: "18px", lineHeight: 1.5 }}>
+                  Create your free wholesale account to view pricing, place orders, and access bulk tier discounts.
+                </p>
+                <div style={{ display: "flex", gap: "8px", justifyContent: "center", flexWrap: "wrap", marginBottom: "18px" }}>
+                  {["✓ Factory-direct pricing", "✓ Tier discounts 50–1,000+ units", "✓ NET 30 available", "✓ Same-day shipping"].map(f => (
+                    <span key={f} style={{ background: "#fff", border: "1px solid #E2E8F0", borderRadius: "3px", padding: "5px 12px", fontSize: "11px", fontWeight: 600, color: "#1B3A5C" }}>{f}</span>
+                  ))}
+                </div>
+                <div style={{ display: "flex", gap: "10px", justifyContent: "center", flexWrap: "wrap" }}>
+                  <Link href="/wholesale/register" style={{ background: "#E8242A", color: "#fff", padding: "9px 20px", borderRadius: "3px", fontSize: "14px", fontWeight: 700, textDecoration: "none", fontFamily: "'Barlow Semi Condensed', sans-serif", letterSpacing: ".04em" }}>Apply for Free Account</Link>
+                  <Link href="/login" style={{ background: "none", color: "#1B3A5C", padding: "8px 18px", borderRadius: "3px", fontSize: "13px", fontWeight: 700, textDecoration: "none", border: "1.5px solid #1B3A5C" }}>Sign In to Existing Account</Link>
                 </div>
               </div>
             )}
@@ -1089,7 +1097,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                   return (
                     <table style={{ borderCollapse: "collapse", fontSize: "13px", minWidth: "500px" }}>
                       <thead>
-                        <tr style={{ background: "#111016" }}>
+                        <tr style={{ background: "#1B3A5C" }}>
                           {["Size", "Chest (in)", "Length (in)", "Sleeve (in)"].map(h => (
                             <th key={h} style={{ padding: "10px 16px", textAlign: "left", color: "#fff", fontFamily: "var(--font-bebas)", letterSpacing: ".06em", fontSize: "13px" }}>{h}</th>
                           ))}
