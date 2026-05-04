@@ -100,7 +100,7 @@ export default function AdminProductSpecsPage() {
         is_active: form.is_active,
       };
       if (editId) {
-        await apiClient.put(`/api/v1/admin/product-specs/${editId}`, payload);
+        await apiClient.patch(`/api/v1/admin/product-specs/${editId}`, payload);
       } else {
         await apiClient.post("/api/v1/admin/product-specs", payload);
       }
@@ -115,7 +115,7 @@ export default function AdminProductSpecsPage() {
 
   async function toggleActive(p: ProductSpec) {
     try {
-      await apiClient.put(`/api/v1/admin/product-specs/${p.id}`, { is_active: !p.is_active });
+      await apiClient.patch(`/api/v1/admin/product-specs/${p.id}`, { is_active: !p.is_active });
       setSpecs(prev => prev.map(r => r.id === p.id ? { ...r, is_active: !r.is_active } : r));
     } catch { /* silent */ }
   }

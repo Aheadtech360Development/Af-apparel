@@ -103,7 +103,7 @@ export default function AdminStyleSheetsPage() {
         is_active: form.is_active,
       };
       if (editId) {
-        await apiClient.put(`/api/v1/admin/style-sheets/${editId}`, payload);
+        await apiClient.patch(`/api/v1/admin/style-sheets/${editId}`, payload);
       } else {
         await apiClient.post("/api/v1/admin/style-sheets", payload);
       }
@@ -118,7 +118,7 @@ export default function AdminStyleSheetsPage() {
 
   async function toggleActive(s: StyleSheet) {
     try {
-      await apiClient.put(`/api/v1/admin/style-sheets/${s.id}`, { is_active: !s.is_active });
+      await apiClient.patch(`/api/v1/admin/style-sheets/${s.id}`, { is_active: !s.is_active });
       setSheets(prev => prev.map(r => r.id === s.id ? { ...r, is_active: !r.is_active } : r));
     } catch { /* silent */ }
   }
