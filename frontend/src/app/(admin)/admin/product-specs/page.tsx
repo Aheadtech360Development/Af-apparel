@@ -75,10 +75,8 @@ export default function AdminProductSpecsPage() {
     try {
       const fd = new FormData();
       fd.append("file", file);
-      const res = await fetch("/api/v1/upload", { method: "POST", body: fd });
-      if (!res.ok) throw new Error("Upload failed");
-      const data = await res.json();
-      setForm(f => ({ ...f, pdf_url: data.url }));
+      const data = await apiClient.postForm<{ url: string }>("/api/v1/upload", fd);
+      setForm(f => ({ ...f, pdf_url: (data as any).url ?? data }));
     } catch {
       setError("PDF upload failed. Try again.");
     } finally {
