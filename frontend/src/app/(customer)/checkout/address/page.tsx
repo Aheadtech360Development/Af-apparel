@@ -153,6 +153,10 @@ export default function CheckoutAddressPage() {
     return base; // standard
   }
 
+  const selectedCost = methodCost(shippingMethod);
+  // Prefer the API-returned tax_amount (TaxJar or manual calc); fall back to rate-based
+  const [apiTaxAmount, setApiTaxAmount] = useState(0);
+
   // Derive address fields for tax lookup
   const savedActive = savedAddresses.find(a => a.id === selectedAddressId);
   const activeState = showNewForm ? form.state : (savedActive?.state ?? "");
@@ -189,11 +193,8 @@ export default function CheckoutAddressPage() {
         }
       })
       .catch(() => { setTaxRate(null); setApiTaxAmount(0); setTaxInfo(null, 0, 0); });
-  }, [activeState, activeZip, subtotal]);
+  }, [activeState, activeZip, subtotal, selectedAddressId]);
 
-  const selectedCost = methodCost(shippingMethod);
-  // Prefer the API-returned tax_amount (TaxJar or manual calc); fall back to rate-based
-  const [apiTaxAmount, setApiTaxAmount] = useState(0);
   const taxAmount = apiTaxAmount > 0 ? apiTaxAmount : (taxRate ? Math.round(subtotal * taxRate.rate / 100 * 100) / 100 : 0);
   const orderTotal = subtotal + selectedCost + taxAmount - couponDiscount;
 
@@ -565,7 +566,7 @@ export default function CheckoutAddressPage() {
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#7A7880" }}>
             <span>{taxRate ? `Tax (${taxRate.region} ${taxRate.rate}%)` : "Tax"}</span>
             <span style={{ fontWeight: 600, color: "#2A2830" }}>
-              {taxRate ? formatCurrency(taxAmount) : <span style={{ fontWeight: 400 }}>Calculated at checkout</span>}
+              {activeState ? formatCurrency(taxAmount) : <span style={{ fontWeight: 400 }}>Calculated at checkout</span>}
             </span>
           </div>
           <div style={{ borderTop: "1px solid #F0EEE9", paddingTop: "8px", display: "flex", justifyContent: "space-between" }}>
