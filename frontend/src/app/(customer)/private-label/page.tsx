@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Shirt, Store, Printer } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Private Label | AF Apparels",
@@ -43,7 +44,7 @@ export default function PrivateLabelPage() {
               </div>
             </div>
             <div style={{ background: "#1a1a1a", border: "1px solid #333", borderRadius: "8px", height: "280px", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", color: "#555", fontSize: "13px" }}>
-              <div style={{ fontSize: "48px", marginBottom: "12px" }}>👕</div>
+              <Shirt size={48} style={{ marginBottom: "12px", color: "#555" }} />
               <span>[PRIVATE LABEL PRODUCT PHOTO]</span>
               <span style={{ fontSize: "10px", marginTop: "4px" }}>Custom neck label / branded hang tag</span>
             </div>
@@ -60,12 +61,12 @@ export default function PrivateLabelPage() {
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "14px" }}>
             {[
-              { icon: "👗", title: "Apparel Brands", body: "Building a clothing line and need consistent, branded blanks with your own label at scale." },
-              { icon: "🏪", title: "Retailers", body: "Retailers wanting exclusive styles or house-brand basics that differentiate from standard wholesale." },
-              { icon: "🖨️", title: "Print Shops", body: "High-volume decorators wanting to offer clients a fully branded blank rather than a standard SKU." },
-            ].map(w => (
-              <div key={w.title} style={{ background: "#F7F8FA", border: "1px solid #eee", borderRadius: "6px", padding: "20px", textAlign: "center" }}>
-                <div style={{ fontSize: "28px", marginBottom: "10px" }}>{w.icon}</div>
+              { icon: <Shirt size={26} />, title: "Apparel Brands", body: "Building a clothing line and need consistent, branded blanks with your own label at scale." },
+              { icon: <Store size={26} />, title: "Retailers", body: "Retailers wanting exclusive styles or house-brand basics that differentiate from standard wholesale." },
+              { icon: <Printer size={26} />, title: "Print Shops", body: "High-volume decorators wanting to offer clients a fully branded blank rather than a standard SKU." },
+            ].map((w, wi) => (
+              <div key={wi} style={{ background: "#F7F8FA", border: "1px solid #eee", borderRadius: "6px", padding: "20px", textAlign: "center" }}>
+                <div style={{ display: "flex", justifyContent: "center", marginBottom: "10px", color: "#2D8CFF" }}>{w.icon}</div>
                 <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "13px", letterSpacing: ".06em", color: "#111", marginBottom: "6px" }}>{w.title}</h4>
                 <p style={{ fontSize: "12px", color: "#666", lineHeight: 1.6 }}>{w.body}</p>
               </div>

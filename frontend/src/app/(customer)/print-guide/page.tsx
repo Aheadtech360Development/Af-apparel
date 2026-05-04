@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Printer, Palette, Droplets, Scissors, Square, BookOpen } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Print Guide | AF Apparels",
@@ -7,7 +8,7 @@ export const metadata: Metadata = {
 
 const METHODS = [
   {
-    icon: "🖨️",
+    icon: <Printer size={22} />,
     name: "DTF Transfers",
     sub: "Direct-to-Film heat transfer",
     compat: { label: "✅ Best Method", color: "#059669", bg: "#d1fae5" },
@@ -29,7 +30,7 @@ const METHODS = [
     ],
   },
   {
-    icon: "🎨",
+    icon: <Palette size={22} />,
     name: "Screen Printing",
     sub: "Plastisol and water-based inks",
     compat: { label: "✅ Best Method", color: "#059669", bg: "#d1fae5" },
@@ -50,7 +51,7 @@ const METHODS = [
     ],
   },
   {
-    icon: "🌊",
+    icon: <Droplets size={22} />,
     name: "Sublimation",
     sub: "Dye sublimation printing",
     compat: { label: "⚠️ Limited", color: "#d97706", bg: "#fef3c7" },
@@ -72,7 +73,7 @@ const METHODS = [
     ],
   },
   {
-    icon: "🪡",
+    icon: <Scissors size={22} />,
     name: "Embroidery",
     sub: "Machine and hand embroidery",
     compat: { label: "✅ Recommended", color: "#059669", bg: "#d1fae5" },
@@ -94,7 +95,7 @@ const METHODS = [
     ],
   },
   {
-    icon: "🔲",
+    icon: <Square size={22} />,
     name: "HTV / Vinyl",
     sub: "Heat Transfer Vinyl",
     compat: { label: "✅ Recommended", color: "#059669", bg: "#d1fae5" },
@@ -116,7 +117,7 @@ const METHODS = [
     ],
   },
   {
-    icon: "🧺",
+    icon: <BookOpen size={22} />,
     name: "After-Print Care Guide",
     sub: "Instructions for end customers",
     compat: { label: "📋 Info", color: "#555", bg: "#f0f0f0" },
@@ -192,7 +193,7 @@ export default function PrintGuidePage() {
               <div key={m.name} style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: "6px", overflow: "hidden" }}>
                 {/* Header */}
                 <div style={{ background: "#1F2937", padding: "16px 20px", display: "flex", alignItems: "center", gap: "12px" }}>
-                  <div style={{ fontSize: "24px" }}>{m.icon}</div>
+                  <div style={{ color: "#9CA3AF", flexShrink: 0 }}>{m.icon}</div>
                   <div style={{ flex: 1 }}>
                     <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "18px", letterSpacing: ".04em", color: "#fff", marginBottom: "2px" }}>{m.name}</h3>
                     <p style={{ fontSize: "11px", color: "#9CA3AF" }}>{m.sub}</p>

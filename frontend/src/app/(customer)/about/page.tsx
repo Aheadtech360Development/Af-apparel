@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Factory, Palette, Zap, Leaf, Package } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "About Us | AF Apparels",
@@ -39,7 +40,7 @@ export default function AboutPage() {
               </div>
             </div>
             <div style={{ background: "#1a1a1a", border: "1px solid #333", borderRadius: "8px", height: "260px", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", color: "#555", fontSize: "13px" }}>
-              <div style={{ fontSize: "48px", marginBottom: "12px" }}>🏭</div>
+              <Factory size={48} style={{ marginBottom: "12px", color: "#555" }} />
               <span>[DALLAS FACILITY / TEAM PHOTO]</span>
               <span style={{ fontSize: "10px", marginTop: "4px" }}>Authentic — not stock</span>
             </div>
@@ -93,7 +94,7 @@ export default function AboutPage() {
             </div>
             <div>
               <div style={{ background: "#e8e8e8", borderRadius: "8px", height: "320px", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", color: "#aaa", fontSize: "13px" }}>
-                <div style={{ fontSize: "40px", marginBottom: "10px", color: "#bbb" }}>📦</div>
+                <Package size={40} style={{ marginBottom: "10px", color: "#bbb" }} />
                 <span>[WAREHOUSE / OPERATIONS IMAGE]</span>
                 <span style={{ fontSize: "10px", marginTop: "4px" }}>Dallas distribution facility</span>
               </div>
@@ -119,13 +120,13 @@ export default function AboutPage() {
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: "12px", maxWidth: "780px", margin: "0 auto" }}>
             {[
-              { icon: "🏭", title: "Factory-Direct Integrity", body: "We never mark up product to cover distributor layers. What you pay reflects the actual cost of premium manufacturing — no inflated margins, no hidden fees." },
-              { icon: "🎨", title: "Print-First Product Development", body: "Every fabric and construction decision is made with the decorator in mind. We test everything against DTF, screen printing, embroidery, and HTV before adding a SKU to our catalog." },
-              { icon: "⚡", title: "Operational Reliability", body: "Same-day shipping, accurate stock counts, and consistent sizing aren't bonuses — they're the baseline. Your business depends on predictability, and so does ours." },
-              { icon: "🌿", title: "Ethical Supply Chain", body: "WRAP, GOTS, and Oeko-Tex certifications aren't marketing badges. They represent our commitment to responsible manufacturing at every level of our supply chain." },
-            ].map(v => (
-              <div key={v.title} style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: "8px", padding: "20px", display: "flex", gap: "14px", alignItems: "flex-start" }}>
-                <div style={{ fontSize: "24px", flexShrink: 0 }}>{v.icon}</div>
+              { icon: <Factory size={22} />, title: "Factory-Direct Integrity", body: "We never mark up product to cover distributor layers. What you pay reflects the actual cost of premium manufacturing — no inflated margins, no hidden fees." },
+              { icon: <Palette size={22} />, title: "Print-First Product Development", body: "Every fabric and construction decision is made with the decorator in mind. We test everything against DTF, screen printing, embroidery, and HTV before adding a SKU to our catalog." },
+              { icon: <Zap size={22} />, title: "Operational Reliability", body: "Same-day shipping, accurate stock counts, and consistent sizing aren't bonuses — they're the baseline. Your business depends on predictability, and so does ours." },
+              { icon: <Leaf size={22} />, title: "Ethical Supply Chain", body: "WRAP, GOTS, and Oeko-Tex certifications aren't marketing badges. They represent our commitment to responsible manufacturing at every level of our supply chain." },
+            ].map((v, vi) => (
+              <div key={vi} style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: "8px", padding: "20px", display: "flex", gap: "14px", alignItems: "flex-start" }}>
+                <div style={{ flexShrink: 0, color: "#2D8CFF", marginTop: "1px" }}>{v.icon}</div>
                 <div>
                   <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "14px", letterSpacing: ".06em", color: "#111", marginBottom: "6px" }}>{v.title}</h4>
                   <p style={{ fontSize: "12.5px", color: "#555", lineHeight: 1.6 }}>{v.body}</p>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Phone, Mail, MapPin, Clock, CheckCircle, Briefcase, Wrench, Tag } from "lucide-react";
 import { apiClient } from "@/lib/api-client";
 
 const DEPARTMENTS = [
@@ -70,7 +71,7 @@ export default function ContactPage() {
 
               {status === "sent" ? (
                 <div style={{ textAlign: "center", padding: "40px 0" }}>
-                  <div style={{ fontSize: "48px", marginBottom: "16px" }}>✅</div>
+                  <CheckCircle size={48} style={{ marginBottom: "16px", color: "#059669" }} />
                   <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "24px", color: "#111", marginBottom: "8px" }}>Message Sent!</h3>
                   <p style={{ fontSize: "13px", color: "#6B7280" }}>We&apos;ll respond within 4 business hours Mon–Fri.</p>
                   <button onClick={() => { setForm({ name: "", business: "", email: "", phone: "", department: "", message: "" }); setStatus("idle"); }} style={{ marginTop: "20px", background: "#E8242A", color: "#fff", border: "none", borderRadius: "3px", padding: "9px 20px", fontSize: "13px", fontFamily: "var(--font-bebas)", fontWeight: 700, cursor: "pointer", letterSpacing: ".04em" }}>
@@ -125,28 +126,28 @@ export default function ContactPage() {
             {/* Info Column */}
             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
               <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: "6px", padding: "16px", display: "flex", gap: "12px", alignItems: "flex-start" }}>
-                <div style={{ fontSize: "22px", flexShrink: 0 }}>📞</div>
+                <div style={{ flexShrink: 0, color: "#2D8CFF", marginTop: "2px" }}><Phone size={20} /></div>
                 <div>
                   <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "14px", letterSpacing: ".04em", color: "#111", marginBottom: "4px" }}>Phone</h4>
                   <p style={{ fontSize: "12.5px", color: "#555", lineHeight: 1.6 }}>(214) 272-7213<br />Mon–Fri, 8AM–6PM CT<br />Same-day callback for wholesale accounts</p>
                 </div>
               </div>
               <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: "6px", padding: "16px", display: "flex", gap: "12px", alignItems: "flex-start" }}>
-                <div style={{ fontSize: "22px", flexShrink: 0 }}>✉️</div>
+                <div style={{ flexShrink: 0, color: "#2D8CFF", marginTop: "2px" }}><Mail size={20} /></div>
                 <div>
                   <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "14px", letterSpacing: ".04em", color: "#111", marginBottom: "4px" }}>Email</h4>
                   <p style={{ fontSize: "12.5px", color: "#555", lineHeight: 1.6 }}>info.afapparel@gmail.com<br />Response within 4 business hours<br />Large orders: include SKU and quantity in subject</p>
                 </div>
               </div>
               <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: "6px", padding: "16px", display: "flex", gap: "12px", alignItems: "flex-start" }}>
-                <div style={{ fontSize: "22px", flexShrink: 0 }}>📍</div>
+                <div style={{ flexShrink: 0, color: "#2D8CFF", marginTop: "2px" }}><MapPin size={20} /></div>
                 <div>
                   <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "14px", letterSpacing: ".04em", color: "#111", marginBottom: "4px" }}>Facility & Shipping Hub</h4>
                   <p style={{ fontSize: "12.5px", color: "#555", lineHeight: 1.6 }}>Dallas, Texas<br />Orders before 2 PM CT ship same day<br />[FULL ADDRESS — ADD BEFORE LAUNCH]</p>
                 </div>
               </div>
               <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: "6px", padding: "16px", display: "flex", gap: "12px", alignItems: "flex-start" }}>
-                <div style={{ fontSize: "22px", flexShrink: 0 }}>🕐</div>
+                <div style={{ flexShrink: 0, color: "#2D8CFF", marginTop: "2px" }}><Clock size={20} /></div>
                 <div style={{ width: "100%" }}>
                   <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "14px", letterSpacing: ".04em", color: "#111", marginBottom: "8px" }}>Business Hours</h4>
                   <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12.5px" }}>
@@ -180,12 +181,12 @@ export default function ContactPage() {
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "16px" }}>
             {[
-              { icon: "💼", title: "Wholesale Sales", body: "New accounts, pricing questions, volume orders, and account applications.", email: "sales@afapparel.com" },
-              { icon: "🛠️", title: "Account Support", body: "Existing orders, shipping status, returns, exchange requests, and account management.", email: "support@afapparel.com" },
-              { icon: "🏷️", title: "Private Label", body: "Custom styles, neck labels, exclusive colorways, and bulk manufacturing programs.", email: "privatelabel@afapparel.com" },
-            ].map(d => (
-              <div key={d.title} style={{ background: "#F7F8FA", border: "1px solid #E5E7EB", borderRadius: "6px", padding: "20px", textAlign: "center" }}>
-                <div style={{ fontSize: "28px", marginBottom: "10px" }}>{d.icon}</div>
+              { icon: <Briefcase size={26} />, title: "Wholesale Sales", body: "New accounts, pricing questions, volume orders, and account applications.", email: "sales@afapparel.com" },
+              { icon: <Wrench size={26} />, title: "Account Support", body: "Existing orders, shipping status, returns, exchange requests, and account management.", email: "support@afapparel.com" },
+              { icon: <Tag size={26} />, title: "Private Label", body: "Custom styles, neck labels, exclusive colorways, and bulk manufacturing programs.", email: "privatelabel@afapparel.com" },
+            ].map((d, di) => (
+              <div key={di} style={{ background: "#F7F8FA", border: "1px solid #E5E7EB", borderRadius: "6px", padding: "20px", textAlign: "center" }}>
+                <div style={{ display: "flex", justifyContent: "center", marginBottom: "10px", color: "#2D8CFF" }}>{d.icon}</div>
                 <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "14px", letterSpacing: ".06em", color: "#111", marginBottom: "6px" }}>{d.title}</h4>
                 <p style={{ fontSize: "12px", color: "#555", lineHeight: 1.6, marginBottom: "10px" }}>{d.body}</p>
                 <div style={{ fontSize: "12px", color: "#2D8CFF", fontWeight: 600 }}>{d.email}</div>

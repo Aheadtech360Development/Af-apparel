@@ -1,14 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { Package, ShoppingCart, FileText, Lock } from "lucide-react";
 
 type PolicyId = "shipping" | "ordering" | "terms" | "privacy";
 
-const POLICIES: { id: PolicyId; icon: string; label: string }[] = [
-  { id: "shipping", icon: "📦", label: "Shipping & Returns" },
-  { id: "ordering", icon: "🛒", label: "Ordering Info" },
-  { id: "terms", icon: "📄", label: "Terms & Conditions" },
-  { id: "privacy", icon: "🔒", label: "Privacy Policy" },
+const POLICIES: { id: PolicyId; icon: React.ReactNode; label: string }[] = [
+  { id: "shipping", icon: <Package size={14} />, label: "Shipping & Returns" },
+  { id: "ordering", icon: <ShoppingCart size={14} />, label: "Ordering Info" },
+  { id: "terms", icon: <FileText size={14} />, label: "Terms & Conditions" },
+  { id: "privacy", icon: <Lock size={14} />, label: "Privacy Policy" },
 ];
 
 export default function PrivacyPolicyPage() {

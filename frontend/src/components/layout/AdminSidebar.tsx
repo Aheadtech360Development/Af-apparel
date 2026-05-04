@@ -33,15 +33,18 @@ export function AdminSidebar() {
   const isProductsActive = pathname.startsWith("/admin/products") || pathname.startsWith("/admin/inventory");
   const isCustomersActive = pathname.startsWith("/admin/customers");
   const isSettingsActive = pathname.startsWith("/admin/settings") || pathname.startsWith("/admin/users") || pathname === "/admin/analytics";
+  const isContentActive = pathname.startsWith("/admin/style-sheets") || pathname.startsWith("/admin/product-specs");
   const [ordersOpen, setOrdersOpen] = useState(isOrdersActive);
   const [productsOpen, setProductsOpen] = useState(isProductsActive);
   const [customersOpen, setCustomersOpen] = useState(isCustomersActive);
   const [settingsOpen, setSettingsOpen] = useState(isSettingsActive);
+  const [contentOpen, setContentOpen] = useState(isContentActive);
 
   useEffect(() => { if (isOrdersActive) setOrdersOpen(true); }, [isOrdersActive]);
   useEffect(() => { if (isProductsActive) setProductsOpen(true); }, [isProductsActive]);
   useEffect(() => { if (isCustomersActive) setCustomersOpen(true); }, [isCustomersActive]);
   useEffect(() => { if (isSettingsActive) setSettingsOpen(true); }, [isSettingsActive]);
+  useEffect(() => { if (isContentActive) setContentOpen(true); }, [isContentActive]);
 
   function NavLink({ href, label, icon }: { href: string; label: string; icon: React.ReactNode }) {
     const active = pathname === href || (href !== "/admin" && pathname.startsWith(href + "/"));
@@ -192,6 +195,33 @@ export function AdminSidebar() {
       {/* ── MARKETING ── */}
       <div style={SECTION_HEAD}>Marketing</div>
       <NavLink href="/admin/discounts" label="Discounts" icon={<span style={{ fontSize: "15px" }}>%</span>} />
+
+      {/* ── CONTENT ── */}
+      <div style={SECTION_HEAD}>Content</div>
+      <div
+        onClick={() => setContentOpen(!contentOpen)}
+        style={{
+          ...NAV_LINK_BASE,
+          justifyContent: "space-between",
+          background: isContentActive ? "rgba(26,92,255,.08)" : "transparent",
+          color: isContentActive ? "#1A5CFF" : "#555",
+          userSelect: "none",
+        }}
+        onMouseEnter={e => { if (!isContentActive) (e.currentTarget as HTMLElement).style.background = "#F4F3EF"; }}
+        onMouseLeave={e => { if (!isContentActive) (e.currentTarget as HTMLElement).style.background = isContentActive ? "rgba(26,92,255,.08)" : "transparent"; }}
+      >
+        <span style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <BookIcon size={15} color="currentColor" />
+          <span>Content</span>
+        </span>
+        <span style={{ fontSize: "10px", color: "#aaa", transition: "transform .2s", transform: contentOpen ? "rotate(180deg)" : "rotate(0deg)", display: "inline-block" }}>▼</span>
+      </div>
+      {contentOpen && (
+        <div style={{ paddingLeft: "18px", marginTop: "3px", marginBottom: "3px" }}>
+          <SubLink href="/admin/style-sheets" label="Style Sheets" />
+          <SubLink href="/admin/product-specs" label="Product Specs" />
+        </div>
+      )}
 
       {/* ── SETTINGS ── */}
       <div style={SECTION_HEAD}>Settings</div>
