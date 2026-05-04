@@ -129,6 +129,7 @@ export function Header() {
                     { href: "/print-guide", label: "Print Guide", icon: "🖨️" },
                     { href: "/private-label", label: "Private Label", icon: "🏷️" },
                     { href: "/style-sheets", label: "Style Sheets", icon: "📄" },
+                    { href: "/product-specs", label: "Product Specs", icon: "📐" },
                     { href: "/contact", label: "Contact Us", icon: "✉" },
                   ].map(({ href, label, icon }) => (
                     <Link
