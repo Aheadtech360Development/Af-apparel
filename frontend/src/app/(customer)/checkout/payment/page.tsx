@@ -41,10 +41,15 @@ const sectionTitle: React.CSSProperties = {
 
 export default function CheckoutPaymentPage() {
   const router = useRouter();
-  const { shippingAddress, shippingMethod, shippingCost, setSavedCardId, setQbToken } = useCheckoutStore();
+  const {
+    shippingAddress, shippingMethod, shippingCost, setSavedCardId, setQbToken,
+    taxAmount: storedTaxAmount, taxRate: storedTaxRate, taxRegion: storedTaxRegion,
+    setPaymentMethod, setAchInfo,
+  } = useCheckoutStore();
   const { isAuthenticated, isLoading } = useAuthStore();
   const isGuest = !isLoading && !isAuthenticated();
   const [couponDiscount, setCouponDiscount] = useState(0);
+  const [paymentType, setPaymentType] = useState<"card" | "ach">("card");
 
   const [savedCards, setSavedCards] = useState<SavedCard[]>([]);
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
@@ -52,6 +57,9 @@ export default function CheckoutPaymentPage() {
   const [loadingCards, setLoadingCards] = useState(true);
   const [cart, setCart] = useState<Cart | null>(null);
   const [guestSubtotal, setGuestSubtotal] = useState(0);
+
+  const [achForm, setAchForm] = useState({ bankName: "", accountHolder: "", routingNumber: "", accountNumber: "", accountType: "checking" as "checking" | "savings" });
+  const [achErrors, setAchErrors] = useState<Partial<Record<keyof typeof achForm, string>>>({});
 
   // Guard: must have shipping address
   useEffect(() => {
@@ -105,12 +113,28 @@ export default function CheckoutPaymentPage() {
 
   function handleContinueWithSavedCard() {
     if (!selectedCardId) return;
+    setPaymentMethod("card");
     setSavedCardId(selectedCardId);
     router.push("/checkout/review");
   }
 
   function handleNewCardToken(token: string) {
+    setPaymentMethod("card");
     setQbToken(token);
+    router.push("/checkout/review");
+  }
+
+  function handleAchContinue() {
+    const errors: Partial<Record<keyof typeof achForm, string>> = {};
+    if (!achForm.bankName.trim()) errors.bankName = "Required";
+    if (!achForm.accountHolder.trim()) errors.accountHolder = "Required";
+    if (!/^\d{9}$/.test(achForm.routingNumber.trim())) errors.routingNumber = "Must be exactly 9 digits";
+    if (!achForm.accountNumber.trim()) errors.accountNumber = "Required";
+    else if (achForm.accountNumber.replace(/\D/g, "").length < 4) errors.accountNumber = "Account number too short";
+    if (Object.keys(errors).length > 0) { setAchErrors(errors); return; }
+    const last4 = achForm.accountNumber.replace(/\D/g, "").slice(-4);
+    setPaymentMethod("ach");
+    setAchInfo(achForm.bankName.trim(), achForm.accountHolder.trim(), achForm.routingNumber.trim(), last4, achForm.accountType);
     router.push("/checkout/review");
   }
 
@@ -124,7 +148,8 @@ export default function CheckoutPaymentPage() {
 
   const subtotal = isGuest ? guestSubtotal : Number(cart?.subtotal ?? 0);
   const shipping = shippingCost;
-  const total = subtotal + shipping - (isGuest ? 0 : couponDiscount);
+  const taxAmountDisplay = storedTaxAmount > 0 ? storedTaxAmount : 0;
+  const total = subtotal + shipping + taxAmountDisplay - (isGuest ? 0 : couponDiscount);
 
   const SHIPPING_LABELS: Record<string, string> = {
     standard: "Standard Ground",
@@ -132,11 +157,91 @@ export default function CheckoutPaymentPage() {
     will_call: "Will Call Pickup",
   };
 
+  const inp: React.CSSProperties = { width: "100%", padding: "10px 12px", border: "1.5px solid #E2E0DA", borderRadius: "7px", fontSize: "13px", fontFamily: "var(--font-jakarta)", outline: "none", boxSizing: "border-box", color: "#2A2830", background: "#fff" };
+  const lbl: React.CSSProperties = { display: "block", fontSize: "11px", fontWeight: 700, color: "#7A7880", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: "5px" };
+
   return (
     <div>
-      {/* ── Payment Method section ── */}
+      {/* ── Payment Method type selector (wholesale only) ── */}
+      {!isGuest && (
+        <div style={sectionCard}>
+          <span style={sectionTitle}>Payment Method</span>
+          <div style={{ display: "flex", gap: "10px" }}>
+            {(["card", "ach"] as const).map(type => {
+              const isSelected = paymentType === type;
+              return (
+                <label key={type} onClick={() => setPaymentType(type)} style={{ flex: 1, display: "flex", alignItems: "center", gap: "12px", padding: "14px 18px", borderRadius: "10px", border: `1.5px solid ${isSelected ? "#1A5CFF" : "#E2E0DA"}`, background: isSelected ? "rgba(26,92,255,.04)" : "#FAFAF8", cursor: "pointer", transition: "all .15s" }}>
+                  <div style={{ width: "18px", height: "18px", borderRadius: "50%", flexShrink: 0, border: `2px solid ${isSelected ? "#1A5CFF" : "#E2E0DA"}`, background: isSelected ? "#1A5CFF" : "#fff", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    {isSelected && <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#fff" }} />}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: "13px", fontWeight: 700, color: "#2A2830" }}>{type === "card" ? "Credit / Debit Card" : "ACH / Bank Transfer"}</div>
+                    <div style={{ fontSize: "11px", color: "#7A7880", marginTop: "2px" }}>{type === "card" ? "Visa, Mastercard, Amex, Discover" : "Checking or savings account"}</div>
+                  </div>
+                </label>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ── ACH form (wholesale, ACH selected) ── */}
+      {!isGuest && paymentType === "ach" && (
+        <div style={sectionCard}>
+          <span style={sectionTitle}>Bank Account Details</span>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+            <div>
+              <label style={lbl}>Bank Name <span style={{ color: "#E8242A" }}>*</span></label>
+              <input style={{ ...inp, borderColor: achErrors.bankName ? "#E8242A" : "#E2E0DA" }} value={achForm.bankName} onChange={e => { setAchForm(p => ({ ...p, bankName: e.target.value })); setAchErrors(p => ({ ...p, bankName: undefined })); }} placeholder="Chase, Wells Fargo, etc." />
+              {achErrors.bankName && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "3px" }}>{achErrors.bankName}</p>}
+            </div>
+            <div>
+              <label style={lbl}>Account Holder Name <span style={{ color: "#E8242A" }}>*</span></label>
+              <input style={{ ...inp, borderColor: achErrors.accountHolder ? "#E8242A" : "#E2E0DA" }} value={achForm.accountHolder} onChange={e => { setAchForm(p => ({ ...p, accountHolder: e.target.value })); setAchErrors(p => ({ ...p, accountHolder: undefined })); }} placeholder="Full name on account" />
+              {achErrors.accountHolder && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "3px" }}>{achErrors.accountHolder}</p>}
+            </div>
+            <div>
+              <label style={lbl}>Routing Number <span style={{ color: "#E8242A" }}>*</span></label>
+              <input style={{ ...inp, borderColor: achErrors.routingNumber ? "#E8242A" : "#E2E0DA" }} value={achForm.routingNumber} onChange={e => { setAchForm(p => ({ ...p, routingNumber: e.target.value.replace(/\D/g, "").slice(0, 9) })); setAchErrors(p => ({ ...p, routingNumber: undefined })); }} placeholder="9-digit routing number" maxLength={9} />
+              {achErrors.routingNumber && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "3px" }}>{achErrors.routingNumber}</p>}
+            </div>
+            <div>
+              <label style={lbl}>Account Number <span style={{ color: "#E8242A" }}>*</span></label>
+              <input style={{ ...inp, borderColor: achErrors.accountNumber ? "#E8242A" : "#E2E0DA" }} value={achForm.accountNumber} onChange={e => { setAchForm(p => ({ ...p, accountNumber: e.target.value.replace(/\D/g, "") })); setAchErrors(p => ({ ...p, accountNumber: undefined })); }} placeholder="Account number" type="text" />
+              {achErrors.accountNumber && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "3px" }}>{achErrors.accountNumber}</p>}
+            </div>
+            <div style={{ gridColumn: "1 / -1" }}>
+              <label style={lbl}>Account Type <span style={{ color: "#E8242A" }}>*</span></label>
+              <div style={{ display: "flex", gap: "10px" }}>
+                {(["checking", "savings"] as const).map(t => (
+                  <label key={t} onClick={() => setAchForm(p => ({ ...p, accountType: t }))} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 16px", borderRadius: "8px", border: `1.5px solid ${achForm.accountType === t ? "#1A5CFF" : "#E2E0DA"}`, cursor: "pointer", fontSize: "13px", fontWeight: 600, color: "#2A2830", background: achForm.accountType === t ? "rgba(26,92,255,.04)" : "#FAFAF8" }}>
+                    <div style={{ width: "16px", height: "16px", borderRadius: "50%", border: `2px solid ${achForm.accountType === t ? "#1A5CFF" : "#E2E0DA"}`, background: achForm.accountType === t ? "#1A5CFF" : "#fff", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      {achForm.accountType === t && <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#fff" }} />}
+                    </div>
+                    {t.charAt(0).toUpperCase() + t.slice(1)}
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div style={{ marginTop: "14px", padding: "12px 14px", background: "#F4F3EF", borderRadius: "8px", fontSize: "12px", color: "#7A7880", lineHeight: 1.6 }}>
+            ACH payments are verified manually. Your order will be processed within 1–2 business days after payment is confirmed.
+          </div>
+          <div style={{ display: "flex", gap: "10px", marginTop: "16px" }}>
+            <button type="button" onClick={() => router.push("/checkout/address")} style={{ flex: 1, padding: "14px", border: "1.5px solid #E2E0DA", borderRadius: "8px", background: "#fff", fontSize: "13px", fontWeight: 600, cursor: "pointer", color: "#7A7880" }}>
+              &#8592; Back
+            </button>
+            <button type="button" onClick={handleAchContinue} style={{ flex: 2, padding: "14px", background: "#E8242A", color: "#fff", border: "none", borderRadius: "8px", fontFamily: "var(--font-bebas)", fontSize: "17px", letterSpacing: ".08em", cursor: "pointer" }}>
+              Continue to Review &#8594;
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Card payment section (guests always see this; wholesale when card type selected) ── */}
+      {(isGuest || paymentType === "card") && (
       <div style={sectionCard}>
-        <span style={sectionTitle}>Payment Method</span>
+        {!isGuest && <span style={sectionTitle}>Card Details</span>}
 
         {savedCards.length > 0 && !isGuest && (
           <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: showNewCardForm ? "16px" : "0" }}>
@@ -227,9 +332,10 @@ export default function CheckoutPaymentPage() {
           </div>
         )}
       </div>
+      )}
 
       {/* ── Order total summary ── */}
-      {cart && (
+      {cart && paymentType === "card" && (
         <div style={{ background: "#fff", border: "1.5px solid #E2E0DA", borderRadius: "12px", padding: "18px 24px", marginBottom: "16px" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#7A7880" }}>
@@ -254,6 +360,10 @@ export default function CheckoutPaymentPage() {
                 <span style={{ fontWeight: 700 }}>-{formatCurrency(couponDiscount)}</span>
               </div>
             )}
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#7A7880" }}>
+              <span>{storedTaxRegion && storedTaxRate > 0 ? `Tax (${storedTaxRegion} ${storedTaxRate}%)` : "Tax"}</span>
+              <span style={{ fontWeight: 600, color: "#2A2830" }}>{formatCurrency(taxAmountDisplay)}</span>
+            </div>
             <div style={{ borderTop: "1px solid #F0EEE9", paddingTop: "8px", display: "flex", justifyContent: "space-between", fontSize: "15px", fontWeight: 800, color: "#2A2830" }}>
               <span>Total</span>
               <span style={{ fontFamily: "var(--font-bebas)", fontSize: "20px", letterSpacing: ".02em" }}>{formatCurrency(total)}</span>
@@ -263,7 +373,7 @@ export default function CheckoutPaymentPage() {
       )}
 
       {/* ── Continue to Review (saved card) ── */}
-      {!showNewCardForm && selectedCardId && (
+      {paymentType === "card" && !showNewCardForm && selectedCardId && (
         <div style={{ display: "flex", gap: "10px" }}>
           <button
             type="button"
@@ -288,7 +398,7 @@ export default function CheckoutPaymentPage() {
       )}
 
       {/* Back button when new card form shown and no saved cards */}
-      {showNewCardForm && savedCards.length === 0 && (
+      {paymentType === "card" && showNewCardForm && savedCards.length === 0 && (
         <button
           type="button"
           onClick={() => router.push("/checkout/address")}

@@ -30,6 +30,14 @@ interface CheckoutState {
   taxRate: number;
   taxAmount: number;
 
+  // Payment method selection
+  paymentMethod: "card" | "ach";
+  achBankName: string;
+  achAccountHolder: string;
+  achRoutingNumber: string;
+  achAccountLast4: string;
+  achAccountType: string;
+
   // Step 2 — payment (QB Payments)
   qbToken: string | null;
   savedCardId: string | null;
@@ -55,6 +63,8 @@ interface CheckoutState {
   setShippingMethod: (m: ShippingMethod) => void;
   setShippingCost: (cost: number) => void;
   setTaxInfo: (region: string | null, rate: number, amount?: number) => void;
+  setPaymentMethod: (m: "card" | "ach") => void;
+  setAchInfo: (bankName: string, accountHolder: string, routingNumber: string, accountLast4: string, accountType: string) => void;
   setPoNumber: (po: string) => void;
   setOrderNotes: (notes: string) => void;
   setQbToken: (token: string | null) => void;
@@ -83,6 +93,12 @@ const initialState = {
   taxRegion: null,
   taxRate: 0,
   taxAmount: 0,
+  paymentMethod: "card" as "card" | "ach",
+  achBankName: "",
+  achAccountHolder: "",
+  achRoutingNumber: "",
+  achAccountLast4: "",
+  achAccountType: "",
   poNumber: "",
   orderNotes: "",
   qbToken: null,
@@ -108,6 +124,9 @@ export const useCheckoutStore = create<CheckoutState>((set) => ({
   setShippingMethod: (m) => set({ shippingMethod: m }),
   setShippingCost: (cost) => set({ shippingCost: cost }),
   setTaxInfo: (region, rate, amount = 0) => set({ taxRegion: region, taxRate: rate, taxAmount: amount }),
+  setPaymentMethod: (m) => set({ paymentMethod: m }),
+  setAchInfo: (bankName, accountHolder, routingNumber, accountLast4, accountType) =>
+    set({ achBankName: bankName, achAccountHolder: accountHolder, achRoutingNumber: routingNumber, achAccountLast4: accountLast4, achAccountType: accountType }),
   setPoNumber: (po) => set({ poNumber: po }),
   setOrderNotes: (notes) => set({ orderNotes: notes }),
   setQbToken: (token) => set({ qbToken: token, savedCardId: null }),

@@ -57,6 +57,12 @@ interface AdminOrder {
   customer_phone?: string;
   pricing_tier?: string;
   payment_method?: string;
+  // ACH fields
+  ach_bank_name?: string | null;
+  ach_account_holder?: string | null;
+  ach_account_last4?: string | null;
+  ach_account_type?: string | null;
+  ach_verified?: boolean | null;
 }
 
 interface CustomerStats {
@@ -170,6 +176,8 @@ export default function AdminOrderDetailPage() {
   const [trackingNumber, setTrackingNumber] = useState("");
   const [isShipping, setIsShipping] = useState(false);
 
+  const [isVerifyingAch, setIsVerifyingAch] = useState(false);
+
   // Notes state
   const [editingNote, setEditingNote] = useState(false);
   const [noteText, setNoteText] = useState("");
@@ -271,6 +279,17 @@ export default function AdminOrderDetailPage() {
     } catch {
       setMsg({ text: "Failed to capture payment.", ok: false });
     } finally { setIsCapturing(false); }
+  }
+
+  async function handleVerifyAch() {
+    setIsVerifyingAch(true); setMsg(null);
+    try {
+      await apiClient.post(`/api/v1/admin/orders/${id}/verify-ach`, {});
+      setMsg({ text: "ACH payment verified. Order payment status updated to Paid.", ok: true });
+      setOrder(prev => prev ? { ...prev, payment_status: "paid", ach_verified: true } : prev);
+    } catch {
+      setMsg({ text: "Failed to verify ACH payment.", ok: false });
+    } finally { setIsVerifyingAch(false); }
   }
 
   async function handleSaveNote() {
@@ -890,7 +909,7 @@ export default function AdminOrderDetailPage() {
               <div style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: ".08em", color: "#aaa", marginBottom: "8px" }}>Payment</div>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", marginBottom: "5px" }}>
                 <span style={{ color: "#7A7880" }}>Method</span>
-                <span style={{ fontWeight: 600, color: "#2A2830" }}>{order.payment_method ?? "Card"}</span>
+                <span style={{ fontWeight: 600, color: "#2A2830" }}>{order.payment_method === "ach" ? "ACH / Bank Transfer" : (order.payment_method ?? "Card")}</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", marginBottom: "5px" }}>
                 <span style={{ color: "#7A7880" }}>Status</span>
@@ -898,12 +917,33 @@ export default function AdminOrderDetailPage() {
                   {order.payment_status.toUpperCase()}
                 </span>
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
-                <span style={{ color: "#7A7880" }}>QB Invoice</span>
-                <span style={{ fontWeight: 600, color: order.qb_invoice_id ? "#059669" : "#aaa" }}>
-                  {order.qb_invoice_id ? `#${order.qb_invoice_id}` : "Not synced"}
-                </span>
-              </div>
+              {order.payment_method === "ach" && (
+                <div style={{ marginTop: "10px", padding: "12px 14px", background: "#F4F3EF", borderRadius: "8px", fontSize: "12px", display: "flex", flexDirection: "column" as const, gap: "4px" }}>
+                  {order.ach_bank_name && <div><span style={{ color: "#7A7880" }}>Bank: </span><span style={{ fontWeight: 600, color: "#2A2830" }}>{order.ach_bank_name}</span></div>}
+                  {order.ach_account_holder && <div><span style={{ color: "#7A7880" }}>Holder: </span><span style={{ fontWeight: 600, color: "#2A2830" }}>{order.ach_account_holder}</span></div>}
+                  {order.ach_account_last4 && <div><span style={{ color: "#7A7880" }}>Account: </span><span style={{ fontWeight: 600, color: "#2A2830" }}>****{order.ach_account_last4}</span></div>}
+                  {order.ach_account_type && <div><span style={{ color: "#7A7880" }}>Type: </span><span style={{ fontWeight: 600, color: "#2A2830" }}>{order.ach_account_type.charAt(0).toUpperCase() + order.ach_account_type.slice(1)}</span></div>}
+                  <div style={{ marginTop: "8px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <span style={{ background: order.ach_verified ? "rgba(5,150,105,.12)" : "rgba(217,119,6,.12)", color: order.ach_verified ? "#059669" : "#D97706", padding: "3px 10px", borderRadius: "10px", fontSize: "11px", fontWeight: 700 }}>
+                      {order.ach_verified ? "Verified" : "Pending Verification"}
+                    </span>
+                    {!order.ach_verified && (
+                      <button onClick={handleVerifyAch} disabled={isVerifyingAch}
+                        style={{ background: "#059669", color: "#fff", border: "none", padding: "6px 12px", borderRadius: "6px", fontSize: "12px", fontWeight: 700, cursor: "pointer", opacity: isVerifyingAch ? .6 : 1 }}>
+                        {isVerifyingAch ? "Verifying…" : "Mark as Verified"}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+              {order.payment_method !== "ach" && (
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", marginTop: "5px" }}>
+                  <span style={{ color: "#7A7880" }}>QB Invoice</span>
+                  <span style={{ fontWeight: 600, color: order.qb_invoice_id ? "#059669" : "#aaa" }}>
+                    {order.qb_invoice_id ? `#${order.qb_invoice_id}` : "Not synced"}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>

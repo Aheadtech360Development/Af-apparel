@@ -53,6 +53,8 @@ export default function CheckoutReviewPage() {
     taxRegion: storedTaxRegion,
     taxRate: storedTaxRate,
     taxAmount: storedTaxAmount,
+    paymentMethod,
+    achBankName, achAccountHolder, achRoutingNumber, achAccountLast4, achAccountType,
   } = useCheckoutStore();
   const clearCart = useCartStore((s) => s.clearCart);
   const { isAuthenticated, isLoading: authIsLoading } = useAuthStore();
@@ -73,10 +75,10 @@ export default function CheckoutReviewPage() {
   useEffect(() => {
     if (!shippingAddress) {
       router.replace("/checkout/address");
-    } else if (!savedCardId && !qbToken) {
+    } else if (!savedCardId && !qbToken && paymentMethod !== "ach") {
       router.replace("/checkout/payment");
     }
-  }, [shippingAddress, savedCardId, qbToken, router]);
+  }, [shippingAddress, savedCardId, qbToken, paymentMethod, router]);
 
   useEffect(() => {
     if (!isGuest) {
@@ -208,9 +210,7 @@ export default function CheckoutReviewPage() {
         phone: shippingPhone || undefined,
       };
 
-      const order = await ordersService.confirmOrder({
-        qb_token: qbToken ?? undefined,
-        saved_card_id: savedCardId ?? undefined,
+      const basePayload = {
         address_id: addressId ?? undefined,
         shipping_address: fullAddress,
         shipping_method: shippingMethod || "standard",
@@ -220,7 +220,25 @@ export default function CheckoutReviewPage() {
         tax_amount: taxAmount > 0 ? taxAmount : undefined,
         tax_rate: taxRate?.rate ?? undefined,
         tax_region: taxRate?.region ?? undefined,
-      });
+      };
+
+      const order = await ordersService.confirmOrder(
+        paymentMethod === "ach"
+          ? {
+              ...basePayload,
+              payment_method: "ach",
+              ach_bank_name: achBankName || undefined,
+              ach_account_holder: achAccountHolder || undefined,
+              ach_routing_number: achRoutingNumber || undefined,
+              ach_account_last4: achAccountLast4 || undefined,
+              ach_account_type: achAccountType || undefined,
+            }
+          : {
+              ...basePayload,
+              qb_token: qbToken ?? undefined,
+              saved_card_id: savedCardId ?? undefined,
+            }
+      );
 
       const productName = cart?.items[0]?.product_name ?? "Your Order";
       const colorSummary = cart ? buildColorSummary(cart) : "";
@@ -250,7 +268,9 @@ export default function CheckoutReviewPage() {
   }
 
   const selectedCard = savedCards.find(c => c.id === savedCardId);
-  const paymentLabel = selectedCard
+  const paymentLabel = paymentMethod === "ach"
+    ? `ACH / Bank Transfer${achAccountLast4 ? ` \u2014 ****${achAccountLast4}` : ""}`
+    : selectedCard
     ? `${brandDisplayName(selectedCard.brand)} \u2022\u2022\u2022\u2022 ${selectedCard.last4}`
     : qbToken
     ? "New Card (tokenized)"
@@ -321,15 +341,28 @@ export default function CheckoutReviewPage() {
           <div style={sectionLabel as React.CSSProperties}>Payment</div>
           <button onClick={() => router.push("/checkout/payment")} style={{ fontSize: "11px", color: "#1A5CFF", background: "none", border: "none", cursor: "pointer", fontWeight: 700 }}>Change</button>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <svg width="32" height="22" viewBox="0 0 32 22" fill="none">
-            <rect width="32" height="22" rx="3" fill="#F4F3EF" stroke="#E2E0DA" />
-            <rect x="4" y="8" width="10" height="6" rx="1.5" fill="#E2E0DA" />
-            <rect x="4" y="16" width="5" height="2" rx="0.5" fill="#E2E0DA" />
-            <rect x="11" y="16" width="5" height="2" rx="0.5" fill="#E2E0DA" />
-          </svg>
-          <span style={{ fontSize: "13px", fontWeight: 700, color: "#2A2830" }}>{paymentLabel}</span>
-        </div>
+        {paymentMethod === "ach" ? (
+          <div style={{ fontSize: "13px", color: "#2A2830", lineHeight: 1.8 }}>
+            <div style={{ fontWeight: 700, marginBottom: "6px" }}>ACH / Bank Transfer</div>
+            {achBankName && <div style={{ color: "#7A7880" }}>Bank: <span style={{ color: "#2A2830", fontWeight: 600 }}>{achBankName}</span></div>}
+            {achAccountHolder && <div style={{ color: "#7A7880" }}>Account Holder: <span style={{ color: "#2A2830", fontWeight: 600 }}>{achAccountHolder}</span></div>}
+            {achAccountLast4 && <div style={{ color: "#7A7880" }}>Account: <span style={{ color: "#2A2830", fontWeight: 600 }}>****{achAccountLast4}</span></div>}
+            {achAccountType && <div style={{ color: "#7A7880" }}>Type: <span style={{ color: "#2A2830", fontWeight: 600 }}>{achAccountType.charAt(0).toUpperCase() + achAccountType.slice(1)}</span></div>}
+            <div style={{ marginTop: "8px", padding: "8px 12px", background: "rgba(217,119,6,.08)", borderRadius: "6px", fontSize: "12px", color: "#D97706", fontWeight: 600 }}>
+              Order pending — payment verified within 1–2 business days
+            </div>
+          </div>
+        ) : (
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <svg width="32" height="22" viewBox="0 0 32 22" fill="none">
+              <rect width="32" height="22" rx="3" fill="#F4F3EF" stroke="#E2E0DA" />
+              <rect x="4" y="8" width="10" height="6" rx="1.5" fill="#E2E0DA" />
+              <rect x="4" y="16" width="5" height="2" rx="0.5" fill="#E2E0DA" />
+              <rect x="11" y="16" width="5" height="2" rx="0.5" fill="#E2E0DA" />
+            </svg>
+            <span style={{ fontSize: "13px", fontWeight: 700, color: "#2A2830" }}>{paymentLabel}</span>
+          </div>
+        )}
       </div>
 
       {/* ── Order Items ── */}

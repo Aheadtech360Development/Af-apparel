@@ -33,6 +33,13 @@ export interface ConfirmOrderPayload {
   tax_amount?: number;
   tax_rate?: number;
   tax_region?: string;
+  // ACH payment
+  payment_method?: string;
+  ach_bank_name?: string;
+  ach_account_holder?: string;
+  ach_routing_number?: string;
+  ach_account_last4?: string;
+  ach_account_type?: string;
 }
 
 export const ordersService = {
