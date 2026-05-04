@@ -101,12 +101,12 @@ export default function CheckoutReviewPage() {
 
   useEffect(() => {
     if (!shippingAddress?.state) return;
-    apiClient.get<{ data: { region: string; rate: number; is_enabled: boolean }[] }>("/api/v1/admin/taxes")
+    const state = shippingAddress.state.toUpperCase();
+    apiClient.get<{ region: string; rate: number; name: string | null }>(`/api/v1/tax-rate?region=${state}`)
       .then(res => {
-        const list = (res as any).data ?? res ?? [];
-        const state = shippingAddress.state.toUpperCase();
-        const match = list.find((r: { region: string; is_enabled: boolean }) => r.region === state && r.is_enabled);
-        setTaxRate(match ? { region: match.region, rate: Number(match.rate) } : null);
+        const r = res as any;
+        const rate = Number(r.rate ?? 0);
+        setTaxRate(rate > 0 ? { region: r.region, rate } : null);
       })
       .catch(() => setTaxRate(null));
   }, [shippingAddress?.state]);
@@ -149,6 +149,7 @@ export default function CheckoutReviewPage() {
           shipping_method: shippingMethod || "standard",
           qb_token: qbToken,
           order_notes: orderNotes || undefined,
+          tax_amount: taxAmount > 0 ? taxAmount : undefined,
         });
 
         const guestSubtotal = guestEntries.reduce((s, e) => s + e.unit_price * e.quantity, 0);
@@ -196,6 +197,8 @@ export default function CheckoutReviewPage() {
         po_number: poNumber || undefined,
         order_notes: orderNotes || undefined,
         discount_code: appliedCoupon?.code || undefined,
+        tax_amount: taxAmount > 0 ? taxAmount : undefined,
+        tax_rate: taxRate?.rate ?? undefined,
       });
 
       const productName = cart?.items[0]?.product_name ?? "Your Order";

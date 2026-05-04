@@ -70,6 +70,7 @@ export default function CheckoutAddressPage() {
   const [showNewForm, setShowNewForm] = useState(false);
   const [subtotal, setSubtotal] = useState(0);
   const [tierShipping, setTierShipping] = useState<number | null>(null);
+  const [taxRate, setTaxRate] = useState<{ region: string; rate: number } | null>(null);
 
   const [form, setForm] = useState({
     company: companyName || "",
@@ -151,8 +152,25 @@ export default function CheckoutAddressPage() {
     return base; // standard
   }
 
+  // Derive the active state for tax lookup
+  const activeState = showNewForm
+    ? form.state
+    : (savedAddresses.find(a => a.id === selectedAddressId)?.state ?? "");
+
+  useEffect(() => {
+    if (!activeState) { setTaxRate(null); return; }
+    apiClient.get<{ region: string; rate: number }>(`/api/v1/tax-rate?region=${activeState.toUpperCase()}`)
+      .then(res => {
+        const r = res as any;
+        const rate = Number(r.rate ?? 0);
+        setTaxRate(rate > 0 ? { region: r.region, rate } : null);
+      })
+      .catch(() => setTaxRate(null));
+  }, [activeState]);
+
   const selectedCost = methodCost(shippingMethod);
-  const orderTotal = subtotal + selectedCost - couponDiscount;
+  const taxAmount = taxRate ? Math.round(subtotal * taxRate.rate / 100 * 100) / 100 : 0;
+  const orderTotal = subtotal + selectedCost + taxAmount - couponDiscount;
 
   function validate() {
     const e: Partial<typeof form> = {};
@@ -519,6 +537,12 @@ export default function CheckoutAddressPage() {
               <span style={{ fontWeight: 700 }}>-{formatCurrency(couponDiscount)}</span>
             </div>
           )}
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#7A7880" }}>
+            <span>{taxRate ? `Tax (${taxRate.region} ${taxRate.rate}%)` : "Tax"}</span>
+            <span style={{ fontWeight: 600, color: "#2A2830" }}>
+              {taxRate ? formatCurrency(taxAmount) : <span style={{ fontWeight: 400 }}>Calculated at checkout</span>}
+            </span>
+          </div>
           <div style={{ borderTop: "1px solid #F0EEE9", paddingTop: "8px", display: "flex", justifyContent: "space-between" }}>
             <span style={{ fontSize: "14px", fontWeight: 800, color: "#2A2830" }}>Total</span>
             <span style={{ fontFamily: "var(--font-bebas)", fontSize: "20px", color: "#E8242A", letterSpacing: ".02em" }}>

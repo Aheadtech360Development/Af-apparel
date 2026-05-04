@@ -30,6 +30,8 @@ export interface ConfirmOrderPayload {
   po_number?: string;
   order_notes?: string;
   discount_code?: string;
+  tax_amount?: number;
+  tax_rate?: number;
 }
 
 export const ordersService = {
