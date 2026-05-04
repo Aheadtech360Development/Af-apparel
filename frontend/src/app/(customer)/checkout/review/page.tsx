@@ -422,7 +422,7 @@ export default function CheckoutReviewPage() {
               {taxRate ? `Tax (${taxRate.region} ${taxRate.rate}%)` : "Tax"}
             </span>
             <span style={{ color: "#2A2830", fontWeight: 600 }}>
-              {taxRate ? formatCurrency(taxAmount) : "Calculated at checkout"}
+              {formatCurrency(taxAmount)}
             </span>
           </div>
           <div style={{ borderTop: "1.5px solid #E2E0DA", paddingTop: "10px", display: "flex", justifyContent: "space-between" }}>
