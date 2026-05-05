@@ -37,7 +37,24 @@ const COLOR_MAP: Record<string, string> = {
   "Dark Navy": "#0f1f3d", Indigo: "#3730a3", Cardinal: "#7b1520", Crimson: "#9f0712",
   "Carolina Blue": "#56a0d3", "Columbia Blue": "#9bc4e2", Silver: "#c0c0c0",
   "Ash Grey": "#b2b2b2", Ash: "#b2b2b2", Stone: "#a8a29e", Mocha: "#7c5c48",
-  Chocolate: "#5c3d2e", Caramel: "#b5651d", Camo: "#78866b",
+  Chocolate: "#5c3d2e", Caramel: "#b5651d", Camo: "#78866b", "Oatmeal Heather": "#D6CFC7",
+  "Sports Grey": "#C4C4C4",
+  "Charcoal Heather": "#4A4A4A",
+  "Texas Orange": "#BF5700",
+  "Baby Pink": "#F4C2C2",
+  "Moss Green": "#8A9A5B",
+  "Lime Green": "#32CD32",
+  "Rust": "#B7410E",
+  "Peach": "#FFDAB9",
+  "Pacific Blue": "#1CA9C9",
+  "Dust": "#B2998A",
+  "Military Green": "#4B5320",
+  "Neon Yellow": "#FFFF33",
+  "Neon Orange": "#FF5F1F",
+  "Denim": "#1560BD",
+  "Salt & Pepper": "#8E8E8E",
+  "Powder Blue": "#B0E0E6",
+
 };
 
 const TABS = ["Description", "Specifications", "Print Guide", "Size Chart", "Reviews"] as const;
@@ -402,9 +419,9 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
   const lastExpandedColor = expandedColors.length > 0 ? expandedColors[expandedColors.length - 1] : null;
   const orderedImages = lastExpandedColor
     ? [
-        ...images.filter(img => img.alt_text?.toLowerCase().includes(lastExpandedColor.toLowerCase())),
-        ...images.filter(img => !img.alt_text?.toLowerCase().includes(lastExpandedColor.toLowerCase())),
-      ]
+      ...images.filter(img => img.alt_text?.toLowerCase().includes(lastExpandedColor.toLowerCase())),
+      ...images.filter(img => !img.alt_text?.toLowerCase().includes(lastExpandedColor.toLowerCase())),
+    ]
     : images;
 
   function toggleColor(color: string) {

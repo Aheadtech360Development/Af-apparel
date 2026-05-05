@@ -47,6 +47,24 @@ const COLOR_MAP: Record<string, string> = {
   "Royal Blue": "#1A5CFF", "Light Blue": "#7DD3FC", "Stonewash Blue": "#5b8fa8",
   Forest: "#1B4332", Burgundy: "#722F37", Green: "#16a34a", Yellow: "#EAB308",
   Orange: "#F97316", Purple: "#9333EA", Pink: "#EC4899", Brown: "#92400E",
+  "Oatmeal Heather": "#D6CFC7",
+  "Sports Grey": "#C4C4C4",
+  "Charcoal Heather": "#4A4A4A",
+  "Texas Orange": "#BF5700",
+  "Baby Pink": "#F4C2C2",
+  "Moss Green": "#8A9A5B",
+  "Lime Green": "#32CD32",
+  "Rust": "#B7410E",
+  "Peach": "#FFDAB9",
+  "Pacific Blue": "#1CA9C9",
+  "Dust": "#B2998A",
+  "Military Green": "#4B5320",
+  "Neon Yellow": "#FFFF33",
+  "Neon Orange": "#FF5F1F",
+  "Denim": "#1560BD",
+  "Salt & Pepper": "#8E8E8E",
+  "Powder Blue": "#B0E0E6",
+
 };
 
 const ALL_SIZES = ["XS", "S", "S/M", "M", "M/L", "L", "XL", "2XL", "3XL", "4XL", "5XL", "One Size"];

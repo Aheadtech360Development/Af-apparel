@@ -38,6 +38,24 @@ const COLOR_MAP: Record<string, string> = {
   "Royal Blue": "#1A5CFF", "Light Blue": "#7DD3FC", Forest: "#1B4332",
   Burgundy: "#722F37", Purple: "#7C3AED", Pink: "#F9A8D4", Sand: "#E8D5B7",
   Gold: "#C9A84C", Mustard: "#D4A843", Orange: "#F97316", Yellow: "#FDE047",
+  "Oatmeal Heather": "#D6CFC7",
+  "Sports Grey": "#C4C4C4",
+  "Charcoal Heather": "#4A4A4A",
+  "Texas Orange": "#BF5700",
+  "Baby Pink": "#F4C2C2",
+  "Moss Green": "#8A9A5B",
+  "Lime Green": "#32CD32",
+  "Rust": "#B7410E",
+  "Peach": "#FFDAB9",
+  "Pacific Blue": "#1CA9C9",
+  "Dust": "#B2998A",
+  "Military Green": "#4B5320",
+  "Neon Yellow": "#FFFF33",
+  "Neon Orange": "#FF5F1F",
+  "Denim": "#1560BD",
+  "Salt & Pepper": "#8E8E8E",
+  "Powder Blue": "#B0E0E6",
+
 };
 const swatchColor = (name: string) => COLOR_MAP[name] ?? "#ccc";
 

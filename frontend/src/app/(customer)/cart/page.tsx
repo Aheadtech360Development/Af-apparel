@@ -23,6 +23,24 @@ const COLOR_MAP: Record<string, string> = {
   Purple: "#7c3aed", Pink: "#ec4899", "Hot Pink": "#db2777", Coral: "#f87171",
   Teal: "#0d9488", Turquoise: "#06b6d4", Mint: "#6ee7b7", Olive: "#4d7c0f",
   Cream: "#fef3c7", Ivory: "#fffff0", "Sky Blue": "#38bdf8", Lavender: "#a78bfa",
+  "Oatmeal Heather": "#D6CFC7",
+  "Sports Grey": "#C4C4C4",
+  "Charcoal Heather": "#4A4A4A",
+  "Texas Orange": "#BF5700",
+  "Baby Pink": "#F4C2C2",
+  "Moss Green": "#8A9A5B",
+  "Lime Green": "#32CD32",
+  "Rust": "#B7410E",
+  "Peach": "#FFDAB9",
+  "Pacific Blue": "#1CA9C9",
+  "Dust": "#B2998A",
+  "Military Green": "#4B5320",
+  "Neon Yellow": "#FFFF33",
+  "Neon Orange": "#FF5F1F",
+  "Denim": "#1560BD",
+  "Salt & Pepper": "#8E8E8E",
+  "Powder Blue": "#B0E0E6",
+
 };
 function colorHex(c: string) { return COLOR_MAP[c] ?? "#888888"; }
 function isLight(hex: string) {
@@ -309,8 +327,8 @@ export default function CartPage() {
           /* ── Empty state ── */
           <div style={{ textAlign: "center", padding: "80px 24px", background: "#fff", borderRadius: "12px", border: "1.5px dashed #E2E0DA" }}>
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ddd" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" style={{ margin: "0 auto 16px" }}>
-              <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-              <path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.66a2 2 0 001.99-1.78L23 6H6"/>
+              <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
+              <path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.66a2 2 0 001.99-1.78L23 6H6" />
             </svg>
             <p style={{ fontSize: "15px", fontWeight: 700, color: "#2A2830", marginBottom: "8px" }}>Your cart is empty</p>
             <p style={{ fontSize: "13px", color: "#7A7880", marginBottom: "24px" }}>Browse our wholesale catalog to add products.</p>
@@ -361,7 +379,7 @@ export default function CartPage() {
                           />
                         ) : (
                           <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ccc" strokeWidth={1.5}><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/></svg>
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ccc" strokeWidth={1.5}><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z" /></svg>
                           </div>
                         )}
                       </div>

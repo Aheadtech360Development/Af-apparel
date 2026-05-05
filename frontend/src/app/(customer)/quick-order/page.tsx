@@ -35,6 +35,24 @@ const COLOR_MAP: Record<string, string> = {
   "Hot Pink": "#db2777", Coral: "#f87171", Teal: "#0d9488",
   Turquoise: "#06b6d4", Mint: "#6ee7b7", Olive: "#4d7c0f",
   Cream: "#fef3c7", Ivory: "#fffff0", "Sky Blue": "#38bdf8", Lavender: "#a78bfa",
+  "Oatmeal Heather": "#D6CFC7",
+  "Sports Grey": "#C4C4C4",
+  "Charcoal Heather": "#4A4A4A",
+  "Texas Orange": "#BF5700",
+  "Baby Pink": "#F4C2C2",
+  "Moss Green": "#8A9A5B",
+  "Lime Green": "#32CD32",
+  "Rust": "#B7410E",
+  "Peach": "#FFDAB9",
+  "Pacific Blue": "#1CA9C9",
+  "Dust": "#B2998A",
+  "Military Green": "#4B5320",
+  "Neon Yellow": "#FFFF33",
+  "Neon Orange": "#FF5F1F",
+  "Denim": "#1560BD",
+  "Salt & Pepper": "#8E8E8E",
+  "Powder Blue": "#B0E0E6",
+
 };
 
 function getColorHex(color: string): string {
