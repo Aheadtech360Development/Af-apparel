@@ -21,29 +21,23 @@ interface ProductListClientProps {
 
 // Color name → hex for swatch dots
 const COLOR_MAP: Record<string, string> = {
-  White: "#FFFFFF",
-  Black: "#111111",
-  Grey: "#9CA3AF",
-  "Sport Grey": "#9CA3AF",
-  Charcoal: "#555555",
-  Navy: "#1e3a5f",
-  Red: "#E8242A",
-  Blue: "#1A5CFF",
-  "Royal Blue": "#1A5CFF",
-  "Light Blue": "#7DD3FC",
-  "Stonewash Blue": "#5b8fa8",
-  Forest: "#1B4332",
-  Burgundy: "#722F37",
-  Purple: "#7C3AED",
-  Pink: "#F9A8D4",
-  "Lt. Pink": "#F9A8D4",
-  Sand: "#E8D5B7",
-  Gold: "#C9A84C",
-  Mustard: "#D4A843",
-  Mint: "#4ADE80",
-  Orange: "#F97316",
-  Yellow: "#FDE047",
-  "Oatmeal Heather": "#D6CFC7",
+  White: "#FFFFFF", Black: "#111111", Navy: "#1e3a5f", Red: "#E8242A",
+  Blue: "#1A5CFF", Royal: "#2251CC", "Royal Blue": "#2251CC",
+  Grey: "#9ca3af", Gray: "#9ca3af", "Dark Grey": "#4b5563", "Dark Gray": "#4b5563",
+  "Light Grey": "#d1d5db", "Light Gray": "#d1d5db", Charcoal: "#374151",
+  "Sport Grey": "#9ca3af", "Heather Grey": "#b0b7c3", "Athletic Heather": "#b0b7c3",
+  Heather: "#b0b7c3", "Dark Heather": "#6b7280", Sand: "#e2c89a", Natural: "#f5f0e8",
+  Tan: "#c9a96e", Brown: "#78350f", Maroon: "#7f1d1d", Burgundy: "#881337",
+  Green: "#166534", Forest: "#1B4332", "Forest Green": "#14532d", "Kelly Green": "#15803d",
+  Lime: "#65a30d", Yellow: "#eab308", Gold: "#C9A84C", Mustard: "#D4A843",
+  Orange: "#ea580c", Purple: "#7c3aed", Pink: "#ec4899", "Hot Pink": "#db2777",
+  Coral: "#f87171", Teal: "#0d9488", Turquoise: "#06b6d4", Mint: "#6ee7b7",
+  Olive: "#4d7c0f", Cream: "#fef3c7", Ivory: "#fffff0", "Sky Blue": "#38bdf8",
+  Lavender: "#a78bfa", "Light Blue": "#7DD3FC", "Stonewash Blue": "#5b8fa8",
+  "Dark Navy": "#0f1f3d", Indigo: "#3730a3", Cardinal: "#7b1520", Crimson: "#9f0712",
+  "Carolina Blue": "#56a0d3", "Columbia Blue": "#9bc4e2", Silver: "#c0c0c0",
+  "Ash Grey": "#b2b2b2", Ash: "#b2b2b2", Stone: "#a8a29e", Mocha: "#7c5c48",
+  Chocolate: "#5c3d2e", Caramel: "#b5651d", Camo: "#78866b", "Oatmeal Heather": "#D6CFC7",
   "Sports Grey": "#C4C4C4",
   "Charcoal Heather": "#4A4A4A",
   "Texas Orange": "#BF5700",
@@ -60,7 +54,6 @@ const COLOR_MAP: Record<string, string> = {
   "Denim": "#1560BD",
   "Salt & Pepper": "#8E8E8E",
   "Powder Blue": "#B0E0E6",
-
 };
 
 function swatchColor(name: string): string {
@@ -118,7 +111,7 @@ export function ProductListClient({
     const qs = new URLSearchParams({ ...params, page_size: "24" }).toString();
     apiClient.get<{ items: ProductListItem[] }>(`/api/v1/products?${qs}`)
       .then((res) => { if (!cancelled && res?.items?.length) setProducts(res.items); })
-      .catch(() => {});
+      .catch(() => { });
     return () => { cancelled = true; };
   }, [isAuthenticated, currentCategory, currentSize, currentColor, currentGender, currentInStock, currentPriceMin, currentPriceMax]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -269,7 +262,7 @@ export function ProductListClient({
           onClick={handleInStockClick}
           style={{ fontSize: "13px", color: currentInStock === "true" ? "#1A5CFF" : "#7A7880", padding: "6px 10px", borderRadius: "6px", cursor: "pointer", fontWeight: currentInStock === "true" ? 700 : 500, background: currentInStock === "true" ? "rgba(26,92,255,.06)" : "transparent", display: "flex", alignItems: "center", gap: "8px" }}
         >
-          <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="#059669"/></svg> In Stock Only
+          <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="#059669" /></svg> In Stock Only
         </div>
       </div>
 
@@ -473,9 +466,9 @@ export function ProductListClient({
 
   const filteredByStock = localMinStock > 0
     ? products.filter(p => {
-        const total = (p.variants ?? []).reduce((sum: number, v: any) => sum + (v.stock_quantity ?? 100), 0);
-        return total >= localMinStock;
-      })
+      const total = (p.variants ?? []).reduce((sum: number, v: any) => sum + (v.stock_quantity ?? 100), 0);
+      return total >= localMinStock;
+    })
     : products;
 
   const displayedProducts = [...filteredByStock].sort((a, b) => {
@@ -573,22 +566,22 @@ export function ProductListClient({
               </select>
             </div>
 
-          {/* Bulk download toolbar */}
-          {selected.size > 0 && (
-            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <span style={{ fontSize: "12px", color: "#7A7880" }}>{selected.size} selected</span>
-              <button
-                onClick={handleBulkDownload}
-                disabled={bulkDownloading}
-                style={{ padding: "7px 16px", background: "#1A5CFF", color: "#fff", borderRadius: "5px", fontSize: "12px", fontWeight: 700, border: "none", cursor: "pointer", opacity: bulkDownloading ? 0.5 : 1 }}
-              >
-                {bulkDownloading ? "Queuing…" : "Bulk Download"}
-              </button>
-              <button onClick={() => setSelected(new Set())} style={{ fontSize: "12px", color: "#aaa", background: "none", border: "none", cursor: "pointer" }}>
-                Clear
-              </button>
-            </div>
-          )}
+            {/* Bulk download toolbar */}
+            {selected.size > 0 && (
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <span style={{ fontSize: "12px", color: "#7A7880" }}>{selected.size} selected</span>
+                <button
+                  onClick={handleBulkDownload}
+                  disabled={bulkDownloading}
+                  style={{ padding: "7px 16px", background: "#1A5CFF", color: "#fff", borderRadius: "5px", fontSize: "12px", fontWeight: 700, border: "none", cursor: "pointer", opacity: bulkDownloading ? 0.5 : 1 }}
+                >
+                  {bulkDownloading ? "Queuing…" : "Bulk Download"}
+                </button>
+                <button onClick={() => setSelected(new Set())} style={{ fontSize: "12px", color: "#aaa", background: "none", border: "none", cursor: "pointer" }}>
+                  Clear
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -653,7 +646,7 @@ export function ProductListClient({
                       )}
                       {/* In-stock badge */}
                       <div style={{ position: "absolute", top: "12px", right: "12px", display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "10px", fontWeight: 700, color: "#059669" }}>
-                        <svg width="7" height="7" viewBox="0 0 7 7"><circle cx="3.5" cy="3.5" r="3.5" fill="#059669"/></svg> In Stock
+                        <svg width="7" height="7" viewBox="0 0 7 7"><circle cx="3.5" cy="3.5" r="3.5" fill="#059669" /></svg> In Stock
                       </div>
                     </div>
 

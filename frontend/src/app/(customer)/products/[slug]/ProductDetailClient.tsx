@@ -54,7 +54,6 @@ const COLOR_MAP: Record<string, string> = {
   "Denim": "#1560BD",
   "Salt & Pepper": "#8E8E8E",
   "Powder Blue": "#B0E0E6",
-
 };
 
 const TABS = ["Description", "Specifications", "Print Guide", "Size Chart", "Reviews"] as const;
