@@ -284,6 +284,28 @@ export default function AdminProductEditPage() {
     } : prev);
   }
 
+  function moveImageInGroup(imageId: string, direction: "up" | "down") {
+    if (!product) return;
+    const images = product.images;
+    const img = images.find(i => i.id === imageId);
+    if (!img) return;
+    const color = img.alt_text || "";
+    const groupImages = images.filter(i => (i.alt_text || "") === color);
+    const groupIdx = groupImages.findIndex(i => i.id === imageId);
+    if (direction === "up" && groupIdx === 0) return;
+    if (direction === "down" && groupIdx === groupImages.length - 1) return;
+    const newGroup = [...groupImages];
+    const swapIdx = direction === "up" ? groupIdx - 1 : groupIdx + 1;
+    [newGroup[groupIdx], newGroup[swapIdx]] = [newGroup[swapIdx], newGroup[groupIdx]];
+    // Rebuild full array: preserve color-group order, replace this group's images
+    const seen = new Set<string>();
+    const colorOrder: string[] = [];
+    for (const i of images) { const c = i.alt_text || ""; if (!seen.has(c)) { seen.add(c); colorOrder.push(c); } }
+    const newImages = colorOrder.flatMap(c => c === color ? newGroup : images.filter(i => (i.alt_text || "") === c));
+    setProduct(prev => prev ? { ...prev, images: newImages } : prev);
+    adminService.reorderImages(product.id, newImages.map(i => i.id));
+  }
+
   async function handleFlyerUpload(e: React.ChangeEvent<HTMLInputElement>) {
     if (!product || !e.target.files?.length) return;
     const file = e.target.files[0]!;
@@ -462,68 +484,88 @@ export default function AdminProductEditPage() {
           <div style={sectionCard}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
               <span style={{ ...sectionTitle, marginBottom: 0 }}>MEDIA</span>
-              <span style={{ fontSize: "11px", color: "#aaa" }}>Click ★ to set primary · select color to link image to variant</span>
+              <span style={{ fontSize: "11px", color: "#aaa" }}>Images grouped by color · ▲▼ to reorder · ★ to set primary</span>
             </div>
 
-            {/* Image grid with controls */}
-            {(product.images?.length ?? 0) > 0 && (
-              <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "12px" }}>
-                {product.images?.map((img, i) => {
-                  const variantColors = [...new Set(product.variants?.map(v => v.color).filter(Boolean) as string[])];
-                  return (
-                    <div key={img.id} style={{ display: "flex", gap: "12px", alignItems: "center", padding: "10px 12px", border: "1px solid #E2E0DA", borderRadius: "8px", background: i === 0 ? "rgba(26,92,255,.03)" : "#fff" }}>
-                      {/* Thumbnail */}
-                      <div style={{ width: "64px", height: "64px", borderRadius: "6px", overflow: "hidden", flexShrink: 0, border: "1px solid #E2E0DA", background: "#f5f5f5" }}>
-                        <img src={img.url_medium} alt={img.alt_text ?? ""} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                      </div>
-
-                      {/* Controls */}
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-                          {i === 0 ? (
-                            <span style={{ background: "#1A5CFF", color: "#fff", fontSize: "9px", fontWeight: 700, padding: "2px 8px", borderRadius: "3px" }}>★ PRIMARY</span>
-                          ) : (
-                            <button
-                              onClick={() => handleSetPrimary(img.id)}
-                              style={{ background: "#F4F3EF", border: "1px solid #E2E0DA", color: "#7A7880", fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "3px", cursor: "pointer" }}
-                            >☆ Set Primary</button>
+            {/* Images grouped by color with sort controls */}
+            {(product.images?.length ?? 0) > 0 && (() => {
+              const variantColors = [...new Set(product.variants?.map(v => v.color).filter(Boolean) as string[])];
+              // Build color order: assigned colors first (in first-appearance order), unassigned last
+              const seen = new Set<string>();
+              const colorOrder: string[] = [];
+              for (const im of product.images) { const c = im.alt_text || ""; if (!seen.has(c)) { seen.add(c); colorOrder.push(c); } }
+              const orderedColors = [...colorOrder.filter(c => c !== ""), ...(colorOrder.includes("") ? [""] : [])];
+              return (
+                <div style={{ marginBottom: "12px" }}>
+                  {orderedColors.map(color => {
+                    const groupImages = product.images.filter(im => (im.alt_text || "") === color);
+                    return (
+                      <div key={color || "__none"} style={{ marginBottom: "14px" }}>
+                        {/* Color group header */}
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "7px", padding: "5px 10px", background: "#F4F3EF", borderRadius: "6px" }}>
+                          {color && COLOR_MAP[color] && (
+                            <div style={{ width: "12px", height: "12px", borderRadius: "50%", background: COLOR_MAP[color], border: "1px solid rgba(0,0,0,.12)", flexShrink: 0 }} />
                           )}
-                          <span style={{ fontSize: "11px", color: "#aaa" }}>Image {i + 1}</span>
+                          <span style={{ fontSize: "12px", fontWeight: 700, color: "#2A2830" }}>{color || "No Color Assigned"}</span>
+                          <span style={{ fontSize: "11px", color: "#7A7880" }}>· {groupImages.length} image{groupImages.length !== 1 ? "s" : ""}</span>
                         </div>
-
-                        {/* Color assignment */}
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                          <label style={{ fontSize: "11px", color: "#7A7880", whiteSpace: "nowrap" }}>Color:</label>
-                          {variantColors.length > 0 ? (
-                            <select
-                              value={img.alt_text ?? ""}
-                              onChange={e => handleUpdateImageColor(img.id, e.target.value)}
-                              style={{ padding: "4px 8px", border: "1px solid #E2E0DA", borderRadius: "5px", fontSize: "12px", background: "#fff", maxWidth: "160px" }}
-                            >
-                              <option value="">— No color —</option>
-                              {variantColors.map(c => <option key={c} value={c}>{c}</option>)}
-                            </select>
-                          ) : (
-                            <input
-                              value={img.alt_text ?? ""}
-                              onChange={e => handleUpdateImageColor(img.id, e.target.value)}
-                              placeholder="e.g. Navy (links to color tab)"
-                              style={{ padding: "4px 8px", border: "1px solid #E2E0DA", borderRadius: "5px", fontSize: "12px", width: "180px" }}
-                            />
-                          )}
+                        {/* Images in this group */}
+                        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                          {groupImages.map((img, groupIdx) => (
+                            <div key={img.id} style={{ display: "flex", gap: "10px", alignItems: "center", padding: "10px 12px", border: "1px solid #E2E0DA", borderRadius: "8px", background: product.images[0]?.id === img.id ? "rgba(26,92,255,.03)" : "#fff" }}>
+                              {/* Up/down sort buttons */}
+                              <div style={{ display: "flex", flexDirection: "column", gap: "3px", flexShrink: 0 }}>
+                                <button type="button" onClick={() => moveImageInGroup(img.id, "up")} disabled={groupIdx === 0}
+                                  style={{ width: "24px", height: "22px", border: "1px solid #E2E0DA", borderRadius: "4px", background: groupIdx === 0 ? "#fafafa" : "#F4F3EF", cursor: groupIdx === 0 ? "default" : "pointer", color: groupIdx === 0 ? "#ccc" : "#7A7880", fontSize: "10px", display: "flex", alignItems: "center", justifyContent: "center", padding: 0 }}
+                                  title="Move up">▲</button>
+                                <button type="button" onClick={() => moveImageInGroup(img.id, "down")} disabled={groupIdx === groupImages.length - 1}
+                                  style={{ width: "24px", height: "22px", border: "1px solid #E2E0DA", borderRadius: "4px", background: groupIdx === groupImages.length - 1 ? "#fafafa" : "#F4F3EF", cursor: groupIdx === groupImages.length - 1 ? "default" : "pointer", color: groupIdx === groupImages.length - 1 ? "#ccc" : "#7A7880", fontSize: "10px", display: "flex", alignItems: "center", justifyContent: "center", padding: 0 }}
+                                  title="Move down">▼</button>
+                              </div>
+                              {/* Thumbnail */}
+                              <div style={{ width: "64px", height: "64px", borderRadius: "6px", overflow: "hidden", flexShrink: 0, border: "1px solid #E2E0DA", background: "#f5f5f5" }}>
+                                <img src={img.url_medium} alt={img.alt_text ?? ""} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                              </div>
+                              {/* Controls */}
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+                                  {product.images[0]?.id === img.id ? (
+                                    <span style={{ background: "#1A5CFF", color: "#fff", fontSize: "9px", fontWeight: 700, padding: "2px 8px", borderRadius: "3px" }}>★ PRIMARY</span>
+                                  ) : (
+                                    <button onClick={() => handleSetPrimary(img.id)}
+                                      style={{ background: "#F4F3EF", border: "1px solid #E2E0DA", color: "#7A7880", fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "3px", cursor: "pointer" }}
+                                    >☆ Set Primary</button>
+                                  )}
+                                </div>
+                                {/* Color assignment */}
+                                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                  <label style={{ fontSize: "11px", color: "#7A7880", whiteSpace: "nowrap" }}>Color:</label>
+                                  {variantColors.length > 0 ? (
+                                    <select value={img.alt_text ?? ""} onChange={e => handleUpdateImageColor(img.id, e.target.value)}
+                                      style={{ padding: "4px 8px", border: "1px solid #E2E0DA", borderRadius: "5px", fontSize: "12px", background: "#fff", maxWidth: "160px" }}>
+                                      <option value="">— No color —</option>
+                                      {variantColors.map(c => <option key={c} value={c}>{c}</option>)}
+                                    </select>
+                                  ) : (
+                                    <input value={img.alt_text ?? ""} onChange={e => handleUpdateImageColor(img.id, e.target.value)}
+                                      placeholder="e.g. Navy (links to color tab)"
+                                      style={{ padding: "4px 8px", border: "1px solid #E2E0DA", borderRadius: "5px", fontSize: "12px", width: "180px" }} />
+                                  )}
+                                </div>
+                              </div>
+                              {/* Delete */}
+                              <button onClick={() => handleDeleteImage(img.id)}
+                                style={{ background: "none", border: "none", cursor: "pointer", color: "#E8242A", padding: "4px", flexShrink: 0 }}
+                              ><TrashIcon size={15} color="#E8242A" /></button>
+                            </div>
+                          ))}
                         </div>
                       </div>
-
-                      {/* Delete */}
-                      <button
-                        onClick={() => handleDeleteImage(img.id)}
-                        style={{ background: "none", border: "none", cursor: "pointer", color: "#E8242A", padding: "4px", flexShrink: 0 }}
-                      ><TrashIcon size={15} color="#E8242A" /></button>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+                    );
+                  })}
+                </div>
+              );
+            })()}
 
             {/* Upload tile */}
             <div

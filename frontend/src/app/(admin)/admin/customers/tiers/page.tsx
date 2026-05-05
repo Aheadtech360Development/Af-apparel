@@ -876,13 +876,38 @@ export default function DiscountGroupsPage() {
               <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
 
                 {/* Store Default */}
-                <label style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 14px", background: groupForm.shipping_type === "store_default" ? "rgba(26,92,255,.06)" : "#fff", border: `1.5px solid ${groupForm.shipping_type === "store_default" ? "#1A5CFF" : "#E2E0DA"}`, borderRadius: "7px", cursor: "pointer" }}>
-                  <input type="radio" name="shipping_type" value="store_default" checked={groupForm.shipping_type === "store_default"} onChange={() => setGroupForm(f => ({ ...f, shipping_type: "store_default" }))} style={{ accentColor: "#1A5CFF" }} />
-                  <div>
-                    <div style={{ fontSize: "13px", fontWeight: 600, color: "#2A2830" }}>Store Default</div>
-                    <div style={{ fontSize: "11px", color: "#7A7880" }}>Use the customer's assigned shipping tier</div>
-                  </div>
-                </label>
+                <div>
+                  <label style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 14px", background: groupForm.shipping_type === "store_default" ? "rgba(26,92,255,.06)" : "#fff", border: `1.5px solid ${groupForm.shipping_type === "store_default" ? "#1A5CFF" : "#E2E0DA"}`, borderRadius: "7px", cursor: "pointer" }}>
+                    <input type="radio" name="shipping_type" value="store_default" checked={groupForm.shipping_type === "store_default"} onChange={() => setGroupForm(f => ({ ...f, shipping_type: "store_default" }))} style={{ accentColor: "#1A5CFF" }} />
+                    <div>
+                      <div style={{ fontSize: "13px", fontWeight: 600, color: "#2A2830" }}>Store Default</div>
+                      <div style={{ fontSize: "11px", color: "#7A7880" }}>Flat shipping rate for this group</div>
+                    </div>
+                  </label>
+                  {groupForm.shipping_type === "store_default" && (
+                    <div style={{ marginTop: "10px", marginLeft: "12px", border: "1px solid #E2E0DA", borderRadius: "8px", background: "#fff", padding: "14px 16px" }}>
+                      <label style={labelStyle}>Shipping Amount</label>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        <span style={{ fontSize: "14px", color: "#7A7880" }}>$</span>
+                        <input
+                          type="number"
+                          min={0}
+                          step="0.01"
+                          value={groupForm.shipping_amount}
+                          onChange={e => setGroupForm(f => ({ ...f, shipping_amount: parseFloat(e.target.value) || 0 }))}
+                          placeholder="0.00"
+                          style={{ ...inputStyle, width: "130px" }}
+                        />
+                        {Number(groupForm.shipping_amount) === 0 && (
+                          <span style={{ fontSize: "11px", fontWeight: 700, color: "#059669", background: "rgba(5,150,105,.1)", padding: "2px 8px", borderRadius: "4px" }}>FREE</span>
+                        )}
+                      </div>
+                      <p style={{ fontSize: "11px", color: "#7A7880", marginTop: "6px" }}>
+                        Flat shipping cost for customers in this group. Set 0.00 for free shipping.
+                      </p>
+                    </div>
+                  )}
+                </div>
 
                 {/* Flat Rate (full shipping tier UI) */}
                 <div>
