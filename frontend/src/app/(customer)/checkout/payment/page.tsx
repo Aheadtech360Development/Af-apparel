@@ -162,31 +162,29 @@ export default function CheckoutPaymentPage() {
 
   return (
     <div>
-      {/* ── Payment Method type selector (wholesale only) ── */}
-      {!isGuest && (
-        <div style={sectionCard}>
-          <span style={sectionTitle}>Payment Method</span>
-          <div style={{ display: "flex", gap: "10px" }}>
-            {(["card", "ach"] as const).map(type => {
-              const isSelected = paymentType === type;
-              return (
-                <label key={type} onClick={() => setPaymentType(type)} style={{ flex: 1, display: "flex", alignItems: "center", gap: "12px", padding: "14px 18px", borderRadius: "10px", border: `1.5px solid ${isSelected ? "#1A5CFF" : "#E2E0DA"}`, background: isSelected ? "rgba(26,92,255,.04)" : "#FAFAF8", cursor: "pointer", transition: "all .15s" }}>
-                  <div style={{ width: "18px", height: "18px", borderRadius: "50%", flexShrink: 0, border: `2px solid ${isSelected ? "#1A5CFF" : "#E2E0DA"}`, background: isSelected ? "#1A5CFF" : "#fff", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    {isSelected && <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#fff" }} />}
-                  </div>
-                  <div>
-                    <div style={{ fontSize: "13px", fontWeight: 700, color: "#2A2830" }}>{type === "card" ? "Credit / Debit Card" : "ACH / Bank Transfer"}</div>
-                    <div style={{ fontSize: "11px", color: "#7A7880", marginTop: "2px" }}>{type === "card" ? "Visa, Mastercard, Amex, Discover" : "Checking or savings account"}</div>
-                  </div>
-                </label>
-              );
-            })}
-          </div>
+      {/* ── Payment Method type selector ── */}
+      <div style={sectionCard}>
+        <span style={sectionTitle}>Payment Method</span>
+        <div style={{ display: "flex", gap: "10px" }}>
+          {(["card", "ach"] as const).map(type => {
+            const isSelected = paymentType === type;
+            return (
+              <label key={type} onClick={() => setPaymentType(type)} style={{ flex: 1, display: "flex", alignItems: "center", gap: "12px", padding: "14px 18px", borderRadius: "10px", border: `1.5px solid ${isSelected ? "#1A5CFF" : "#E2E0DA"}`, background: isSelected ? "rgba(26,92,255,.04)" : "#FAFAF8", cursor: "pointer", transition: "all .15s" }}>
+                <div style={{ width: "18px", height: "18px", borderRadius: "50%", flexShrink: 0, border: `2px solid ${isSelected ? "#1A5CFF" : "#E2E0DA"}`, background: isSelected ? "#1A5CFF" : "#fff", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  {isSelected && <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#fff" }} />}
+                </div>
+                <div>
+                  <div style={{ fontSize: "13px", fontWeight: 700, color: "#2A2830" }}>{type === "card" ? "Credit / Debit Card" : "ACH / Bank Transfer"}</div>
+                  <div style={{ fontSize: "11px", color: "#7A7880", marginTop: "2px" }}>{type === "card" ? "Visa, Mastercard, Amex, Discover" : "Checking or savings account"}</div>
+                </div>
+              </label>
+            );
+          })}
         </div>
-      )}
+      </div>
 
-      {/* ── ACH form (wholesale, ACH selected) ── */}
-      {!isGuest && paymentType === "ach" && (
+      {/* ── ACH form ── */}
+      {paymentType === "ach" && (
         <div style={sectionCard}>
           <span style={sectionTitle}>Bank Account Details</span>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
@@ -238,8 +236,8 @@ export default function CheckoutPaymentPage() {
         </div>
       )}
 
-      {/* ── Card payment section (guests always see this; wholesale when card type selected) ── */}
-      {(isGuest || paymentType === "card") && (
+      {/* ── Card payment section (when card type selected) ── */}
+      {paymentType === "card" && (
       <div style={sectionCard}>
         {!isGuest && <span style={sectionTitle}>Card Details</span>}
 
