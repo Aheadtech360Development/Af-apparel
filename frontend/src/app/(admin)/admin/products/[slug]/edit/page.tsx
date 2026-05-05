@@ -20,7 +20,7 @@ const RichTextEditor = dynamic(
     ),
   }
 );
-import type { Category, ProductDetail, ProductVariant } from "@/types/product.types";
+import type { Category, ProductDetail, ProductImage, ProductVariant } from "@/types/product.types";
 
 // ── Style constants ────────────────────────────────────────────────────────
 const labelStyle: React.CSSProperties = {
@@ -296,7 +296,9 @@ export default function AdminProductEditPage() {
     if (direction === "down" && groupIdx === groupImages.length - 1) return;
     const newGroup = [...groupImages];
     const swapIdx = direction === "up" ? groupIdx - 1 : groupIdx + 1;
-    [newGroup[groupIdx], newGroup[swapIdx]] = [newGroup[swapIdx], newGroup[groupIdx]];
+    const tmp = newGroup[groupIdx] as ProductImage;
+    newGroup[groupIdx] = newGroup[swapIdx] as ProductImage;
+    newGroup[swapIdx] = tmp;
     // Rebuild full array: preserve color-group order, replace this group's images
     const seen = new Set<string>();
     const colorOrder: string[] = [];
