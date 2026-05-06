@@ -1,10 +1,21 @@
 import type { Metadata } from "next";
 import { Shirt, Store, Printer } from "lucide-react";
 
-export const metadata: Metadata = {
-  title: "Private Label | AF Apparels",
-  description: "Custom private label blank apparel manufacturing. Your brand, our factory expertise. Starting at 2,500 units per style/color.",
-};
+const _API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+export async function generateMetadata(): Promise<Metadata> {
+  try {
+    const seo = await fetch(`${_API}/api/v1/pages-seo/private-label`, { next: { revalidate: 300 } }).then(r => r.json());
+    return {
+      title: seo.meta_title ?? "Private Label | AF Apparels",
+      description: seo.meta_description ?? "Custom private label blank apparel manufacturing. Your brand, our factory expertise. Starting at 2,500 units per style/color.",
+      keywords: seo.keywords ?? undefined,
+      openGraph: seo.og_image_url ? { images: [{ url: seo.og_image_url }] } : undefined,
+    };
+  } catch {
+    return { title: "Private Label | AF Apparels" };
+  }
+}
 
 export default function PrivateLabelPage() {
   return (

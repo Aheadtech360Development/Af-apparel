@@ -1,10 +1,21 @@
 import type { Metadata } from "next";
 import { Printer, Palette, Droplets, Scissors, Square, BookOpen } from "lucide-react";
 
-export const metadata: Metadata = {
-  title: "Print Guide | AF Apparels",
-  description: "Tested press settings and fabric compatibility ratings for DTF, screen printing, sublimation, embroidery, and HTV on all AF core blanks.",
-};
+const _API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+export async function generateMetadata(): Promise<Metadata> {
+  try {
+    const seo = await fetch(`${_API}/api/v1/pages-seo/print-guide`, { next: { revalidate: 300 } }).then(r => r.json());
+    return {
+      title: seo.meta_title ?? "Print Guide | AF Apparels",
+      description: seo.meta_description ?? "Tested press settings and fabric compatibility ratings for DTF, screen printing, sublimation, embroidery, and HTV on all AF core blanks.",
+      keywords: seo.keywords ?? undefined,
+      openGraph: seo.og_image_url ? { images: [{ url: seo.og_image_url }] } : undefined,
+    };
+  } catch {
+    return { title: "Print Guide | AF Apparels" };
+  }
+}
 
 const METHODS = [
   {

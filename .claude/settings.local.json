@@ -140,7 +140,9 @@
       "Bash(python \"C:/Users/RT/Desktop/AF Apparel/frontend/src/app/\\(customer\\)/checkout/payment/page.tsx\")",
       "Bash(grep -v \"^$\")",
       "Bash(python -c ' *)",
-      "Bash(xargs grep *)"
+      "Bash(xargs grep *)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\RT\\\\Desktop\\\\AF Apparel\" -Recurse -Directory)",
+      "Bash(Select-Object -ExpandProperty FullName)"
     ]
   }
 }

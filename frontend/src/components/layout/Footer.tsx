@@ -34,6 +34,7 @@ export function Footer() {
           {
             h: "Resources",
             links: [
+              { label: "Blog", href: "/blog" },
               { label: "Print Guide", href: "/print-guide" },
               { label: "Product Specs", href: "/product-specs" },
               { label: "Style Sheets", href: "/style-sheets" },

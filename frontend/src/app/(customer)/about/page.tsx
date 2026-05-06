@@ -1,10 +1,21 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-export const metadata: Metadata = {
-  title: "About Us | AF Apparels",
-  description: "Factory-direct wholesale blank apparel. Dallas, TX. Serving the US print industry since 2010.",
-};
+const _API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+export async function generateMetadata(): Promise<Metadata> {
+  try {
+    const seo = await fetch(`${_API}/api/v1/pages-seo/about`, { next: { revalidate: 300 } }).then(r => r.json());
+    return {
+      title: seo.meta_title ?? "About Us | AF Apparels",
+      description: seo.meta_description ?? "Factory-direct wholesale blank apparel. Dallas, TX. Serving the US print industry since 2010.",
+      keywords: seo.keywords ?? undefined,
+      openGraph: seo.og_image_url ? { images: [{ url: seo.og_image_url }] } : undefined,
+    };
+  } catch {
+    return { title: "About Us | AF Apparels" };
+  }
+}
 
 export default function AboutPage() {
   return (

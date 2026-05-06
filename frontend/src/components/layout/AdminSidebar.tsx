@@ -33,7 +33,7 @@ export function AdminSidebar() {
   const isProductsActive = pathname.startsWith("/admin/products") || pathname.startsWith("/admin/inventory");
   const isCustomersActive = pathname.startsWith("/admin/customers");
   const isSettingsActive = pathname.startsWith("/admin/settings") || pathname.startsWith("/admin/users") || pathname === "/admin/analytics";
-  const isContentActive = pathname.startsWith("/admin/style-sheets") || pathname.startsWith("/admin/product-specs");
+  const isContentActive = pathname.startsWith("/admin/style-sheets") || pathname.startsWith("/admin/product-specs") || pathname.startsWith("/admin/pages") || pathname.startsWith("/admin/blogs");
   const [ordersOpen, setOrdersOpen] = useState(isOrdersActive);
   const [productsOpen, setProductsOpen] = useState(isProductsActive);
   const [customersOpen, setCustomersOpen] = useState(isCustomersActive);
@@ -218,6 +218,8 @@ export function AdminSidebar() {
       </div>
       {contentOpen && (
         <div style={{ paddingLeft: "18px", marginTop: "3px", marginBottom: "3px" }}>
+          <SubLink href="/admin/pages" label="Pages SEO" />
+          <SubLink href="/admin/blogs" label="Blogs" />
           <SubLink href="/admin/style-sheets" label="Style Sheets" />
           <SubLink href="/admin/product-specs" label="Product Specs" />
         </div>

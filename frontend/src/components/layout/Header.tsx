@@ -130,6 +130,7 @@ export function Header() {
                     { href: "/private-label", label: "Private Label", icon: "🏷️" },
                     { href: "/style-sheets", label: "Style Sheets", icon: "📄" },
                     { href: "/product-specs", label: "Product Specs", icon: "📐" },
+                    { href: "/blog", label: "Blog", icon: "✍" },
                     { href: "/contact", label: "Contact Us", icon: "✉" },
                   ].map(({ href, label, icon }) => (
                     <Link
