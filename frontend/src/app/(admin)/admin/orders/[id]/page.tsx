@@ -177,6 +177,7 @@ export default function AdminOrderDetailPage() {
   const [isShipping, setIsShipping] = useState(false);
 
   const [isVerifyingAch, setIsVerifyingAch] = useState(false);
+  const [isResendingInvoice, setIsResendingInvoice] = useState(false);
 
   // Notes state
   const [editingNote, setEditingNote] = useState(false);
@@ -290,6 +291,16 @@ export default function AdminOrderDetailPage() {
     } catch {
       setMsg({ text: "Failed to verify ACH payment.", ok: false });
     } finally { setIsVerifyingAch(false); }
+  }
+
+  async function handleResendInvoice() {
+    setIsResendingInvoice(true); setMsg(null);
+    try {
+      await apiClient.post(`/api/v1/admin/orders/${id}/resend-invoice`, {});
+      setMsg({ text: "Invoice emailed to customer.", ok: true });
+    } catch {
+      setMsg({ text: "Failed to send invoice email.", ok: false });
+    } finally { setIsResendingInvoice(false); }
   }
 
   async function handleSaveNote() {
@@ -690,6 +701,26 @@ export default function AdminOrderDetailPage() {
 
         {/* ── RIGHT SIDEBAR ── */}
         <div>
+          {/* ── SECTION 0: DOCUMENTS ── */}
+          <div style={CardStyle}>
+            <h3 style={{ ...SectionHead, marginBottom: "14px" }}>DOCUMENTS</h3>
+            <div style={{ display: "flex", flexDirection: "column" as const, gap: "8px" }}>
+              <button
+                onClick={handleResendInvoice}
+                disabled={isResendingInvoice}
+                style={{ display: "flex", alignItems: "center", gap: "8px", background: isResendingInvoice ? "#F4F3EF" : "#1B3A5C", color: isResendingInvoice ? "#7A7880" : "#fff", border: "none", padding: "10px 16px", borderRadius: "6px", fontSize: "13px", fontWeight: 700, cursor: isResendingInvoice ? "not-allowed" : "pointer", opacity: isResendingInvoice ? .6 : 1, width: "100%", justifyContent: "center" as const }}>
+                {isResendingInvoice ? "Sending…" : "📄 Email Invoice to Customer"}
+              </button>
+              <a
+                href={`/api/v1/orders/${id}/pdf/invoice`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ display: "flex", alignItems: "center", justifyContent: "center" as const, gap: "8px", background: "#F4F3EF", color: "#2A2830", border: "1px solid #E2E0DA", padding: "10px 16px", borderRadius: "6px", fontSize: "13px", fontWeight: 700, textDecoration: "none" }}>
+                ⬇ Download Invoice PDF
+              </a>
+            </div>
+          </div>
+
           {/* ── SECTION 1: NOTES ── */}
           <div style={CardStyle}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
