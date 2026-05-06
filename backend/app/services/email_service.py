@@ -1,5 +1,6 @@
 #backend/app/services/email_service.py
 """EmailService — DB-stored Jinja2 templates + Resend delivery."""
+import base64
 import json
 import logging
 from uuid import UUID
@@ -83,6 +84,7 @@ class EmailService:
         cc: list[str] | None = None,
         bcc: list[str] | None = None,
         reply_to: str | None = None,
+        attachments: list[dict] | None = None,
     ) -> bool:
         """Send an ad-hoc email without requiring a DB template."""
         return self._send_via_resend(
@@ -93,6 +95,7 @@ class EmailService:
             cc=cc,
             bcc=bcc,
             reply_to=reply_to,
+            attachments=attachments,
         )
 
     def _send_via_resend(
@@ -104,6 +107,7 @@ class EmailService:
         cc: list[str] | None = None,
         bcc: list[str] | None = None,
         reply_to: str | None = None,
+        attachments: list[dict] | None = None,
     ) -> bool:
         if not settings.RESEND_API_KEY:
             logger.warning("RESEND_API_KEY not set — skipping email to %s", to_email)
@@ -131,6 +135,16 @@ class EmailService:
             params["bcc"] = bcc
         if reply_to:
             params["reply_to"] = [reply_to]
+        if attachments:
+            params["attachments"] = [
+                {
+                    "filename": a["filename"],
+                    "content": base64.b64encode(a["content"]).decode()
+                    if isinstance(a["content"], bytes)
+                    else a["content"],
+                }
+                for a in attachments
+            ]
 
         try:
             result = resend.Emails.send(params)

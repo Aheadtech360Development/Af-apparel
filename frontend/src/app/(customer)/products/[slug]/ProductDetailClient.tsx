@@ -745,11 +745,11 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                 <p style={{ fontSize: "13px", color: "#64748B", marginBottom: "18px", lineHeight: 1.5 }}>
                   Create your free wholesale account to view pricing, place orders, and access bulk tier discounts.
                 </p>
-                <div style={{ display: "flex", gap: "8px", justifyContent: "center", flexWrap: "wrap", marginBottom: "18px" }}>
+                {/* <div style={{ display: "flex", gap: "8px", justifyContent: "center", flexWrap: "wrap", marginBottom: "18px" }}>
                   {["✓ Factory-direct pricing", "✓ Tier discounts 50–1,000+ units", "✓ NET 30 available", "✓ Same-day shipping"].map(f => (
                     <span key={f} style={{ background: "#fff", border: "1px solid #E2E8F0", borderRadius: "3px", padding: "5px 12px", fontSize: "11px", fontWeight: 600, color: "#1B3A5C" }}>{f}</span>
                   ))}
-                </div>
+                </div> */}
                 <div style={{ display: "flex", gap: "10px", justifyContent: "center", flexWrap: "wrap" }}>
                   <Link href="/wholesale/register" style={{ background: "#E8242A", color: "#fff", padding: "9px 20px", borderRadius: "3px", fontSize: "14px", fontWeight: 700, textDecoration: "none", fontFamily: "'Barlow Semi Condensed', sans-serif", letterSpacing: ".04em" }}>Apply for Free Account</Link>
                   <Link href="/login" style={{ background: "none", color: "#1B3A5C", padding: "8px 18px", borderRadius: "3px", fontSize: "13px", fontWeight: 700, textDecoration: "none", border: "1.5px solid #1B3A5C" }}>Sign In to Existing Account</Link>
