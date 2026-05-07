@@ -245,7 +245,7 @@ export function Header() {
         </div>
 
         {/* Browse Bar */}
-        <div style={{ background: "#1B3A5C" }} className="hidden md:block">
+        {/* <div style={{ background: "#1B3A5C" }} className="hidden md:block">
           <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 32px", display: "flex", alignItems: "center", overflowX: "auto" }}>
             <span style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".08em", color: "rgba(255,255,255,.45)", whiteSpace: "nowrap", padding: "8px 14px 8px 0", flexShrink: 0 }}>Browse:</span>
             {BROWSE_LINKS.map(({ href, label }) => (
@@ -258,7 +258,7 @@ export function Header() {
               </Link>
             ))}
           </div>
-        </div>
+        </div> */}
 
         {/* Mobile menu */}
         {menuOpen && (

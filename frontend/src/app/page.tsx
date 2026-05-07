@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
 import { Footer } from "@/components/layout/Footer";
 import HeroSection from "@/components/home/HeroSection";
 import TrustStrip from "@/components/home/TrustStrip";
-import { BrandLogos } from "@/components/home/BrandLogos";
+// import { BrandLogos } from "@/components/home/BrandLogos";
 import CategoryGrid from "@/components/home/CategoryGrid";
 import { BestSellers } from "@/components/home/BestSellers";
 import HowItWorks from "@/components/home/HowItWorks";
@@ -53,7 +53,7 @@ export default async function HomePage() {
         {/* S10: Why Choose AF */}
         <WhyChooseUs />
         {/* S11: Client Logos */}
-        <BrandLogos />
+        {/* <BrandLogos /> */}
         <Certifications />
         <FaqSection />
         {/* S13: CTA */}

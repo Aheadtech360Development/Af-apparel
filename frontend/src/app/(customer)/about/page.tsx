@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 
 const _API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -78,13 +79,23 @@ export default function AboutPage() {
               </div>
             </div>
             <div style={{ flex: 1, minWidth: "240px" }}>
-              <div style={{ background: "#F4F6F9", border: "1px solid #E2E8F0", borderRadius: "4px", height: "300px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "#64748B", fontSize: "11px", fontWeight: 600, textAlign: "center", gap: "6px", marginBottom: "12px" }}>
-                <div style={{ fontSize: "28px", opacity: 0.5 }}>🏭</div>
-                <div>Dallas Warehouse Facility<br />American flag, loading docks,<br />branded signage visible</div>
+              <div style={{ border: "1px solid #E2E8F0", borderRadius: "15px", height: "300px", overflow: "hidden", position: "relative", marginBottom: "12px" }}>
+                <Image
+                  src="/Our Story.png"
+                  alt="AF Apparels Dallas Warehouse Facility"
+                  fill
+                  sizes="(max-width: 1140px) 35vw, 380px"
+                  style={{ objectFit: "cover" }}
+                />
               </div>
-              <div style={{ background: "#F4F6F9", border: "1px solid #E2E8F0", borderRadius: "4px", height: "180px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "#64748B", fontSize: "11px", fontWeight: 600, textAlign: "center", gap: "6px" }}>
-                <div style={{ fontSize: "28px", opacity: 0.5 }}>📦</div>
-                <div>Interior: Rack system,<br />folded blanks by color,<br />fulfillment team working</div>
+              <div style={{ border: "1px solid #E2E8F0", borderRadius: "15px", height: "380px", overflow: "hidden", position: "relative" }}>
+                <Image
+                  src="/Our Story-2.png"
+                  alt="AF Apparels Interior Fulfillment Rack System"
+                  fill
+                  sizes="(max-width: 1140px) 35vw, 380px"
+                  style={{ objectFit: "cover" }}
+                />
               </div>
             </div>
           </div>

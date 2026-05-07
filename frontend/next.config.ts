@@ -14,6 +14,9 @@ const nextConfig: NextConfig = {
   },
   images: {
     remotePatterns: [
+      { protocol: "https", hostname: "raw.githubusercontent.com" },
+      { protocol: "https", hostname: "github.com" },
+      { protocol: "https", hostname: "*.githubusercontent.com" },
       { protocol: "http",  hostname: "**" },
       { protocol: "https", hostname: "**" },
     ],

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Shirt, Store, Printer } from "lucide-react";
+import Image from "next/image";
+import { Store, Printer, Shirt } from "lucide-react";
 
 const _API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -23,41 +24,46 @@ export default function PrivateLabelPage() {
 
       {/* Announce */}
       <div style={{ background: "#E8242A", color: "#fff", textAlign: "center", padding: "7px 24px", fontSize: "12px", fontWeight: 600, letterSpacing: ".02em" }}>
-        🏷️ Private Label Program — Custom Styles, Your Brand, Factory-Direct | Min. 2,500 Units/Style/Color
+        Private Label Program — Custom Styles, Your Brand, Factory-Direct | Min. 2,500 Units/Style/Color
       </div>
 
       {/* Hero */}
-      <div style={{ background: "#111", padding: "56px 24px" }}>
+      <div style={{ background: "#f4f3ef", padding: "56px 24px" }}>
         <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "48px", alignItems: "center" }}>
             <div>
-              <div style={{ display: "inline-block", background: "rgba(45,140,255,.15)", color: "#2D8CFF", fontSize: "12px", fontWeight: 700, padding: "4px 12px", borderRadius: "4px", marginBottom: "12px", letterSpacing: ".04em" }}>
-                🏷️ Private Label Program
+              <div style={{ display: "inline-block", background: "#0a1628", color: "#fff", fontSize: "12px", fontWeight: 700, padding: "4px 12px", borderRadius: "4px", marginBottom: "12px", letterSpacing: ".04em" }}>
+                Private Label Program
               </div>
-              <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(22px,3vw,36px)", color: "#fff", margin: "12px 0 10px", lineHeight: 1.1, letterSpacing: ".04em" }}>
+              <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(22px,3vw,36px)", color: "#0a1628", margin: "12px 0 10px", lineHeight: 1.1, letterSpacing: ".04em" }}>
                 Build Your Brand on<br />Factory-Direct Blanks
               </h1>
-              <p style={{ color: "#9CA3AF", fontSize: "14px", lineHeight: 1.7, maxWidth: "460px" }}>
+              <p style={{ color: "#444", fontSize: "14px", lineHeight: 1.7, maxWidth: "460px" }}>
                 Custom neck labels, exclusive colorways, unique styles — all manufactured to your spec and delivered direct from our Dallas facility. Your brand, our infrastructure, no middlemen.
               </p>
               <div style={{ display: "flex", gap: "10px", marginTop: "22px", flexWrap: "wrap" }}>
                 <a href="/contact?dept=private-label" style={{ display: "inline-flex", alignItems: "center", background: "#E8242A", color: "#fff", padding: "12px 28px", fontFamily: "var(--font-bebas)", fontWeight: 700, fontSize: "15px", letterSpacing: ".05em", borderRadius: "3px", textDecoration: "none" }}>
                   Request a Quote →
                 </a>
-                <a href="#" style={{ display: "inline-flex", alignItems: "center", background: "none", color: "#ddd", padding: "12px 28px", fontFamily: "var(--font-bebas)", fontWeight: 700, fontSize: "15px", letterSpacing: ".05em", borderRadius: "3px", border: "2px solid #444", textDecoration: "none" }}>
+                <a href="#" style={{ display: "inline-flex", alignItems: "center", background: "none", color: "#0a1628", padding: "12px 28px", fontFamily: "var(--font-bebas)", fontWeight: 700, fontSize: "15px", letterSpacing: ".05em", borderRadius: "3px", border: "2px solid #0a1628", textDecoration: "none" }}>
                   Download Program Guide
                 </a>
               </div>
               <div style={{ display: "flex", gap: "24px", marginTop: "22px", flexWrap: "wrap" }}>
-                <div style={{ fontSize: "12px", color: "#6B7280" }}>📦 <span style={{ color: "#9CA3AF", fontWeight: 600 }}>Min. 2,500 units</span> per style/color</div>
-                <div style={{ fontSize: "12px", color: "#6B7280" }}>📅 <span style={{ color: "#9CA3AF", fontWeight: 600 }}>45–60 day</span> lead time</div>
-                <div style={{ fontSize: "12px", color: "#6B7280" }}>🌍 <span style={{ color: "#9CA3AF", fontWeight: 600 }}>WRAP & GOTS</span> certified</div>
+                <div style={{ fontSize: "12px", color: "#555" }}>📦 <span style={{ color: "#555", fontWeight: 600 }}>Min. 2,500 units</span> per style/color</div>
+                <div style={{ fontSize: "12px", color: "#555" }}>📅 <span style={{ color: "#555", fontWeight: 600 }}>45–60 day</span> lead time</div>
+                <div style={{ fontSize: "12px", color: "#555" }}>🌍 <span style={{ color: "#555", fontWeight: 600 }}>WRAP & GOTS</span> certified</div>
               </div>
             </div>
-            <div style={{ background: "#1a1a1a", border: "1px solid #333", borderRadius: "8px", height: "280px", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", color: "#555", fontSize: "13px" }}>
-              <Shirt size={48} style={{ marginBottom: "12px", color: "#555" }} />
-              <span>[PRIVATE LABEL PRODUCT PHOTO]</span>
-              <span style={{ fontSize: "10px", marginTop: "4px" }}>Custom neck label / branded hang tag</span>
+            <div style={{ border: "1px solid #ddd", borderRadius: "15px", height: "380px", overflow: "hidden", position: "relative" }}>
+              <Image
+                src="/Private Label Direct Blanks.png"
+                alt="AF Apparels Private Label Direct Blanks"
+                fill
+                sizes="(max-width: 1100px) 45vw, 480px"
+                style={{ objectFit: "cover" }}
+                priority
+              />
             </div>
           </div>
         </div>

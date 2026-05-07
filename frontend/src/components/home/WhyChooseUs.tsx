@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function WhyChooseUs() {
   const rows = [
     { num: "01", h: "No Distributor Markup", p: "We ship direct from our Dallas facility. No intermediaries means 15–30% lower unit cost vs. traditional wholesale." },
@@ -27,11 +29,13 @@ export default function WhyChooseUs() {
             ))}
           </div>
           <div className="hidden lg:flex" style={{ flex: 1, minWidth: "240px" }}>
-            <div style={{ height: "360px", width: "100%", overflow: "hidden", borderRadius: "15px", border: "1px solid #E2E8F0" }}>
-              <img
+            <div style={{ height: "360px", width: "100%", overflow: "hidden", borderRadius: "15px", border: "1px solid #E2E8F0", position: "relative" }}>
+              <Image
                 src="/Why 2,000+ Businesses Choose AF Apparels.png"
                 alt="Warehouse / Fulfillment Center"
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                fill
+                sizes="(max-width: 1140px) 40vw, 440px"
+                style={{ objectFit: "cover" }}
               />
             </div>
           </div>

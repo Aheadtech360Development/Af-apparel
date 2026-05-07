@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useAuthStore } from "@/stores/auth.store";
 
 export default function HeroSection() {
@@ -51,11 +52,14 @@ export default function HeroSection() {
           </div>
         </div>
         <div className="hidden lg:flex" style={{ flex: 1, minWidth: "240px", position: "relative" }}>
-          <div style={{ background: "#E2E0DA", border: "1px solid #CBD5E1", borderRadius: "15px", height: "400px", width: "100%", overflow: "hidden", position: "relative" }}>
-            <img
-              src="/Home Page Hero.png"
+          <div style={{ border: "1px solid #CBD5E1", borderRadius: "15px", height: "400px", width: "100%", overflow: "hidden", position: "relative" }}>
+            <Image
+              src="/Home page Hero.png"
               alt="AF Apparels Wholesale Blanks"
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              fill
+              sizes="(max-width: 1140px) 45vw, 480px"
+              style={{ objectFit: "cover" }}
+              priority
             />
           </div>
         </div>
