@@ -5,7 +5,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import {
   BarChartIcon, PackageIcon, BuildingIcon, ShirtIcon,
-  SettingsIcon, BookIcon, SearchIcon, RefreshIcon, UsersIcon, TrendingUpIcon,
+  SettingsIcon, BookIcon, SearchIcon, RefreshIcon, UsersIcon, TrendingUpIcon, TruckIcon,
 } from "@/components/ui/icons";
 
 const SECTION_HEAD: React.CSSProperties = {
@@ -195,6 +195,7 @@ export function AdminSidebar() {
       {/* ── MARKETING ── */}
       <div style={SECTION_HEAD}>Marketing</div>
       <NavLink href="/admin/discounts" label="Discounts" icon={<span style={{ fontSize: "15px" }}>%</span>} />
+      <NavLink href="/admin/standard-shipping" label="Standard Shipping" icon={<TruckIcon size={15} color="currentColor" />} />
 
       {/* ── CONTENT ── */}
       <div style={SECTION_HEAD}>Content</div>

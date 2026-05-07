@@ -702,7 +702,7 @@ export default function AdminOrderDetailPage() {
         {/* ── RIGHT SIDEBAR ── */}
         <div>
           {/* ── SECTION 0: DOCUMENTS ── */}
-          <div style={CardStyle}>
+          {/* <div style={CardStyle}>
             <h3 style={{ ...SectionHead, marginBottom: "14px" }}>DOCUMENTS</h3>
             <div style={{ display: "flex", flexDirection: "column" as const, gap: "8px" }}>
               <button
@@ -719,7 +719,7 @@ export default function AdminOrderDetailPage() {
                 ⬇ Download Invoice PDF
               </a>
             </div>
-          </div>
+          </div> */}
 
           {/* ── SECTION 1: NOTES ── */}
           <div style={CardStyle}>

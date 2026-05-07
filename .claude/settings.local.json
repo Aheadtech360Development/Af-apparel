@@ -145,7 +145,11 @@
       "Bash(Select-Object -ExpandProperty FullName)",
       "Bash(git commit -m ' *)",
       "Bash(git push *)",
-      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\RT\\\\Desktop\\\\AF Apparel\\\\frontend\\\\src\\\\app\" -Recurse -Name)"
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\RT\\\\Desktop\\\\AF Apparel\\\\frontend\\\\src\\\\app\" -Recurse -Name)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\RT\\\\Desktop\\\\AF Apparel\\\\frontend\\\\src\\\\app\\\\\\(admin\\)\" -Recurse -Include \"*.tsx\", \"*.ts\")",
+      "Bash(Sort-Object)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\RT\\\\Desktop\\\\AF Apparel\\\\backend\\\\app\\\\api\\\\v1\" -Recurse -File)",
+      "Bash(Select-Object FullName)"
     ]
   }
 }

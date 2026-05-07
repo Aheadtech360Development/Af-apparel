@@ -1,7 +1,7 @@
 // frontend/src/app/(customer)/cart/page.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
@@ -9,6 +9,7 @@ import { cartService } from "@/services/cart.service";
 import { apiClient } from "@/lib/api-client";
 import { useAuthStore } from "@/stores/auth.store";
 import type { Cart, CartItem } from "@/types/order.types";
+import { TruckIcon, LockIcon, PhoneIcon, MailIcon } from "@/components/ui/icons";
 
 // ── Color map (same as quick-order) ──────────────────────────────────────────
 const COLOR_MAP: Record<string, string> = {
@@ -191,15 +192,33 @@ export default function CartPage() {
   useEffect(() => {
     if (authIsLoading) return;
     if (!isAuthenticated) {
-      // Guest: load from localStorage
+      // Guest: load from localStorage then fetch real shipping estimate
       setIsGuest(true);
       if (typeof window !== "undefined") {
-        try {
-          const entries: GuestCartEntry[] = JSON.parse(localStorage.getItem("af_guest_cart") || "[]");
-          setCart(entries.length > 0 ? buildGuestCart(entries) : null);
-        } catch { setCart(null); }
+        const loadGuestCart = async () => {
+          try {
+            const entries: GuestCartEntry[] = JSON.parse(localStorage.getItem("af_guest_cart") || "[]");
+            if (entries.length > 0) {
+              const guestCart = buildGuestCart(entries);
+              try {
+                const totalUnits = entries.reduce((s, e) => s + e.quantity, 0);
+                const subtotal = entries.reduce((s, e) => s + e.unit_price * e.quantity, 0);
+                const est = await apiClient.get<{ estimated_shipping: number }>(
+                  `/api/v1/guest/shipping-estimate?units=${totalUnits}&subtotal=${subtotal.toFixed(2)}`
+                );
+                guestCart.validation.estimated_shipping = String(est.estimated_shipping);
+              } catch { /* keep buildGuestCart default */ }
+              setCart(guestCart);
+            } else {
+              setCart(null);
+            }
+          } catch { setCart(null); }
+          setIsLoading(false);
+        };
+        loadGuestCart();
+      } else {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     } else {
       setIsGuest(false);
       cartService.getCart().then(setCart).catch(console.error).finally(() => setIsLoading(false));
@@ -485,8 +504,8 @@ export default function CartPage() {
             <div style={{ position: "sticky", top: "88px" }}>
               <OrderSummary
                 subtotal={subtotal}
-                estimatedShipping={isGuest ? 9.99 : Number(cart?.validation?.estimated_shipping ?? 0)}
-                hasShippingTier={isGuest ? true : hasShippingTier}
+                estimatedShipping={Number(cart?.validation?.estimated_shipping ?? (isGuest ? 9.99 : 0))}
+                hasShippingTier={hasShippingTier}
                 discountPercent={discountPercent}
                 isValid={isCheckoutEnabled}
                 disabledReason={disabledReason}
@@ -564,11 +583,11 @@ function OrderSummary({
   const couponDiscount = appliedCoupon?.discount_amount ?? 0;
   const total = subtotal + (hasShippingTier ? estimatedShipping : 0) + tax - couponDiscount;
 
-  const usp = [
-    { icon: "🚚", text: "Orders before 2 PM CT ship same day" },
-    { icon: "🔒", text: "Secure checkout — SSL encrypted" },
-    { icon: "📞", text: "(214) 272-7213" },
-    { icon: "✉", text: "info.afapparel@gmail.com" },
+  const usp: { icon: ReactNode; text: string }[] = [
+    { icon: <TruckIcon size={14} color="currentColor" />, text: "Orders before 2 PM CT ship same day" },
+    { icon: <LockIcon size={14} color="currentColor" />, text: "Secure checkout — SSL encrypted" },
+    { icon: <PhoneIcon size={14} color="currentColor" />, text: "(214) 272-7213" },
+    { icon: <MailIcon size={14} color="currentColor" />, text: "info.afapparel@gmail.com" },
   ];
 
   return (
@@ -584,12 +603,6 @@ function OrderSummary({
           <span>Subtotal</span>
           <span style={{ fontWeight: 600, color: "#2A2830" }}>{formatCurrency(subtotal)}</span>
         </div>
-        {discountPercent > 0 && (
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#059669" }}>
-            <span style={{ fontWeight: 600 }}>Tier Discount ({discountPercent}% applied)</span>
-            <span style={{ fontWeight: 700 }}>✓ Included</span>
-          </div>
-        )}
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#7A7880" }}>
           <span>Shipping (Standard Ground)</span>
           <span style={{ fontWeight: 600, color: (hasShippingTier && estimatedShipping === 0) ? "#059669" : "#2A2830" }}>
@@ -686,7 +699,7 @@ function OrderSummary({
       <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: "9px" }}>
         {usp.map(({ icon, text }) => (
           <div key={text} style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "12px", color: "#7A7880" }}>
-            <span style={{ fontSize: "14px", flexShrink: 0 }}>{icon}</span>
+            <span style={{ flexShrink: 0, display: "flex" }}>{icon}</span>
             <span>{text}</span>
           </div>
         ))}
