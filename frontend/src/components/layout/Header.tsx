@@ -98,7 +98,7 @@ export function Header() {
           {/* Logo */}
           <Link href="/" className="header-logo" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
             <img
-              src="/Af-apparel logo.jpeg"
+              src="/Af-apparel logo.png"
               alt="AF Apparels Logo"
               style={{ height: "70px", width: "auto", objectFit: "contain" }}
             />

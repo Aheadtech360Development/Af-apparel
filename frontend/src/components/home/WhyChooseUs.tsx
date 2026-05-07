@@ -27,9 +27,9 @@ export default function WhyChooseUs() {
             ))}
           </div>
           <div className="hidden lg:flex" style={{ flex: 1, minWidth: "240px" }}>
-            <div style={{ height: "360px", width: "100%", overflow: "hidden", borderRadius: "4px", border: "1px solid #E2E8F0" }}>
+            <div style={{ height: "360px", width: "100%", overflow: "hidden", borderRadius: "15px", border: "1px solid #E2E8F0" }}>
               <img
-                src="/private_labels_af.webp"
+                src="/Why 2,000+ Businesses Choose AF Apparels.png"
                 alt="Warehouse / Fulfillment Center"
                 style={{ width: "100%", height: "100%", objectFit: "cover" }}
               />

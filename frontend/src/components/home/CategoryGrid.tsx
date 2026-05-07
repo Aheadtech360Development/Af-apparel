@@ -51,7 +51,7 @@ export default function CategoryGrid({ categories }: CategoryGridProps) {
                   <img
                     src={(cat as any).image_url}
                     alt={cat.name}
-                    style={{ width: "100%", height: "100%", objectFit: "contain", position: "absolute", inset: 0 }}
+                    style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", inset: 0 }}
                   />
                 ) : (
                   <ShirtIcon size={52} color="#2A2830" style={{ opacity: 0.2 }} />

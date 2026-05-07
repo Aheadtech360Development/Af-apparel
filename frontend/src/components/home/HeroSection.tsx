@@ -51,9 +51,9 @@ export default function HeroSection() {
           </div>
         </div>
         <div className="hidden lg:flex" style={{ flex: 1, minWidth: "240px", position: "relative" }}>
-          <div style={{ background: "#E2E0DA", border: "1px solid #CBD5E1", borderRadius: "4px", height: "300px", width: "100%", overflow: "hidden", position: "relative" }}>
+          <div style={{ background: "#E2E0DA", border: "1px solid #CBD5E1", borderRadius: "15px", height: "400px", width: "100%", overflow: "hidden", position: "relative" }}>
             <img
-              src="/image1.webp"
+              src="/Home Page Hero.png"
               alt="AF Apparels Wholesale Blanks"
               style={{ width: "100%", height: "100%", objectFit: "cover" }}
             />

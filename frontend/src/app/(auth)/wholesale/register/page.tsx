@@ -211,7 +211,7 @@ export default function WholesaleRegisterPage() {
       {/* Page header */}
       <div style={{ background: "#1B3A5C", padding: "32px", textAlign: "center", borderBottom: "3px solid #E8242A" }}>
         <Link href="/" style={{ display: "inline-flex", alignItems: "center", textDecoration: "none", marginBottom: "16px" }}>
-          <img src="/Af-apparel logo.jpeg" alt="AF Apparels Logo" style={{ height: "55px", width: "auto", objectFit: "contain" }} />
+          <img src="/Af-apparel logo.png" alt="AF Apparels Logo" style={{ height: "55px", width: "auto", objectFit: "contain" }} />
         </Link>
         <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(28px,3vw,42px)", color: "#fff", letterSpacing: ".02em", lineHeight: 1, marginBottom: "8px" }}>
           Apply for Wholesale Access
