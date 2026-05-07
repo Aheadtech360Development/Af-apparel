@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { Store, Printer, Shirt } from "lucide-react";
+import { Store, Printer, Shirt, Package, Calendar, Globe } from "lucide-react";
 
 const _API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -50,9 +50,9 @@ export default function PrivateLabelPage() {
                 </a>
               </div>
               <div style={{ display: "flex", gap: "24px", marginTop: "22px", flexWrap: "wrap" }}>
-                <div style={{ fontSize: "12px", color: "#555" }}>📦 <span style={{ color: "#555", fontWeight: 600 }}>Min. 2,500 units</span> per style/color</div>
-                <div style={{ fontSize: "12px", color: "#555" }}>📅 <span style={{ color: "#555", fontWeight: 600 }}>45–60 day</span> lead time</div>
-                <div style={{ fontSize: "12px", color: "#555" }}>🌍 <span style={{ color: "#555", fontWeight: 600 }}>WRAP & GOTS</span> certified</div>
+                <div style={{ fontSize: "12px", color: "#555", display: "flex", alignItems: "center", gap: "5px" }}><Package size={13} style={{ flexShrink: 0 }} /> <span><span style={{ fontWeight: 600 }}>Min. 2,500 units</span> per style/color</span></div>
+                <div style={{ fontSize: "12px", color: "#555", display: "flex", alignItems: "center", gap: "5px" }}><Calendar size={13} style={{ flexShrink: 0 }} /> <span><span style={{ fontWeight: 600 }}>45–60 day</span> lead time</span></div>
+                <div style={{ fontSize: "12px", color: "#555", display: "flex", alignItems: "center", gap: "5px" }}><Globe size={13} style={{ flexShrink: 0 }} /> <span><span style={{ fontWeight: 600 }}>WRAP & GOTS</span> certified</span></div>
               </div>
             </div>
             <div style={{ border: "1px solid #ddd", borderRadius: "15px", height: "380px", overflow: "hidden", position: "relative" }}>

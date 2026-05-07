@@ -8,6 +8,7 @@ import { authService } from "@/services/auth.service";
 import { apiClient } from "@/lib/api-client";
 import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { ShoppingCartIcon } from "@/components/ui/icons";
+import { Building2, Star, Printer, Tag, FileText, Ruler, PenLine, Mail } from "lucide-react";
 
 const BROWSE_LINKS = [
   { href: "/products?category=t-shirts", label: "T-Shirts" },
@@ -134,16 +135,16 @@ export function Header() {
               </button>
               {resourcesOpen && (
                 <div style={{ position: "absolute", top: "100%", left: 0, marginTop: "6px", background: "#fff", border: "1px solid #E2E0DA", borderRadius: "8px", padding: "6px", minWidth: "200px", boxShadow: "0 8px 24px rgba(0,0,0,.1)", zIndex: 100 }}>
-                  {[
-                    { href: "/about", label: "About Us", icon: "🏭" },
-                    { href: "/reviews", label: "Customer Reviews", icon: "★" },
-                    { href: "/print-guide", label: "Print Guide", icon: "🖨️" },
-                    { href: "/private-label", label: "Private Label", icon: "🏷️" },
-                    { href: "/style-sheets", label: "Style Sheets", icon: "📄" },
-                    { href: "/product-specs", label: "Product Specs", icon: "📐" },
-                    { href: "/blog", label: "Blog", icon: "✍" },
-                    { href: "/contact", label: "Contact Us", icon: "✉" },
-                  ].map(({ href, label, icon }) => (
+                  {([
+                    { href: "/about", label: "About Us", icon: <Building2 size={15} /> },
+                    { href: "/reviews", label: "Customer Reviews", icon: <Star size={15} /> },
+                    { href: "/print-guide", label: "Print Guide", icon: <Printer size={15} /> },
+                    { href: "/private-label", label: "Private Label", icon: <Tag size={15} /> },
+                    { href: "/style-sheets", label: "Style Sheets", icon: <FileText size={15} /> },
+                    { href: "/product-specs", label: "Product Specs", icon: <Ruler size={15} /> },
+                    { href: "/blog", label: "Blog", icon: <PenLine size={15} /> },
+                    { href: "/contact", label: "Contact Us", icon: <Mail size={15} /> },
+                  ] as { href: string; label: string; icon: React.ReactNode }[]).map(({ href, label, icon }) => (
                     <Link
                       key={href}
                       href={href}
@@ -152,7 +153,7 @@ export function Header() {
                       onMouseEnter={e => (e.currentTarget.style.background = "rgba(27,58,92,.06)")}
                       onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                     >
-                      <span style={{ fontSize: "14px", flexShrink: 0 }}>{icon}</span>
+                      <span style={{ flexShrink: 0, color: "#64748B", display: "flex" }}>{icon}</span>
                       {label}
                     </Link>
                   ))}

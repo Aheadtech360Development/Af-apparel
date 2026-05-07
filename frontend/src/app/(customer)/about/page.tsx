@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import { Trophy, Leaf, Handshake, ClipboardList } from "lucide-react";
 
 const _API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -111,21 +112,22 @@ export default function AboutPage() {
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "12px" }}>
             {[
-              { icon: "🏆", title: "ISO 9000", body: "Full quality management system. Consistent production standards, run-to-run." },
-              { icon: "🌿", title: "Oeko-Tex Standard 100", body: "Every component tested for harmful substances. Safe for sensitive skin." },
-              { icon: "🍃", title: "GOTS Certified", body: "Global Organic Textile Standard. Organic cotton sourced and verified from field to finished product." },
-              { icon: "🤝", title: "WRAP Certified", body: "Worldwide Responsible Accredited Production. Ethical labor, legal compliance, safe working conditions." },
+              { icon: <Trophy size={28} style={{ color: "#1B3A5C" }} />, title: "ISO 9000", body: "Full quality management system. Consistent production standards, run-to-run." },
+              { icon: <Leaf size={28} style={{ color: "#1B3A5C" }} />, title: "Oeko-Tex Standard 100", body: "Every component tested for harmful substances. Safe for sensitive skin." },
+              { icon: <Leaf size={28} style={{ color: "#1B3A5C" }} />, title: "GOTS Certified", body: "Global Organic Textile Standard. Organic cotton sourced and verified from field to finished product." },
+              { icon: <Handshake size={28} style={{ color: "#1B3A5C" }} />, title: "WRAP Certified", body: "Worldwide Responsible Accredited Production. Ethical labor, legal compliance, safe working conditions." },
             ].map(c => (
               <div key={c.title} style={{ background: "#fff", border: "1px solid #E2E8F0", borderRadius: "4px", padding: "20px 14px", textAlign: "center" }}>
-                <div style={{ fontSize: "28px", marginBottom: "10px" }}>{c.icon}</div>
+                <div style={{ display: "flex", justifyContent: "center", marginBottom: "10px" }}>{c.icon}</div>
                 <h5 style={{ fontFamily: "'Barlow Semi Condensed', sans-serif", fontSize: "13px", fontWeight: 700, letterSpacing: ".03em", marginBottom: "4px", color: "#1B3A5C" }}>{c.title}</h5>
                 <p style={{ fontSize: "11px", color: "#64748B", lineHeight: 1.5 }}>{c.body}</p>
               </div>
             ))}
           </div>
           <div style={{ textAlign: "center", marginTop: "24px" }}>
-            <div style={{ display: "inline-block", textAlign: "left", maxWidth: "560px", background: "#EEF6FF", borderLeft: "3px solid #1E90FF", padding: "10px 14px", borderRadius: "0 4px 4px 0", fontSize: "12px", color: "#0F172A" }}>
-              📋 <strong>Corporate &amp; Institutional Buyers:</strong> Full certification documentation available on request. Contact us at info.afapparel@gmail.com or (214) 272-7213.
+            <div style={{ display: "inline-flex", alignItems: "flex-start", gap: "8px", textAlign: "left", maxWidth: "560px", background: "#EEF6FF", borderLeft: "3px solid #1E90FF", padding: "10px 14px", borderRadius: "0 4px 4px 0", fontSize: "12px", color: "#0F172A" }}>
+              <ClipboardList size={14} style={{ flexShrink: 0, marginTop: "1px", color: "#1E90FF" }} />
+              <span><strong>Corporate &amp; Institutional Buyers:</strong> Full certification documentation available on request. Contact us at info.afapparel@gmail.com or (214) 272-7213.</span>
             </div>
           </div>
         </div>

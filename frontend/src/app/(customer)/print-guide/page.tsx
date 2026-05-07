@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Printer, Palette, Droplets, Scissors, Square, BookOpen } from "lucide-react";
+import { Printer, Palette, Droplets, Scissors, Square, BookOpen, Microscope, Phone } from "lucide-react";
 
 const _API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -166,15 +166,17 @@ export default function PrintGuidePage() {
     <div style={{ background: "#F7F8FA", minHeight: "100vh" }}>
 
       {/* Announce */}
-      <div style={{ background: "#E8242A", color: "#fff", textAlign: "center", padding: "7px 24px", fontSize: "12px", fontWeight: 600, letterSpacing: ".02em" }}>
-        🖨️ Print Guide — Tested Press Settings &amp; Compatibility for AF Blanks
+      <div style={{ background: "#E8242A", color: "#fff", textAlign: "center", padding: "7px 24px", fontSize: "12px", fontWeight: 600, letterSpacing: ".02em", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+        <Printer size={13} style={{ flexShrink: 0 }} />
+        Print Guide — Tested Press Settings &amp; Compatibility for AF Blanks
       </div>
 
       {/* Hero */}
       <div style={{ background: "#0a1628", padding: "56px 24px" }}>
         <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
-          <div style={{ display: "inline-block", background: "rgba(45,140,255,.15)", color: "#2D8CFF", fontSize: "12px", fontWeight: 700, padding: "4px 12px", borderRadius: "4px", marginBottom: "12px", letterSpacing: ".04em" }}>
-            🔬 Tested in our Dallas facility + validated by 200+ print shops
+          <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(45,140,255,.15)", color: "#2D8CFF", fontSize: "12px", fontWeight: 700, padding: "4px 12px", borderRadius: "4px", marginBottom: "12px", letterSpacing: ".04em" }}>
+            <Microscope size={14} style={{ flexShrink: 0 }} />
+            Tested in our Dallas facility + validated by 200+ print shops
           </div>
           <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(22px,3vw,36px)", color: "#fff", margin: "12px 0 10px", letterSpacing: ".04em" }}>
             Printing Recommendations
@@ -308,8 +310,9 @@ export default function PrintGuidePage() {
             Browse All Blanks
           </a>
         </div>
-        <div style={{ color: "#555", fontSize: "11px", marginTop: "16px" }}>
-          📞 (214) 272-7213 · info.afapparel@gmail.com
+        <div style={{ color: "#555", fontSize: "11px", marginTop: "16px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
+          <Phone size={12} style={{ flexShrink: 0 }} />
+          (214) 272-7213 · info.afapparel@gmail.com
         </div>
       </div>
 

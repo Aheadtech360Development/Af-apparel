@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Phone, Mail, MapPin, Clock, CheckCircle, Briefcase, Wrench, Tag } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, CheckCircle, Briefcase, Wrench, Tag, Check } from "lucide-react";
 import { apiClient } from "@/lib/api-client";
 
 const DEPARTMENTS = [
@@ -42,14 +42,15 @@ export default function ContactPage() {
 
       {/* Announce */}
       <div style={{ background: "#E8242A", color: "#fff", textAlign: "center", padding: "7px 24px", fontSize: "12px", fontWeight: 600, letterSpacing: ".02em" }}>
-        🇺🇸 Factory-Direct Wholesale Blanks — (214) 272-7213 | info.afapparel@gmail.com
+        Factory-Direct Wholesale Blanks — (214) 272-7213 | info.afapparel@gmail.com
       </div>
 
       {/* Hero */}
-      <div style={{ background: "#111", padding: "56px 24px" }}>
+      <div style={{ background: "#0a1628", padding: "56px 24px" }}>
         <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
-          <div style={{ display: "inline-block", background: "rgba(45,140,255,.15)", color: "#2D8CFF", fontSize: "12px", fontWeight: 700, padding: "4px 12px", borderRadius: "4px", marginBottom: "12px", letterSpacing: ".04em" }}>
-            📞 We respond within 4 business hours
+          <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(45,140,255,.15)", color: "#2D8CFF", fontSize: "12px", fontWeight: 700, padding: "4px 12px", borderRadius: "4px", marginBottom: "12px", letterSpacing: ".04em" }}>
+            <Phone size={13} style={{ flexShrink: 0 }} />
+            We respond within 4 business hours
           </div>
           <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(22px,3vw,34px)", color: "#fff", margin: "12px 0 8px", letterSpacing: ".04em" }}>
             Get in Touch With Our Team
@@ -116,8 +117,9 @@ export default function ContactPage() {
                   <button type="submit" disabled={status === "sending"} style={{ width: "100%", background: "#E8242A", color: "#fff", border: "none", borderRadius: "3px", padding: "13px", fontSize: "14px", fontFamily: "var(--font-bebas)", fontWeight: 700, cursor: "pointer", letterSpacing: ".05em", opacity: status === "sending" ? 0.7 : 1 }}>
                     {status === "sending" ? "Sending…" : "Send Message →"}
                   </button>
-                  <div style={{ fontSize: "11px", color: "#aaa", textAlign: "center", marginTop: "10px" }}>
-                    ✓ We respond within 4 business hours Mon–Fri &nbsp;·&nbsp; <span style={{ color: "#E8242A" }}>*</span> Required
+                  <div style={{ fontSize: "11px", color: "#aaa", textAlign: "center", marginTop: "10px", display: "flex", alignItems: "center", justifyContent: "center", gap: "5px" }}>
+                    <Check size={12} style={{ flexShrink: 0 }} />
+                    We respond within 4 business hours Mon–Fri &nbsp;·&nbsp; <span style={{ color: "#E8242A" }}>*</span> Required
                   </div>
                 </form>
               )}
@@ -231,11 +233,11 @@ export default function ContactPage() {
       </div>
 
       {/* CTA */}
-      <div style={{ background: "#1B3A5C", padding: "56px 24px", textAlign: "center" }}>
-        <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(28px,4vw,42px)", color: "#fff", letterSpacing: ".04em", marginBottom: "14px" }}>
+      <div style={{ background: "#f4f3ef", padding: "56px 24px", textAlign: "center" }}>
+        <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(28px,4vw,42px)", color: "#0a1628", letterSpacing: ".04em", marginBottom: "14px" }}>
           NOT SURE WHERE TO START?
         </h2>
-        <p style={{ color: "rgba(255,255,255,.7)", fontSize: "14px", marginBottom: "28px" }}>
+        <p style={{ color: "#444", fontSize: "14px", marginBottom: "28px" }}>
           Apply for a wholesale account and our team will reach out to walk you through everything.
         </p>
         <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
@@ -243,7 +245,7 @@ export default function ContactPage() {
             Apply for Wholesale →
           </a>
         </div>
-        <div style={{ fontSize: "11px", color: "#374151", marginTop: "16px" }}>
+        <div style={{ fontSize: "11px", color: "#666", marginTop: "16px" }}>
           Free · No commitment · Approved within 24 hours
         </div>
       </div>

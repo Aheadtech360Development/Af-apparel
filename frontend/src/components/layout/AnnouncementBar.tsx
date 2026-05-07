@@ -1,5 +1,7 @@
 "use client";
 
+import { Flag } from "lucide-react";
+
 const messages = [
   "Factory-Direct Wholesale Blanks",
   "2,000+ American Businesses",
@@ -17,7 +19,7 @@ export function AnnouncementBar() {
         padding: "9px 24px", fontSize: "12px", fontWeight: 700,
         letterSpacing: ".06em", textTransform: "uppercase", gap: "16px",
       }}>
-        <span>🇺🇸 Factory-Direct Wholesale Blanks</span>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}><Flag size={12} />Factory-Direct Wholesale Blanks</span>
         <span style={{ opacity: .5 }}>·</span>
         <span>2,000+ American Businesses</span>
         <span style={{ opacity: .5 }}>·</span>
@@ -37,7 +39,7 @@ export function AnnouncementBar() {
               flexShrink: 0,
             }}>
               {msg}
-              <span style={{ marginLeft: "48px", opacity: .4 }}>✦</span>
+              <span style={{ marginLeft: "48px", opacity: .4 }}>·</span>
             </span>
           ))}
         </div>

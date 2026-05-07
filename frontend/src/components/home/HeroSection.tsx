@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { Flag } from "lucide-react";
 import { useAuthStore } from "@/stores/auth.store";
 
 export default function HeroSection() {
@@ -13,7 +14,8 @@ export default function HeroSection() {
       <div style={{ maxWidth: "1140px", margin: "0 auto", padding: "48px 24px 44px", display: "flex", gap: "48px", alignItems: "center", flexWrap: "wrap" }}>
         <div style={{ flex: "1.3", minWidth: "280px" }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(27,58,92,.06)", border: "1px solid rgba(27,58,92,.15)", color: "#1B3A5C", fontSize: "11px", fontWeight: 700, padding: "5px 14px", borderRadius: "2px", letterSpacing: ".08em", marginBottom: "18px", textTransform: "uppercase" }}>
-            🇺🇸 Factory-Direct · Dallas, TX · Est. 2010
+            <Flag size={12} style={{ flexShrink: 0 }} />
+            Factory-Direct · Dallas, TX · Est. 2010
           </div>
           <h1 style={{ fontFamily: "'Barlow Semi Condensed', sans-serif", fontSize: "clamp(28px,4vw,46px)", color: "#1B3A5C", lineHeight: 1.05, marginBottom: "14px", fontWeight: 800 }}>
             Premium Blank Apparel.<br />
