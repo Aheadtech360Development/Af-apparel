@@ -372,41 +372,60 @@ export default function CheckoutReviewPage() {
       </div>
 
       {/* ── Order Items ── */}
-      {(isGuest ? guestEntries.length > 0 : cart && cart.items.length > 0) && (
+      {(isGuest ? guestEntries.length > 0 : cart ? cart.items.length > 0 : false) && (
         <div style={sectionCard}>
-          <div style={sectionLabel as React.CSSProperties}>Items in Your Order</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
+            <div style={sectionLabel as React.CSSProperties}>Items in Your Order</div>
+            <span style={{ fontSize: "11px", color: "#7A7880" }}>
+              {isGuest
+                ? `${guestEntries.reduce((s, e) => s + e.quantity, 0)} units`
+                : `${cart!.total_units} units`}
+            </span>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
             {isGuest
               ? guestEntries.map((item, idx) => (
-                  <div key={idx} style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
-                    <div>
-                      <span style={{ fontWeight: 600, color: "#2A2830" }}>{item.product_name}</span>
-                      {(item.color || item.size) && (
-                        <span style={{ color: "#7A7880", marginLeft: "6px" }}>
-                          {[item.color, item.size].filter(Boolean).join(" / ")}
-                        </span>
-                      )}
-                      <span style={{ color: "#7A7880", marginLeft: "6px" }}>x{item.quantity}</span>
+                  <div key={idx} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                    <div style={{ width: "38px", height: "38px", flexShrink: 0, borderRadius: "6px", background: "#F4F3EF", border: "1px solid #E2E0DA", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px" }}>
+                      👕
                     </div>
-                    <span style={{ fontWeight: 600, color: "#2A2830", whiteSpace: "nowrap" }}>{formatCurrency(item.unit_price * item.quantity)}</span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: "13px", fontWeight: 600, color: "#2A2830" }}>{item.product_name}</div>
+                      <div style={{ fontSize: "11px", color: "#7A7880", marginTop: "1px" }}>
+                        {[item.color, item.size].filter(Boolean).join(" / ")}
+                        {" · "}qty {item.quantity}
+                      </div>
+                    </div>
+                    <span style={{ fontSize: "13px", fontWeight: 600, color: "#2A2830", whiteSpace: "nowrap" }}>{formatCurrency(item.unit_price * item.quantity)}</span>
                   </div>
                 ))
               : cart!.items.map(item => (
-                  <div key={item.id} style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
-                    <div>
-                      <span style={{ fontWeight: 600, color: "#2A2830" }}>{item.product_name}</span>
-                      {(item.color || item.size) && (
-                        <span style={{ color: "#7A7880", marginLeft: "6px" }}>
-                          {[item.color, item.size].filter(Boolean).join(" / ")}
-                        </span>
-                      )}
-                      <span style={{ color: "#7A7880", marginLeft: "6px" }}>x{item.quantity}</span>
+                  <div key={item.id} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                    <div style={{ width: "38px", height: "38px", flexShrink: 0, borderRadius: "6px", background: "#F4F3EF", border: "1px solid #E2E0DA", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      {item.product_image_url
+                        ? <img src={item.product_image_url} alt={item.product_name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        : <span style={{ fontSize: "16px" }}>👕</span>
+                      }
                     </div>
-                    <span style={{ fontWeight: 600, color: "#2A2830", whiteSpace: "nowrap" }}>{formatCurrency(Number(item.line_total))}</span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: "13px", fontWeight: 600, color: "#2A2830" }}>{item.product_name}</div>
+                      <div style={{ fontSize: "11px", color: "#7A7880", marginTop: "1px" }}>
+                        {[item.color, item.size].filter(Boolean).join(" / ")}
+                        {" · "}SKU {item.sku}
+                        {" · "}qty {item.quantity}
+                      </div>
+                    </div>
+                    <span style={{ fontSize: "13px", fontWeight: 600, color: "#2A2830", whiteSpace: "nowrap" }}>{formatCurrency(Number(item.line_total))}</span>
                   </div>
                 ))
             }
           </div>
+        </div>
+      )}
+      {/* Loading state for wholesale cart */}
+      {!isGuest && !cart && (
+        <div style={{ ...sectionCard, textAlign: "center", color: "#bbb", fontSize: "13px" }}>
+          Loading order items…
         </div>
       )}
 

@@ -90,7 +90,16 @@ export default function AdminProductsPage() {
   async function handleBulkDelete() {
     if (!selectedIds.length) return;
     if (!confirm(`Permanently delete ${selectedIds.length} product(s)? This cannot be undone.`)) return;
-    await Promise.all(selectedIds.map(id => adminService.deleteProduct(id)));
+    try {
+      const results = await Promise.allSettled(selectedIds.map(id => adminService.deleteProduct(id)));
+      const failed = results.filter(r => r.status === "rejected");
+      if (failed.length > 0) {
+        const reason = (failed[0] as PromiseRejectedResult).reason;
+        alert(`Delete failed: ${reason instanceof Error ? reason.message : "Server error. The product may be referenced by existing orders."}`);
+      }
+    } catch (err: unknown) {
+      alert(`Delete failed: ${err instanceof Error ? err.message : "Server error."}`);
+    }
     setSelectedIds([]);
     load();
   }

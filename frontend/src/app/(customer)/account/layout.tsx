@@ -19,6 +19,7 @@ const NAV_ITEMS = [
   { href: "/account/statements", label: "Statements" },
   { href: "/account/sales-history", label: "Sales History" },
   { href: "/account/inventory", label: "Inventory Listing Report" },
+  { href: "/account/price-list", label: "Price List" },
   { href: "/account/abandoned-carts", label: "Abandoned Carts" },
 ];
 

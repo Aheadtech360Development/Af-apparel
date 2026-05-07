@@ -61,7 +61,7 @@ export default async function ProductsPage({ searchParams }: PageProps) {
   return (
     <div style={{ minHeight: "100vh", background: "#fff", fontFamily: "var(--font-jakarta)" }}>
       {/* Banner */}
-      <div style={{ background: "#1B3A5C", padding: "28px 32px", borderBottom: "3px solid #E8242A" }}>
+      <div style={{ display: "none", background: "#1B3A5C", padding: "28px 32px", borderBottom: "3px solid #E8242A" }}>
         <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
           <h2 style={{ fontFamily: "'Barlow Semi Condensed', sans-serif", fontSize: "28px", fontWeight: 800, color: "#fff", marginBottom: "4px" }}>
             {filters.category

@@ -200,8 +200,8 @@ function BracketEditor({
 export default function DiscountGroupsPage() {
   const searchParams = useSearchParams();
   const initialTab = searchParams.get("tab");
-  const [activeTab, setActiveTab] = useState<"groups" | "variants">(
-    initialTab === "variants" ? "variants" : "groups"
+  const [activeTab, setActiveTab] = useState<"groups" | "variants" | "standard">(
+    initialTab === "variants" ? "variants" : initialTab === "standard" ? "standard" : "groups"
   );
 
   const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null);
@@ -236,6 +236,54 @@ export default function DiscountGroupsPage() {
   const [customerAssignSearch, setCustomerAssignSearch] = useState("");
   const [showAddPanel, setShowAddPanel] = useState(false);
   const [allCustomers, setAllCustomers] = useState<CustomerItem[]>([]);
+
+  // ── Standard Shipping state ───────────────────────────────────────────────
+  const [stdShippingType, setStdShippingType] = useState<"store_default" | "flat_rate">("store_default");
+  const [stdShippingAmount, setStdShippingAmount] = useState(0);
+  const [stdCalcType, setStdCalcType] = useState<"units" | "order_value">("order_value");
+  const [stdCutoffTime, setStdCutoffTime] = useState("");
+  const [stdBrackets, setStdBrackets] = useState<FullShippingBracket[]>([]);
+  const [stdLoading, setStdLoading] = useState(false);
+  const [stdSaving, setStdSaving] = useState(false);
+
+  async function loadStandardShipping() {
+    setStdLoading(true);
+    try {
+      const settings = await apiClient.get<Record<string, string>>("/api/v1/admin/settings");
+      if (settings?.standard_shipping) {
+        try {
+          const cfg = JSON.parse(settings.standard_shipping);
+          setStdShippingType(cfg.shipping_type === "flat_rate" ? "flat_rate" : "store_default");
+          setStdShippingAmount(Number(cfg.shipping_amount ?? 0));
+          setStdCalcType(cfg.calc_type === "units" ? "units" : "order_value");
+          setStdCutoffTime(cfg.cutoff_time ?? "");
+          setStdBrackets(Array.isArray(cfg.brackets) ? cfg.brackets : []);
+        } catch { /* ignore parse errors — use defaults */ }
+      }
+    } finally {
+      setStdLoading(false);
+    }
+  }
+
+  async function saveStandardShipping() {
+    setStdSaving(true);
+    try {
+      await apiClient.patch("/api/v1/admin/settings", {
+        standard_shipping: JSON.stringify({
+          shipping_type: stdShippingType,
+          shipping_amount: stdShippingAmount,
+          calc_type: stdCalcType,
+          cutoff_time: stdCutoffTime,
+          brackets: stdShippingType === "flat_rate" ? stdBrackets : [],
+        }),
+      });
+      showToast("Standard shipping saved");
+    } catch {
+      showToast("Save failed", false);
+    } finally {
+      setStdSaving(false);
+    }
+  }
 
   // ── Individual Variant Pricing state ──────────────────────────────────────
   const [vpProducts, setVpProducts] = useState<VPProduct[]>([]);
@@ -312,10 +360,12 @@ export default function DiscountGroupsPage() {
   useEffect(() => {
     loadGroups();
     if (activeTab === "variants") loadVariantPricing();
+    if (activeTab === "standard") loadStandardShipping();
   }, []); // eslint-disable-line
 
   useEffect(() => {
     if (activeTab === "variants" && vpProducts.length === 0) loadVariantPricing();
+    if (activeTab === "standard") loadStandardShipping();
   }, [activeTab]); // eslint-disable-line
 
   // ── Discount Group helpers ────────────────────────────────────────────────
@@ -343,7 +393,7 @@ export default function DiscountGroupsPage() {
       applies_to: g.applies_to,
       min_req_type: g.min_req_type,
       min_req_value: g.min_req_value,
-      shipping_type: g.shipping_type,
+      shipping_type: ((g.shipping_type as string) === "custom_brackets" ? "flat_rate" : g.shipping_type) as "store_default" | "flat_rate",
       shipping_amount: g.shipping_amount,
       status: g.status,
     });
@@ -503,6 +553,11 @@ export default function DiscountGroupsPage() {
             {vpSaving ? "Saving…" : "Save Pricing"}
           </button>
         )}
+        {activeTab === "standard" && (
+          <button onClick={saveStandardShipping} disabled={stdSaving} style={{ padding: "10px 20px", background: "#1A5CFF", color: "#fff", border: "none", borderRadius: "8px", fontSize: "13px", fontWeight: 700, cursor: "pointer", opacity: stdSaving ? 0.6 : 1 }}>
+            {stdSaving ? "Saving…" : "Save Standard Shipping"}
+          </button>
+        )}
       </div>
 
       {/* Tabs */}
@@ -510,6 +565,7 @@ export default function DiscountGroupsPage() {
         {([
           { key: "groups", label: "Discount Groups" },
           { key: "variants", label: "Individual Variant Pricing" },
+          { key: "standard", label: "Standard Shipping" },
         ] as const).map(tab => (
           <button key={tab.key} onClick={() => setActiveTab(tab.key)}
             style={{
@@ -668,6 +724,115 @@ export default function DiscountGroupsPage() {
                   ))}
                 </tbody>
               </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── TAB: Standard Shipping ── */}
+      {activeTab === "standard" && (
+        <div>
+          <div style={{ background: "rgba(26,92,255,.04)", border: "1px solid rgba(26,92,255,.15)", borderRadius: "8px", padding: "14px 18px", marginBottom: "20px", fontSize: "13px", color: "#2A2830", lineHeight: 1.7 }}>
+            <strong>Standard Shipping</strong> — applies to customers who are not in any discount group and have no shipping tier assigned.
+            Configure a flat rate or bracket-based shipping rate for these customers.
+          </div>
+
+          {stdLoading ? (
+            <div style={{ textAlign: "center", padding: "60px", color: "#bbb", fontSize: "14px" }}>Loading…</div>
+          ) : (
+            <div style={{ background: "#fff", border: "1.5px solid #E2E0DA", borderRadius: "12px", padding: "24px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+
+                {/* Flat Rate option */}
+                <div>
+                  <label style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 14px", background: stdShippingType === "store_default" ? "rgba(26,92,255,.06)" : "#fff", border: `1.5px solid ${stdShippingType === "store_default" ? "#1A5CFF" : "#E2E0DA"}`, borderRadius: "7px", cursor: "pointer" }}>
+                    <input type="radio" name="std_shipping_type" value="store_default" checked={stdShippingType === "store_default"} onChange={() => setStdShippingType("store_default")} style={{ accentColor: "#1A5CFF" }} />
+                    <div>
+                      <div style={{ fontSize: "13px", fontWeight: 600, color: "#2A2830" }}>Flat Rate</div>
+                      <div style={{ fontSize: "11px", color: "#7A7880" }}>A single shipping cost applied to every order</div>
+                    </div>
+                  </label>
+                  {stdShippingType === "store_default" && (
+                    <div style={{ marginTop: "10px", marginLeft: "12px", border: "1px solid #E2E0DA", borderRadius: "8px", background: "#fff", padding: "14px 16px" }}>
+                      <label style={labelStyle}>Shipping Amount</label>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        <span style={{ fontSize: "14px", color: "#7A7880" }}>$</span>
+                        <input
+                          type="number"
+                          min={0}
+                          step="0.01"
+                          value={stdShippingAmount}
+                          onChange={e => setStdShippingAmount(parseFloat(e.target.value) || 0)}
+                          placeholder="0.00"
+                          style={{ ...inputStyle, width: "130px" }}
+                        />
+                        {stdShippingAmount === 0 && (
+                          <span style={{ fontSize: "11px", fontWeight: 700, color: "#059669", background: "rgba(5,150,105,.1)", padding: "2px 8px", borderRadius: "4px" }}>FREE</span>
+                        )}
+                      </div>
+                      <p style={{ fontSize: "11px", color: "#7A7880", marginTop: "6px" }}>Set 0.00 for free shipping on all standard orders.</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Bracket-based option */}
+                <div>
+                  <label style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 14px", background: stdShippingType === "flat_rate" ? "rgba(26,92,255,.06)" : "#fff", border: `1.5px solid ${stdShippingType === "flat_rate" ? "#1A5CFF" : "#E2E0DA"}`, borderRadius: "7px", cursor: "pointer" }}>
+                    <input type="radio" name="std_shipping_type" value="flat_rate" checked={stdShippingType === "flat_rate"} onChange={() => setStdShippingType("flat_rate")} style={{ accentColor: "#1A5CFF" }} />
+                    <div>
+                      <div style={{ fontSize: "13px", fontWeight: 600, color: "#2A2830" }}>Bracket-Based Rate</div>
+                      <div style={{ fontSize: "11px", color: "#7A7880" }}>Shipping cost varies by order size or value</div>
+                    </div>
+                  </label>
+
+                  {stdShippingType === "flat_rate" && (
+                    <div style={{ marginTop: "10px", marginLeft: "12px", border: "1px solid #E2E0DA", borderRadius: "8px", background: "#fff", padding: "16px" }}>
+                      <div style={{ marginBottom: "14px" }}>
+                        <label style={labelStyle}>Calculation Type</label>
+                        <div style={{ display: "flex", gap: "8px" }}>
+                          {(["units", "order_value"] as const).map(t => (
+                            <button key={t} type="button"
+                              onClick={() => { setStdCalcType(t); setStdBrackets([]); }}
+                              style={{
+                                flex: 1, padding: "9px 12px", border: `2px solid ${stdCalcType === t ? "#1A5CFF" : "#E2E0DA"}`,
+                                borderRadius: "7px", fontSize: "12px", fontWeight: 700, cursor: "pointer",
+                                background: stdCalcType === t ? "rgba(26,92,255,.06)" : "#fff",
+                                color: stdCalcType === t ? "#1A5CFF" : "#7A7880",
+                              }}>
+                              {t === "units" ? "📦 Per Unit Count" : "💰 Per Order Value"}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div style={{ marginBottom: "14px" }}>
+                        <label style={labelStyle}>Order Cutoff Time</label>
+                        <input
+                          value={stdCutoffTime}
+                          onChange={e => setStdCutoffTime(e.target.value)}
+                          placeholder="e.g. 12PM"
+                          style={{ ...inputStyle, width: "130px" }}
+                        />
+                        <div style={{ fontSize: "11px", color: "#aaa", marginTop: "4px" }}>Shown to customers at checkout.</div>
+                      </div>
+
+                      <div>
+                        <label style={{ ...labelStyle, marginBottom: "10px" }}>Pricing Brackets</label>
+                        <BracketEditor
+                          brackets={stdBrackets}
+                          calcType={stdCalcType}
+                          onChange={setStdBrackets}
+                        />
+                        <div style={{ fontSize: "11px", color: "#aaa", marginTop: "6px" }}>
+                          {stdCalcType === "units"
+                            ? "Each row covers a unit range. Leave Max blank on the last row to cover all quantities above."
+                            : "Each row covers a dollar range. Set cost $0.00 to offer free shipping above a certain amount."}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           )}
         </div>

@@ -131,7 +131,7 @@ export default function QuickOrderPage() {
 
   function getRowTotals(row: QuickOrderRow): { units: number; price: number } {
     let units = 0, price = 0;
-    for (const color of row.expandedColors) {
+    for (const color of Object.keys(row.quantities)) {
       for (const size of getSizesForColor(row, color)) {
         const qty = row.quantities[color]?.[size] ?? 0;
         if (qty > 0) {
@@ -189,7 +189,9 @@ export default function QuickOrderPage() {
     const qty = parseInt(value, 10);
     setRows((prev) => prev.map((r) => {
       if (r.id !== rowId) return r;
-      const colorQtys = { ...(r.quantities[color] ?? {}), [size]: isNaN(qty) || qty < 0 ? 0 : qty };
+      const maxQty = r.productDetail?.variants.find((v) => v.color === color && v.size === size)?.stock_quantity;
+      const clamped = isNaN(qty) || qty < 0 ? 0 : maxQty !== undefined ? Math.min(qty, maxQty) : qty;
+      const colorQtys = { ...(r.quantities[color] ?? {}), [size]: clamped };
       return { ...r, quantities: { ...r.quantities, [color]: colorQtys } };
     }));
   }
@@ -206,7 +208,7 @@ export default function QuickOrderPage() {
     setCartMsg(null);
     let added = 0, errors = 0;
     for (const row of activeRows) {
-      const items = row.expandedColors.flatMap((color) =>
+      const items = Object.keys(row.quantities).flatMap((color) =>
         getSizesForColor(row, color)
           .filter((size) => (row.quantities[color]?.[size] ?? 0) > 0)
           .flatMap((size) => {
@@ -637,14 +639,17 @@ export default function QuickOrderPage() {
                                         {sizes.map((size) => {
                                           const v = getVariantForColor(row, color, size);
                                           const unitPrice = v?.effective_price ?? v?.retail_price;
+                                          const oos = !v || v.stock_quantity === 0 || v.status === "out_of_stock";
                                           return (
                                             <th key={size} style={{ padding: "0 0 8px", textAlign: "center", minWidth: "60px" }}>
-                                              <div style={{ fontFamily: "var(--font-bebas)", fontSize: "15px", letterSpacing: ".06em", color: "#2A2830" }}>{size}</div>
-                                              {unitPrice && (
+                                              <div style={{ fontFamily: "var(--font-bebas)", fontSize: "15px", letterSpacing: ".06em", color: oos ? "#ccc" : "#2A2830" }}>{size}</div>
+                                              {oos ? (
+                                                <div style={{ fontSize: "9px", color: "#E8242A", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em" }}>Out</div>
+                                              ) : unitPrice ? (
                                                 <div style={{ fontSize: "10px", color: "#7A7880", fontWeight: 400, fontFamily: "var(--font-jakarta)" }}>
                                                   {formatCurrency(parseFloat(unitPrice))}
                                                 </div>
-                                              )}
+                                              ) : null}
                                             </th>
                                           );
                                         })}
@@ -657,26 +662,32 @@ export default function QuickOrderPage() {
                                       <tr>
                                         {sizes.map((size) => {
                                           const qty = row.quantities[color]?.[size] ?? 0;
+                                          const v = getVariantForColor(row, color, size);
+                                          const oos = !v || v.stock_quantity === 0 || v.status === "out_of_stock";
                                           return (
                                             <td key={size} style={{ padding: 0, textAlign: "center" }}>
                                               <input
                                                 type="number"
                                                 min={0}
+                                                max={v?.stock_quantity ?? 0}
+                                                disabled={oos}
                                                 value={qty === 0 ? "" : qty}
                                                 onChange={(e) => handleQtyChange(row.id, color, size, e.target.value)}
-                                                placeholder="0"
+                                                placeholder={oos ? "—" : "0"}
                                                 style={{
                                                   width: "60px", height: "42px",
                                                   textAlign: "center", fontSize: "15px", fontWeight: 700,
-                                                  border: qty > 0 ? "2px solid #1A5CFF" : "1.5px solid #E2E0DA",
+                                                  border: oos ? "1.5px solid #E2E0DA" : qty > 0 ? "2px solid #1A5CFF" : "1.5px solid #E2E0DA",
                                                   borderRadius: "6px", outline: "none",
-                                                  background: qty > 0 ? "rgba(26,92,255,.04)" : "#fff",
-                                                  color: "#2A2830", transition: "border-color .12s, background .12s",
+                                                  background: oos ? "#F9F8F7" : qty > 0 ? "rgba(26,92,255,.04)" : "#fff",
+                                                  color: oos ? "#ccc" : "#2A2830",
+                                                  cursor: oos ? "not-allowed" : "text",
+                                                  transition: "border-color .12s, background .12s",
                                                   fontFamily: "var(--font-jakarta)",
                                                   MozAppearance: "textfield",
                                                 }}
                                                 onFocus={(e) => { if (!e.currentTarget.value) e.currentTarget.placeholder = ""; }}
-                                                onBlur={(e) => { e.currentTarget.placeholder = "0"; }}
+                                                onBlur={(e) => { e.currentTarget.placeholder = oos ? "—" : "0"; }}
                                               />
                                             </td>
                                           );

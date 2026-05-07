@@ -302,8 +302,7 @@ export default function CheckoutAddressPage() {
 
   const SHIPPING_OPTIONS: { id: ShippingMethod; label: string; sub: string }[] = [
     { id: "standard", label: "Standard Ground", sub: "3–5 business days · Ships from Dallas, TX" },
-    { id: "expedited", label: "Expedited (2-Day)", sub: "2 business days — guaranteed delivery" },
-    { id: "will_call", label: "Will Call Pickup", sub: "Pick up from our warehouse · No shipping fee" },
+    { id: "will_call", label: "Will Call Pickup", sub: "Pick up at our warehouse · 11655 Plano Rd, Dallas, TX 75243 · No shipping fee" },
   ];
 
   return (

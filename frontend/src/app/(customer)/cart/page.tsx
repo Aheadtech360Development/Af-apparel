@@ -317,7 +317,7 @@ export default function CartPage() {
     <div style={{ minHeight: "100vh", background: "#F4F3EF", fontFamily: "var(--font-jakarta)", paddingBottom: "60px" }}>
 
       {/* Header bar */}
-      <div style={{ background: "#1B3A5C", borderBottom: "3px solid #E8242A", padding: "20px 32px 18px" }}>
+      <div style={{ display: "none", background: "#1B3A5C", borderBottom: "3px solid #E8242A", padding: "20px 32px 18px" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
           <div style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".14em", color: "rgba(255,255,255,.5)", marginBottom: "4px" }}>Wholesale</div>
           <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(24px,4vw,40px)", color: "#fff", letterSpacing: ".03em", lineHeight: 1 }}>

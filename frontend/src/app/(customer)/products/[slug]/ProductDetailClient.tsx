@@ -202,6 +202,14 @@ function ReviewsTab({ productId, isAuthenticated }: { productId: string; isAuthe
             Write a Review
           </button>
         )}
+        {!isAuthenticated && (
+          <a
+            href="/login"
+            style={{ padding: "9px 18px", background: "#f4f3ef", color: "#1B3A5C", border: "1.5px solid #1B3A5C", borderRadius: "7px", fontSize: "13px", fontWeight: 700, textDecoration: "none" }}
+          >
+            Log in to Write a Review →
+          </a>
+        )}
       </div>
 
       {/* Submit form — only shown when logged in */}

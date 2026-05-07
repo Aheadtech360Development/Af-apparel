@@ -6,7 +6,7 @@
 
 @layer base {
   :root {
-    --font-jakarta: "Plus Jakarta Sans", system-ui, sans-serif;
+    --font-jakarta: "Barlow Semi Condensed", system-ui, sans-serif;
     --font-bebas: "Bebas Neue", sans-serif;
     --af-black: #080808;
     --af-dark: #111016;

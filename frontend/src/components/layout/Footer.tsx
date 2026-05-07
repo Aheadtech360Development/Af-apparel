@@ -3,17 +3,10 @@ import { PhoneIcon, MailIcon } from "@/components/ui/icons";
 
 export function Footer() {
   return (
-    <footer style={{ background: "#040406", borderTop: "1px solid rgba(255,255,255,.04)" }}>
+    <footer style={{ background: "#1B3A5C", borderTop: "1px solid rgba(255,255,255,.08)" }}>
       <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "52px 32px 40px", display: "grid", gridTemplateColumns: "1.8fr 1fr 1fr 1fr 1fr", gap: "32px" }} className="footer-grid-responsive">
         <div>
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <img
-              src="/Af-apparel logo.jpeg"
-              alt="AF Apparels Logo"
-              style={{ height: "55px", width: "auto", objectFit: "contain" }}
-            />
-          </div>
-          <p style={{ fontSize: "15px", color: "#d3d0d0", lineHeight: 1.75, marginTop: "14px", fontWeight: 500 }}>
+          <p style={{ fontSize: "15px", color: "#d3d0d0", lineHeight: 1.75, fontWeight: 500 }}>
             Factory-direct wholesale blank apparel. Serving 2,000+ businesses across the US from our Dallas, TX warehouse.<br /><br />
             <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}><PhoneIcon size={15} color="#d3d0d0" /> (214) 272-7213</span><br />
             <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}><MailIcon size={15} color="#d3d0d0" /> info@afblanks.com</span>
@@ -28,17 +21,14 @@ export function Footer() {
               { label: "Hoodies", href: "/products?category=hoodies" },
               { label: "Sweatshirts", href: "/products?category=sweatshirts" },
               { label: "Polos", href: "/products?category=polo-shirts" },
-              { label: "Jackets", href: "/products?category=jackets" },
             ],
           },
           {
             h: "Resources",
             links: [
               { label: "Blog", href: "/blog" },
-              { label: "Print Guide", href: "/print-guide" },
               { label: "Product Specs", href: "/product-specs" },
               { label: "Style Sheets", href: "/style-sheets" },
-              { label: "Private Label", href: "/private-label" },
               { label: "About Us", href: "/about" },
             ],
           },
@@ -47,19 +37,16 @@ export function Footer() {
             links: [
               { label: "Apply for Wholesale", href: "/wholesale/register" },
               { label: "Log In", href: "/login" },
+              { label: "My Account", href: "/account" },
               { label: "Order History", href: "/account/orders" },
-              { label: "NET 30 Terms", href: "/privacy-policy#terms" },
-              { label: "Settings", href: "/account/profile" },
             ],
           },
           {
             h: "Support",
             links: [
               { label: "Contact Us", href: "/contact" },
-              { label: "Shipping Info", href: "/privacy-policy#shipping" },
-              { label: "Returns Policy", href: "/privacy-policy#returns" },
-              { label: "Privacy Policy", href: "/privacy-policy#privacy" },
               { label: "Track Order", href: "/track-order" },
+              { label: "Privacy Policy", href: "/privacy-policy" },
             ],
           },
         ].map(col => (
@@ -81,7 +68,7 @@ export function Footer() {
         <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", alignItems: "center" }}>
           <span style={{ fontSize: "11px", color: "#d3d0d0", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".07em", marginRight: "6px" }}>Accepted:</span>
           {["VISA", "MC", "AMEX", "ACH", "WIRE", "NET 30"].map(m => (
-            <span key={m} style={{ background: "#0d0d0f", color: "#d3d0d0", padding: "5px 12px", borderRadius: "4px", fontSize: "11px", fontWeight: 800, border: "1px solid rgba(255,255,255,.08)", letterSpacing: ".04em" }}>{m}</span>
+            <span key={m} style={{ background: "rgba(255,255,255,.08)", color: "#d3d0d0", padding: "5px 12px", borderRadius: "4px", fontSize: "11px", fontWeight: 800, border: "1px solid rgba(255,255,255,.15)", letterSpacing: ".04em" }}>{m}</span>
           ))}
         </div>
         <div style={{ fontSize: "13px", color: "#d3d0d0", letterSpacing: ".02em", fontWeight: 500 }}>

@@ -29,7 +29,7 @@ export default function CheckoutLayout({ children }: CheckoutLayoutProps) {
   return (
     <div style={{ minHeight: "100vh", background: "#F4F3EF", fontFamily: "var(--font-jakarta)" }}>
       {/* Page header */}
-      <div style={{ background: "#1B3A5C", borderBottom: "3px solid #E8242A", padding: "18px 32px 16px" }}>
+      <div style={{ display: "none", background: "#1B3A5C", borderBottom: "3px solid #E8242A", padding: "18px 32px 16px" }}>
         <div style={{ maxWidth: "680px", margin: "0 auto" }}>
           <div style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".14em", color: "rgba(255,255,255,.5)", marginBottom: "4px" }}>AF Apparels</div>
           <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(22px,3vw,34px)", color: "#fff", letterSpacing: ".03em", lineHeight: 1 }}>

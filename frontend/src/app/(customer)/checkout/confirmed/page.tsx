@@ -157,7 +157,7 @@ export default function CheckoutConfirmedPage() {
         >
           {(() => { try { const d = JSON.parse(sessionStorage.getItem("af_confirmed_order") || "{}"); return d.isGuest ? "Track Your Order" : "View My Orders"; } catch { return "View My Orders"; } })()}
         </Link>
-        <Link
+        <a
           href="/products"
           style={{
             display: "block", padding: "14px", background: "#fff", color: "#2A2830",
@@ -166,7 +166,7 @@ export default function CheckoutConfirmedPage() {
           }}
         >
           Continue Shopping
-        </Link>
+        </a>
       </div>
     </div>
   );

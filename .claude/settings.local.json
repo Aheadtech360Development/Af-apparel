@@ -142,7 +142,10 @@
       "Bash(python -c ' *)",
       "Bash(xargs grep *)",
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\RT\\\\Desktop\\\\AF Apparel\" -Recurse -Directory)",
-      "Bash(Select-Object -ExpandProperty FullName)"
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\RT\\\\Desktop\\\\AF Apparel\\\\frontend\\\\src\\\\app\" -Recurse -Name)"
     ]
   }
 }
