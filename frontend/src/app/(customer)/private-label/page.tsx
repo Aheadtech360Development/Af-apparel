@@ -192,22 +192,22 @@ export default function PrivateLabelPage() {
       </div>
 
       {/* CTA */}
-      <div style={{ background: "#1B3A5C", padding: "56px 24px", textAlign: "center" }}>
-        <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(24px,3.5vw,36px)", color: "#fff", letterSpacing: ".04em", marginBottom: "14px" }}>
+      <div style={{ background: "#f4f3ef", padding: "56px 24px", textAlign: "center" }}>
+        <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(24px,3.5vw,36px)", color: "#0a1628", letterSpacing: ".04em", marginBottom: "14px" }}>
           READY TO BUILD YOUR BRAND?
         </h2>
-        <p style={{ color: "rgba(255,255,255,.7)", fontSize: "14px", marginBottom: "24px" }}>
+        <p style={{ color: "#444", fontSize: "14px", marginBottom: "24px" }}>
           Tell us about your project and our private label team will respond within 1 business day with pricing, timeline, and next steps.
         </p>
         <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap", marginBottom: "14px" }}>
           <a href="/contact?dept=private-label" style={{ display: "inline-flex", alignItems: "center", background: "#E8242A", color: "#fff", padding: "12px 28px", fontFamily: "var(--font-bebas)", fontWeight: 700, fontSize: "15px", letterSpacing: ".05em", borderRadius: "3px", textDecoration: "none" }}>
             Request a Private Label Quote →
           </a>
-          <a href="#" style={{ display: "inline-flex", alignItems: "center", background: "none", color: "#ddd", padding: "12px 28px", fontFamily: "var(--font-bebas)", fontWeight: 700, fontSize: "15px", letterSpacing: ".05em", borderRadius: "3px", border: "2px solid #444", textDecoration: "none" }}>
+          <a href="#" style={{ display: "inline-flex", alignItems: "center", background: "none", color: "#0a1628", padding: "12px 28px", fontFamily: "var(--font-bebas)", fontWeight: 700, fontSize: "15px", letterSpacing: ".05em", borderRadius: "3px", border: "2px solid #0a1628", textDecoration: "none" }}>
             Download Program Guide
           </a>
         </div>
-        <div style={{ fontSize: "11px", color: "#374151" }}>
+        <div style={{ fontSize: "11px", color: "#555" }}>
           📞 (214) 272-7213 &nbsp;·&nbsp; privatelabel@afapparel.com &nbsp;·&nbsp; Response within 1 business day
         </div>
       </div>
