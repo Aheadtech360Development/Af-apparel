@@ -16,6 +16,7 @@ export function ApprovalModal({ applicationId, companyName, onClose, onSuccess }
   const [discountGroups, setDiscountGroups] = useState<DiscountGroup[]>([]);
   const [discountGroupId, setDiscountGroupId] = useState("");
   const [notes, setNotes] = useState("");
+  const [taxExempt, setTaxExempt] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,6 +34,7 @@ export function ApprovalModal({ applicationId, companyName, onClose, onSuccess }
       await adminService.approveApplication(applicationId, {
         discount_group_id: discountGroupId || undefined,
         notes: notes || undefined,
+        tax_exempt: taxExempt,
       });
       onSuccess();
     } catch (err: unknown) {
@@ -63,6 +65,22 @@ export function ApprovalModal({ applicationId, companyName, onClose, onSuccess }
                 </option>
               ))}
             </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Tax Exempt</label>
+            <label className="flex items-center gap-3 cursor-pointer select-none">
+              <div
+                onClick={() => setTaxExempt(v => !v)}
+                className="relative flex-shrink-0"
+                style={{ width: "44px", height: "24px", borderRadius: "12px", background: taxExempt ? "#059669" : "#E2E0DA", cursor: "pointer", transition: "background .2s" }}
+              >
+                <div style={{ position: "absolute", top: "3px", left: taxExempt ? "23px" : "3px", width: "18px", height: "18px", borderRadius: "50%", background: "#fff", transition: "left .2s", boxShadow: "0 1px 4px rgba(0,0,0,.2)" }} />
+              </div>
+              <span className="text-sm text-gray-700">
+                {taxExempt ? <strong style={{ color: "#059669" }}>Tax Exempt — no tax will be charged</strong> : "Not tax exempt (standard tax applies)"}
+              </span>
+            </label>
           </div>
 
           <div>

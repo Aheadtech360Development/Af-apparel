@@ -41,6 +41,7 @@ interface Customer {
   qb_customer_id: string | null;
   admin_notes: string | null;
   tags: string[];
+  tax_exempt: boolean;
   created_at: string;
   updated_at: string;
   // enriched (may be missing)
@@ -149,6 +150,10 @@ export default function CustomerDetailPage() {
   const [suspendReason, setSuspendReason] = useState("");
   const [suspending, setSuspending] = useState(false);
 
+  // tax exempt
+  const [taxExempt, setTaxExempt] = useState(false);
+  const [savingTaxExempt, setSavingTaxExempt] = useState(false);
+
   // feedback
   const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null);
 
@@ -168,6 +173,7 @@ export default function CustomerDetailPage() {
         setTags(co.tags ?? []);
         setNote(co.admin_notes ?? "");
         setNoteText(co.admin_notes ?? "");
+        setTaxExempt(co.tax_exempt ?? false);
 
         const groups = await apiClient.get<DiscountGroup[]>("/api/v1/admin/discount-groups").catch(() => []);
         setDiscountGroups(Array.isArray(groups) ? groups : []);
@@ -269,6 +275,21 @@ export default function CustomerDetailPage() {
       showToast("Company reactivated");
     } catch {
       showToast("Failed to reactivate", false);
+    }
+  }
+
+  async function handleToggleTaxExempt() {
+    const newValue = !taxExempt;
+    setSavingTaxExempt(true);
+    try {
+      await adminService.updateCompany(id, { tax_exempt: newValue });
+      setTaxExempt(newValue);
+      setCustomer(c => c ? { ...c, tax_exempt: newValue } : c);
+      showToast(newValue ? "Tax Exempt enabled — no tax will be charged" : "Tax Exempt disabled");
+    } catch {
+      showToast("Failed to update tax exempt status", false);
+    } finally {
+      setSavingTaxExempt(false);
     }
   }
 
@@ -664,6 +685,42 @@ export default function CustomerDetailPage() {
                 ));
               })()}
             </div>
+          </div>
+
+          {/* Tax Exempt */}
+          <div style={card}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+              <div style={sectionTitle}>Tax Exempt</div>
+              {taxExempt && (
+                <span style={{ fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "20px", background: "rgba(5,150,105,.1)", color: "#059669" }}>
+                  ACTIVE
+                </span>
+              )}
+            </div>
+            <p style={{ fontSize: "12px", color: "#7A7880", marginBottom: "12px", lineHeight: 1.5 }}>
+              When enabled, this customer will not be charged or shown any tax at checkout.
+            </p>
+            <label
+              onClick={!savingTaxExempt ? handleToggleTaxExempt : undefined}
+              style={{ display: "flex", alignItems: "center", gap: "12px", cursor: savingTaxExempt ? "not-allowed" : "pointer", opacity: savingTaxExempt ? 0.6 : 1 }}
+            >
+              <div style={{
+                position: "relative", width: "44px", height: "24px", borderRadius: "12px",
+                background: taxExempt ? "#059669" : "#E2E0DA",
+                transition: "background .2s", flexShrink: 0,
+              }}>
+                <div style={{
+                  position: "absolute", top: "3px",
+                  left: taxExempt ? "23px" : "3px",
+                  width: "18px", height: "18px", borderRadius: "50%",
+                  background: "#fff", transition: "left .2s",
+                  boxShadow: "0 1px 4px rgba(0,0,0,.2)",
+                }} />
+              </div>
+              <span style={{ fontSize: "13px", fontWeight: 600, color: taxExempt ? "#059669" : "#7A7880" }}>
+                {savingTaxExempt ? "Saving…" : taxExempt ? "Tax Exempt — no tax charged" : "Not exempt (standard tax)"}
+              </span>
+            </label>
           </div>
 
           {/* Tags */}

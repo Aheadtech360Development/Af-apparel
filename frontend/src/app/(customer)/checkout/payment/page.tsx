@@ -23,6 +23,14 @@ interface SavedCard {
   is_default: boolean;
 }
 
+interface SavedAch {
+  bank_name: string;
+  account_holder: string;
+  routing_last4: string;
+  account_last4: string;
+  account_type: string;
+}
+
 function brandDisplayName(brand: string): string {
   const b = brand.toLowerCase();
   if (b === "visa") return "Visa";
@@ -58,6 +66,8 @@ export default function CheckoutPaymentPage() {
   const [cart, setCart] = useState<Cart | null>(null);
   const [guestSubtotal, setGuestSubtotal] = useState(0);
 
+  const [savedAch, setSavedAch] = useState<SavedAch | null>(null);
+  const [useNewAch, setUseNewAch] = useState(false);
   const [achForm, setAchForm] = useState({ bankName: "", accountHolder: "", routingNumber: "", accountNumber: "", accountType: "checking" as "checking" | "savings" });
   const [achErrors, setAchErrors] = useState<Partial<Record<keyof typeof achForm, string>>>({});
 
@@ -97,6 +107,16 @@ export default function CheckoutPaymentPage() {
       })
       .catch(() => setShowNewCardForm(true))
       .finally(() => setLoadingCards(false));
+
+    apiClient
+      .get<SavedAch>("/api/v1/account/ach-method")
+      .then(ach => {
+        if (ach && ach.account_last4) {
+          setSavedAch(ach);
+          setUseNewAch(false);
+        }
+      })
+      .catch(() => { /* no saved ACH */ });
   }, [isLoading, isGuest, isAuthenticated]);
 
   // Load cart for total display (wholesale only)
@@ -125,6 +145,12 @@ export default function CheckoutPaymentPage() {
   }
 
   function handleAchContinue() {
+    if (savedAch && !useNewAch) {
+      setPaymentMethod("ach");
+      setAchInfo(savedAch.bank_name, savedAch.account_holder, savedAch.routing_last4, savedAch.account_last4, savedAch.account_type as "checking" | "savings");
+      router.push("/checkout/review");
+      return;
+    }
     const errors: Partial<Record<keyof typeof achForm, string>> = {};
     if (!achForm.bankName.trim()) errors.bankName = "Required";
     if (!achForm.accountHolder.trim()) errors.accountHolder = "Required";
@@ -183,45 +209,117 @@ export default function CheckoutPaymentPage() {
         </div>
       </div>
 
-      {/* ── ACH form ── */}
+      {/* ── ACH section ── */}
       {paymentType === "ach" && (
         <div style={sectionCard}>
           <span style={sectionTitle}>Bank Account Details</span>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
-            <div>
-              <label style={lbl}>Bank Name <span style={{ color: "#E8242A" }}>*</span></label>
-              <input style={{ ...inp, borderColor: achErrors.bankName ? "#E8242A" : "#E2E0DA" }} value={achForm.bankName} onChange={e => { setAchForm(p => ({ ...p, bankName: e.target.value })); setAchErrors(p => ({ ...p, bankName: undefined })); }} placeholder="Chase, Wells Fargo, etc." />
-              {achErrors.bankName && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "3px" }}>{achErrors.bankName}</p>}
+
+          {/* Saved ACH — shown for authenticated users who have one saved */}
+          {!isGuest && savedAch && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: useNewAch ? "16px" : "0" }}>
+              {/* Saved ACH option */}
+              <label
+                onClick={() => setUseNewAch(false)}
+                style={{
+                  display: "flex", alignItems: "center", gap: "14px",
+                  padding: "14px 18px", borderRadius: "10px",
+                  border: `1.5px solid ${!useNewAch ? "#1A5CFF" : "#E2E0DA"}`,
+                  background: !useNewAch ? "rgba(26,92,255,.04)" : "#FAFAF8",
+                  cursor: "pointer", transition: "all .15s",
+                }}
+              >
+                <div style={{
+                  width: "18px", height: "18px", borderRadius: "50%", flexShrink: 0,
+                  border: `2px solid ${!useNewAch ? "#1A5CFF" : "#E2E0DA"}`,
+                  background: !useNewAch ? "#1A5CFF" : "#fff",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
+                  {!useNewAch && <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#fff" }} />}
+                </div>
+                {/* Bank icon */}
+                <svg width="32" height="22" viewBox="0 0 32 22" fill="none" style={{ flexShrink: 0 }}>
+                  <rect width="32" height="22" rx="3" fill="#F4F3EF" stroke="#E2E0DA" />
+                  <rect x="4" y="5" width="24" height="3" rx="1" fill="#E2E0DA" />
+                  <rect x="6" y="10" width="3" height="6" rx="0.5" fill="#E2E0DA" />
+                  <rect x="14" y="10" width="3" height="6" rx="0.5" fill="#E2E0DA" />
+                  <rect x="22" y="10" width="3" height="6" rx="0.5" fill="#E2E0DA" />
+                </svg>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: "13px", fontWeight: 700, color: "#2A2830" }}>
+                    {savedAch.bank_name} •••• {savedAch.account_last4}
+                  </div>
+                  <div style={{ fontSize: "11px", color: "#7A7880", marginTop: "2px" }}>
+                    {savedAch.account_holder} · {savedAch.account_type.charAt(0).toUpperCase() + savedAch.account_type.slice(1)}
+                  </div>
+                </div>
+              </label>
+
+              {/* Use different account option */}
+              <label
+                onClick={() => setUseNewAch(true)}
+                style={{
+                  display: "flex", alignItems: "center", gap: "14px",
+                  padding: "12px 18px", borderRadius: "10px",
+                  border: `1.5px solid ${useNewAch ? "#1A5CFF" : "#E2E0DA"}`,
+                  background: useNewAch ? "rgba(26,92,255,.04)" : "#FAFAF8",
+                  cursor: "pointer", fontSize: "13px", fontWeight: 600, color: "#2A2830",
+                  transition: "all .15s",
+                }}
+              >
+                <div style={{
+                  width: "18px", height: "18px", borderRadius: "50%", flexShrink: 0,
+                  border: `2px solid ${useNewAch ? "#1A5CFF" : "#E2E0DA"}`,
+                  background: useNewAch ? "#1A5CFF" : "#fff",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
+                  {useNewAch && <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#fff" }} />}
+                </div>
+                + Use a different account
+              </label>
             </div>
-            <div>
-              <label style={lbl}>Account Holder Name <span style={{ color: "#E8242A" }}>*</span></label>
-              <input style={{ ...inp, borderColor: achErrors.accountHolder ? "#E8242A" : "#E2E0DA" }} value={achForm.accountHolder} onChange={e => { setAchForm(p => ({ ...p, accountHolder: e.target.value })); setAchErrors(p => ({ ...p, accountHolder: undefined })); }} placeholder="Full name on account" />
-              {achErrors.accountHolder && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "3px" }}>{achErrors.accountHolder}</p>}
-            </div>
-            <div>
-              <label style={lbl}>Routing Number <span style={{ color: "#E8242A" }}>*</span></label>
-              <input style={{ ...inp, borderColor: achErrors.routingNumber ? "#E8242A" : "#E2E0DA" }} value={achForm.routingNumber} onChange={e => { setAchForm(p => ({ ...p, routingNumber: e.target.value.replace(/\D/g, "").slice(0, 9) })); setAchErrors(p => ({ ...p, routingNumber: undefined })); }} placeholder="9-digit routing number" maxLength={9} />
-              {achErrors.routingNumber && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "3px" }}>{achErrors.routingNumber}</p>}
-            </div>
-            <div>
-              <label style={lbl}>Account Number <span style={{ color: "#E8242A" }}>*</span></label>
-              <input style={{ ...inp, borderColor: achErrors.accountNumber ? "#E8242A" : "#E2E0DA" }} value={achForm.accountNumber} onChange={e => { setAchForm(p => ({ ...p, accountNumber: e.target.value.replace(/\D/g, "") })); setAchErrors(p => ({ ...p, accountNumber: undefined })); }} placeholder="Account number" type="text" />
-              {achErrors.accountNumber && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "3px" }}>{achErrors.accountNumber}</p>}
-            </div>
-            <div style={{ gridColumn: "1 / -1" }}>
-              <label style={lbl}>Account Type <span style={{ color: "#E8242A" }}>*</span></label>
-              <div style={{ display: "flex", gap: "10px" }}>
-                {(["checking", "savings"] as const).map(t => (
-                  <label key={t} onClick={() => setAchForm(p => ({ ...p, accountType: t }))} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 16px", borderRadius: "8px", border: `1.5px solid ${achForm.accountType === t ? "#1A5CFF" : "#E2E0DA"}`, cursor: "pointer", fontSize: "13px", fontWeight: 600, color: "#2A2830", background: achForm.accountType === t ? "rgba(26,92,255,.04)" : "#FAFAF8" }}>
-                    <div style={{ width: "16px", height: "16px", borderRadius: "50%", border: `2px solid ${achForm.accountType === t ? "#1A5CFF" : "#E2E0DA"}`, background: achForm.accountType === t ? "#1A5CFF" : "#fff", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      {achForm.accountType === t && <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#fff" }} />}
-                    </div>
-                    {t.charAt(0).toUpperCase() + t.slice(1)}
-                  </label>
-                ))}
+          )}
+
+          {/* Manual ACH form — shown when no saved ACH, or user chose "use different account" */}
+          {(isGuest || !savedAch || useNewAch) && (
+            <div style={{ borderTop: savedAch && useNewAch ? "1px solid #F0EEE9" : "none", paddingTop: savedAch && useNewAch ? "16px" : "0" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+                <div>
+                  <label style={lbl}>Bank Name <span style={{ color: "#E8242A" }}>*</span></label>
+                  <input style={{ ...inp, borderColor: achErrors.bankName ? "#E8242A" : "#E2E0DA" }} value={achForm.bankName} onChange={e => { setAchForm(p => ({ ...p, bankName: e.target.value })); setAchErrors(p => ({ ...p, bankName: undefined })); }} placeholder="Chase, Wells Fargo, etc." />
+                  {achErrors.bankName && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "3px" }}>{achErrors.bankName}</p>}
+                </div>
+                <div>
+                  <label style={lbl}>Account Holder Name <span style={{ color: "#E8242A" }}>*</span></label>
+                  <input style={{ ...inp, borderColor: achErrors.accountHolder ? "#E8242A" : "#E2E0DA" }} value={achForm.accountHolder} onChange={e => { setAchForm(p => ({ ...p, accountHolder: e.target.value })); setAchErrors(p => ({ ...p, accountHolder: undefined })); }} placeholder="Full name on account" />
+                  {achErrors.accountHolder && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "3px" }}>{achErrors.accountHolder}</p>}
+                </div>
+                <div>
+                  <label style={lbl}>Routing Number <span style={{ color: "#E8242A" }}>*</span></label>
+                  <input style={{ ...inp, borderColor: achErrors.routingNumber ? "#E8242A" : "#E2E0DA" }} value={achForm.routingNumber} onChange={e => { setAchForm(p => ({ ...p, routingNumber: e.target.value.replace(/\D/g, "").slice(0, 9) })); setAchErrors(p => ({ ...p, routingNumber: undefined })); }} placeholder="9-digit routing number" maxLength={9} />
+                  {achErrors.routingNumber && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "3px" }}>{achErrors.routingNumber}</p>}
+                </div>
+                <div>
+                  <label style={lbl}>Account Number <span style={{ color: "#E8242A" }}>*</span></label>
+                  <input style={{ ...inp, borderColor: achErrors.accountNumber ? "#E8242A" : "#E2E0DA" }} value={achForm.accountNumber} onChange={e => { setAchForm(p => ({ ...p, accountNumber: e.target.value.replace(/\D/g, "") })); setAchErrors(p => ({ ...p, accountNumber: undefined })); }} placeholder="Account number" type="text" />
+                  {achErrors.accountNumber && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "3px" }}>{achErrors.accountNumber}</p>}
+                </div>
+                <div style={{ gridColumn: "1 / -1" }}>
+                  <label style={lbl}>Account Type <span style={{ color: "#E8242A" }}>*</span></label>
+                  <div style={{ display: "flex", gap: "10px" }}>
+                    {(["checking", "savings"] as const).map(t => (
+                      <label key={t} onClick={() => setAchForm(p => ({ ...p, accountType: t }))} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 16px", borderRadius: "8px", border: `1.5px solid ${achForm.accountType === t ? "#1A5CFF" : "#E2E0DA"}`, cursor: "pointer", fontSize: "13px", fontWeight: 600, color: "#2A2830", background: achForm.accountType === t ? "rgba(26,92,255,.04)" : "#FAFAF8" }}>
+                        <div style={{ width: "16px", height: "16px", borderRadius: "50%", border: `2px solid ${achForm.accountType === t ? "#1A5CFF" : "#E2E0DA"}`, background: achForm.accountType === t ? "#1A5CFF" : "#fff", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          {achForm.accountType === t && <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#fff" }} />}
+                        </div>
+                        {t.charAt(0).toUpperCase() + t.slice(1)}
+                      </label>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+          )}
+
           <div style={{ marginTop: "14px", padding: "12px 14px", background: "#F4F3EF", borderRadius: "8px", fontSize: "12px", color: "#7A7880", lineHeight: 1.6 }}>
             ACH payments are verified manually. Your order will be processed within 1–2 business days after payment is confirmed.
           </div>

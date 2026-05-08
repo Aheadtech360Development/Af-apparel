@@ -219,7 +219,7 @@ export const adminService = {
 
   async approveApplication(
     id: string,
-    data: { pricing_tier_id?: string; discount_group_id?: string; notes?: string }
+    data: { pricing_tier_id?: string; discount_group_id?: string; notes?: string; tax_exempt?: boolean }
   ) {
     return apiClient.post(`/api/v1/admin/wholesale-applications/${id}/approve`, data);
   },

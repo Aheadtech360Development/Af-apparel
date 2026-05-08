@@ -249,6 +249,9 @@ export default function DiscountGroupsPage() {
   const [vpProducts, setVpProducts] = useState<VPProduct[]>([]);
   const [vpLoading, setVpLoading] = useState(false);
   const [vpOverrides, setVpOverrides] = useState<Record<string, Record<string, TierOverride>>>({}); // productId → groupId → {price, discount}
+  const [vpVariantOverrides, setVpVariantOverrides] = useState<Record<string, Record<string, string>>>({}); // variantId → groupId → price string
+  const [vpBulkSelected, setVpBulkSelected] = useState<Set<string>>(new Set());
+  const [vpBulkPrices, setVpBulkPrices] = useState<Record<string, string>>({});
   const [vpSaving, setVpSaving] = useState(false);
   const [vpSearch, setVpSearch] = useState("");
   const [vpExpanded, setVpExpanded] = useState<Set<string>>(new Set());
@@ -287,6 +290,8 @@ export default function DiscountGroupsPage() {
       );
       const overrides = await apiClient.get<Record<string, Record<string, TierOverride>>>("/api/v1/admin/variant-pricing").catch(() => ({}));
       setVpOverrides(overrides ?? {});
+      const variantOverrides = await apiClient.get<Record<string, Record<string, string>>>("/api/v1/admin/variant-level-pricing").catch(() => ({}));
+      setVpVariantOverrides(variantOverrides ?? {});
     } finally {
       setVpLoading(false);
     }
@@ -476,10 +481,35 @@ export default function DiscountGroupsPage() {
     }));
   }
 
+  function updateVPVariantOverride(variantId: string, groupId: string, value: string) {
+    setVpVariantOverrides(prev => ({
+      ...prev,
+      [variantId]: { ...(prev[variantId] ?? {}), [groupId]: value },
+    }));
+  }
+
+  function applyBulkPrices() {
+    if (vpBulkSelected.size === 0) return;
+    setVpVariantOverrides(prev => {
+      const next = { ...prev };
+      for (const vid of vpBulkSelected) {
+        for (const [gid, price] of Object.entries(vpBulkPrices)) {
+          if (price.trim()) {
+            next[vid] = { ...(next[vid] ?? {}), [gid]: price };
+          }
+        }
+      }
+      return next;
+    });
+    setVpBulkSelected(new Set());
+    setVpBulkPrices({});
+  }
+
   async function handleSaveVariantPricing() {
     setVpSaving(true);
     try {
       await apiClient.post("/api/v1/admin/variant-pricing", { overrides: vpOverrides });
+      await apiClient.post("/api/v1/admin/variant-level-pricing", { overrides: vpVariantOverrides });
       showToast("Pricing saved");
     } catch { showToast("Save failed", false); }
     finally { setVpSaving(false); }
@@ -695,41 +725,108 @@ export default function DiscountGroupsPage() {
                         {isExp && (
                           <tr key={`${product.id}-variants`}>
                             <td colSpan={2 + groups.length} style={{ padding: 0, background: "#FAFAF8", borderBottom: "2px solid #E8E6E0" }}>
+                              {/* Bulk edit bar — shown when variants are selected */}
+                              {vpBulkSelected.size > 0 && product.variants.some(v => vpBulkSelected.has(v.id)) && (
+                                <div style={{ padding: "10px 16px", background: "rgba(26,92,255,.06)", borderBottom: "1px solid rgba(26,92,255,.15)", display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+                                  <span style={{ fontSize: "12px", fontWeight: 700, color: "#1A5CFF" }}>
+                                    {vpBulkSelected.size} variant{vpBulkSelected.size !== 1 ? "s" : ""} selected
+                                  </span>
+                                  <span style={{ fontSize: "11px", color: "#7A7880" }}>Set price for each group:</span>
+                                  {groups.map(g => (
+                                    <div key={g.id} style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                                      <span style={{ fontSize: "11px", color: "#7A7880", whiteSpace: "nowrap" }}>{g.title}:</span>
+                                      <span style={{ fontSize: "11px", color: "#aaa" }}>$</span>
+                                      <input
+                                        type="number"
+                                        value={vpBulkPrices[g.id] ?? ""}
+                                        onChange={e => setVpBulkPrices(p => ({ ...p, [g.id]: e.target.value }))}
+                                        placeholder="0.00"
+                                        style={{ width: "70px", padding: "4px 6px", border: "1px solid rgba(26,92,255,.3)", borderRadius: "5px", fontSize: "12px", textAlign: "center" }}
+                                      />
+                                    </div>
+                                  ))}
+                                  <button
+                                    onClick={applyBulkPrices}
+                                    style={{ padding: "5px 14px", background: "#1A5CFF", color: "#fff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: 700, cursor: "pointer" }}
+                                  >Apply to Selected</button>
+                                  <button
+                                    onClick={() => { setVpBulkSelected(new Set()); setVpBulkPrices({}); }}
+                                    style={{ padding: "5px 10px", background: "none", border: "1px solid #E2E0DA", borderRadius: "6px", fontSize: "12px", color: "#7A7880", cursor: "pointer" }}
+                                  >Clear</button>
+                                </div>
+                              )}
                               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "11px" }}>
                                 <thead>
                                   <tr style={{ background: "#F0EDE8" }}>
-                                    <th style={{ padding: "5px 16px 5px 32px", textAlign: "left", color: "#7A7880", fontWeight: 700, letterSpacing: ".05em", textTransform: "uppercase", fontSize: "10px" }}>Color</th>
+                                    <th style={{ padding: "5px 8px 5px 16px", width: "30px" }} />
+                                    <th style={{ padding: "5px 12px", textAlign: "left", color: "#7A7880", fontWeight: 700, letterSpacing: ".05em", textTransform: "uppercase", fontSize: "10px" }}>Color</th>
                                     <th style={{ padding: "5px 12px", textAlign: "left", color: "#7A7880", fontWeight: 700, letterSpacing: ".05em", textTransform: "uppercase", fontSize: "10px" }}>Size</th>
                                     <th style={{ padding: "5px 12px", textAlign: "right", color: "#7A7880", fontWeight: 700, letterSpacing: ".05em", textTransform: "uppercase", fontSize: "10px" }}>MSRP</th>
                                     {groups.map(g => (
-                                      <th key={g.id} style={{ padding: "5px 12px", textAlign: "center", color: "#1A5CFF", fontWeight: 700, letterSpacing: ".05em", textTransform: "uppercase", fontSize: "10px" }}>{g.title}</th>
+                                      <th key={g.id} style={{ padding: "5px 12px", textAlign: "center", color: "#1A5CFF", fontWeight: 700, letterSpacing: ".05em", textTransform: "uppercase", fontSize: "10px" }}>
+                                        {g.title}
+                                        <div style={{ fontSize: "9px", color: "#aaa", fontWeight: 500, textTransform: "none" }}>Price ($)</div>
+                                      </th>
                                     ))}
                                   </tr>
                                 </thead>
                                 <tbody>
                                   {product.variants.length === 0 ? (
-                                    <tr><td colSpan={3 + groups.length} style={{ padding: "10px 32px", color: "#bbb", fontSize: "11px" }}>No variants</td></tr>
-                                  ) : product.variants.map(v => (
-                                    <tr key={v.id} style={{ borderTop: "1px solid #EDE9E3" }}>
-                                      <td style={{ padding: "5px 16px 5px 32px", color: "#555" }}>{v.color || "—"}</td>
-                                      <td style={{ padding: "5px 12px", color: "#555" }}>{v.size || "—"}</td>
-                                      <td style={{ padding: "5px 12px", textAlign: "right", fontFamily: "monospace", color: "#2A2830" }}>
-                                        {v.retail_price != null ? `$${v.retail_price.toFixed(2)}` : "—"}
-                                      </td>
-                                      {groups.map(g => {
-                                        const gOv = vpOverrides[product.id]?.[g.id] ?? { price: "", discount: "" };
-                                        const disc = gOv.price ? parseFloat(gOv.price) : null;
-                                        const calc = (disc != null && v.retail_price != null)
-                                          ? `$${Math.max(0, v.retail_price - disc).toFixed(2)}`
-                                          : null;
-                                        return (
-                                          <td key={g.id} style={{ padding: "5px 12px", textAlign: "center", fontFamily: "monospace", color: calc ? "#059669" : "#ccc" }}>
-                                            {calc ?? "—"}
-                                          </td>
-                                        );
-                                      })}
-                                    </tr>
-                                  ))}
+                                    <tr><td colSpan={4 + groups.length} style={{ padding: "10px 32px", color: "#bbb", fontSize: "11px" }}>No variants</td></tr>
+                                  ) : product.variants.map(v => {
+                                    const isSelected = vpBulkSelected.has(v.id);
+                                    return (
+                                      <tr key={v.id} style={{ borderTop: "1px solid #EDE9E3", background: isSelected ? "rgba(26,92,255,.04)" : "transparent" }}>
+                                        <td style={{ padding: "5px 8px 5px 16px", textAlign: "center" }}>
+                                          <input
+                                            type="checkbox"
+                                            checked={isSelected}
+                                            onChange={e => {
+                                              setVpBulkSelected(prev => {
+                                                const s = new Set(prev);
+                                                e.target.checked ? s.add(v.id) : s.delete(v.id);
+                                                return s;
+                                              });
+                                            }}
+                                            style={{ accentColor: "#1A5CFF", width: "14px", height: "14px", cursor: "pointer" }}
+                                          />
+                                        </td>
+                                        <td style={{ padding: "5px 12px", color: "#555" }}>{v.color || "—"}</td>
+                                        <td style={{ padding: "5px 12px", color: "#555" }}>{v.size || "—"}</td>
+                                        <td style={{ padding: "5px 12px", textAlign: "right", fontFamily: "monospace", color: "#2A2830" }}>
+                                          {v.retail_price != null ? `$${v.retail_price.toFixed(2)}` : "—"}
+                                        </td>
+                                        {groups.map(g => {
+                                          const variantPrice = vpVariantOverrides[v.id]?.[g.id] ?? "";
+                                          return (
+                                            <td key={g.id} style={{ padding: "4px 10px", textAlign: "center" }}>
+                                              <div style={{ display: "flex", alignItems: "center", gap: "3px", justifyContent: "center" }}>
+                                                <span style={{ fontSize: "11px", color: "#aaa" }}>$</span>
+                                                <input
+                                                  type="number"
+                                                  value={variantPrice}
+                                                  onChange={e => updateVPVariantOverride(v.id, g.id, e.target.value)}
+                                                  placeholder={(() => {
+                                                    const gOv = vpOverrides[product.id]?.[g.id] ?? { price: "", discount: "" };
+                                                    const disc = gOv.price ? parseFloat(gOv.price) : null;
+                                                    return (disc != null && v.retail_price != null)
+                                                      ? `${Math.max(0, v.retail_price - disc).toFixed(2)}`
+                                                      : "0.00";
+                                                  })()}
+                                                  style={{ width: "70px", padding: "4px 6px", border: `1px solid ${variantPrice ? "#1A5CFF" : "#E2E0DA"}`, borderRadius: "5px", fontSize: "12px", textAlign: "center", background: variantPrice ? "rgba(26,92,255,.04)" : "#fff" }}
+                                                />
+                                              </div>
+                                              {variantPrice && (
+                                                <div style={{ fontSize: "10px", color: "#059669", fontWeight: 700, textAlign: "center", marginTop: "2px" }}>
+                                                  ${parseFloat(variantPrice).toFixed(2)}
+                                                </div>
+                                              )}
+                                            </td>
+                                          );
+                                        })}
+                                      </tr>
+                                    );
+                                  })}
                                 </tbody>
                               </table>
                             </td>
