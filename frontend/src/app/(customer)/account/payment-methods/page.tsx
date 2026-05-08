@@ -241,7 +241,12 @@ export default function PaymentMethodsPage() {
     setAchSaving(true);
     setMessage(null);
     try {
-      const saved = await apiClient.put<AchAccount>("/api/v1/account/ach-method", achForm);
+      const payload = {
+        ...achForm,
+        routing_last4: (achForm.routing_last4 || "").replace(/\D/g, "").slice(-4),
+        account_last4: (achForm.account_last4 || "").replace(/\D/g, "").slice(-4),
+      };
+      const saved = await apiClient.put<AchAccount>("/api/v1/account/ach-method", payload);
       setAchAccount(saved && Object.keys(saved).length > 0 ? saved : null);
       setMessage({ type: "success", text: "Bank account saved." });
       setShowAchForm(false);
@@ -665,26 +670,26 @@ export default function PaymentMethodsPage() {
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
               <div>
-                <label style={labelStyle}>Routing Number (last 4)</label>
+                <label style={labelStyle}>Routing Number</label>
                 <input
                   type="text"
                   inputMode="numeric"
-                  maxLength={4}
+                  maxLength={9}
                   value={achForm.routing_last4 || ""}
-                  onChange={e => setAchForm(p => ({ ...p, routing_last4: e.target.value.replace(/\D/g, "").slice(0, 4) }))}
-                  placeholder="e.g. 5678"
+                  onChange={e => setAchForm(p => ({ ...p, routing_last4: e.target.value.replace(/\D/g, "").slice(0, 9) }))}
+                  placeholder="9-digit routing number"
                   style={{ ...inp, fontFamily: "monospace", letterSpacing: "0.1em" }}
                 />
               </div>
               <div>
-                <label style={labelStyle}>Account Number (last 4)</label>
+                <label style={labelStyle}>Account Number</label>
                 <input
                   type="text"
                   inputMode="numeric"
-                  maxLength={4}
+                  maxLength={17}
                   value={achForm.account_last4 || ""}
-                  onChange={e => setAchForm(p => ({ ...p, account_last4: e.target.value.replace(/\D/g, "").slice(0, 4) }))}
-                  placeholder="e.g. 9012"
+                  onChange={e => setAchForm(p => ({ ...p, account_last4: e.target.value.replace(/\D/g, "").slice(0, 17) }))}
+                  placeholder="Bank account number"
                   style={{ ...inp, fontFamily: "monospace", letterSpacing: "0.1em" }}
                 />
               </div>
@@ -692,7 +697,7 @@ export default function PaymentMethodsPage() {
           </div>
 
           <p style={{ fontSize: "11px", color: "#aaa", marginTop: "12px" }}>
-            Only the last 4 digits of routing and account numbers are stored for identification purposes.
+            Your full routing and account numbers are not stored — only the last 4 digits are saved for identification.
           </p>
 
           <div style={{ display: "flex", gap: "10px", marginTop: "14px" }}>

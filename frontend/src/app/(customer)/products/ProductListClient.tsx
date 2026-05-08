@@ -246,9 +246,10 @@ export function ProductListClient({
           <div
             key={g.value}
             onClick={() => handleGenderClick(g.value)}
-            style={{ fontSize: "13px", color: currentGender === g.value ? "#1A5CFF" : "#7A7880", padding: "6px 10px", borderRadius: "6px", cursor: "pointer", fontWeight: currentGender === g.value ? 700 : 500, background: currentGender === g.value ? "rgba(26,92,255,.06)" : "transparent" }}
+            style={{ fontSize: "13px", color: currentGender === g.value ? "#1A5CFF" : "#7A7880", padding: "6px 10px", borderRadius: "6px", cursor: "pointer", fontWeight: currentGender === g.value ? 700 : 500, background: currentGender === g.value ? "rgba(26,92,255,.06)" : "transparent", display: "flex", alignItems: "center", justifyContent: "space-between" }}
           >
             {g.label}
+            {currentGender === g.value && <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="1,5.5 3.8,9 10,1.5" stroke="#1A5CFF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
           </div>
         ))}
       </div>
@@ -275,7 +276,10 @@ export function ProductListClient({
           onClick={() => handleCategoryClick("")}
           style={{ fontSize: "13px", color: currentCategory === "" ? "#1A5CFF" : "#7A7880", padding: "6px 10px", borderRadius: "6px", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", fontWeight: currentCategory === "" ? 700 : 500, background: currentCategory === "" ? "rgba(26,92,255,.06)" : "transparent" }}
         >
-          All Products
+          <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            {currentCategory === "" && <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="1,5.5 3.8,9 10,1.5" stroke="#1A5CFF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+            All Products
+          </span>
           <span style={{ fontSize: "11px", color: currentCategory === "" ? "#1A5CFF" : "#bbb", background: currentCategory === "" ? "rgba(26,92,255,.1)" : "#f5f5f5", padding: "2px 6px", borderRadius: "10px" }}>{total}</span>
         </div>
         {categories.map((cat) => (
@@ -284,7 +288,10 @@ export function ProductListClient({
             onClick={() => handleCategoryClick(cat.slug)}
             style={{ fontSize: "13px", color: currentCategory === cat.slug ? "#1A5CFF" : "#7A7880", padding: "6px 10px", borderRadius: "6px", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", fontWeight: currentCategory === cat.slug ? 700 : 500, background: currentCategory === cat.slug ? "rgba(26,92,255,.06)" : "transparent" }}
           >
-            {cat.name}
+            <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              {currentCategory === cat.slug && <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="1,5.5 3.8,9 10,1.5" stroke="#1A5CFF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+              {cat.name}
+            </span>
           </div>
         ))}
       </div>
@@ -687,8 +694,15 @@ export function ProductListClient({
 
                       {/* Price */}
                       {price ? (
-                        <div style={{ fontSize: "13px", color: "#2A2830", fontWeight: 700, lineHeight: 1 }}>
-                          From ${Number(price).toFixed(2)}
+                        <div style={{ lineHeight: 1 }}>
+                          {primaryVariant?.effective_price != null && primaryVariant?.retail_price != null && Number(primaryVariant.effective_price) < Number(primaryVariant.retail_price) && (
+                            <span style={{ fontSize: "11px", color: "#9CA3AF", textDecoration: "line-through", marginRight: "5px" }}>
+                              ${Number(primaryVariant.retail_price).toFixed(2)}
+                            </span>
+                          )}
+                          <span style={{ fontSize: "13px", color: "#2A2830", fontWeight: 700 }}>
+                            From ${Number(price).toFixed(2)}
+                          </span>
                         </div>
                       ) : null}
                     </div>

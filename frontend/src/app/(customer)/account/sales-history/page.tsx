@@ -5,10 +5,18 @@ import { useEffect, useRef, useState } from "react";
 import { apiClient } from "@/lib/api-client";
 import { useAuthStore } from "@/stores/auth.store";
 
+interface SalesByProductVariant {
+  color: string;
+  size: string;
+  units_sold: number;
+  total_revenue: number;
+}
+
 interface SalesByProduct {
   product_name: string;
   units_sold: number;
   total_revenue: number;
+  variants?: SalesByProductVariant[];
 }
 
 interface SalesByPrice {
@@ -45,6 +53,7 @@ export default function SalesHistoryPage() {
   const [resultYear, setResultYear] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [generated, setGenerated] = useState(false);
+  const [productExpanded, setProductExpanded] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     if (isLoading) return;
@@ -238,16 +247,37 @@ export default function SalesHistoryPage() {
                 </tr>
               </thead>
               <tbody>
-                {(items as SalesByProduct[]).map((item, idx) => (
-                  <tr
-                    key={idx}
-                    className={`border-b border-gray-100 hover:bg-blue-50 ${idx % 2 === 0 ? "bg-white" : "bg-gray-50"}`}
-                  >
-                    <td className="px-4 py-3 text-gray-800 font-medium">{item.product_name}</td>
-                    <td className="px-4 py-3 text-right text-gray-700">{item.units_sold.toLocaleString()}</td>
-                    <td className="px-4 py-3 text-right font-semibold text-gray-900">${item.total_revenue.toFixed(2)}</td>
-                  </tr>
-                ))}
+                {(items as SalesByProduct[]).map((item, idx) => {
+                  const isExp = productExpanded.has(idx);
+                  const hasVariants = (item.variants?.length ?? 0) > 0;
+                  return (
+                    <React.Fragment key={idx}>
+                      <tr
+                        className={`border-b border-gray-100 ${hasVariants ? "cursor-pointer hover:bg-blue-50" : ""} ${idx % 2 === 0 ? "bg-white" : "bg-gray-50"}`}
+                        onClick={() => {
+                          if (!hasVariants) return;
+                          setProductExpanded(prev => { const s = new Set(prev); s.has(idx) ? s.delete(idx) : s.add(idx); return s; });
+                        }}
+                      >
+                        <td className="px-4 py-3 text-gray-800 font-medium">
+                          <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                            {hasVariants && <span style={{ fontSize: "9px", color: "#9CA3AF", display: "inline-block", transform: isExp ? "rotate(90deg)" : "rotate(0deg)", transition: "transform .15s" }}>▶</span>}
+                            {item.product_name}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-right text-gray-700">{item.units_sold.toLocaleString()}</td>
+                        <td className="px-4 py-3 text-right font-semibold text-gray-900">${item.total_revenue.toFixed(2)}</td>
+                      </tr>
+                      {isExp && hasVariants && (item.variants ?? []).map((v, vi) => (
+                        <tr key={`${idx}-v${vi}`} className="bg-blue-50 border-b border-blue-100">
+                          <td className="py-2 text-gray-600 text-xs" style={{ paddingLeft: "36px" }}>{v.color} / {v.size}</td>
+                          <td className="px-4 py-2 text-right text-gray-500 text-xs">{v.units_sold.toLocaleString()}</td>
+                          <td className="px-4 py-2 text-right text-gray-600 text-xs">${v.total_revenue.toFixed(2)}</td>
+                        </tr>
+                      ))}
+                    </React.Fragment>
+                  );
+                })}
                 <tr className="bg-gray-800">
                   <td className="px-4 py-3 text-white font-bold text-sm">TOTAL</td>
                   <td className="px-4 py-3 text-right text-white font-bold text-sm">{totalUnits.toLocaleString()}</td>

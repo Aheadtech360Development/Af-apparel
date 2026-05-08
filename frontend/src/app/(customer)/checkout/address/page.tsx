@@ -96,14 +96,20 @@ export default function CheckoutAddressPage() {
     }
 
     if (isGuest) {
-      // Calculate subtotal from guest cart localStorage
+      // Calculate subtotal + units from guest cart, then fetch real shipping rate
+      let guestSubtotal = 0;
+      let guestUnits = 0;
       try {
         const guestCart = JSON.parse(localStorage.getItem("af_guest_cart") || "[]") as Array<{ unit_price: number; quantity: number }>;
-        const guestSubtotal = guestCart.reduce((s, i) => s + i.unit_price * i.quantity, 0);
+        guestSubtotal = guestCart.reduce((s, i) => s + i.unit_price * i.quantity, 0);
+        guestUnits = guestCart.reduce((s, i) => s + i.quantity, 0);
         setSubtotal(guestSubtotal);
       } catch { /* ignore */ }
-      setTierShipping(9.99); // flat guest shipping
       setShowNewForm(true);
+      const sp = new URLSearchParams({ units: String(guestUnits), subtotal: String(guestSubtotal) });
+      apiClient.get<{ estimated_shipping: number }>(`/api/v1/guest/shipping-estimate?${sp}`)
+        .then(est => setTierShipping(Number(est.estimated_shipping ?? 9.99)))
+        .catch(() => setTierShipping(9.99));
 
       // Restore from sessionStorage if returning to this step
       try {
@@ -302,7 +308,7 @@ export default function CheckoutAddressPage() {
 
   const SHIPPING_OPTIONS: { id: ShippingMethod; label: string; sub: string }[] = [
     { id: "standard", label: "Standard Ground", sub: "3–5 business days · Ships from Dallas, TX" },
-    { id: "will_call", label: "Will Call Pickup", sub: "Pick up at our warehouse · 10719 Turbeville Rd, Dallas , TX 75243 · No shipping fee" },
+    { id: "will_call", label: "Will Call Pickup", sub: "Pick up at our warehouse · 10719 Turbeville Rd, Dallas, TX 75243 · Orders before 12 PM → same-day pickup by 4 PM · After 12 PM → next business day by 12 PM · Sat/Sun: closed · No shipping fee" },
   ];
 
   return (

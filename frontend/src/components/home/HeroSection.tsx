@@ -11,7 +11,7 @@ export default function HeroSection() {
 
   return (
     <section style={{ background: "#f4f3ef", padding: "0" }}>
-      <div style={{ maxWidth: "1140px", margin: "0 auto", padding: "48px 24px 44px", display: "flex", gap: "48px", alignItems: "center", flexWrap: "wrap" }}>
+      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "48px 32px 44px", display: "flex", gap: "48px", alignItems: "center", flexWrap: "wrap" }}>
         <div style={{ flex: "1.3", minWidth: "280px" }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(27,58,92,.06)", border: "1px solid rgba(27,58,92,.15)", color: "#1B3A5C", fontSize: "11px", fontWeight: 700, padding: "5px 14px", borderRadius: "2px", letterSpacing: ".08em", marginBottom: "18px", textTransform: "uppercase" }}>
             <Flag size={12} style={{ flexShrink: 0 }} />

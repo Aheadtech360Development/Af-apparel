@@ -75,11 +75,7 @@ export default async function ProductsPage({ searchParams }: PageProps) {
       </div>
 
       {/* ProductListClient owns the full collection layout (sidebar + grid) */}
-      <Suspense fallback={
-        <div style={{ padding: "40px 32px", textAlign: "center", color: "#aaa", fontSize: "14px" }}>
-          Loading products…
-        </div>
-      }>
+      <Suspense fallback={null}>
         <ProductListClient
           initialProducts={productData.items}
           total={productData.total}
