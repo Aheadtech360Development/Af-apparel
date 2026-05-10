@@ -321,11 +321,11 @@ export default function AdminOrderDetailPage() {
     if (!val.trim()) { setItemResults([]); return; }
     searchDebounce.current = setTimeout(async () => {
       try {
-        const data = await apiClient.get<{ items: { id: string; name: string; variants: { id: string; sku: string; color: string | null; size: string | null; retail_price: number }[] }[] }>(
+        const data = await apiClient.get<{ id: string; name: string; variants: { id: string; sku: string; color: string | null; size: string | null; retail_price: number }[] }[]>(
           `/api/v1/admin/products?q=${encodeURIComponent(val)}&page_size=20`
         );
         const results: typeof itemResults = [];
-        for (const p of data.items ?? []) {
+        for (const p of (Array.isArray(data) ? data : []) as typeof data) {
           for (const v of p.variants ?? []) {
             results.push({ variant_id: v.id, sku: v.sku, product_name: p.name, color: v.color, size: v.size, price: Number(v.retail_price || 0) });
           }

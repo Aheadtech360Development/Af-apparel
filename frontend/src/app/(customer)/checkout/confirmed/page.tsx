@@ -8,9 +8,10 @@ import type { ShippingMethod } from "@/stores/checkout.store";
 import { formatCurrency } from "@/lib/utils";
 
 const SHIPPING_LABELS: Record<string, string> = {
-  standard: "Standard Ground — FREE",
-  expedited: "Expedited (2-Day) — $45.00",
-  freight: "Freight / LTL — Quoted",
+  standard: "Standard Ground",
+  expedited: "Expedited (2-Day)",
+  will_call: "Will Call Pickup",
+  freight: "Freight / LTL",
 };
 
 export default function CheckoutConfirmedPage() {
@@ -23,6 +24,8 @@ export default function CheckoutConfirmedPage() {
     confirmedColorSummary,
     confirmedProductName,
     confirmedShippingMethod,
+    confirmedShippingCost,
+    confirmedPaymentMethod,
     setConfirmedOrder,
   } = useCheckoutStore();
 
@@ -38,7 +41,8 @@ export default function CheckoutConfirmedPage() {
           const data = JSON.parse(stored) as {
             id: string; number: string; total: number;
             units: number; colorSummary: string; productName: string;
-            shippingMethod: ShippingMethod;
+            shippingMethod: ShippingMethod; shippingCost?: number;
+            paymentMethod?: string; isGuest?: boolean;
           };
           setConfirmedOrder(data);
           setReady(true);
@@ -124,12 +128,16 @@ export default function CheckoutConfirmedPage() {
 
           <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", fontSize: "13px" }}>
             <span style={{ color: "#7A7880" }}>Shipping</span>
-            <span style={{ fontWeight: 600, color: "#2A2830" }}>{shippingLabel}</span>
+            <span style={{ fontWeight: 600, color: "#2A2830" }}>
+              {shippingLabel}{confirmedShippingCost > 0 ? ` — ${formatCurrency(confirmedShippingCost)}` : " — FREE"}
+            </span>
           </div>
 
           <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", fontSize: "13px" }}>
             <span style={{ color: "#7A7880" }}>Payment</span>
-            <span style={{ fontWeight: 600, color: "#2A2830" }}>Credit Card</span>
+            <span style={{ fontWeight: 600, color: "#2A2830" }}>
+              {confirmedPaymentMethod === "ach" ? "ACH / Bank Transfer" : "Credit Card"}
+            </span>
           </div>
 
           <div style={{ borderTop: "1.5px solid #E2E0DA" }} />

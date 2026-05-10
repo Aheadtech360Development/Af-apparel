@@ -33,6 +33,7 @@ export interface ConfirmOrderPayload {
   tax_amount?: number;
   tax_rate?: number;
   tax_region?: string;
+  shipping_cost?: number;
   // ACH payment
   payment_method?: string;
   ach_bank_name?: string;

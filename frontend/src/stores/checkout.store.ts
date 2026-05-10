@@ -53,6 +53,8 @@ interface CheckoutState {
   confirmedColorSummary: string;
   confirmedProductName: string;
   confirmedShippingMethod: ShippingMethod;
+  confirmedShippingCost: number;
+  confirmedPaymentMethod: string;
 
   // Actions
   setAddressId: (id: string | null) => void;
@@ -78,6 +80,9 @@ interface CheckoutState {
     colorSummary: string;
     productName: string;
     shippingMethod: ShippingMethod;
+    shippingCost?: number;
+    paymentMethod?: string;
+    isGuest?: boolean;
   }) => void;
   reset: () => void;
 }
@@ -112,6 +117,8 @@ const initialState = {
   confirmedColorSummary: "",
   confirmedProductName: "",
   confirmedShippingMethod: "standard" as ShippingMethod,
+  confirmedShippingCost: 0,
+  confirmedPaymentMethod: "card",
 };
 
 export const useCheckoutStore = create<CheckoutState>((set) => ({
@@ -132,7 +139,7 @@ export const useCheckoutStore = create<CheckoutState>((set) => ({
   setQbToken: (token) => set({ qbToken: token, savedCardId: null }),
   setSavedCardId: (id) => set({ savedCardId: id, qbToken: null }),
   setPaymentIntent: (id, secret) => set({ paymentIntentId: id, clientSecret: secret }),
-  setConfirmedOrder: ({ id, number, total, units, colorSummary, productName, shippingMethod }) =>
+  setConfirmedOrder: ({ id, number, total, units, colorSummary, productName, shippingMethod, shippingCost, paymentMethod }) =>
     set({
       confirmedOrderId: id,
       confirmedOrderNumber: number,
@@ -141,6 +148,8 @@ export const useCheckoutStore = create<CheckoutState>((set) => ({
       confirmedColorSummary: colorSummary,
       confirmedProductName: productName,
       confirmedShippingMethod: shippingMethod,
+      confirmedShippingCost: shippingCost ?? 0,
+      confirmedPaymentMethod: paymentMethod ?? "card",
     }),
   reset: () => set(initialState),
 }));

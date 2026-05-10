@@ -192,6 +192,8 @@ export default function CheckoutReviewPage() {
           colorSummary,
           productName,
           shippingMethod,
+          shippingCost,
+          paymentMethod,
           isGuest: true,
         };
         setConfirmedOrder(confirmedData);
@@ -226,6 +228,7 @@ export default function CheckoutReviewPage() {
         tax_amount: taxAmount > 0 ? taxAmount : undefined,
         tax_rate: taxRate?.rate ?? undefined,
         tax_region: taxRate?.region ?? undefined,
+        shipping_cost: shippingCost > 0 ? shippingCost : undefined,
       };
 
       const order = await ordersService.confirmOrder(
@@ -249,16 +252,18 @@ export default function CheckoutReviewPage() {
       const productName = cart?.items[0]?.product_name ?? "Your Order";
       const colorSummary = cart ? buildColorSummary(cart) : "";
       const subtotal = Number(cart?.subtotal ?? 0);
-      const total = subtotal + shippingCost;
+      const orderTotal = subtotal + shippingCost + taxAmount - couponDiscount;
 
       const confirmedData = {
         id: order.id,
         number: order.order_number,
-        total,
+        total: orderTotal,
         units: cart?.total_units ?? 0,
         colorSummary,
         productName,
         shippingMethod,
+        shippingCost,
+        paymentMethod,
       };
       setConfirmedOrder(confirmedData);
       sessionStorage.setItem("af_confirmed_order", JSON.stringify(confirmedData));
