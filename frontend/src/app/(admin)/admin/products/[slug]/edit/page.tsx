@@ -84,20 +84,21 @@ export default function AdminProductEditPage() {
   const [variantEdits, setVariantEdits] = useState<Record<string, Record<string, string>>>({});
 
   // Bulk apply to all variants
-  const [bulkApply, setBulkApply] = useState({ price: "", compare: "", msrp: "", stock: "" });
+  const [bulkApply, setBulkApply] = useState({ price: "", compare: "", cost: "", origin: "", stock: "" });
 
   async function applyToAllVariants() {
     if (!product) return;
     const updates: Record<string, string> = {};
     if (bulkApply.price.trim()) updates.retail_price = bulkApply.price.trim();
     if (bulkApply.compare.trim()) updates.compare_price = bulkApply.compare.trim();
-    if (bulkApply.msrp.trim()) updates.msrp = bulkApply.msrp.trim();
+    if (bulkApply.cost.trim()) updates.cost_per_item = bulkApply.cost.trim();
+    if (bulkApply.origin.trim()) updates.country_of_origin = bulkApply.origin.trim();
     if (bulkApply.stock.trim()) updates.stock_quantity = bulkApply.stock.trim();
     if (!Object.keys(updates).length) return;
     await Promise.all(
       product.variants.map(v => adminService.updateVariant(product.id, v.id, updates))
     );
-    setBulkApply({ price: "", compare: "", msrp: "", stock: "" });
+    setBulkApply({ price: "", compare: "", cost: "", origin: "", stock: "" });
     await load();
   }
 
@@ -106,13 +107,14 @@ export default function AdminProductEditPage() {
     const updates: Record<string, string> = {};
     if (bulkApply.price.trim()) updates.retail_price = bulkApply.price.trim();
     if (bulkApply.compare.trim()) updates.compare_price = bulkApply.compare.trim();
-    if (bulkApply.msrp.trim()) updates.msrp = bulkApply.msrp.trim();
+    if (bulkApply.cost.trim()) updates.cost_per_item = bulkApply.cost.trim();
+    if (bulkApply.origin.trim()) updates.country_of_origin = bulkApply.origin.trim();
     if (bulkApply.stock.trim()) updates.stock_quantity = bulkApply.stock.trim();
     if (!Object.keys(updates).length) return;
     await Promise.all(
       product.variants.filter(v => selectedVariantIds.has(v.id)).map(v => adminService.updateVariant(product.id, v.id, updates))
     );
-    setBulkApply({ price: "", compare: "", msrp: "", stock: "" });
+    setBulkApply({ price: "", compare: "", cost: "", origin: "", stock: "" });
     setSelectedVariantIds(new Set());
     await load();
   }
@@ -623,8 +625,12 @@ export default function AdminProductEditPage() {
                   <input type="number" placeholder="—" value={bulkApply.compare} onChange={e => setBulkApply(p => ({ ...p, compare: e.target.value }))} style={{ width: "72px", padding: "5px 7px", border: "1px solid #E2E0DA", borderRadius: "5px", fontSize: "12px" }} />
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                  <span style={{ fontSize: "12px", color: "#aaa" }}>MSRP $</span>
-                  <input type="number" placeholder="—" value={bulkApply.msrp} onChange={e => setBulkApply(p => ({ ...p, msrp: e.target.value }))} style={{ width: "72px", padding: "5px 7px", border: "1px solid #E2E0DA", borderRadius: "5px", fontSize: "12px" }} />
+                  <span style={{ fontSize: "12px", color: "#aaa" }}>Cost $</span>
+                  <input type="number" placeholder="—" value={bulkApply.cost} onChange={e => setBulkApply(p => ({ ...p, cost: e.target.value }))} style={{ width: "72px", padding: "5px 7px", border: "1px solid #E2E0DA", borderRadius: "5px", fontSize: "12px" }} />
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                  <span style={{ fontSize: "12px", color: "#aaa" }}>Country</span>
+                  <input type="text" placeholder="e.g. Bangladesh" value={bulkApply.origin} onChange={e => setBulkApply(p => ({ ...p, origin: e.target.value }))} style={{ width: "120px", padding: "5px 7px", border: "1px solid #E2E0DA", borderRadius: "5px", fontSize: "12px" }} />
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
                   <span style={{ fontSize: "12px", color: "#aaa" }}>Stock</span>
@@ -632,16 +638,16 @@ export default function AdminProductEditPage() {
                 </div>
                 <button
                   onClick={applyToAllVariants}
-                  disabled={!bulkApply.price && !bulkApply.compare && !bulkApply.msrp && !bulkApply.stock}
-                  style={{ padding: "5px 14px", background: "#1A5CFF", color: "#fff", border: "none", borderRadius: "5px", fontSize: "12px", fontWeight: 700, cursor: "pointer", opacity: (!bulkApply.price && !bulkApply.compare && !bulkApply.msrp && !bulkApply.stock) ? 0.4 : 1 }}
+                  disabled={!bulkApply.price && !bulkApply.compare && !bulkApply.cost && !bulkApply.origin && !bulkApply.stock}
+                  style={{ padding: "5px 14px", background: "#1A5CFF", color: "#fff", border: "none", borderRadius: "5px", fontSize: "12px", fontWeight: 700, cursor: "pointer", opacity: (!bulkApply.price && !bulkApply.compare && !bulkApply.cost && !bulkApply.origin && !bulkApply.stock) ? 0.4 : 1 }}
                 >
                   Apply to All
                 </button>
                 {selectedVariantIds.size > 0 && (
                   <button
                     onClick={applyToSelectedVariants}
-                    disabled={!bulkApply.price && !bulkApply.compare && !bulkApply.msrp && !bulkApply.stock}
-                    style={{ padding: "5px 14px", background: "#059669", color: "#fff", border: "none", borderRadius: "5px", fontSize: "12px", fontWeight: 700, cursor: "pointer", opacity: (!bulkApply.price && !bulkApply.compare && !bulkApply.msrp && !bulkApply.stock) ? 0.4 : 1 }}
+                    disabled={!bulkApply.price && !bulkApply.compare && !bulkApply.cost && !bulkApply.origin && !bulkApply.stock}
+                    style={{ padding: "5px 14px", background: "#059669", color: "#fff", border: "none", borderRadius: "5px", fontSize: "12px", fontWeight: 700, cursor: "pointer", opacity: (!bulkApply.price && !bulkApply.compare && !bulkApply.cost && !bulkApply.origin && !bulkApply.stock) ? 0.4 : 1 }}
                   >
                     Apply to Selected ({selectedVariantIds.size})
                   </button>
@@ -688,7 +694,7 @@ export default function AdminProductEditPage() {
                             }}
                           />
                         </th>
-                        {["Size", "SKU", "Price", "Compare Price", "MSRP (Retail)", "Stock", ""].map(h => (
+                        {["Size", "SKU", "Price", "Compare Price", "Cost / Item", "Country of Origin", "Stock", ""].map(h => (
                           <th key={h} style={thStyle}>{h}</th>
                         ))}
                       </tr>
@@ -748,13 +754,23 @@ export default function AdminProductEditPage() {
                               <span style={{ color: "#aaa", fontSize: "13px" }}>$</span>
                               <input
                                 type="number"
-                                value={getVariantValue(variant, "msrp")}
-                                onChange={e => updateVariantEdit(variant.id, "msrp", e.target.value)}
+                                value={getVariantValue(variant, "cost_per_item")}
+                                onChange={e => updateVariantEdit(variant.id, "cost_per_item", e.target.value)}
                                 onBlur={() => saveVariant(variant.id)}
                                 placeholder="0.00"
                                 style={{ padding: "6px 8px", border: "1px solid #E2E0DA", borderRadius: "5px", fontSize: "12px", width: "80px" }}
                               />
                             </div>
+                          </td>
+                          <td style={{ padding: "10px 16px" }}>
+                            <input
+                              type="text"
+                              value={getVariantValue(variant, "country_of_origin")}
+                              onChange={e => updateVariantEdit(variant.id, "country_of_origin", e.target.value)}
+                              onBlur={() => saveVariant(variant.id)}
+                              placeholder="e.g. Bangladesh"
+                              style={{ padding: "6px 8px", border: "1px solid #E2E0DA", borderRadius: "5px", fontSize: "12px", width: "140px" }}
+                            />
                           </td>
                           <td style={{ padding: "10px 16px" }}>
                             <input
