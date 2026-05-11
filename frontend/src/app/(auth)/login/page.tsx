@@ -26,6 +26,8 @@ function decodeJwtPayload(token: string): Record<string, unknown> {
   }
 }
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+
 export default function LoginPage() {
   const router = useRouter();
   const { setAuth } = useAuthStore();
@@ -36,6 +38,8 @@ export default function LoginPage() {
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showResendActivation, setShowResendActivation] = useState(false);
+  const [resendSent, setResendSent] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -71,8 +75,10 @@ export default function LoginPage() {
       if (err instanceof ApiClientError) {
         if (err.code === "ACCOUNT_SUSPENDED") {
           setError("Your account has been suspended. Please contact support.");
+        } else if (err.code === "ACCOUNT_NOT_ACTIVATED") {
+          setError("Your account is not yet activated. Check your email for the activation link.");
+          setShowResendActivation(true);
         } else if (err.code === "UNAUTHORIZED") {
-          // Show the exact backend message — covers wrong password, pending, and rejected cases
           setError(err.message || "Invalid email or password. Please try again.");
         } else {
           setError("Invalid email or password. Please try again.");
@@ -82,6 +88,20 @@ export default function LoginPage() {
       }
     } finally {
       setIsSubmitting(false);
+    }
+  }
+
+  async function handleResendActivation() {
+    setResendSent(false);
+    try {
+      await fetch(`${API_BASE}/api/v1/resend-activation`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      setResendSent(true);
+    } catch {
+      // non-fatal
     }
   }
 
@@ -111,8 +131,31 @@ export default function LoginPage() {
           <div style={{ background: "#0F2340", border: "1px solid rgba(255,255,255,.12)", borderRadius: "12px", padding: "36px" }}>
             <form onSubmit={handleSubmit}>
               {error && (
-                <div style={{ background: "rgba(232,36,42,.12)", border: "1px solid rgba(232,36,42,.3)", borderRadius: "6px", padding: "12px 14px", fontSize: "13px", color: "#f87171", marginBottom: "20px" }}>
+                <div style={{ background: "rgba(232,36,42,.12)", border: "1px solid rgba(232,36,42,.3)", borderRadius: "6px", padding: "12px 14px", fontSize: "13px", color: "#f87171", marginBottom: "12px" }}>
                   {error}
+                </div>
+              )}
+
+              {showResendActivation && (
+                <div style={{ marginBottom: "20px", padding: "14px 16px", background: "rgba(255,248,225,.06)", border: "1px solid rgba(255,224,130,.25)", borderRadius: "8px" }}>
+                  {resendSent ? (
+                    <p style={{ fontSize: "13px", color: "#86efac", margin: 0 }}>
+                      Activation email sent! Check your inbox.
+                    </p>
+                  ) : (
+                    <>
+                      <p style={{ fontSize: "13px", color: "#d3d0d0", margin: "0 0 10px" }}>
+                        {"Didn't receive the activation email?"}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={handleResendActivation}
+                        style={{ background: "#1B3A5C", color: "#fff", border: "none", padding: "9px 18px", borderRadius: "6px", fontSize: "13px", cursor: "pointer", fontWeight: 600 }}
+                      >
+                        Resend Activation Email
+                      </button>
+                    </>
+                  )}
                 </div>
               )}
 

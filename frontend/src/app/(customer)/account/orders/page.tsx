@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { accountService } from "@/services/account.service";
 import { useAuthStore } from "@/stores/auth.store";
 
@@ -28,11 +29,22 @@ const STATUS_COLORS: Record<string, string> = {
 
 export default function AccountOrdersPage() {
   const { isLoading: authLoading, isAuthenticated } = useAuthStore();
+  const searchParams = useSearchParams();
   const [orders, setOrders] = useState<Order[]>([]);
   const [statusFilter, setStatusFilter] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [welcomeBanner, setWelcomeBanner] = useState(false);
+
+  // Show welcome banner when redirected from activation
+  useEffect(() => {
+    if (searchParams.get("activated") === "true") {
+      setWelcomeBanner(true);
+      const t = setTimeout(() => setWelcomeBanner(false), 6000);
+      return () => clearTimeout(t);
+    }
+  }, [searchParams]);
 
   // Debounce search
   useEffect(() => {
@@ -59,6 +71,15 @@ export default function AccountOrdersPage() {
 
   return (
     <div>
+      {welcomeBanner && (
+        <div style={{ background: "#ecfdf5", border: "1px solid #6ee7b7", borderRadius: "8px", padding: "14px 18px", marginBottom: "16px", display: "flex", alignItems: "center", gap: "10px" }}>
+          <span style={{ fontSize: "18px" }}>🎉</span>
+          <p style={{ margin: 0, fontSize: "14px", color: "#065f46", fontWeight: 600 }}>
+            Welcome! Your account has been activated. Here are your orders.
+          </p>
+        </div>
+      )}
+
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-xl font-bold text-gray-900">Orders</h1>
       </div>
