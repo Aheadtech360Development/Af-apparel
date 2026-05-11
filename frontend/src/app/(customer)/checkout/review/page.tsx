@@ -12,7 +12,7 @@ import { apiClient } from "@/lib/api-client";
 import { formatCurrency } from "@/lib/utils";
 import type { Cart } from "@/types/order.types";
 
-type GuestCartEntry = { variant_id: string; quantity: number; product_id: string; product_name: string; slug: string; color: string | null; size: string | null; unit_price: number };
+type GuestCartEntry = { variant_id: string; quantity: number; product_id: string; product_name: string; slug: string; color: string | null; size: string | null; unit_price: number; image_url?: string | null };
 
 interface SavedCard {
   id: string;
@@ -391,8 +391,12 @@ export default function CheckoutReviewPage() {
             {isGuest
               ? guestEntries.map((item, idx) => (
                   <div key={idx} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                    <div style={{ width: "38px", height: "38px", flexShrink: 0, borderRadius: "6px", background: "#F4F3EF", border: "1px solid #E2E0DA", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px" }}>
-                      👕
+                    <div style={{ width: "38px", height: "38px", flexShrink: 0, borderRadius: "6px", background: "#F4F3EF", border: "1px solid #E2E0DA", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px" }}>
+                      {item.image_url
+                        // eslint-disable-next-line @next/next/no-img-element
+                        ? <img src={item.image_url} alt={item.product_name} style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
+                        : <span>👕</span>
+                      }
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: "13px", fontWeight: 600, color: "#2A2830" }}>{item.product_name}</div>

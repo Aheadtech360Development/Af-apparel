@@ -270,12 +270,13 @@ export default function CartPage() {
     setApplyingCoupon(true);
     setCouponError(null);
     try {
+      const discountBase = subtotal + (hasShippingTier ? estimatedShipping : 0);
       const data = await apiClient.post<{
         valid: boolean; message: string; code?: string;
         discount_type?: string; discount_amount?: number; final_total?: number;
       }>("/api/v1/discounts/validate", {
         code: couponInput.trim(),
-        cart_total: subtotal,
+        cart_total: discountBase,
         customer_type: "wholesale",
       });
       if (data.valid) {
@@ -331,6 +332,7 @@ export default function CartPage() {
   const subtotal = Number(cart?.subtotal ?? 0);
   const discountPercent = Number(cart?.discount_percent ?? 0);
   const hasShippingTier = cart?.validation?.has_shipping_tier ?? false;
+  const estimatedShipping = Number(cart?.validation?.estimated_shipping ?? (isGuest ? 9.99 : 0));
 
   return (
     <div style={{ minHeight: "100vh", background: "#F4F3EF", fontFamily: "var(--font-jakarta)", paddingBottom: "60px" }}>
@@ -504,7 +506,7 @@ export default function CartPage() {
             <div style={{ position: "sticky", top: "88px" }}>
               <OrderSummary
                 subtotal={subtotal}
-                estimatedShipping={Number(cart?.validation?.estimated_shipping ?? (isGuest ? 9.99 : 0))}
+                estimatedShipping={estimatedShipping}
                 hasShippingTier={hasShippingTier}
                 discountPercent={discountPercent}
                 isValid={isCheckoutEnabled}
