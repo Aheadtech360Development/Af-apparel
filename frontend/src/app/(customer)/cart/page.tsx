@@ -270,13 +270,12 @@ export default function CartPage() {
     setApplyingCoupon(true);
     setCouponError(null);
     try {
-      const discountBase = subtotal + (hasShippingTier ? estimatedShipping : 0);
       const data = await apiClient.post<{
         valid: boolean; message: string; code?: string;
         discount_type?: string; discount_amount?: number; final_total?: number;
       }>("/api/v1/discounts/validate", {
         code: couponInput.trim(),
-        cart_total: discountBase,
+        cart_total: subtotal,   // discount applies to subtotal only, not shipping
         customer_type: "wholesale",
       });
       if (data.valid) {
