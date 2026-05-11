@@ -129,6 +129,8 @@ export default function OrderDetailPage() {
   const [sendingComment, setSendingComment] = useState(false);
   const [isReordering, setIsReordering] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
   const [companyAddress, setCompanyAddress] = useState<{
     name: string | null;
     company_email: string | null;
@@ -146,6 +148,7 @@ export default function OrderDetailPage() {
     if (authLoading || !isAuthenticated()) return;
     async function load() {
       setLoading(true);
+      setLoadError(null);
       try {
         const [orderData, commentsData] = await Promise.all([
           accountService.getOrder(id) as Promise<Order>,
@@ -153,6 +156,8 @@ export default function OrderDetailPage() {
         ]);
         setOrder(orderData);
         setComments(commentsData);
+      } catch (err) {
+        setLoadError(err instanceof Error ? err.message : "Failed to load order.");
       } finally {
         setLoading(false);
       }
@@ -162,7 +167,7 @@ export default function OrderDetailPage() {
     apiClient.get<{ company: { name: string | null; company_email: string | null; address_line1: string | null; address_line2: string | null; city: string | null; state_province: string | null; postal_code: string | null; country: string | null; phone: string | null } | null }>("/api/v1/account/profile/full")
       .then((d) => { if (d.company) setCompanyAddress(d.company); })
       .catch(() => {});
-  }, [id, authLoading]);
+  }, [id, authLoading, retryCount]);
 
   async function handleReorder() {
     setIsReordering(true);
@@ -215,8 +220,26 @@ export default function OrderDetailPage() {
     }
   }
 
-  if (loading || !order) {
+  if (loading) {
     return <div className="py-12 text-center text-gray-400">Loading order…</div>;
+  }
+
+  if (loadError) {
+    return (
+      <div className="py-12 text-center">
+        <p className="text-red-500 text-sm mb-3">{loadError}</p>
+        <button
+          onClick={() => setRetryCount(c => c + 1)}
+          className="text-sm text-brand-600 underline"
+        >
+          Try again
+        </button>
+      </div>
+    );
+  }
+
+  if (!order) {
+    return <div className="py-12 text-center text-gray-400">Order not found.</div>;
   }
 
   const isShipped = ["shipped", "delivered"].includes(order.status);

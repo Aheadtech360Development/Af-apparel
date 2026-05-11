@@ -161,6 +161,8 @@ export default function AdminOrderDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const [order, setOrder] = useState<AdminOrder | null>(null);
+  const [orderLoading, setOrderLoading] = useState(true);
+  const [orderError, setOrderError] = useState<string | null>(null);
   const [customerStats, setCustomerStats] = useState<CustomerStats | null>(null);
   const [companyReg, setCompanyReg] = useState<CompanyRegistration | null>(null);
   const [status, setStatus] = useState("");
@@ -196,26 +198,37 @@ export default function AdminOrderDetailPage() {
   const searchDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    adminService.getOrder(id).then(async (d) => {
-      const o = d as AdminOrder;
-      setOrder(o);
-      setStatus(o.status);
-      setTracking(o.tracking_number ?? "");
-      setNoteText(o.order_notes ?? "");
-      if (o.courier) setSelectedCourier(o.courier);
-      if (o.courier_service) setSelectedService(o.courier_service);
-      if (o.tracking_number) setTrackingNumber(o.tracking_number);
+    setOrderLoading(true);
+    setOrderError(null);
+    adminService.getOrder(id)
+      .then(async (d) => {
+        const o = d as AdminOrder;
+        setOrder(o);
+        setStatus(o.status);
+        setTracking(o.tracking_number ?? "");
+        setNoteText(o.order_notes ?? "");
+        if (o.courier) setSelectedCourier(o.courier);
+        if (o.courier_service) setSelectedService(o.courier_service);
+        if (o.tracking_number) setTrackingNumber(o.tracking_number);
 
-      // Fetch customer stats and company registration info (best-effort)
-      try {
-        const stats = await apiClient.get<CustomerStats>(`/api/v1/admin/customers/${o.company_id}/stats`);
-        if (stats) setCustomerStats(stats);
-      } catch { /* stats are optional */ }
-      try {
-        const co = await apiClient.get<CompanyRegistration>(`/api/v1/admin/customers/${o.company_id}`);
-        if (co) setCompanyReg(co);
-      } catch { /* company info optional */ }
-    });
+        // Fetch customer stats and company registration info (best-effort)
+        if (o.company_id) {
+          try {
+            const stats = await apiClient.get<CustomerStats>(`/api/v1/admin/customers/${o.company_id}/stats`);
+            if (stats) setCustomerStats(stats);
+          } catch { /* stats are optional */ }
+          try {
+            const co = await apiClient.get<CompanyRegistration>(`/api/v1/admin/customers/${o.company_id}`);
+            if (co) setCompanyReg(co);
+          } catch { /* company info optional */ }
+        }
+      })
+      .catch((err) => {
+        setOrderError(err?.message || "Failed to load order.");
+      })
+      .finally(() => {
+        setOrderLoading(false);
+      });
   }, [id]);
 
   function handleCourierSelect(courierId: string) {
@@ -381,10 +394,19 @@ export default function AdminOrderDetailPage() {
     }
   }
 
-  if (!order) {
+  if (orderLoading) {
     return (
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "320px" }}>
         <div style={{ fontSize: "13px", color: "#aaa" }}>Loading order…</div>
+      </div>
+    );
+  }
+
+  if (orderError || !order) {
+    return (
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "320px", gap: "12px" }}>
+        <div style={{ fontSize: "14px", color: "#E8242A", fontWeight: 600 }}>{orderError || "Order not found."}</div>
+        <button onClick={() => router.back()} style={{ fontSize: "13px", color: "#1A5CFF", background: "none", border: "none", cursor: "pointer", fontWeight: 700 }}>← Back to Orders</button>
       </div>
     );
   }
@@ -404,7 +426,7 @@ export default function AdminOrderDetailPage() {
     {
       icon: <CheckIcon size={10} color="#fff" />,
       text: "Order placed",
-      sub: `${order.company_name} · ${order.payment_status}`,
+      sub: `${order.company_name || order.customer_name || "Customer"} · ${order.payment_status}`,
       time: order.created_at, color: "#1A5CFF",
     },
   ].filter(Boolean) as { icon: React.ReactNode; text: string; sub: string; time: string; color: string }[];
