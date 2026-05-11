@@ -40,6 +40,7 @@ export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showResendActivation, setShowResendActivation] = useState(false);
   const [resendSent, setResendSent] = useState(false);
+  const [showPendingApproval, setShowPendingApproval] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -78,6 +79,9 @@ export default function LoginPage() {
         } else if (err.code === "ACCOUNT_NOT_ACTIVATED") {
           setError("Your account is not yet activated. Check your email for the activation link.");
           setShowResendActivation(true);
+        } else if (err.code === "ACCOUNT_PENDING_APPROVAL") {
+          setError(null);
+          setShowPendingApproval(true);
         } else if (err.code === "UNAUTHORIZED") {
           setError(err.message || "Invalid email or password. Please try again.");
         } else {
@@ -156,6 +160,20 @@ export default function LoginPage() {
                       </button>
                     </>
                   )}
+                </div>
+              )}
+
+              {showPendingApproval && (
+                <div style={{ marginBottom: "20px", padding: "16px", background: "rgba(26,92,255,.08)", border: "1px solid rgba(26,92,255,.3)", borderRadius: "8px" }}>
+                  <p style={{ fontSize: "13px", fontWeight: 700, color: "#93c5fd", margin: "0 0 6px" }}>
+                    Application Under Review
+                  </p>
+                  <p style={{ fontSize: "13px", color: "#d3d0d0", margin: 0, lineHeight: 1.5 }}>
+                    Your wholesale application is currently being reviewed by our team. You will receive an email within 1–2 business days once a decision has been made.
+                  </p>
+                  <p style={{ fontSize: "12px", color: "#7A7880", margin: "8px 0 0" }}>
+                    Questions? Call <a href="tel:+12142727213" style={{ color: "#93c5fd", textDecoration: "none" }}>(214) 272-7213</a>
+                  </p>
                 </div>
               )}
 
