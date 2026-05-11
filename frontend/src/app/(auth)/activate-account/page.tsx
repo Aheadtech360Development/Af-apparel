@@ -284,7 +284,7 @@ function ActivateAccountContent() {
       const jwtPayload = decodeJwtPayload(data.access_token);
       const fullProfile = { ...profile, is_admin: false, account_type: (jwtPayload.account_type as string) || "retail" };
       setAuth(data.access_token, fullProfile);
-      router.push("/account/orders?activated=true");
+      router.push("/account/orders");
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
