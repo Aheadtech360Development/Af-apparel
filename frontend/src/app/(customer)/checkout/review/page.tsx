@@ -188,6 +188,7 @@ export default function CheckoutReviewPage() {
           tax_amount: taxAmount > 0 ? taxAmount : undefined,
           tax_rate: taxRate?.rate ?? undefined,
           tax_region: taxRate?.region ?? undefined,
+          shipping_cost: shippingCost > 0 ? shippingCost : undefined,
         });
 
         const guestSubtotal = guestEntries.reduce((s, e) => s + e.unit_price * e.quantity, 0);

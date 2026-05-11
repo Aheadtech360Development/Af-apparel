@@ -23,15 +23,6 @@ const NAV_ITEMS = [
   { href: "/account/abandoned-carts", label: "Abandoned Carts" },
 ];
 
-const RETAIL_NAV_ITEMS = [
-  { href: "/account", label: "Overview" },
-  { href: "/account/profile", label: "Account Profile" },
-  { href: "/account/change-password", label: "Change Password" },
-  { href: "/account/addresses", label: "Address Book" },
-  { href: "/account/payment-methods", label: "Manage Payment Methods" },
-  { href: "/account/orders", label: "Orders Status" },
-];
-
 function NavLinks({ items, pathname, onClose }: { items: typeof NAV_ITEMS; pathname: string; onClose?: () => void }) {
   return (
     <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
@@ -72,7 +63,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
   const { isAuthenticated, isLoading, user } = useAuthStore();
   const redirectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const navItems = user?.account_type === "retail" ? RETAIL_NAV_ITEMS : NAV_ITEMS;
+  const navItems = NAV_ITEMS;
 
   // Get current page label for mobile breadcrumb
   const currentLabel =
