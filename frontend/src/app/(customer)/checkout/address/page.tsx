@@ -182,6 +182,7 @@ export default function CheckoutAddressPage() {
       city: activeCity,
       subtotal: String(subtotal),
       shipping: String(selectedCost),
+      discount: String(couponDiscount),
     });
     apiClient.get<{ region: string; rate: number; tax_amount: number }>(`/api/v1/tax-rate?${params}`)
       .then(res => {
@@ -199,9 +200,10 @@ export default function CheckoutAddressPage() {
         }
       })
       .catch(() => { setTaxRate(null); setApiTaxAmount(0); setTaxInfo(null, 0, 0); });
-  }, [activeState, activeZip, subtotal, selectedAddressId]);
+  }, [activeState, activeZip, subtotal, selectedAddressId, couponDiscount]);
 
-  const taxAmount = apiTaxAmount > 0 ? apiTaxAmount : (taxRate ? Math.round(subtotal * taxRate.rate / 100 * 100) / 100 : 0);
+  const taxableBase = Math.max(0, subtotal + selectedCost - couponDiscount);
+  const taxAmount = apiTaxAmount > 0 ? apiTaxAmount : (taxRate ? Math.round(taxableBase * taxRate.rate / 100 * 100) / 100 : 0);
   const orderTotal = subtotal + selectedCost + taxAmount - couponDiscount;
 
   function validate() {

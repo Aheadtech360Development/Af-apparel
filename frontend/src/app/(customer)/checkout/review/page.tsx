@@ -70,6 +70,7 @@ export default function CheckoutReviewPage() {
   const [taxRate, setTaxRate] = useState<{ region: string; rate: number } | null>(
     storedTaxRate > 0 && storedTaxRegion ? { region: storedTaxRegion, rate: storedTaxRate } : null
   );
+  const [freshTaxAmount, setFreshTaxAmount] = useState(0);
 
   // Guard: must have shipping + payment
   useEffect(() => {
@@ -121,15 +122,18 @@ export default function CheckoutReviewPage() {
       city: shippingAddress.city ?? "",
       subtotal: String(subtotal),
       shipping: String(shipping),
+      discount: String(couponDiscount),
     });
     apiClient.get<{ region: string; rate: number; tax_amount: number }>(`/api/v1/tax-rate?${params}`)
       .then(res => {
         const r = res as any;
         const rate = Number(r.rate ?? 0);
+        const amount = Number(r.tax_amount ?? 0);
         setTaxRate(rate > 0 ? { region: r.region, rate } : null);
+        if (amount > 0) setFreshTaxAmount(amount);
       })
       .catch(() => setTaxRate(null));
-  }, [storedTaxRegion, storedTaxRate, shippingAddress?.state]);
+  }, [storedTaxRegion, storedTaxRate, shippingAddress?.state, couponDiscount]);
 
   function buildColorSummary(c: Cart): string {
     const colorMap = new Map<string, number>();
@@ -291,10 +295,12 @@ export default function CheckoutReviewPage() {
   const subtotal = isGuest ? guestSubtotalCalc : Number(cart?.subtotal ?? 0);
   const shipping = shippingCost;
   const couponDiscount = appliedCoupon ? Number(appliedCoupon.discount_amount) : 0;
-  // Prefer TaxJar-calculated amount from store; fall back to rate × subtotal
+  // Priority: stored TaxJar amount → fresh re-fetch amount → rate × (subtotal+shipping-discount)
   const taxAmount = storedTaxAmount > 0
     ? storedTaxAmount
-    : (taxRate ? Math.round(subtotal * taxRate.rate / 100 * 100) / 100 : 0);
+    : freshTaxAmount > 0
+      ? freshTaxAmount
+      : (taxRate ? Math.round(Math.max(0, subtotal + shipping - couponDiscount) * taxRate.rate / 100 * 100) / 100 : 0);
   const total = subtotal + shipping + taxAmount - (isGuest ? 0 : couponDiscount);
   const shippingLabel = SHIPPING_LABELS[shippingMethod] ?? "Standard Ground";
 
