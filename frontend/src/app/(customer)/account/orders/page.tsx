@@ -164,7 +164,7 @@ export default function AccountOrdersPage() {
                   </td>
                   <td className="px-4 py-3 text-right">
                     <Link
-                      href={`/account/orders/${o.id}`}
+                      href={`/account/orders/${o.order_number}`}
                       className="text-xs font-medium text-brand-600 hover:text-brand-800"
                     >
                       View

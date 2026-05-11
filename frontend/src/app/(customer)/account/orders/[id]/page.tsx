@@ -150,12 +150,15 @@ export default function OrderDetailPage() {
       setLoading(true);
       setLoadError(null);
       try {
-        const [orderData, commentsData] = await Promise.all([
-          accountService.getOrder(id) as Promise<Order>,
-          accountService.getOrderComments(id) as Promise<Comment[]>,
-        ]);
+        const orderData = await accountService.getOrder(id) as Order;
         setOrder(orderData);
-        setComments(commentsData);
+        // Load comments using the real UUID (not the order_number from URL)
+        try {
+          const commentsData = await accountService.getOrderComments(orderData.id) as Comment[];
+          setComments(commentsData);
+        } catch {
+          setComments([]);
+        }
       } catch (err) {
         setLoadError(err instanceof Error ? err.message : "Failed to load order.");
       } finally {
@@ -172,7 +175,7 @@ export default function OrderDetailPage() {
   async function handleReorder() {
     setIsReordering(true);
     try {
-      await accountService.reorder(id);
+      await accountService.reorder(order?.id ?? id);
       router.push("/cart");
     } finally {
       setIsReordering(false);
@@ -184,7 +187,7 @@ export default function OrderDetailPage() {
     if (!commentBody.trim()) return;
     setSendingComment(true);
     try {
-      const newComment = await accountService.addOrderComment(id, commentBody.trim()) as Comment;
+      const newComment = await accountService.addOrderComment(order?.id ?? id, commentBody.trim()) as Comment;
       setComments((prev) => [...prev, newComment]);
       setCommentBody("");
       setTimeout(() => commentEndRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
@@ -199,8 +202,9 @@ export default function OrderDetailPage() {
       const token = session ? JSON.parse(session).token : null;
       if (!token) return;
 
+      const oid = order?.id ?? id;
       const resp = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/orders/${id}/pdf/${type}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/orders/${oid}/pdf/${type}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (!resp.ok) throw new Error("Failed");

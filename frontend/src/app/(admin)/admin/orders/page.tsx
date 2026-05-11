@@ -195,7 +195,7 @@ export default function AdminOrdersPage() {
                 <td className="px-4 py-3 text-right text-gray-700 font-medium">${Number(o.total).toFixed(2)}</td>
                 <td className="px-4 py-3 text-gray-500">{new Date(o.created_at).toLocaleDateString()}</td>
                 <td className="px-4 py-3">
-                  <Link href={`/admin/orders/${o.id}`} className="text-xs text-blue-600 hover:text-blue-800 font-medium">View</Link>
+                  <Link href={`/admin/orders/${o.order_number}`} className="text-xs text-blue-600 hover:text-blue-800 font-medium">View</Link>
                 </td>
               </tr>
             ))}

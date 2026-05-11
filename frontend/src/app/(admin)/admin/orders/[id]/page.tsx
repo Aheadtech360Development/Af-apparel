@@ -241,7 +241,7 @@ export default function AdminOrderDetailPage() {
     e.preventDefault();
     setIsSaving(true); setMsg(null);
     try {
-      await adminService.updateOrder(id, { status });
+      await adminService.updateOrder(order?.id ?? id, { status });
       setMsg({ text: "Order updated successfully.", ok: true });
       setOrder(prev => prev ? { ...prev, status, tracking_number: tracking || null } : prev);
     } catch {
@@ -252,7 +252,7 @@ export default function AdminOrderDetailPage() {
   async function handleSyncQB() {
     setIsSyncing(true); setMsg(null);
     try {
-      await adminService.syncOrderToQb(id);
+      await adminService.syncOrderToQb(order?.id ?? id);
       setMsg({ text: "QuickBooks sync queued.", ok: true });
     } catch {
       setMsg({ text: "QB sync failed.", ok: false });
@@ -263,7 +263,7 @@ export default function AdminOrderDetailPage() {
     if (!selectedCourier || !selectedService) return;
     setIsShipping(true); setMsg(null);
     try {
-      await apiClient.patch(`/api/v1/admin/orders/${id}/status`, {
+      await apiClient.patch(`/api/v1/admin/orders/${order?.id ?? id}/status`, {
         status: "shipped",
         tracking_number: trackingNumber || undefined,
         courier: selectedCourier,
@@ -287,7 +287,7 @@ export default function AdminOrderDetailPage() {
   async function handleCapturePayment() {
     setIsCapturing(true); setMsg(null);
     try {
-      await apiClient.post(`/api/v1/admin/orders/${id}/capture`, {});
+      await apiClient.post(`/api/v1/admin/orders/${order?.id ?? id}/capture`, {});
       setMsg({ text: "Payment captured successfully.", ok: true });
       setOrder(prev => prev ? { ...prev, payment_status: "paid" } : prev);
     } catch {
@@ -298,7 +298,7 @@ export default function AdminOrderDetailPage() {
   async function handleVerifyAch() {
     setIsVerifyingAch(true); setMsg(null);
     try {
-      await apiClient.post(`/api/v1/admin/orders/${id}/verify-ach`, {});
+      await apiClient.post(`/api/v1/admin/orders/${order?.id ?? id}/verify-ach`, {});
       setMsg({ text: "ACH payment verified. Order payment status updated to Paid.", ok: true });
       setOrder(prev => prev ? { ...prev, payment_status: "paid", ach_verified: true } : prev);
     } catch {
@@ -309,7 +309,7 @@ export default function AdminOrderDetailPage() {
   async function handleResendInvoice() {
     setIsResendingInvoice(true); setMsg(null);
     try {
-      await apiClient.post(`/api/v1/admin/orders/${id}/resend-invoice`, {});
+      await apiClient.post(`/api/v1/admin/orders/${order?.id ?? id}/resend-invoice`, {});
       setMsg({ text: "Invoice emailed to customer.", ok: true });
     } catch {
       setMsg({ text: "Failed to send invoice email.", ok: false });
@@ -318,7 +318,7 @@ export default function AdminOrderDetailPage() {
 
   async function handleSaveNote() {
     try {
-      await apiClient.patch(`/api/v1/admin/orders/${id}`, { notes: noteText });
+      await apiClient.patch(`/api/v1/admin/orders/${order?.id ?? id}`, { notes: noteText });
       setEditingNote(false);
       setOrder(prev => prev ? { ...prev, order_notes: noteText } : prev);
       setMsg({ text: "Note saved.", ok: true });
@@ -353,7 +353,7 @@ export default function AdminOrderDetailPage() {
     setAddingItem(true); setAddItemMsg(null);
     try {
       const result = await apiClient.post<{ subtotal: number; total: number }>(
-        `/api/v1/admin/orders/${id}/items`,
+        `/api/v1/admin/orders/${order?.id ?? id}/items`,
         { variant_id: selectedVariant.variant_id, quantity: addQty, unit_price: selectedVariant.price }
       );
       setOrder(prev => prev ? {
@@ -382,7 +382,7 @@ export default function AdminOrderDetailPage() {
 
   async function handleRemoveItem(itemId: string, lineTotal: string) {
     try {
-      await apiClient.delete(`/api/v1/admin/orders/${id}/items/${itemId}`);
+      await apiClient.delete(`/api/v1/admin/orders/${order?.id ?? id}/items/${itemId}`);
       setOrder(prev => prev ? {
         ...prev,
         items: prev.items.filter(i => i.id !== itemId),
