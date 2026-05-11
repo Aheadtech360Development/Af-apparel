@@ -27,6 +27,8 @@ const RETAIL_NAV_ITEMS = [
   { href: "/account", label: "Overview" },
   { href: "/account/profile", label: "Account Profile" },
   { href: "/account/change-password", label: "Change Password" },
+  { href: "/account/addresses", label: "Address Book" },
+  { href: "/account/payment-methods", label: "Manage Payment Methods" },
   { href: "/account/orders", label: "Orders Status" },
 ];
 

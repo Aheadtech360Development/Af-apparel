@@ -358,9 +358,9 @@ export default function AdminCustomersPage() {
               const isRetail = co.account_type === "retail";
               return (
                 <tr key={co.id}
-                  onClick={isRetail ? undefined : () => router.push(`/admin/customers/${co.id}`)}
-                  style={{ borderBottom: "1px solid #F4F3EF", cursor: isRetail ? "default" : "pointer", transition: "background .12s" }}
-                  onMouseEnter={e => { if (!isRetail) e.currentTarget.style.background = "#FAFAF8"; }}
+                  onClick={() => router.push(`/admin/customers/${co.id}`)}
+                  style={{ borderBottom: "1px solid #F4F3EF", cursor: "pointer", transition: "background .12s" }}
+                  onMouseEnter={e => (e.currentTarget.style.background = "#FAFAF8")}
                   onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
                   <td style={{ padding: "13px 14px" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -395,13 +395,11 @@ export default function AdminCustomersPage() {
                     </span>
                   </td>
                   <td style={{ padding: "13px 14px" }} onClick={e => e.stopPropagation()}>
-                    {!isRetail && (
-                      <button
-                        onClick={() => router.push(`/admin/customers/${co.id}`)}
-                        style={{ padding: "5px 12px", border: "1px solid #E2E0DA", borderRadius: "6px", background: "#fff", fontSize: "12px", fontWeight: 600, cursor: "pointer" }}>
-                        View
-                      </button>
-                    )}
+                    <button
+                      onClick={() => router.push(`/admin/customers/${co.id}`)}
+                      style={{ padding: "5px 12px", border: "1px solid #E2E0DA", borderRadius: "6px", background: "#fff", fontSize: "12px", fontWeight: 600, cursor: "pointer" }}>
+                      View
+                    </button>
                   </td>
                 </tr>
               );
