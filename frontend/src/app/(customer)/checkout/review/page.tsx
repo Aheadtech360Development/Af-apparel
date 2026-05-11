@@ -72,6 +72,12 @@ export default function CheckoutReviewPage() {
   );
   const [freshTaxAmount, setFreshTaxAmount] = useState(0);
 
+  // Derived values needed by useEffects below
+  const guestSubtotalCalc = guestEntries.reduce((s, e) => s + e.unit_price * e.quantity, 0);
+  const subtotal = isGuest ? guestSubtotalCalc : Number(cart?.subtotal ?? 0);
+  const shipping = shippingCost;
+  const couponDiscount = appliedCoupon ? Number(appliedCoupon.discount_amount) : 0;
+
   // Guard: must have shipping + payment
   useEffect(() => {
     if (!shippingAddress) {
@@ -255,7 +261,6 @@ export default function CheckoutReviewPage() {
 
       const productName = cart?.items[0]?.product_name ?? "Your Order";
       const colorSummary = cart ? buildColorSummary(cart) : "";
-      const subtotal = Number(cart?.subtotal ?? 0);
       const orderTotal = subtotal + shippingCost + taxAmount - couponDiscount;
 
       const confirmedData = {
@@ -291,10 +296,6 @@ export default function CheckoutReviewPage() {
     ? "New Card (tokenized)"
     : "Credit Card";
 
-  const guestSubtotalCalc = guestEntries.reduce((s, e) => s + e.unit_price * e.quantity, 0);
-  const subtotal = isGuest ? guestSubtotalCalc : Number(cart?.subtotal ?? 0);
-  const shipping = shippingCost;
-  const couponDiscount = appliedCoupon ? Number(appliedCoupon.discount_amount) : 0;
   // Priority: stored TaxJar amount → fresh re-fetch amount → rate × (subtotal+shipping-discount)
   const taxAmount = storedTaxAmount > 0
     ? storedTaxAmount
