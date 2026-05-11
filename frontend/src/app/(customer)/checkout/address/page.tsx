@@ -202,7 +202,7 @@ export default function CheckoutAddressPage() {
       .catch(() => { setTaxRate(null); setApiTaxAmount(0); setTaxInfo(null, 0, 0); });
   }, [activeState, activeZip, subtotal, selectedAddressId, couponDiscount]);
 
-  const taxableBase = Math.max(0, subtotal + selectedCost - couponDiscount);
+  const taxableBase = Math.max(0, subtotal - couponDiscount); // shipping not taxed
   const taxAmount = apiTaxAmount > 0 ? apiTaxAmount : (taxRate ? Math.round(taxableBase * taxRate.rate / 100 * 100) / 100 : 0);
   const orderTotal = subtotal + selectedCost + taxAmount - couponDiscount;
 

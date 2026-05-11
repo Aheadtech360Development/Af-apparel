@@ -301,7 +301,7 @@ export default function CheckoutReviewPage() {
     ? storedTaxAmount
     : freshTaxAmount > 0
       ? freshTaxAmount
-      : (taxRate ? Math.round(Math.max(0, subtotal + shipping - couponDiscount) * taxRate.rate / 100 * 100) / 100 : 0);
+      : (taxRate ? Math.round(Math.max(0, subtotal - couponDiscount) * taxRate.rate / 100 * 100) / 100 : 0); // shipping not taxed
   const total = subtotal + shipping + taxAmount - (isGuest ? 0 : couponDiscount);
   const shippingLabel = SHIPPING_LABELS[shippingMethod] ?? "Standard Ground";
 
