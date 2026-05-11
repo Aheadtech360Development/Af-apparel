@@ -23,10 +23,17 @@ const NAV_ITEMS = [
   { href: "/account/abandoned-carts", label: "Abandoned Carts" },
 ];
 
-function NavLinks({ pathname, onClose }: { pathname: string; onClose?: () => void }) {
+const RETAIL_NAV_ITEMS = [
+  { href: "/account", label: "Overview" },
+  { href: "/account/profile", label: "Account Profile" },
+  { href: "/account/change-password", label: "Change Password" },
+  { href: "/account/orders", label: "Orders Status" },
+];
+
+function NavLinks({ items, pathname, onClose }: { items: typeof NAV_ITEMS; pathname: string; onClose?: () => void }) {
   return (
     <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
-      {NAV_ITEMS.map((item) => {
+      {items.map((item) => {
         const active =
           pathname === item.href ||
           (item.href !== "/account" && pathname.startsWith(item.href));
@@ -63,10 +70,11 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
   const { isAuthenticated, isLoading, user } = useAuthStore();
   const redirectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const navItems = user?.account_type === "retail" ? RETAIL_NAV_ITEMS : NAV_ITEMS;
 
   // Get current page label for mobile breadcrumb
   const currentLabel =
-    NAV_ITEMS.find(
+    navItems.find(
       (i) =>
         pathname === i.href ||
         (i.href !== "/account" && pathname.startsWith(i.href))
@@ -220,7 +228,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
                 ✕
               </button>
             </div>
-            <NavLinks pathname={pathname} onClose={() => setDrawerOpen(false)} />
+            <NavLinks items={navItems} pathname={pathname} onClose={() => setDrawerOpen(false)} />
           </div>
         </div>
       )}
@@ -259,7 +267,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
           >
             My Account
           </h2>
-          <NavLinks pathname={pathname} />
+          <NavLinks items={navItems} pathname={pathname} />
         </nav>
 
         {/* Main content */}

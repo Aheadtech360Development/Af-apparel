@@ -59,9 +59,9 @@ export default function LoginPage() {
 
       const profile = await authService.getProfile();
 
-      // JWT payload contains is_admin since backend embeds it as a claim
+      // JWT payload contains is_admin and account_type as claims
       const payload = decodeJwtPayload(tokens.access_token);
-      const fullProfile = { ...profile, is_admin: !!payload.is_admin };
+      const fullProfile = { ...profile, is_admin: !!payload.is_admin, account_type: (payload.account_type as string) || "wholesale" };
 
       setAuth(tokens.access_token, fullProfile);
 

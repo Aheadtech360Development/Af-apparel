@@ -19,6 +19,7 @@ interface CompanyRow {
   email?: string;
   phone?: string;
   last_order_date?: string;
+  account_type?: string;
 }
 
 interface PricingTier { id: string; name: string; }
@@ -354,19 +355,25 @@ export default function AdminCustomersPage() {
               <tr><td colSpan={7} style={{ padding: "40px", textAlign: "center", color: "#bbb", fontSize: "14px" }}>No customers found</td></tr>
             ) : sorted.map(co => {
               const statusCfg = STATUS_BADGE[co.status] ?? { bg: "rgba(156,163,175,.15)", color: "#9CA3AF" };
+              const isRetail = co.account_type === "retail";
               return (
                 <tr key={co.id}
-                  onClick={() => router.push(`/admin/customers/${co.id}`)}
-                  style={{ borderBottom: "1px solid #F4F3EF", cursor: "pointer", transition: "background .12s" }}
-                  onMouseEnter={e => (e.currentTarget.style.background = "#FAFAF8")}
+                  onClick={isRetail ? undefined : () => router.push(`/admin/customers/${co.id}`)}
+                  style={{ borderBottom: "1px solid #F4F3EF", cursor: isRetail ? "default" : "pointer", transition: "background .12s" }}
+                  onMouseEnter={e => { if (!isRetail) e.currentTarget.style.background = "#FAFAF8"; }}
                   onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
                   <td style={{ padding: "13px 14px" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                      <div style={{ width: "34px", height: "34px", borderRadius: "50%", background: "#1A5CFF", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontFamily: "var(--font-bebas)", fontSize: "15px", flexShrink: 0 }}>
+                      <div style={{ width: "34px", height: "34px", borderRadius: "50%", background: isRetail ? "#7C3AED" : "#1A5CFF", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontFamily: "var(--font-bebas)", fontSize: "15px", flexShrink: 0 }}>
                         {co.name[0]?.toUpperCase()}
                       </div>
                       <div>
-                        <div style={{ fontWeight: 700, fontSize: "13px", color: "#2A2830" }}>{co.name}</div>
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                          <span style={{ fontWeight: 700, fontSize: "13px", color: "#2A2830" }}>{co.name}</span>
+                          <span style={{ padding: "1px 7px", borderRadius: "20px", fontSize: "10px", fontWeight: 700, background: isRetail ? "rgba(124,58,237,.1)" : "rgba(26,92,255,.1)", color: isRetail ? "#7C3AED" : "#1A5CFF", textTransform: "uppercase", letterSpacing: ".04em", flexShrink: 0 }}>
+                            {isRetail ? "Retail" : "Wholesale"}
+                          </span>
+                        </div>
                         {co.phone && <div style={{ fontSize: "11px", color: "#7A7880" }}>{co.phone}</div>}
                       </div>
                     </div>
@@ -388,11 +395,13 @@ export default function AdminCustomersPage() {
                     </span>
                   </td>
                   <td style={{ padding: "13px 14px" }} onClick={e => e.stopPropagation()}>
-                    <button
-                      onClick={() => router.push(`/admin/customers/${co.id}`)}
-                      style={{ padding: "5px 12px", border: "1px solid #E2E0DA", borderRadius: "6px", background: "#fff", fontSize: "12px", fontWeight: 600, cursor: "pointer" }}>
-                      View
-                    </button>
+                    {!isRetail && (
+                      <button
+                        onClick={() => router.push(`/admin/customers/${co.id}`)}
+                        style={{ padding: "5px 12px", border: "1px solid #E2E0DA", borderRadius: "6px", background: "#fff", fontSize: "12px", fontWeight: 600, cursor: "pointer" }}>
+                        View
+                      </button>
+                    )}
                   </td>
                 </tr>
               );

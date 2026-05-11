@@ -1,8 +1,22 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { useAuthStore } from "@/stores/auth.store";
+import { authService } from "@/services/auth.service";
+import { setAccessToken } from "@/lib/api-client";
+
+function decodeJwtPayload(token: string): Record<string, unknown> {
+  try {
+    const part = token.split(".")[1];
+    if (!part) return {};
+    const base64 = part.replace(/-/g, "+").replace(/_/g, "/");
+    return JSON.parse(atob(base64));
+  } catch {
+    return {};
+  }
+}
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
@@ -186,6 +200,8 @@ type TokenInfo = { first_name: string; last_name: string; email: string };
 function ActivateAccountContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token") ?? "";
+  const router = useRouter();
+  const { setAuth } = useAuthStore();
 
   const [tokenState, setTokenState] = useState<"loading" | "valid" | "invalid" | "expired">("loading");
   const [prefill, setPrefill] = useState<TokenInfo | null>(null);
@@ -262,8 +278,13 @@ function ActivateAccountContent() {
         return;
       }
 
-      setSubmittedName(form.first_name);
-      setSubmitted(true);
+      // Activation returns JWT — log in directly
+      setAccessToken(data.access_token);
+      const profile = await authService.getProfile();
+      const jwtPayload = decodeJwtPayload(data.access_token);
+      const fullProfile = { ...profile, is_admin: false, account_type: (jwtPayload.account_type as string) || "retail" };
+      setAuth(data.access_token, fullProfile);
+      router.push("/account/orders?activated=true");
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
