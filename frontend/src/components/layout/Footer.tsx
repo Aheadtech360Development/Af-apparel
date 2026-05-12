@@ -1,7 +1,51 @@
+"use client";
+
 import Link from "next/link";
 import { PhoneIcon, MailIcon } from "@/components/ui/icons";
+import { useAuthStore } from "@/stores/auth.store";
 
 export function Footer() {
+  const { isAuthenticated } = useAuthStore();
+  const authed = isAuthenticated();
+
+  const cols = [
+    {
+      h: "Shop",
+      links: [
+        { label: "All Products", href: "/products" },
+        { label: "T-Shirts", href: "/products?category=t-shirts" },
+        { label: "Hoodies", href: "/products?category=hoodies" },
+        { label: "Sweatshirts", href: "/products?category=sweatshirts" },
+        { label: "Polos", href: "/products?category=polo-shirts" },
+      ],
+    },
+    {
+      h: "Resources",
+      links: [
+        { label: "Blog", href: "/blog" },
+        { label: "Product Specs", href: "/product-specs" },
+        { label: "Style Sheets", href: "/style-sheets" },
+        { label: "About Us", href: "/about" },
+      ],
+    },
+    {
+      h: "Account",
+      links: [
+        { label: "Apply for Wholesale", href: authed ? "/account" : "/wholesale/register" },
+        { label: authed ? "My Account" : "Log In", href: authed ? "/account" : "/login" },
+        { label: "Order History", href: "/account/orders" },
+      ],
+    },
+    {
+      h: "Support",
+      links: [
+        { label: "Contact Us", href: "/contact" },
+        { label: "Track Order", href: "/track-order" },
+        { label: "Privacy Policy", href: "/privacy-policy" },
+      ],
+    },
+  ];
+
   return (
     <footer style={{ background: "#1B3A5C", borderTop: "1px solid rgba(255,255,255,.08)" }}>
       <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "52px 32px 40px", display: "grid", gridTemplateColumns: "1.8fr 1fr 1fr 1fr 1fr", gap: "32px" }} className="footer-grid-responsive">
@@ -12,44 +56,7 @@ export function Footer() {
             <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}><MailIcon size={15} color="#d3d0d0" /> info@afblanks.com</span>
           </p>
         </div>
-        {[
-          {
-            h: "Shop",
-            links: [
-              { label: "All Products", href: "/products" },
-              { label: "T-Shirts", href: "/products?category=t-shirts" },
-              { label: "Hoodies", href: "/products?category=hoodies" },
-              { label: "Sweatshirts", href: "/products?category=sweatshirts" },
-              { label: "Polos", href: "/products?category=polo-shirts" },
-            ],
-          },
-          {
-            h: "Resources",
-            links: [
-              { label: "Blog", href: "/blog" },
-              { label: "Product Specs", href: "/product-specs" },
-              { label: "Style Sheets", href: "/style-sheets" },
-              { label: "About Us", href: "/about" },
-            ],
-          },
-          {
-            h: "Account",
-            links: [
-              { label: "Apply for Wholesale", href: "/wholesale/register" },
-              { label: "Log In", href: "/login" },
-              { label: "My Account", href: "/account" },
-              { label: "Order History", href: "/account/orders" },
-            ],
-          },
-          {
-            h: "Support",
-            links: [
-              { label: "Contact Us", href: "/contact" },
-              { label: "Track Order", href: "/track-order" },
-              { label: "Privacy Policy", href: "/privacy-policy" },
-            ],
-          },
-        ].map(col => (
+        {cols.map(col => (
           <div key={col.h}>
             <h5 style={{ fontFamily: "var(--font-bebas)", fontSize: "13px", letterSpacing: ".14em", color: "#fff", marginBottom: "14px" }}>{col.h}</h5>
             {col.links.map(link => (

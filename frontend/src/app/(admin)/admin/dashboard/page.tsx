@@ -190,7 +190,7 @@ export default function AdminDashboard() {
 
   async function handleReject(id: string) {
     try {
-      await apiClient.patch(`/api/v1/admin/wholesale-applications/${id}/reject`, {});
+      await apiClient.post(`/api/v1/admin/wholesale-applications/${id}/reject`, { rejection_reason: "Rejected by admin" });
       setState(prev => ({
         ...prev,
         recentApplications: prev.recentApplications?.filter(a => a.id !== id),

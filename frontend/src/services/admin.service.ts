@@ -225,7 +225,7 @@ export const adminService = {
   },
 
   async rejectApplication(id: string, reason: string) {
-    return apiClient.post(`/api/v1/admin/wholesale-applications/${id}/reject`, { reason });
+    return apiClient.post(`/api/v1/admin/wholesale-applications/${id}/reject`, { rejection_reason: reason || "Rejected by admin" });
   },
 
   // Companies

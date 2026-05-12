@@ -50,8 +50,7 @@ export default function PrivacyPolicyPage() {
             ))}
             <div style={{ padding: "12px 16px", fontSize: "11px", fontWeight: 700, color: "#6B7280", textTransform: "uppercase", letterSpacing: ".08em", borderBottom: "1px solid #E5E7EB" }}>Quick Links</div>
             <a href="/contact" style={{ display: "block", padding: "12px 16px", fontSize: "13px", color: "#555", textDecoration: "none", borderBottom: "1px solid #E5E7EB" }}>Contact Support</a>
-            <a href="/track-order" style={{ display: "block", padding: "12px 16px", fontSize: "13px", color: "#555", textDecoration: "none", borderBottom: "1px solid #E5E7EB" }}>Track My Order</a>
-            <a href="/register" style={{ display: "block", padding: "12px 16px", fontSize: "13px", color: "#555", textDecoration: "none" }}>Apply for NET 30</a>
+            <a href="/track-order" style={{ display: "block", padding: "12px 16px", fontSize: "13px", color: "#555", textDecoration: "none" }}>Track My Order</a>
           </div>
         </div>
 

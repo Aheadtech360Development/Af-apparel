@@ -8,7 +8,7 @@ import { authService } from "@/services/auth.service";
 import { apiClient } from "@/lib/api-client";
 import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { ShoppingCartIcon } from "@/components/ui/icons";
-import { Building2, Star, Printer, Tag, FileText, Ruler, PenLine, Mail } from "lucide-react";
+import { Building2, Star, Printer, Tag, FileText, Ruler, PenLine, Mail, Lock } from "lucide-react";
 
 const BROWSE_LINKS = [
   { href: "/products?category=t-shirts", label: "T-Shirts" },
@@ -144,6 +144,7 @@ export function Header() {
                     { href: "/product-specs", label: "Product Specs", icon: <Ruler size={15} /> },
                     { href: "/blog", label: "Blog", icon: <PenLine size={15} /> },
                     { href: "/contact", label: "Contact Us", icon: <Mail size={15} /> },
+                    { href: "/privacy-policy", label: "Privacy Policy", icon: <Lock size={15} /> },
                   ] as { href: string; label: string; icon: React.ReactNode }[]).map(({ href, label, icon }) => (
                     <Link
                       key={href}
