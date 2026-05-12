@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { adminService } from "@/services/admin.service";
 import { apiClient } from "@/lib/api-client";
-import { TruckIcon, PackageIcon, CheckIcon } from "@/components/ui/icons";
 
 interface OrderItem {
   id: string;
@@ -63,6 +62,8 @@ interface AdminOrder {
   ach_account_last4?: string | null;
   ach_account_type?: string | null;
   ach_verified?: boolean | null;
+  // Timeline
+  timeline?: Array<{ status: string; message: string; created_by: string; created_at: string }>;
 }
 
 interface CustomerStats {
@@ -90,7 +91,27 @@ interface CompanyRegistration {
   fax: string | null;
 }
 
-const STATUSES = ["pending", "confirmed", "processing", "ready_for_pickup", "shipped", "delivered", "cancelled"];
+const STATUSES = ["pending", "confirmed", "processing", "ready_for_pickup", "shipped", "delivered", "cancelled", "refunded"];
+
+function getAvailableStatuses(currentStatus: string): string[] {
+  if (currentStatus === "delivered") return ["delivered", "refunded"];
+  if (currentStatus === "cancelled") return ["cancelled", "refunded"];
+  return STATUSES.filter(s => s !== "refunded");
+}
+
+function getStatusColor(status: string): string {
+  const map: Record<string, string> = {
+    pending: "#D97706",
+    confirmed: "#1A5CFF",
+    processing: "#6366F1",
+    ready_for_pickup: "#0891B2",
+    shipped: "#8B5CF6",
+    delivered: "#059669",
+    cancelled: "#E8242A",
+    refunded: "#6B7280",
+  };
+  return map[status] ?? "#7A7880";
+}
 
 const STATUS_LABEL: Record<string, string> = {
   pending: "Pending",
@@ -100,6 +121,7 @@ const STATUS_LABEL: Record<string, string> = {
   shipped: "Shipped",
   delivered: "Delivered",
   cancelled: "Cancelled",
+  refunded: "Refunded",
 };
 
 const COURIERS = [
@@ -118,6 +140,7 @@ const STATUS_STYLE: Record<string, { bg: string; color: string }> = {
   shipped:           { bg: "rgba(139,92,246,.1)",  color: "#8B5CF6" },
   delivered:         { bg: "rgba(5,150,105,.1)",   color: "#059669" },
   cancelled:         { bg: "rgba(232,36,42,.1)",   color: "#E8242A" },
+  refunded:          { bg: "rgba(107,114,128,.1)", color: "#6B7280" },
   authorized:        { bg: "rgba(245,158,11,.1)",  color: "#D97706" },
   paid:              { bg: "rgba(5,150,105,.1)",   color: "#059669" },
   unpaid:            { bg: "rgba(107,114,128,.1)", color: "#6B7280" },
@@ -416,20 +439,23 @@ export default function AdminOrderDetailPage() {
   const addr = order.shipping_address;
   const zip = addr?.zip_code ?? addr?.postal_code ?? "";
 
-  const timelineEvents = [
-    order.shipped_at ? {
-      icon: <PackageIcon size={10} color="#fff" />,
-      text: `Shipped via ${courierDisplayName ?? "courier"}${order.courier_service ? ` ${order.courier_service}` : ""}`,
-      sub: order.tracking_number ? `Tracking: ${order.tracking_number}` : "",
-      time: order.shipped_at, color: "#059669",
-    } : null,
+  const backendTimeline = order.timeline ?? [];
+  const timelineEvents: { text: string; sub: string; time: string; color: string }[] = [
+    // Seed the "Order placed" entry from order creation time
     {
-      icon: <CheckIcon size={10} color="#fff" />,
       text: "Order placed",
       sub: `${order.company_name || order.customer_name || "Customer"} · ${order.payment_status}`,
-      time: order.created_at, color: "#1A5CFF",
+      time: order.created_at,
+      color: "#1A5CFF",
     },
-  ].filter(Boolean) as { icon: React.ReactNode; text: string; sub: string; time: string; color: string }[];
+    // Append all backend-recorded status changes in chronological order
+    ...backendTimeline.map(entry => ({
+      text: entry.message,
+      sub: entry.created_by === "admin" ? "Admin" : entry.created_by,
+      time: entry.created_at,
+      color: getStatusColor(entry.status),
+    })),
+  ].sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime()).reverse();
 
   const avatarInitial = order.customer_name?.[0]?.toUpperCase() ?? order.company_name?.[0]?.toUpperCase() ?? "C";
   const mapQuery = [addr?.address_line1, addr?.city, addr?.state].filter(Boolean).join(", ");
@@ -551,7 +577,7 @@ export default function AdminOrderDetailPage() {
                 <label style={LabelStyle}>Status</label>
                 <select value={status} onChange={e => setStatus(e.target.value)}
                   style={{ padding: "10px 14px", border: "1.5px solid #E2E0DA", borderRadius: "6px", fontSize: "14px", fontFamily: "var(--font-jakarta)", background: "#fff" }}>
-                  {STATUSES.filter(s => !(s === "shipped" && order.shipping_method === "will_call")).map(s => (
+                  {getAvailableStatuses(order.status).filter(s => !(s === "shipped" && order.shipping_method === "will_call")).map(s => (
                     <option key={s} value={s}>{STATUS_LABEL[s] ?? s}</option>
                   ))}
                 </select>
@@ -707,9 +733,7 @@ export default function AdminOrderDetailPage() {
               <div style={{ position: "absolute", left: "8px", top: "8px", bottom: "8px", width: "2px", background: "#E2E0DA" }} />
               {timelineEvents.map((event, i) => (
                 <div key={i} style={{ display: "flex", gap: "16px", marginBottom: "20px", position: "relative", alignItems: "flex-start" }}>
-                  <div style={{ width: "20px", height: "20px", borderRadius: "50%", background: event.color, border: "2px solid #fff", boxShadow: `0 0 0 2px ${event.color}`, flexShrink: 0, zIndex: 1, display: "flex", alignItems: "center", justifyContent: "center", marginLeft: "-14px", marginTop: "2px" }}>
-                    {event.icon}
-                  </div>
+                  <div style={{ width: "20px", height: "20px", borderRadius: "50%", background: event.color, border: "2px solid #fff", boxShadow: `0 0 0 2px ${event.color}`, flexShrink: 0, zIndex: 1, marginLeft: "-14px", marginTop: "2px" }} />
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 700, fontSize: "14px", color: "#2A2830" }}>{event.text}</div>
                     {event.sub && <div style={{ fontSize: "12px", color: "#7A7880", marginTop: "2px" }}>{event.sub}</div>}
