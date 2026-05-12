@@ -183,11 +183,19 @@ export default function AccountPriceListPage() {
                       <td className="px-4 py-2.5 font-mono text-xs text-gray-500">{item.sku}</td>
                       <td className="px-4 py-2.5 text-gray-700">{item.color}</td>
                       <td className="px-4 py-2.5 text-gray-700">{item.size}</td>
-                      <td className="px-4 py-2.5 text-right text-gray-400 line-through text-xs">
-                        ${item.retail_price.toFixed(2)}
+                      <td className="px-4 py-2.5 text-right text-xs">
+                        {item.unit_price < item.retail_price ? (
+                          <span className="text-gray-400 line-through">${item.retail_price.toFixed(2)}</span>
+                        ) : (
+                          <span className="text-gray-400">${item.retail_price.toFixed(2)}</span>
+                        )}
                       </td>
-                      <td className="px-4 py-2.5 text-right font-semibold text-gray-900">
-                        ${item.unit_price.toFixed(2)}
+                      <td className="px-4 py-2.5 text-right font-semibold">
+                        {item.unit_price < item.retail_price ? (
+                          <span style={{ color: "#D01F2D", fontWeight: 700 }}>${item.unit_price.toFixed(2)}</span>
+                        ) : (
+                          <span className="text-gray-900">${item.unit_price.toFixed(2)}</span>
+                        )}
                       </td>
                     </tr>
                   ))}

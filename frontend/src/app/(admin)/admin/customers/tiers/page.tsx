@@ -808,10 +808,7 @@ export default function DiscountGroupsPage() {
                                                   onChange={e => updateVPVariantOverride(v.id, g.id, e.target.value)}
                                                   placeholder={(() => {
                                                     const gOv = vpOverrides[product.id]?.[g.id] ?? { price: "", discount: "" };
-                                                    const disc = gOv.price ? parseFloat(gOv.price) : null;
-                                                    return (disc != null && v.retail_price != null)
-                                                      ? `${Math.max(0, v.retail_price - disc).toFixed(2)}`
-                                                      : "0.00";
+                                                    return gOv.price || "0.00";
                                                   })()}
                                                   style={{ width: "70px", padding: "4px 6px", border: `1px solid ${variantPrice ? "#1A5CFF" : "#E2E0DA"}`, borderRadius: "5px", fontSize: "12px", textAlign: "center", background: variantPrice ? "rgba(26,92,255,.04)" : "#fff" }}
                                                 />

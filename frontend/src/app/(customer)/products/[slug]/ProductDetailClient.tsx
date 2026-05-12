@@ -733,11 +733,18 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                 {isAuthenticated ? "Wholesale Price" : "Retail Price"}
               </div>
               {primaryVariant?.effective_price ? (
-                <div style={{ display: "flex", alignItems: "baseline", gap: "10px" }}>
-                  <span style={{ fontFamily: "var(--font-bebas)", fontSize: "36px", color: "#E8242A", letterSpacing: ".02em" }}>
-                    {formatCurrency(Number(primaryVariant.effective_price))}
-                  </span>
-                  <span style={{ fontSize: "12px", color: "#7A7880" }}>/ unit</span>
+                <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                  {Number(primaryVariant.retail_price) > Number(primaryVariant.effective_price) && (
+                    <div style={{ fontSize: "14px", color: "#999", textDecoration: "line-through" }}>
+                      {formatCurrency(Number(primaryVariant.retail_price))}
+                    </div>
+                  )}
+                  <div style={{ display: "flex", alignItems: "baseline", gap: "10px" }}>
+                    <span style={{ fontFamily: "var(--font-bebas)", fontSize: "36px", color: "#E8242A", letterSpacing: ".02em" }}>
+                      {formatCurrency(Number(primaryVariant.effective_price))}
+                    </span>
+                    <span style={{ fontSize: "12px", color: "#7A7880" }}>/ unit</span>
+                  </div>
                 </div>
               ) : (
                 <span style={{ fontFamily: "var(--font-bebas)", fontSize: "28px", color: "#7A7880" }}>Price on request</span>

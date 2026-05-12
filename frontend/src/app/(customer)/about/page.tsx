@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { Trophy, Leaf, Handshake, ClipboardList } from "lucide-react";
+import { Trophy, Leaf, Handshake, FileText } from "lucide-react";
 
 const _API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -124,10 +124,26 @@ export default function AboutPage() {
               </div>
             ))}
           </div>
-          <div style={{ textAlign: "center", marginTop: "24px" }}>
-            <div style={{ display: "inline-flex", alignItems: "flex-start", gap: "8px", textAlign: "left", maxWidth: "560px", background: "#EEF6FF", borderLeft: "3px solid #1E90FF", padding: "10px 14px", borderRadius: "0 4px 4px 0", fontSize: "12px", color: "#0F172A" }}>
-              <ClipboardList size={14} style={{ flexShrink: 0, marginTop: "1px", color: "#1E90FF" }} />
-              <span><strong>Corporate &amp; Institutional Buyers:</strong> Full certification documentation available on request. Contact us at info.afapparel@gmail.com or (214) 272-7213.</span>
+          <div style={{ marginTop: "32px" }}>
+            <div style={{ background: "linear-gradient(135deg, #0a1628 0%, #1a3a5c 100%)", borderRadius: "12px", padding: "24px 28px", display: "flex", alignItems: "flex-start", gap: "16px" }}>
+              <div style={{ background: "rgba(255,255,255,0.1)", borderRadius: "8px", padding: "10px", flexShrink: 0 }}>
+                <FileText size={24} color="white" />
+              </div>
+              <div>
+                <p style={{ color: "white", fontWeight: "700", fontSize: "15px", margin: "0 0 6px" }}>
+                  Corporate &amp; Institutional Buyers
+                </p>
+                <p style={{ color: "rgba(255,255,255,0.75)", fontSize: "14px", margin: 0, lineHeight: "1.6" }}>
+                  Full certification documentation available on request. Contact us at{" "}
+                  <a href="mailto:info.afapparel@gmail.com" style={{ color: "#D01F2D", textDecoration: "none" }}>
+                    info.afapparel@gmail.com
+                  </a>
+                  {" "}or{" "}
+                  <a href="tel:+12142727213" style={{ color: "#D01F2D", textDecoration: "none" }}>
+                    (214) 272-7213
+                  </a>
+                </p>
+              </div>
             </div>
           </div>
         </div>

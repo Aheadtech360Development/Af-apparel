@@ -30,7 +30,14 @@ export default function ContactPage() {
     e.preventDefault();
     setStatus("sending");
     try {
-      await apiClient.post("/api/v1/contact", form);
+      await apiClient.post("/api/v1/contact", {
+        name: form.name,
+        company: form.business,
+        email: form.email,
+        phone: form.phone,
+        department: form.department,
+        message: form.message,
+      });
       setStatus("sent");
     } catch {
       setStatus("error");

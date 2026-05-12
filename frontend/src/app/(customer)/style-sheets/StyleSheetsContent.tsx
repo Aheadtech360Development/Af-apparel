@@ -48,7 +48,7 @@ export default function StyleSheetsPage() {
       {/* Grid */}
       <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "48px 32px" }}>
         {loading ? (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "24px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "24px" }}>
             {Array.from({ length: 8 }).map((_, i) => (
               <div key={i} style={{ background: "#fff", borderRadius: "12px", border: "1.5px solid #E2E0DA", overflow: "hidden", height: "280px", opacity: 0.5, animation: "pulse 1.5s ease-in-out infinite" }} />
             ))}
@@ -59,7 +59,7 @@ export default function StyleSheetsPage() {
             <p style={{ fontSize: "15px", color: "#7A7880" }}>Style sheets will be available here soon.</p>
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "24px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "24px" }}>
             {sheets.map(sheet => (
               <StyleCard key={sheet.id} sheet={sheet} />
             ))}
@@ -95,19 +95,8 @@ function StyleCard({ sheet }: { sheet: StyleSheet }) {
         position: "relative",
       }}
     >
-      {/* Style number badge */}
-      <div style={{
-        position: "absolute", top: "12px", left: "12px", zIndex: 2,
-        background: "#2A2830", color: "#fff", borderRadius: "6px",
-        padding: "4px 10px", display: "flex", flexDirection: "column", alignItems: "center",
-        gap: "0px", lineHeight: 1.1,
-      }}>
-        <span style={{ fontSize: "8px", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", opacity: 0.75 }}>STYLE</span>
-        <span style={{ fontSize: "14px", fontWeight: 800, letterSpacing: ".02em" }}>{sheet.style_number}</span>
-      </div>
-
       {/* Image */}
-      <div style={{ height: "200px", background: "#F4F3EF", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+      <div style={{ height: "320px", background: "#F4F3EF", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
         {sheet.image_url ? (
           <img
             src={sheet.image_url}

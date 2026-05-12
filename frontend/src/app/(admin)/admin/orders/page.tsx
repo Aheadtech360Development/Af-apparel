@@ -176,7 +176,7 @@ export default function AdminOrdersPage() {
               <tr key={o.id} className="border-b border-gray-100 last:border-0 hover:bg-gray-50">
                 <td className="px-4 py-3 font-mono text-xs font-medium text-gray-800">
                   {o.order_number}
-                  {o.is_guest_order && <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-700">Guest</span>}
+                  {o.is_guest_order && <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium" style={{ background: '#E8F4FD', color: '#1A6FA8', fontSize: '11px', fontWeight: 600, padding: '2px 8px', borderRadius: '20px' }}>Retail</span>}
                 </td>
                 <td className="px-4 py-3 text-gray-700">
                   {o.is_guest_order ? (
