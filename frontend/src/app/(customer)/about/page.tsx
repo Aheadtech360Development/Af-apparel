@@ -135,12 +135,12 @@ export default function AboutPage() {
                 </p>
                 <p style={{ color: "rgba(255,255,255,0.75)", fontSize: "14px", margin: 0, lineHeight: "1.6" }}>
                   Full certification documentation available on request. Contact us at{" "}
-                  <a href="mailto:info.afapparel@gmail.com" style={{ color: "#D01F2D", textDecoration: "none" }}>
-                    info.afapparel@gmail.com
+                  <a href="mailto:info@afblanks.com" style={{ color: "#D01F2D", textDecoration: "none" }}>
+                    info@afblanks.com
                   </a>
                   {" "}or{" "}
-                  <a href="tel:+12142727213" style={{ color: "#D01F2D", textDecoration: "none" }}>
-                    (214) 272-7213
+                  <a href="tel:+14693679753" style={{ color: "#D01F2D", textDecoration: "none" }}>
+                    +1 (469) 367-9753
                   </a>
                 </p>
               </div>

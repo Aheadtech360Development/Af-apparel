@@ -49,7 +49,7 @@ export default function ContactPage() {
 
       {/* Announce */}
       <div style={{ background: "#E8242A", color: "#fff", textAlign: "center", padding: "7px 24px", fontSize: "12px", fontWeight: 600, letterSpacing: ".02em" }}>
-        Factory-Direct Wholesale Blanks — (214) 272-7213 | info.afapparel@gmail.com
+        Factory-Direct Wholesale Blanks — +1 (469) 367-9753 | info@afblanks.com
       </div>
 
       {/* Hero */}
@@ -119,7 +119,7 @@ export default function ContactPage() {
                     <textarea rows={5} style={{ ...inp, resize: "vertical" }} value={form.message} onChange={e => set("message", e.target.value)} required placeholder="Tell us about your business, order size, or question — the more detail the better." />
                   </div>
                   {status === "error" && (
-                    <p style={{ fontSize: "12px", color: "#E8242A", marginBottom: "12px" }}>Failed to send. Please try again or email us directly at info.afapparel@gmail.com.</p>
+                    <p style={{ fontSize: "12px", color: "#E8242A", marginBottom: "12px" }}>Failed to send. Please try again or email us directly at info@afblanks.com.</p>
                   )}
                   <button type="submit" disabled={status === "sending"} style={{ width: "100%", background: "#E8242A", color: "#fff", border: "none", borderRadius: "3px", padding: "13px", fontSize: "14px", fontFamily: "var(--font-bebas)", fontWeight: 700, cursor: "pointer", letterSpacing: ".05em", opacity: status === "sending" ? 0.7 : 1 }}>
                     {status === "sending" ? "Sending…" : "Send Message →"}
@@ -138,21 +138,21 @@ export default function ContactPage() {
                 <div style={{ flexShrink: 0, color: "#2D8CFF", marginTop: "2px" }}><Phone size={20} /></div>
                 <div>
                   <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "14px", letterSpacing: ".04em", color: "#111", marginBottom: "4px" }}>Phone</h4>
-                  <p style={{ fontSize: "12.5px", color: "#555", lineHeight: 1.6 }}>(214) 272-7213<br />Mon–Fri, 8AM–6PM CT<br />Same-day callback for wholesale accounts</p>
+                  <p style={{ fontSize: "12.5px", color: "#555", lineHeight: 1.6 }}>+1 (469) 367-9753<br />Mon–Fri, 8AM–6PM CT<br />Same-day callback for wholesale accounts</p>
                 </div>
               </div>
               <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: "6px", padding: "16px", display: "flex", gap: "12px", alignItems: "flex-start" }}>
                 <div style={{ flexShrink: 0, color: "#2D8CFF", marginTop: "2px" }}><Mail size={20} /></div>
                 <div>
                   <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "14px", letterSpacing: ".04em", color: "#111", marginBottom: "4px" }}>Email</h4>
-                  <p style={{ fontSize: "12.5px", color: "#555", lineHeight: 1.6 }}>info.afapparel@gmail.com<br />Response within 4 business hours<br />Large orders: include SKU and quantity in subject</p>
+                  <p style={{ fontSize: "12.5px", color: "#555", lineHeight: 1.6 }}>info@afblanks.com<br />Response within 4 business hours<br />Large orders: include SKU and quantity in subject</p>
                 </div>
               </div>
               <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: "6px", padding: "16px", display: "flex", gap: "12px", alignItems: "flex-start" }}>
                 <div style={{ flexShrink: 0, color: "#2D8CFF", marginTop: "2px" }}><MapPin size={20} /></div>
                 <div>
                   <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "14px", letterSpacing: ".04em", color: "#111", marginBottom: "4px" }}>Facility & Shipping Hub</h4>
-                  <p style={{ fontSize: "12.5px", color: "#555", lineHeight: 1.6 }}>Dallas, Texas<br />Orders before 2 PM CT ship same day<br />[FULL ADDRESS — ADD BEFORE LAUNCH]</p>
+                  <p style={{ fontSize: "12.5px", color: "#555", lineHeight: 1.6 }}>10719 Turbeville Rd<br />Dallas, TX 75243<br />Orders before 2 PM CT ship same day</p>
                 </div>
               </div>
               <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: "6px", padding: "16px", display: "flex", gap: "12px", alignItems: "flex-start" }}>
@@ -190,9 +190,9 @@ export default function ContactPage() {
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "16px" }}>
             {[
-              { icon: <Briefcase size={26} />, title: "Wholesale Sales", body: "New accounts, pricing questions, volume orders, and account applications.", email: "sales@afapparel.com" },
-              { icon: <Wrench size={26} />, title: "Account Support", body: "Existing orders, shipping status, returns, exchange requests, and account management.", email: "support@afapparel.com" },
-              { icon: <Tag size={26} />, title: "Private Label", body: "Custom styles, neck labels, exclusive colorways, and bulk manufacturing programs.", email: "privatelabel@afapparel.com" },
+              { icon: <Briefcase size={26} />, title: "Wholesale Sales", body: "New accounts, pricing questions, volume orders, and account applications.", email: "info@afblanks.com" },
+              { icon: <Wrench size={26} />, title: "Account Support", body: "Existing orders, shipping status, returns, exchange requests, and account management.", email: "info@afblanks.com" },
+              { icon: <Tag size={26} />, title: "Private Label", body: "Custom styles, neck labels, exclusive colorways, and bulk manufacturing programs.", email: "info@afblanks.com" },
             ].map((d, di) => (
               <div key={di} style={{ background: "#F7F8FA", border: "1px solid #E5E7EB", borderRadius: "6px", padding: "20px", textAlign: "center" }}>
                 <div style={{ display: "flex", justifyContent: "center", marginBottom: "10px", color: "#2D8CFF" }}>{d.icon}</div>
@@ -215,11 +215,11 @@ export default function ContactPage() {
             {[
               {
                 q: "What's the fastest way to get a quote for a large order?",
-                a: "Email sales@afapparel.com with your SKU(s), colors, size breakdown, and quantity. Include \"QUOTE REQUEST\" in the subject line. We respond within 2 business hours for orders over 500 units.",
+                a: "Email info@afblanks.com with your SKU(s), colors, size breakdown, and quantity. Include \"QUOTE REQUEST\" in the subject line. We respond within 2 business hours for orders over 500 units.",
               },
               {
                 q: "How do I check my order status?",
-                a: "Log in to your wholesale account and navigate to Order History. You'll find real-time tracking information for every shipment. For urgent inquiries, call (214) 272-7213 and reference your order number.",
+                a: "Log in to your wholesale account and navigate to Order History. You'll find real-time tracking information for every shipment. For urgent inquiries, call +1 (469) 367-9753 and reference your order number.",
               },
               {
                 q: "Can I visit your Dallas facility?",

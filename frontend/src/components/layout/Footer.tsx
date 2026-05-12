@@ -52,7 +52,7 @@ export function Footer() {
         <div>
           <p style={{ fontSize: "15px", color: "#d3d0d0", lineHeight: 1.75, fontWeight: 500 }}>
             Factory-direct wholesale blank apparel. Serving 2,000+ businesses across the US from our Dallas, TX warehouse.<br /><br />
-            <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}><PhoneIcon size={15} color="#d3d0d0" /> (214) 272-7213</span><br />
+            <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}><PhoneIcon size={15} color="#d3d0d0" /> +1 (469) 367-9753</span><br />
             <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}><MailIcon size={15} color="#d3d0d0" /> info@afblanks.com</span>
           </p>
         </div>

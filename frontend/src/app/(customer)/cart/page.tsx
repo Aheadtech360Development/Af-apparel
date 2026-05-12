@@ -587,8 +587,8 @@ function OrderSummary({
   const usp: { icon: ReactNode; text: string }[] = [
     { icon: <TruckIcon size={14} color="currentColor" />, text: "Orders before 2 PM CT ship same day" },
     { icon: <LockIcon size={14} color="currentColor" />, text: "Secure checkout — SSL encrypted" },
-    { icon: <PhoneIcon size={14} color="currentColor" />, text: "(214) 272-7213" },
-    { icon: <MailIcon size={14} color="currentColor" />, text: "info.afapparel@gmail.com" },
+    { icon: <PhoneIcon size={14} color="currentColor" />, text: "+1 (469) 367-9753" },
+    { icon: <MailIcon size={14} color="currentColor" />, text: "info@afblanks.com" },
   ];
 
   return (

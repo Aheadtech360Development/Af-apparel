@@ -107,7 +107,7 @@ export default function PrivacyPolicyPage() {
 
               <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>Defective / Damaged Items</h3>
               <ul style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, paddingLeft: "20px", marginBottom: "16px" }}>
-                <li style={{ marginBottom: "4px" }}>Contact support@afapparel.com with your order number and photos of the defective units</li>
+                <li style={{ marginBottom: "4px" }}>Contact info@afblanks.com with your order number and photos of the defective units</li>
                 <li style={{ marginBottom: "4px" }}>Include the quantity affected and a brief description of the defect</li>
                 <li style={{ marginBottom: "4px" }}>We will respond within 1 business day with resolution options</li>
                 <li style={{ marginBottom: "4px" }}>Resolution options: replacement units, store credit, or refund (at AF discretion based on claim)</li>
@@ -169,10 +169,10 @@ export default function PrivacyPolicyPage() {
               <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>For large orders (over 1,000 units) or custom configurations, you can use the &ldquo;Request a Quote&rdquo; option on any product page. Our sales team will respond within 2 business hours with pricing and availability confirmation.</p>
 
               <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>Order Confirmation</h3>
-              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>You will receive an order confirmation email immediately after checkout. Review this confirmation carefully — it reflects the exact quantities, colors, and sizes ordered. Report any discrepancies to support@afapparel.com within 24 hours of receiving the confirmation.</p>
+              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>You will receive an order confirmation email immediately after checkout. Review this confirmation carefully — it reflects the exact quantities, colors, and sizes ordered. Report any discrepancies to info@afblanks.com within 24 hours of receiving the confirmation.</p>
 
               <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>Order Modifications &amp; Cancellations</h3>
-              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>Orders can be modified or cancelled within 2 hours of placement by contacting support@afapparel.com with your order number. Orders that have already entered the picking and packing process cannot be modified or cancelled. Same-day orders (placed for same-day shipping) cannot be modified after confirmation.</p>
+              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>Orders can be modified or cancelled within 2 hours of placement by contacting info@afblanks.com with your order number. Orders that have already entered the picking and packing process cannot be modified or cancelled. Same-day orders (placed for same-day shipping) cannot be modified after confirmation.</p>
 
               <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>Stock Availability</h3>
               <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>Stock counts displayed in the Bulk Order Grid are updated in near-real time. In the rare event that an item becomes unavailable after your order is placed, we will contact you within 4 hours to offer: (1) a backordered fulfillment date, (2) a substitute from available inventory, or (3) a full refund for the unavailable units.</p>
@@ -186,7 +186,7 @@ export default function PrivacyPolicyPage() {
               </ul>
 
               <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>Sales Tax</h3>
-              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7 }}>AF Apparels collects sales tax in states where we have nexus, as required by law. If your business holds a valid sales tax exemption certificate, submit it to tax@afapparel.com before your first order. Exemptions will be applied to your account within 1 business day.</p>
+              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7 }}>AF Apparels collects sales tax in states where we have nexus, as required by law. If your business holds a valid sales tax exemption certificate, submit it to info@afblanks.com before your first order. Exemptions will be applied to your account within 1 business day.</p>
             </div>
           )}
 
@@ -209,7 +209,7 @@ export default function PrivacyPolicyPage() {
                 { n: "6", h: "Limitation of Liability", body: "AF Apparels' liability for any claim arising from a transaction is limited to the value of the goods in question. We are not liable for indirect, consequential, or incidental damages including lost profits, production downtime, or client penalties arising from defective or delayed goods." },
                 { n: "7", h: "Governing Law", body: "These Terms & Conditions are governed by the laws of the State of Texas. Any disputes arising from transactions with AF Apparels shall be resolved in the courts of Dallas County, Texas." },
                 { n: "8", h: "Changes to Terms", body: "AF Apparels reserves the right to update these Terms & Conditions at any time. Updated terms are effective immediately upon posting. Continued use of the platform following an update constitutes acceptance of the revised terms." },
-                { n: "9", h: "Contact for Legal Matters", body: "For questions regarding these Terms & Conditions, contact: legal@afapparel.com or write to American Fashion LLC, Dallas, Texas [FULL ADDRESS]." },
+                { n: "9", h: "Contact for Legal Matters", body: "For questions regarding these Terms & Conditions, contact: info@afblanks.com or write to AF Apparels, 10719 Turbeville Rd, Dallas, TX 75243." },
               ].map(s => (
                 <div key={s.n}>
                   <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>{s.n}. {s.h}</h3>
@@ -270,10 +270,10 @@ export default function PrivacyPolicyPage() {
               <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>We retain your account and order information for 7 years as required for tax and accounting purposes. If you close your account, your personal information will be removed from active systems within 90 days, subject to legal retention requirements.</p>
 
               <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>7. Your Rights</h3>
-              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>You have the right to: access the data we hold about you; request correction of inaccurate data; request deletion of your data (subject to legal retention requirements); opt out of marketing communications at any time. To exercise any of these rights, contact privacy@afapparel.com.</p>
+              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>You have the right to: access the data we hold about you; request correction of inaccurate data; request deletion of your data (subject to legal retention requirements); opt out of marketing communications at any time. To exercise any of these rights, contact info@afblanks.com.</p>
 
               <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>8. Contact</h3>
-              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7 }}>For privacy-related questions: privacy@afapparel.com or (214) 272-7213.</p>
+              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7 }}>For privacy-related questions: info@afblanks.com or +1 (469) 367-9753.</p>
             </div>
           )}
 

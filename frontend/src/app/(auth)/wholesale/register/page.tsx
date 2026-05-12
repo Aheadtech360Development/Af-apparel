@@ -518,7 +518,7 @@ export default function WholesaleRegisterPage() {
           <div style={{ marginTop: "20px", background: "rgba(26,92,255,.08)", border: "1px solid rgba(26,92,255,.15)", borderRadius: "8px", padding: "14px" }}>
             <div style={{ fontSize: "12px", color: "#6B9FFF", fontWeight: 600, marginBottom: "4px" }}>Questions?</div>
             <div style={{ fontSize: "12px", color: "#aaa" }}>
-              (214) 272-7213<br />
+              +1 (469) 367-9753<br />
               info@afblanks.com
             </div>
           </div>

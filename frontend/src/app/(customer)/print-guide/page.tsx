@@ -312,7 +312,7 @@ export default function PrintGuidePage() {
         </div>
         <div style={{ color: "#555", fontSize: "11px", marginTop: "16px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
           <Phone size={12} style={{ flexShrink: 0 }} />
-          (214) 272-7213 · info.afapparel@gmail.com
+          +1 (469) 367-9753 · info@afblanks.com
         </div>
       </div>
 

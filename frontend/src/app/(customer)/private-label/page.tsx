@@ -208,7 +208,7 @@ export default function PrivateLabelPage() {
           </a>
         </div>
         <div style={{ fontSize: "11px", color: "#555" }}>
-          📞 (214) 272-7213 &nbsp;·&nbsp; privatelabel@afapparel.com &nbsp;·&nbsp; Response within 1 business day
+          📞 +1 (469) 367-9753 &nbsp;·&nbsp; info@afblanks.com &nbsp;·&nbsp; Response within 1 business day
         </div>
       </div>
 
