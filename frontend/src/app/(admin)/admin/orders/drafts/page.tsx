@@ -282,16 +282,18 @@ function CreateDraftModal({ onClose, onSuccess }: { onClose: () => void; onSucce
                       <div style={{ padding: "32px", textAlign: "center", color: "#aaa", fontSize: "13px" }}>No products found</div>
                     ) : products.map((p, i) => (
                       <div key={p.id} onClick={() => { setSelectedProduct(p); setVariantQtys({}); }}
-                        style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 14px", cursor: "pointer", borderBottom: i < products.length - 1 ? "1px solid #F4F3EF" : "none", background: "#fff" }}
+                        style={{ display: "flex", alignItems: "center", gap: "12px", padding: "10px 14px", cursor: "pointer", borderBottom: i < products.length - 1 ? "1px solid #F4F3EF" : "none", background: "#fff" }}
                         onMouseEnter={e => (e.currentTarget.style.background = "#F4F3EF")}
                         onMouseLeave={e => (e.currentTarget.style.background = "#fff")}
                       >
-                        {p.primary_image?.url_thumbnail ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={p.primary_image.url_thumbnail} alt="" style={{ width: "40px", height: "40px", objectFit: "contain", borderRadius: "4px", background: "#F4F3EF", flexShrink: 0 }} />
-                        ) : (
-                          <div style={{ width: "40px", height: "40px", background: "#F4F3EF", borderRadius: "4px", flexShrink: 0 }} />
-                        )}
+                        <div style={{ width: "48px", height: "48px", borderRadius: "6px", overflow: "hidden", background: "#F4F3EF", flexShrink: 0 }}>
+                          {p.primary_image?.url_thumbnail ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={p.primary_image.url_thumbnail} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={e => { e.currentTarget.style.display = "none"; }} />
+                          ) : (
+                            <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "22px" }}>👕</div>
+                          )}
+                        </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ fontWeight: 600, fontSize: "13px", color: "#2A2830", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
                           <div style={{ fontSize: "11px", color: "#7A7880" }}>{p.categories?.[0]?.name ?? "Apparel"} · {p.variants?.length ?? 0} variants</div>

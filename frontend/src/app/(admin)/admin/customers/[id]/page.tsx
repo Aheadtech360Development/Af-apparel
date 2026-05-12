@@ -372,16 +372,6 @@ export default function CustomerDetailPage() {
 
           {/* Action buttons */}
           <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-            <button
-              onClick={() => { window.location.href = `mailto:${customer.email ?? ""}`; }}
-              style={{ padding: "9px 16px", border: "1px solid #E2E0DA", borderRadius: "8px", background: "#fff", fontSize: "13px", fontWeight: 600, cursor: "pointer", color: "#2A2830" }}>
-              ✉ Send Email
-            </button>
-            <button
-              onClick={() => router.push(`/admin/orders/new?company_id=${id}`)}
-              style={{ padding: "9px 16px", border: "1px solid #1A5CFF", borderRadius: "8px", background: "rgba(26,92,255,.06)", fontSize: "13px", fontWeight: 600, cursor: "pointer", color: "#1A5CFF" }}>
-              + Create Order
-            </button>
             {customer.status === "active" ? (
               <button
                 onClick={() => setShowSuspend(true)}
