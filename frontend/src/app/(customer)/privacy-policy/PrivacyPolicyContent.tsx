@@ -24,7 +24,7 @@ export default function PrivacyPolicyPage() {
       </div>
 
       {/* Hero */}
-      <div style={{ background: "#0a1628", padding: "36px 24px" }}>
+      <div style={{ background: "#111", padding: "36px 24px" }}>
         <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
           <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(20px,2.8vw,32px)", color: "#fff", marginBottom: "6px", letterSpacing: ".04em" }}>Policies &amp; Legal</h1>
           <p style={{ color: "#6B7280", fontSize: "13px" }}>Clear, plain-English policies for all AF Apparels wholesale customers</p>
