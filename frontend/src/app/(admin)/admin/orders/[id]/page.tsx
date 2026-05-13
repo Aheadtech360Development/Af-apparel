@@ -62,6 +62,11 @@ interface AdminOrder {
   ach_account_last4?: string | null;
   ach_account_type?: string | null;
   ach_verified?: boolean | null;
+  // Invoice & payment tracking
+  payment_terms?: string | null;
+  invoice_sent_at?: string | null;
+  marked_paid_at?: string | null;
+  marked_paid_by?: string | null;
   // Timeline
   timeline?: Array<{ status: string; message: string; created_by: string; created_at: string }>;
 }
@@ -203,6 +208,8 @@ export default function AdminOrderDetailPage() {
 
   const [isVerifyingAch, setIsVerifyingAch] = useState(false);
   const [isResendingInvoice, setIsResendingInvoice] = useState(false);
+  const [paymentTerms, setPaymentTerms] = useState('net_30');
+  const [isMarkingPaid, setIsMarkingPaid] = useState(false);
 
   // Notes state
   const [editingNote, setEditingNote] = useState(false);
@@ -233,6 +240,7 @@ export default function AdminOrderDetailPage() {
         if (o.courier) setSelectedCourier(o.courier);
         if (o.courier_service) setSelectedService(o.courier_service);
         if (o.tracking_number) setTrackingNumber(o.tracking_number);
+        if (o.payment_terms) setPaymentTerms(o.payment_terms);
 
         // Fetch customer stats and company registration info (best-effort)
         if (o.company_id) {
@@ -332,11 +340,24 @@ export default function AdminOrderDetailPage() {
   async function handleResendInvoice() {
     setIsResendingInvoice(true); setMsg(null);
     try {
-      await apiClient.post(`/api/v1/admin/orders/${order?.id ?? id}/resend-invoice`, {});
+      await apiClient.post(`/api/v1/admin/orders/${order?.id ?? id}/send-invoice`, { payment_terms: paymentTerms });
       setMsg({ text: "Invoice emailed to customer.", ok: true });
+      setOrder(prev => prev ? { ...prev, invoice_sent_at: new Date().toISOString() } : prev);
     } catch {
       setMsg({ text: "Failed to send invoice email.", ok: false });
     } finally { setIsResendingInvoice(false); }
+  }
+
+  async function handleMarkAsPaid() {
+    if (!confirm("Mark this order as paid?")) return;
+    setIsMarkingPaid(true); setMsg(null);
+    try {
+      await apiClient.post(`/api/v1/admin/orders/${order?.id ?? id}/mark-paid`, {});
+      setMsg({ text: "Order marked as paid.", ok: true });
+      setOrder(prev => prev ? { ...prev, payment_status: "paid", marked_paid_at: new Date().toISOString() } : prev);
+    } catch {
+      setMsg({ text: "Failed to mark as paid.", ok: false });
+    } finally { setIsMarkingPaid(false); }
   }
 
   async function handleSaveNote() {
@@ -582,6 +603,15 @@ export default function AdminOrderDetailPage() {
                   ))}
                 </select>
               </div>
+              <div>
+                <label style={LabelStyle}>Payment Terms</label>
+                <select value={paymentTerms} onChange={e => setPaymentTerms(e.target.value)}
+                  style={{ padding: "10px 14px", border: "1.5px solid #E2E0DA", borderRadius: "6px", fontSize: "14px", fontFamily: "var(--font-jakarta)", background: "#fff" }}>
+                  <option value="net_30">Net 30</option>
+                  <option value="net_15">Net 15</option>
+                  <option value="due_on_receipt">Due on Receipt</option>
+                </select>
+              </div>
               {/* Tracking is managed via Shipping & Courier section above */}
               <button type="submit" disabled={isSaving}
                 style={{ background: "#1A5CFF", color: "#fff", border: "none", padding: "11px 24px", borderRadius: "6px", fontSize: "14px", fontWeight: 700, cursor: "pointer", opacity: isSaving ? .6 : 1 }}>
@@ -724,6 +754,36 @@ export default function AdminOrderDetailPage() {
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* INVOICE & PAYMENT */}
+          <div style={{ background: '#f8f9fa', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '16px', marginTop: '16px', display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' as const }}>
+            <div style={{ flex: 1 }}>
+              <p style={{ margin: 0, fontSize: '13px', fontWeight: 600, color: '#1B3A5C' }}>Invoice &amp; Payment</p>
+              <p style={{ margin: '2px 0 0', fontSize: '12px', color: '#888' }}>
+                {order.invoice_sent_at
+                  ? `Invoice sent ${new Date(order.invoice_sent_at).toLocaleDateString()}`
+                  : 'Invoice not yet sent'}
+                {order.marked_paid_at && ` · Paid ${new Date(order.marked_paid_at).toLocaleDateString()}`}
+              </p>
+            </div>
+            <button
+              onClick={handleResendInvoice}
+              disabled={isResendingInvoice}
+              style={{ background: '#fff', color: '#1B3A5C', border: '1px solid #1B3A5C', padding: '8px 16px', borderRadius: '6px', fontSize: '13px', fontWeight: 700, cursor: isResendingInvoice ? 'not-allowed' : 'pointer', opacity: isResendingInvoice ? 0.6 : 1 }}>
+              {isResendingInvoice ? 'Sending…' : (order.invoice_sent_at ? 'Resend Invoice' : 'Send Invoice')}
+            </button>
+            {order.payment_status !== 'paid' && (
+              <button
+                onClick={handleMarkAsPaid}
+                disabled={isMarkingPaid}
+                style={{ background: '#10B981', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '6px', fontSize: '13px', fontWeight: 700, cursor: isMarkingPaid ? 'not-allowed' : 'pointer', opacity: isMarkingPaid ? 0.6 : 1 }}>
+                {isMarkingPaid ? 'Saving…' : '✓ Mark as Paid'}
+              </button>
+            )}
+            {order.payment_status === 'paid' && (
+              <span style={{ background: '#D1FAE5', color: '#065F46', padding: '6px 14px', borderRadius: '20px', fontSize: '12px', fontWeight: 700 }}>PAID</span>
+            )}
           </div>
 
           {/* TIMELINE */}
