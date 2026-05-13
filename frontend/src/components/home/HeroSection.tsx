@@ -56,7 +56,7 @@ export default function HeroSection() {
         <div className="hidden lg:flex" style={{ flex: 1, minWidth: "240px", position: "relative" }}>
           <div style={{ border: "1px solid #CBD5E1", borderRadius: "15px", height: "400px", width: "100%", overflow: "hidden", position: "relative" }}>
             <Image
-              src="/Home page Hero.png"
+              src="/Hame page Hero.png"
               alt="AF Apparels Wholesale Blanks"
               fill
               sizes="(max-width: 1140px) 45vw, 480px"

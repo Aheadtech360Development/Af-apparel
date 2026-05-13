@@ -31,7 +31,7 @@ export default function WhyChooseUs() {
           <div className="hidden lg:flex" style={{ flex: 1, minWidth: "240px" }}>
             <div style={{ height: "360px", width: "100%", overflow: "hidden", borderRadius: "15px", border: "1px solid #E2E8F0", position: "relative" }}>
               <Image
-                src="/Why 2,000+ Businesses Choose AF Apparels.png"
+                src="/Home page Hero.png"
                 alt="Warehouse / Fulfillment Center"
                 fill
                 sizes="(max-width: 1140px) 40vw, 440px"

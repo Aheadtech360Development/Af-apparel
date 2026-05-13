@@ -82,7 +82,7 @@ export default function AboutPage() {
             <div style={{ flex: 1, minWidth: "240px" }}>
               <div style={{ border: "1px solid #E2E8F0", borderRadius: "15px", height: "300px", overflow: "hidden", position: "relative", marginBottom: "12px" }}>
                 <Image
-                  src="/Our Story.png"
+                  src="/Our Store.png"
                   alt="AF Apparels Dallas Warehouse Facility"
                   fill
                   sizes="(max-width: 1140px) 35vw, 380px"
