@@ -422,6 +422,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
   const filteredGroups = showAllColors ? colorGroups : colorGroups.slice(0, 4);
   const pricePerUnit = Number(primaryVariant?.effective_price ?? primaryVariant?.retail_price ?? 0);
   const orderTotal = totalUnits * pricePerUnit;
+  const anyInStock = (product.variants ?? []).some(v => (v.stock_quantity ?? 0) > 0);
 
   const lastExpandedColor = expandedColors.length > 0 ? expandedColors[expandedColors.length - 1] : null;
   const orderedImages = lastExpandedColor
@@ -628,8 +629,8 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                 {(product.tags?.some(t => t.toLowerCase().includes("best seller") || t.toLowerCase().includes("bestseller"))) && (
                   <span style={{ background: "#E8242A", color: "#fff", fontSize: "10px", fontWeight: 700, padding: "3px 8px", borderRadius: "4px", textTransform: "uppercase", letterSpacing: ".06em" }}>Best Seller</span>
                 )}
-                <span style={{ background: "rgba(5,150,105,.1)", color: "#059669", fontSize: "10px", fontWeight: 700, padding: "3px 8px", borderRadius: "4px", display: "flex", alignItems: "center", gap: "4px" }}>
-                  <svg width="7" height="7" viewBox="0 0 7 7"><circle cx="3.5" cy="3.5" r="3.5" fill="#059669" /></svg> In Stock
+                <span style={{ background: anyInStock ? "rgba(5,150,105,.1)" : "rgba(232,36,42,.1)", color: anyInStock ? "#059669" : "#E8242A", fontSize: "10px", fontWeight: 700, padding: "3px 8px", borderRadius: "4px", display: "flex", alignItems: "center", gap: "4px" }}>
+                  <svg width="7" height="7" viewBox="0 0 7 7"><circle cx="3.5" cy="3.5" r="3.5" fill={anyInStock ? "#059669" : "#E8242A"} /></svg> {anyInStock ? "In Stock" : "Out of Stock"}
                 </span>
                 {(product.tags ?? []).filter(t => !t.toLowerCase().includes("best seller") && !t.toLowerCase().includes("bestseller")).map(tag => (
                   <span key={tag} style={{ background: "#F4F3EF", color: "#7A7880", fontSize: "10px", fontWeight: 700, padding: "3px 8px", borderRadius: "4px", textTransform: "uppercase", letterSpacing: ".06em", border: "1px solid #E2E0DA" }}>
@@ -824,6 +825,11 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                         <div style={{ padding: "16px", display: "flex", flexWrap: "wrap", gap: "10px" }}>
                           {group.variants.map(variant => {
                             const qty = quantities[variant.id] ?? 0;
+                            const stock = variant.stock_quantity ?? 0;
+                            const isUnlimited = stock >= 9999;
+                            const isOOS = !isUnlimited && stock === 0;
+                            const stockColor = isOOS ? "#E8242A" : isUnlimited || stock > 10 ? "#059669" : stock >= 5 ? "#D97706" : "#E8242A";
+                            const stockLabel = isOOS ? "Out of Stock" : isUnlimited ? "In Stock" : `${stock} left`;
                             return (
                               <div key={variant.id} style={{ textAlign: "center", minWidth: "64px" }}>
                                 <div style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", color: "#7A7880", marginBottom: "4px" }}>{variant.size}</div>
@@ -835,6 +841,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                                   min="0"
                                   max={variant.stock_quantity ?? undefined}
                                   value={qty === 0 ? "" : qty}
+                                  disabled={isOOS}
                                   onChange={e => {
                                     const raw = parseInt(e.target.value, 10) || 0;
                                     const maxStock = variant.stock_quantity ?? 9999;
@@ -848,18 +855,11 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                                       return { ...prev, [variant.id]: val };
                                     });
                                   }}
-                                  style={{ width: "64px", height: "44px", textAlign: "center", border: qty > 0 ? "2px solid #1A5CFF" : "1.5px solid #E2E0DA", borderRadius: "8px", fontSize: "15px", fontWeight: 700, outline: "none", fontFamily: "var(--font-jakarta)" }}
+                                  style={{ width: "64px", height: "44px", textAlign: "center", border: qty > 0 ? "2px solid #1A5CFF" : "1.5px solid #E2E0DA", borderRadius: "8px", fontSize: "15px", fontWeight: 700, outline: "none", fontFamily: "var(--font-jakarta)", opacity: isOOS ? 0.4 : 1, cursor: isOOS ? "not-allowed" : "text" }}
                                 />
-                                {(() => {
-                                  const stock = variant.stock_quantity ?? 0;
-                                  const isUnlimited = stock >= 9999;
-                                  const color = isUnlimited || stock > 10 ? "#059669" : stock >= 5 ? "#D97706" : "#E8242A";
-                                  return (
-                                    <div style={{ fontSize: "10px", fontWeight: 700, marginTop: "4px", textAlign: "center", color }}>
-                                      {isUnlimited ? "In Stock" : `${stock} left`}
-                                    </div>
-                                  );
-                                })()}
+                                <div style={{ fontSize: "10px", fontWeight: 700, marginTop: "4px", textAlign: "center", color: stockColor }}>
+                                  {stockLabel}
+                                </div>
                               </div>
                             );
                           })}
