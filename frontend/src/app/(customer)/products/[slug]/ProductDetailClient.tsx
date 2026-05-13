@@ -353,6 +353,22 @@ function thumbSrc(img: { url_thumbnail_webp?: string | null; url_thumbnail?: str
   return img.url_thumbnail_webp ?? img.url_thumbnail ?? "";
 }
 
+function isOutOfStock(stock: number | null | undefined): boolean {
+  return stock === null || stock === undefined || stock === 0;
+}
+
+function getStockLabel(stock: number | null | undefined): string {
+  if (isOutOfStock(stock)) return "Out of Stock";
+  if ((stock as number) >= 9999) return "In Stock";
+  return `${stock} left`;
+}
+
+function getStockColor(stock: number | null | undefined): string {
+  if (isOutOfStock(stock)) return "#EF4444";
+  if ((stock as number) <= 10) return "#F59E0B";
+  return "#10B981";
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
 export function ProductDetailClient({ slug }: ProductDetailClientProps) {
   const router = useRouter();
@@ -422,7 +438,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
   const filteredGroups = showAllColors ? colorGroups : colorGroups.slice(0, 4);
   const pricePerUnit = Number(primaryVariant?.effective_price ?? primaryVariant?.retail_price ?? 0);
   const orderTotal = totalUnits * pricePerUnit;
-  const anyInStock = (product.variants ?? []).some(v => (v.stock_quantity ?? 0) > 0);
+  const anyInStock = (product.variants ?? []).some(v => !isOutOfStock(v.stock_quantity));
 
   const lastExpandedColor = expandedColors.length > 0 ? expandedColors[expandedColors.length - 1] : null;
   const orderedImages = lastExpandedColor
@@ -462,6 +478,20 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
       .filter(([, qty]) => qty > 0)
       .map(([variant_id, quantity]) => ({ variant_id, quantity }));
     if (items.length === 0) return;
+
+    for (const { variant_id, quantity } of items) {
+      const v = product?.variants?.find(x => x.id === variant_id);
+      if (!v) continue;
+      if (isOutOfStock(v.stock_quantity)) {
+        setCartMsg({ type: "error", text: `${v.color ?? ""}${v.size ? ` / ${v.size}` : ""} is out of stock` });
+        return;
+      }
+      const maxStock = v.stock_quantity as number;
+      if (maxStock < 9999 && quantity > maxStock) {
+        setCartMsg({ type: "error", text: `Only ${maxStock} left for ${v.color ?? ""}${v.size ? ` / ${v.size}` : ""}` });
+        return;
+      }
+    }
 
     if (!isAuthenticated) {
       const guestCart = getGuestCart();
@@ -825,11 +855,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                         <div style={{ padding: "16px", display: "flex", flexWrap: "wrap", gap: "10px" }}>
                           {group.variants.map(variant => {
                             const qty = quantities[variant.id] ?? 0;
-                            const stock = variant.stock_quantity ?? 0;
-                            const isUnlimited = stock >= 9999;
-                            const isOOS = !isUnlimited && stock === 0;
-                            const stockColor = isOOS ? "#E8242A" : isUnlimited || stock > 10 ? "#059669" : stock >= 5 ? "#D97706" : "#E8242A";
-                            const stockLabel = isOOS ? "Out of Stock" : isUnlimited ? "In Stock" : `${stock} left`;
+                            const isOOS = isOutOfStock(variant.stock_quantity);
                             return (
                               <div key={variant.id} style={{ textAlign: "center", minWidth: "64px" }}>
                                 <div style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", color: "#7A7880", marginBottom: "4px" }}>{variant.size}</div>
@@ -843,6 +869,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                                   value={qty === 0 ? "" : qty}
                                   disabled={isOOS}
                                   onChange={e => {
+                                    if (isOOS) return;
                                     const raw = parseInt(e.target.value, 10) || 0;
                                     const maxStock = variant.stock_quantity ?? 9999;
                                     const val = Math.min(raw, maxStock);
@@ -855,10 +882,10 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                                       return { ...prev, [variant.id]: val };
                                     });
                                   }}
-                                  style={{ width: "64px", height: "44px", textAlign: "center", border: qty > 0 ? "2px solid #1A5CFF" : "1.5px solid #E2E0DA", borderRadius: "8px", fontSize: "15px", fontWeight: 700, outline: "none", fontFamily: "var(--font-jakarta)", opacity: isOOS ? 0.4 : 1, cursor: isOOS ? "not-allowed" : "text" }}
+                                  style={{ width: "64px", height: "44px", textAlign: "center", border: qty > 0 ? "2px solid #1A5CFF" : "1.5px solid #E2E0DA", borderRadius: "8px", fontSize: "15px", fontWeight: 700, outline: "none", fontFamily: "var(--font-jakarta)", opacity: isOOS ? 0.4 : 1, cursor: isOOS ? "not-allowed" : "text", background: isOOS ? "#f5f5f5" : "white" }}
                                 />
-                                <div style={{ fontSize: "10px", fontWeight: 700, marginTop: "4px", textAlign: "center", color: stockColor }}>
-                                  {stockLabel}
+                                <div style={{ fontSize: "10px", fontWeight: 700, marginTop: "4px", textAlign: "center", color: getStockColor(variant.stock_quantity) }}>
+                                  {getStockLabel(variant.stock_quantity)}
                                 </div>
                               </div>
                             );
