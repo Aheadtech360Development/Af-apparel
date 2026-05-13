@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -37,7 +39,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 async function getPosts(): Promise<BlogPost[]> {
   try {
-    const r = await fetch(`${API}/api/v1/blog-posts`, { next: { revalidate: 60 } });
+    const r = await fetch(`${API}/api/v1/blog-posts`, { cache: "no-store" });
     if (!r.ok) return [];
     const data: unknown = await r.json();
     return Array.isArray(data) ? (data as BlogPost[]) : [];
@@ -63,6 +65,11 @@ export default async function BlogListingPage() {
         </div>
       </div>
 
+      <style>{`
+        .blog-card { transition: box-shadow .2s; }
+        .blog-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,.10); }
+      `}</style>
+
       {/* Posts Grid */}
       <div style={{ maxWidth: "1140px", margin: "0 auto", padding: "48px 24px" }}>
         {posts.length === 0 ? (
@@ -73,9 +80,7 @@ export default async function BlogListingPage() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "28px" }} className="blog-grid">
             {posts.map(post => (
               <Link key={post.id} href={`/blog/${post.slug}`} style={{ textDecoration: "none", color: "inherit" }}>
-                <article style={{ background: "#fff", border: "1px solid #E2E0DA", borderRadius: "12px", overflow: "hidden", transition: "box-shadow .2s", cursor: "pointer" }}
-                  onMouseEnter={(e: React.MouseEvent<HTMLElement>) => ((e.currentTarget as HTMLElement).style.boxShadow = "0 8px 24px rgba(0,0,0,.10)")}
-                  onMouseLeave={(e: React.MouseEvent<HTMLElement>) => ((e.currentTarget as HTMLElement).style.boxShadow = "none")}>
+                <article className="blog-card" style={{ background: "#fff", border: "1px solid #E2E0DA", borderRadius: "12px", overflow: "hidden", cursor: "pointer" }}>
                   {/* Cover */}
                   <div style={{ height: "200px", background: "#F4F3EF", overflow: "hidden" }}>
                     {post.cover_image_url ? (

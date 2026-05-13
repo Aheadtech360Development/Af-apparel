@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -31,7 +33,7 @@ interface BlogPost {
 
 async function getPost(slug: string): Promise<BlogPost | null> {
   try {
-    return await fetch(`${API}/api/v1/blog-posts/${slug}`, { next: { revalidate: 60 } }).then(r => {
+    return await fetch(`${API}/api/v1/blog-posts/${slug}`, { cache: "no-store" }).then(r => {
       if (!r.ok) return null;
       return r.json();
     });
@@ -40,7 +42,7 @@ async function getPost(slug: string): Promise<BlogPost | null> {
 
 async function getAllPosts(): Promise<BlogPost[]> {
   try {
-    const r = await fetch(`${API}/api/v1/blog-posts`, { next: { revalidate: 60 } });
+    const r = await fetch(`${API}/api/v1/blog-posts`, { cache: "no-store" });
     if (!r.ok) return [];
     const data: unknown = await r.json();
     return Array.isArray(data) ? (data as BlogPost[]) : [];
