@@ -57,7 +57,7 @@ export default function HeroSection() {
           <div style={{ border: "1px solid #CBD5E1", borderRadius: "15px", height: "400px", width: "100%", overflow: "hidden", position: "relative" }}>
             <Image
               src="/Hame page Hero.png"
-              alt="AF Apparels Wholesale Blanks"
+              alt=""
               fill
               sizes="(max-width: 1140px) 45vw, 480px"
               style={{ objectFit: "cover" }}
