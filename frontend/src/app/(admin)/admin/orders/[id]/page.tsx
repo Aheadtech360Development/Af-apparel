@@ -272,7 +272,7 @@ export default function AdminOrderDetailPage() {
     e.preventDefault();
     setIsSaving(true); setMsg(null);
     try {
-      await adminService.updateOrder(order?.id ?? id, { status });
+      await adminService.updateOrder(order?.id ?? id, { status, payment_terms: paymentTerms });
       setMsg({ text: "Order updated successfully.", ok: true });
       setOrder(prev => prev ? { ...prev, status, tracking_number: tracking || null } : prev);
     } catch {
