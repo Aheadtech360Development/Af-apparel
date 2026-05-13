@@ -59,6 +59,7 @@ interface OrderRow {
   total: string | number;
   item_count: number;
   created_at: string;
+  timeline?: Array<{ status: string; message: string; created_by: string; created_at: string }>;
 }
 
 interface DiscountGroup { id: string; title: string; customer_tag: string; applies_to: string; shipping_type: string; status: string; }
@@ -547,42 +548,59 @@ export default function CustomerDetailPage() {
           </div>
 
           {/* Timeline */}
-          <div style={card}>
-            <div style={sectionTitle}>Timeline</div>
-            <div style={{ display: "flex", flexDirection: "column" }}>
-              {[
-                ...orders.slice(0, 5).map((o, i) => ({
-                  date: o.created_at,
-                  label: `Order #${o.order_number} placed`,
-                  sub: `${o.item_count} item${o.item_count !== 1 ? "s" : ""} · $${Number(o.total).toLocaleString("en-US", { minimumFractionDigits: 2 })}`,
-                  color: ORDER_STATUS[o.status]?.color ?? "#7A7880",
-                  key: `order-${i}`,
-                })),
-                {
-                  date: customer.created_at,
-                  label: "Account created",
-                  sub: "Wholesale account registered",
-                  color: "#059669",
-                  key: "created",
-                },
-              ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-               .map((ev, i, arr) => (
-                <div key={ev.key} style={{ display: "flex", gap: "14px", alignItems: "flex-start" }}>
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0 }}>
-                    <div style={{ width: "10px", height: "10px", borderRadius: "50%", background: ev.color, marginTop: "4px" }} />
-                    {i < arr.length - 1 && <div style={{ width: "2px", background: "#E2E0DA", flexGrow: 1, minHeight: "20px" }} />}
-                  </div>
-                  <div style={{ paddingBottom: "16px" }}>
-                    <div style={{ fontSize: "13px", fontWeight: 600, color: "#2A2830" }}>{ev.label}</div>
-                    <div style={{ fontSize: "11px", color: "#7A7880", marginTop: "1px" }}>{ev.sub}</div>
-                    <div style={{ fontSize: "11px", color: "#9CA3AF", marginTop: "1px" }}>
-                      {new Date(ev.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+          {(() => {
+            type TLEntry = { date: string; label: string; sub: string; color: string; key: string };
+            const entries: TLEntry[] = [
+              {
+                date: customer.created_at,
+                label: "Account created",
+                sub: "Wholesale account registered",
+                color: "#059669",
+                key: "created",
+              },
+            ];
+            orders.forEach((o, oi) => {
+              entries.push({
+                date: o.created_at,
+                label: `Order #${o.order_number} placed`,
+                sub: `${o.item_count} item${o.item_count !== 1 ? "s" : ""} · $${Number(o.total).toLocaleString("en-US", { minimumFractionDigits: 2 })}`,
+                color: "#1A5CFF",
+                key: `order-placed-${oi}`,
+              });
+              (o.timeline ?? []).forEach((e, ei) => {
+                entries.push({
+                  date: e.created_at,
+                  label: e.message,
+                  sub: `Order #${o.order_number}`,
+                  color: ORDER_STATUS[e.status]?.color ?? "#8B5CF6",
+                  key: `tl-${oi}-${ei}`,
+                });
+              });
+            });
+            const sorted = entries.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+            return (
+              <div style={card}>
+                <div style={sectionTitle}>Timeline</div>
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  {sorted.map((ev, i, arr) => (
+                    <div key={ev.key} style={{ display: "flex", gap: "14px", alignItems: "flex-start" }}>
+                      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0 }}>
+                        <div style={{ width: "10px", height: "10px", borderRadius: "50%", background: ev.color, marginTop: "4px" }} />
+                        {i < arr.length - 1 && <div style={{ width: "2px", background: "#E2E0DA", flexGrow: 1, minHeight: "20px" }} />}
+                      </div>
+                      <div style={{ paddingBottom: "16px" }}>
+                        <div style={{ fontSize: "13px", fontWeight: 600, color: "#2A2830" }}>{ev.label}</div>
+                        <div style={{ fontSize: "11px", color: "#7A7880", marginTop: "1px" }}>{ev.sub}</div>
+                        <div style={{ fontSize: "11px", color: "#9CA3AF", marginTop: "1px" }}>
+                          {new Date(ev.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
+            );
+          })()}
         </div>
 
         {/* ── RIGHT ────────────────────────────────────────────────────── */}
