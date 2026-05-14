@@ -374,6 +374,19 @@ export default function OrderDetailPage() {
         </div>
       )}
 
+      {/* Pay Now banner for unpaid draft invoice orders */}
+      {order.order_number?.startsWith('DRAFT-') && order.payment_status !== 'paid' && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-center">
+          <p className="text-sm font-semibold text-gray-800 mb-3">Invoice payment pending</p>
+          <a
+            href={`/checkout/invoice/${order.order_number}`}
+            className="inline-block bg-brand-700 text-white px-8 py-2.5 rounded-md font-bold text-sm hover:bg-brand-800"
+          >
+            Pay Now — ${Number(order.total).toFixed(2)}
+          </a>
+        </div>
+      )}
+
       {/* Line items */}
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
         <div className="px-5 py-3 border-b border-gray-100">

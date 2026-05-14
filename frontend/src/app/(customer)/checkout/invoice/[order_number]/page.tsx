@@ -6,13 +6,11 @@ import { apiClient } from '@/lib/api-client'
 import { QBPaymentForm } from '@/components/checkout/QBPaymentForm'
 
 interface OrderItem {
-  id: string
   product_name: string
   color: string | null
   size: string | null
   quantity: number
-  unit_price: string
-  line_total: string
+  unit_price: string | number
 }
 
 interface OrderDetail {
@@ -20,10 +18,10 @@ interface OrderDetail {
   order_number: string
   status: string
   payment_status: string
-  subtotal: string
-  shipping_cost: string
-  tax_amount?: string
-  total: string
+  subtotal: string | number
+  shipping_cost: string | number
+  tax_amount?: string | number
+  total: string | number
   items: OrderItem[]
 }
 
@@ -38,23 +36,35 @@ export default function InvoicePaymentPage() {
   const [error, setError] = useState('')
   const [paying, setPaying] = useState(false)
   const [paid, setPaid] = useState(false)
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false)
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated()) {
-      router.replace(`/login?redirect=/checkout/invoice/${orderNumber}`)
+    if (isLoading) return
+
+    async function load() {
+      setLoading(true)
+      try {
+        if (isAuthenticated()) {
+          const data = await apiClient.get<OrderDetail>(`/api/v1/orders/${orderNumber}`)
+          setOrder(data)
+          if (data.payment_status === 'paid') setPaid(true)
+        } else {
+          // Not authenticated — use public invoice summary endpoint
+          const apiBase = process.env.NEXT_PUBLIC_API_URL ?? ''
+          const res = await fetch(`${apiBase}/api/v1/orders/${orderNumber}/invoice-summary`)
+          if (!res.ok) throw new Error('not found')
+          const data = await res.json()
+          setOrder(data)
+          if (data.payment_status === 'paid') setPaid(true)
+          setShowLoginPrompt(true)
+        }
+      } catch {
+        setError('Order not found or you do not have access to this order.')
+      } finally {
+        setLoading(false)
+      }
     }
-  }, [isLoading, isAuthenticated, router, orderNumber])
-
-  useEffect(() => {
-    if (isLoading || !isAuthenticated()) return
-    apiClient
-      .get<OrderDetail>(`/api/v1/orders/${orderNumber}`)
-      .then(data => {
-        setOrder(data)
-        if (data.payment_status === 'paid') setPaid(true)
-      })
-      .catch(() => setError('Order not found or you do not have access to this order.'))
-      .finally(() => setLoading(false))
+    load()
   }, [isLoading, orderNumber]) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function handleToken(token: string) {
@@ -82,7 +92,7 @@ export default function InvoicePaymentPage() {
       <div style={{ maxWidth: '500px', margin: '60px auto', padding: '0 20px', textAlign: 'center' }}>
         <p style={{ color: '#E8242A', fontSize: '14px', marginBottom: '16px' }}>{error}</p>
         <button
-          onClick={() => setError('')}
+          onClick={() => { setError(''); setLoading(true); }}
           style={{ marginRight: '10px', padding: '10px 20px', background: '#fff', color: '#1B3A5C', border: '1.5px solid #1B3A5C', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}
         >
           Try Again
@@ -166,8 +176,23 @@ export default function InvoicePaymentPage() {
         </div>
       </div>
 
-      {/* Payment form */}
-      {paying ? (
+      {/* Login prompt — unauthenticated users */}
+      {showLoginPrompt ? (
+        <div style={{ background: '#f0f6ff', border: '1px solid #bdd3fb', borderRadius: '10px', padding: '24px 20px', textAlign: 'center' }}>
+          <p style={{ margin: '0 0 6px', fontSize: '15px', fontWeight: 700, color: '#1e3a5f' }}>
+            Log in to complete your payment
+          </p>
+          <p style={{ margin: '0 0 18px', fontSize: '13px', color: '#6b7280' }}>
+            Use the email address your invoice was sent to.
+          </p>
+          <a
+            href={`/login?redirect=/checkout/invoice/${orderNumber}`}
+            style={{ display: 'inline-block', background: '#1B3A5C', color: '#fff', padding: '12px 32px', borderRadius: '6px', fontWeight: 700, fontSize: '14px', textDecoration: 'none' }}
+          >
+            Log In to Pay
+          </a>
+        </div>
+      ) : paying ? (
         <div style={{ textAlign: 'center', padding: '40px', color: '#888', fontSize: '14px' }}>
           Processing payment…
         </div>
