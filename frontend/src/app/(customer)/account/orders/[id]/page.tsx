@@ -26,6 +26,7 @@ interface Order {
   total: string;
   subtotal: string;
   shipping_cost: string;
+  amount_paid?: string | null;
   po_number: string | null;
   order_notes: string | null;
   tracking_number: string | null;
@@ -382,7 +383,9 @@ export default function OrderDetailPage() {
             href={`/checkout/invoice/${order.order_number}`}
             className="inline-block bg-brand-700 text-white px-8 py-2.5 rounded-md font-bold text-sm hover:bg-brand-800"
           >
-            Pay Now — ${Number(order.total).toFixed(2)}
+            {Number(order.amount_paid) > 0
+              ? `Pay Balance — $${Math.max(0, Number(order.total) - Number(order.amount_paid)).toFixed(2)}`
+              : `Pay Now — $${Number(order.total).toFixed(2)}`}
           </a>
         </div>
       )}

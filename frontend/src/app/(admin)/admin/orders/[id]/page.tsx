@@ -67,6 +67,9 @@ interface AdminOrder {
   invoice_sent_at?: string | null;
   marked_paid_at?: string | null;
   marked_paid_by?: string | null;
+  amount_paid?: string | null;
+  balance_due?: string | null;
+  is_fully_paid?: boolean;
   // Timeline
   timeline?: Array<{ status: string; message: string; created_by: string; created_at: string }>;
 }
@@ -765,15 +768,22 @@ export default function AdminOrderDetailPage() {
                   ? `Invoice sent ${new Date(order.invoice_sent_at).toLocaleDateString()}`
                   : 'Invoice not yet sent'}
                 {order.marked_paid_at && ` · Paid ${new Date(order.marked_paid_at).toLocaleDateString()}`}
+                {!order.is_fully_paid && Number(order.amount_paid) > 0 && (
+                  <span style={{ color: '#D97706', marginLeft: '6px' }}>
+                    · ${Number(order.amount_paid).toFixed(2)} paid · ${Number(order.balance_due ?? 0).toFixed(2)} remaining
+                  </span>
+                )}
               </p>
             </div>
-            <button
-              onClick={handleResendInvoice}
-              disabled={isResendingInvoice}
-              style={{ background: '#fff', color: '#1B3A5C', border: '1px solid #1B3A5C', padding: '8px 16px', borderRadius: '6px', fontSize: '13px', fontWeight: 700, cursor: isResendingInvoice ? 'not-allowed' : 'pointer', opacity: isResendingInvoice ? 0.6 : 1 }}>
-              {isResendingInvoice ? 'Sending…' : (order.invoice_sent_at ? 'Resend Invoice' : 'Send Invoice')}
-            </button>
-            {order.payment_status !== 'paid' && (
+            {!order.is_fully_paid && (
+              <button
+                onClick={handleResendInvoice}
+                disabled={isResendingInvoice}
+                style={{ background: '#fff', color: '#1B3A5C', border: '1px solid #1B3A5C', padding: '8px 16px', borderRadius: '6px', fontSize: '13px', fontWeight: 700, cursor: isResendingInvoice ? 'not-allowed' : 'pointer', opacity: isResendingInvoice ? 0.6 : 1 }}>
+                {isResendingInvoice ? 'Sending…' : (order.invoice_sent_at ? 'Resend Invoice' : 'Send Invoice')}
+              </button>
+            )}
+            {!order.is_fully_paid && (
               <button
                 onClick={handleMarkAsPaid}
                 disabled={isMarkingPaid}
@@ -781,8 +791,8 @@ export default function AdminOrderDetailPage() {
                 {isMarkingPaid ? 'Saving…' : '✓ Mark as Paid'}
               </button>
             )}
-            {order.payment_status === 'paid' && (
-              <span style={{ background: '#D1FAE5', color: '#065F46', padding: '6px 14px', borderRadius: '20px', fontSize: '12px', fontWeight: 700 }}>PAID</span>
+            {order.is_fully_paid && (
+              <span style={{ background: '#D1FAE5', color: '#065F46', padding: '6px 14px', borderRadius: '20px', fontSize: '12px', fontWeight: 700 }}>PAID IN FULL</span>
             )}
           </div>
 

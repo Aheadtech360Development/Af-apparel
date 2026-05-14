@@ -22,6 +22,8 @@ interface OrderDetail {
   shipping_cost: string | number
   tax_amount?: string | number
   total: string | number
+  amount_paid?: string | number
+  balance_due?: string | number
   items: OrderItem[]
 }
 
@@ -119,7 +121,7 @@ export default function InvoicePaymentPage() {
           PAYMENT COMPLETE
         </h1>
         <p style={{ color: '#374151', fontSize: '14px', margin: '0 0 24px' }}>
-          Thank you! Order {order.order_number} has been paid.
+          Thank you! Order {order.order_number} has been paid in full.
         </p>
         <button
           onClick={() => router.push('/account/orders')}
@@ -134,6 +136,8 @@ export default function InvoicePaymentPage() {
   const shipping = Number(order.shipping_cost || 0)
   const tax = Number(order.tax_amount || 0)
   const total = Number(order.total)
+  const amountPaid = Number(order.amount_paid || 0)
+  const balanceDue = order.balance_due != null ? Number(order.balance_due) : Math.max(0, total - amountPaid)
 
   return (
     <div style={{ maxWidth: '560px', margin: '48px auto', padding: '0 20px' }}>
@@ -170,9 +174,21 @@ export default function InvoicePaymentPage() {
             <span>${tax.toFixed(2)}</span>
           </div>
         )}
+        {amountPaid > 0 && (
+          <>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0', fontSize: '13px', color: '#6b7280', borderTop: '1px solid #e5e7eb', marginTop: '4px' }}>
+              <span>Order Total</span>
+              <span>${total.toFixed(2)}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0', fontSize: '13px', color: '#059669', fontWeight: 600 }}>
+              <span>Amount Paid</span>
+              <span>&#8722;${amountPaid.toFixed(2)}</span>
+            </div>
+          </>
+        )}
         <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0 0', marginTop: '4px', borderTop: '2px solid #1B3A5C', fontSize: '17px', fontWeight: 800, color: '#1B3A5C' }}>
-          <span>Total Due</span>
-          <span style={{ color: '#E8242A' }}>${total.toFixed(2)}</span>
+          <span>Balance Due</span>
+          <span style={{ color: '#E8242A' }}>${balanceDue.toFixed(2)}</span>
         </div>
       </div>
 
@@ -204,7 +220,7 @@ export default function InvoicePaymentPage() {
           <QBPaymentForm
             onToken={handleToken}
             onBack={() => router.push('/account/orders')}
-            submitLabel={`Pay $${total.toFixed(2)}`}
+            submitLabel={amountPaid > 0 ? `Pay Balance $${balanceDue.toFixed(2)}` : `Pay $${balanceDue.toFixed(2)}`}
           />
         </div>
       )}
