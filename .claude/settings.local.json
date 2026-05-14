@@ -151,7 +151,9 @@
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\RT\\\\Desktop\\\\AF Apparel\\\\backend\\\\app\\\\api\\\\v1\" -Recurse -File)",
       "Bash(Select-Object FullName)",
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\RT\\\\Desktop\\\\AF Apparel\\\\frontend\\\\src\" -Recurse -Directory)",
-      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\RT\\\\Desktop\\\\AF Apparel\\\\frontend\\\\src\\\\app\" -Recurse -Filter \"*edit*\")"
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\RT\\\\Desktop\\\\AF Apparel\\\\frontend\\\\src\\\\app\" -Recurse -Filter \"*edit*\")",
+      "Bash(New-Item -ItemType Directory -Force \"C:\\\\Users\\\\RT\\\\Desktop\\\\AF Apparel\\\\frontend\\\\src\\\\app\\\\\\(customer\\)\\\\checkout\\\\invoice\\\\[order_number]\")",
+      "Bash(Out-Null)"
     ]
   }
 }

@@ -38,8 +38,8 @@ export default function CheckoutLayout({ children }: CheckoutLayoutProps) {
         </div>
       </div>
 
-      {/* Step indicator */}
-      <div style={{ background: "#fff", borderBottom: "1px solid #E2E0DA", padding: "0 32px" }}>
+      {/* Step indicator — hidden on invoice payment page */}
+      <div style={{ background: "#fff", borderBottom: "1px solid #E2E0DA", padding: "0 32px", display: pathname.includes('/checkout/invoice') ? 'none' : undefined }}>
         <div style={{ maxWidth: "680px", margin: "0 auto", display: "flex", alignItems: "center" }}>
           {STEPS.map((step, i) => {
             const isActive = activeStep === step.step;

@@ -17,6 +17,7 @@ import { apiClient } from "@/lib/api-client";
 interface QBPaymentFormProps {
   onToken: (token: string) => void;
   onBack: () => void;
+  submitLabel?: string;
 }
 
 interface CardFields {
@@ -37,7 +38,7 @@ const empty: CardFields = {
   postal_code: "",
 };
 
-export function QBPaymentForm({ onToken, onBack }: QBPaymentFormProps) {
+export function QBPaymentForm({ onToken, onBack, submitLabel }: QBPaymentFormProps) {
   const [fields, setFields] = useState<CardFields>(empty);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -214,7 +215,7 @@ export function QBPaymentForm({ onToken, onBack }: QBPaymentFormProps) {
           disabled={isProcessing}
           className="flex-1 rounded-md bg-brand-600 text-white py-3 text-sm font-medium hover:bg-brand-700 disabled:opacity-50"
         >
-          {isProcessing ? "Authorizing…" : "Continue to Review"}
+          {isProcessing ? "Authorizing…" : (submitLabel ?? "Continue to Review")}
         </button>
       </div>
     </form>
