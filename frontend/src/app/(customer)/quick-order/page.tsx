@@ -224,6 +224,9 @@ export default function QuickOrderPage() {
       }
     }
     setIsAddingToCart(false);
+    if (added > 0) {
+      window.dispatchEvent(new Event("cart_updated"));
+    }
     if (errors > 0) {
       setCartMsg({ type: "error", text: `${errors} product${errors !== 1 ? "s" : ""} failed to add.` });
     } else {
