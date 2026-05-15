@@ -34,7 +34,7 @@ export default function AboutPage() {
       {/* Stats */}
       <div style={{ background: "#fff", padding: "40px 0" }}>
         <div style={{ maxWidth: "1140px", margin: "0 auto", padding: "0 24px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "16px", marginBottom: "40px" }}>
+          <div className="about-stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "16px", marginBottom: "40px" }}>
             {[
               { n: "2,000+", l: "Wholesale Accounts" },
               { n: "15 yrs", l: "Industry Experience" },
@@ -110,7 +110,7 @@ export default function AboutPage() {
             <h2 style={{ fontFamily: "'Barlow Semi Condensed', sans-serif", fontSize: "28px", fontWeight: 800, color: "#0F172A", marginBottom: "8px" }}>Certifications &amp; Compliance</h2>
             <p style={{ fontSize: "14px", color: "#64748B", maxWidth: "560px", margin: "0 auto", lineHeight: 1.6 }}>Every AF product meets international production, environmental, and ethical standards.</p>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "12px" }}>
+          <div className="about-cert-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "12px" }}>
             {[
               { icon: <Trophy size={28} style={{ color: "#1B3A5C" }} />, title: "ISO 9000", body: "Full quality management system. Consistent production standards, run-to-run." },
               { icon: <Leaf size={28} style={{ color: "#1B3A5C" }} />, title: "Oeko-Tex Standard 100", body: "Every component tested for harmful substances. Safe for sensitive skin." },

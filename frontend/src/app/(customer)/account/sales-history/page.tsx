@@ -140,7 +140,7 @@ export default function SalesHistoryPage() {
 
       {/* Controls card */}
       <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-        <div className="grid grid-cols-2 divide-x divide-gray-200">
+        <div className="sales-history-controls grid grid-cols-2 divide-x divide-gray-200">
           {/* Step 1: Display Options */}
           <div className="p-5">
             <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">
@@ -226,7 +226,7 @@ export default function SalesHistoryPage() {
 
       {/* Results table */}
       {generated && items.length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden" id="print-area">
+        <div className="bg-white border border-gray-200 rounded-lg overflow-x-auto" id="print-area">
           <div className="px-5 py-3 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
             <p className="text-sm font-semibold text-gray-700">
               {resultYear} — {resultDisplay === "product" ? "Sales by Product" : "Sales by Price"}

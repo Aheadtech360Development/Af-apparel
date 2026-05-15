@@ -276,7 +276,7 @@ export default function QuickOrderPage() {
       onClick={() => setRows((prev) => prev.map((r) => ({ ...r, showDropdown: false })))}
     >
       {/* ══ PAGE HEADER ══════════════════════════════════════════════════ */}
-      <div style={{ background: "#1B3A5C", padding: "32px 32px 28px", borderBottom: "3px solid #E8242A" }}>
+      <div className="qo-header-pad" style={{ background: "#1B3A5C", padding: "32px 32px 28px", borderBottom: "3px solid #E8242A" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "24px", flexWrap: "wrap" }}>
             <div>
@@ -332,7 +332,7 @@ export default function QuickOrderPage() {
       </div>
 
       {/* ══ TOOLBAR ══════════════════════════════════════════════════════ */}
-      <div style={{ background: "#fff", borderBottom: "1px solid #E2E0DA", padding: "0 32px" }}>
+      <div className="qo-toolbar-pad" style={{ background: "#fff", borderBottom: "1px solid #E2E0DA", padding: "0 32px" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto", height: "44px", display: "flex", alignItems: "center", gap: "16px" }}>
           <span style={{ fontSize: "12px", fontWeight: 600, color: "#7A7880" }}>
             {rows.length} line{rows.length !== 1 ? "s" : ""}
@@ -367,7 +367,7 @@ export default function QuickOrderPage() {
       </div>
 
       {/* ══ COLUMN HEADERS ═══════════════════════════════════════════════ */}
-      <div style={{ background: "#F4F3EF", padding: "0 32px" }}>
+      <div className="qo-col-header-pad" style={{ background: "#F4F3EF", padding: "0 32px" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
           <div style={{ display: "grid", gridTemplateColumns: "28px 28px 1fr 220px 40px", gap: "0", padding: "8px 12px 6px", alignItems: "center" }}>
             <div />
@@ -380,7 +380,7 @@ export default function QuickOrderPage() {
       </div>
 
       {/* ══ ROWS ═════════════════════════════════════════════════════════ */}
-      <div style={{ flex: 1, maxWidth: "1200px", width: "100%", margin: "0 auto", padding: "8px 32px 120px" }}>
+      <div className="qo-rows-pad" style={{ flex: 1, maxWidth: "1200px", width: "100%", margin: "0 auto", padding: "8px 32px 120px" }}>
         <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
           {rows.map((row, rowIdx) => {
             const colors = getRowColors(row);

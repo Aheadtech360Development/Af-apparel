@@ -328,17 +328,8 @@
   .admin-layout-root > main { padding: 16px !important; padding-bottom: 80px !important; }
 }
 
-/* ── Table horizontal scroll utility ─────────────────────────────────── */
+/* ── Horizontal scroll utility ─────────────────────────────────────────── */
 .af-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-@media (max-width: 768px) {
-  /* Customer account: ensure content doesn't overflow the viewport */
-  .account-main { overflow-x: hidden; }
-  /* Any table inside account-main: scroll horizontally */
-  .account-main table { min-width: 520px; }
-  .account-main .overflow-hidden { overflow-x: auto !important; overflow-y: hidden; }
-  /* Statements: tighten mobile padding */
-  .account-main > div { padding-left: 0 !important; padding-right: 0 !important; }
-}
 
 /* ── WhoWeServe section padding on tiny screens ─────────────────────── */
 @media (max-width: 480px) {
@@ -352,4 +343,45 @@
     padding-left: 16px !important;
     padding-right: 16px !important;
   }
+}
+
+/* ── About Us page ──────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .about-stats-grid { grid-template-columns: repeat(2,1fr) !important; }
+  .about-cert-grid  { grid-template-columns: repeat(2,1fr) !important; }
+  .about-story-flex { padding-left: 16px !important; padding-right: 16px !important; }
+}
+@media (max-width: 380px) {
+  .about-stats-grid { grid-template-columns: 1fr 1fr !important; }
+}
+
+/* ── Contact Us page ─────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .contact-main-grid { grid-template-columns: 1fr !important; }
+}
+@media (max-width: 600px) {
+  .contact-form-row { grid-template-columns: 1fr !important; }
+}
+
+/* ── Blog listing grid ───────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .blog-grid { grid-template-columns: repeat(2,1fr) !important; gap: 18px !important; }
+}
+@media (max-width: 540px) {
+  .blog-grid { grid-template-columns: 1fr !important; gap: 14px !important; }
+}
+
+/* ── Quick Order page ────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .qo-header-pad  { padding: 24px 16px 20px !important; }
+  .qo-toolbar-pad { padding: 0 16px !important; }
+  .qo-rows-pad    { padding: 8px 16px 100px !important; }
+  .qo-col-header-pad { padding: 0 16px !important; }
+}
+
+/* ── Sales History controls: stack on mobile ─────────────────────────── */
+@media (max-width: 600px) {
+  .sales-history-controls { grid-template-columns: 1fr !important; }
+  .sales-history-controls > * { border-right: none !important; border-bottom: 1px solid #e5e7eb; }
+  .sales-history-controls > *:last-child { border-bottom: none; }
 }

@@ -71,7 +71,7 @@ export default function ContactPage() {
       {/* Main Contact */}
       <div style={{ background: "#F7F8FA", padding: "56px 24px" }}>
         <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 360px", gap: "32px", alignItems: "start" }}>
+          <div className="contact-main-grid" style={{ display: "grid", gridTemplateColumns: "1fr 360px", gap: "32px", alignItems: "start" }}>
 
             {/* Form */}
             <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: "6px", padding: "24px" }}>
@@ -88,7 +88,7 @@ export default function ContactPage() {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit}>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "12px" }}>
+                  <div className="contact-form-row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "12px" }}>
                     <div>
                       <label style={{ display: "block", fontSize: "11px", fontWeight: 700, color: "#374151", marginBottom: "4px", textTransform: "uppercase", letterSpacing: ".06em" }}>Full Name <span style={{ color: "#E8242A" }}>*</span></label>
                       <input style={inp} value={form.name} onChange={e => set("name", e.target.value)} required placeholder="Your full name" />
@@ -98,7 +98,7 @@ export default function ContactPage() {
                       <input style={inp} value={form.business} onChange={e => set("business", e.target.value)} required placeholder="Company name" />
                     </div>
                   </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "12px" }}>
+                  <div className="contact-form-row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "12px" }}>
                     <div>
                       <label style={{ display: "block", fontSize: "11px", fontWeight: 700, color: "#374151", marginBottom: "4px", textTransform: "uppercase", letterSpacing: ".06em" }}>Email Address <span style={{ color: "#E8242A" }}>*</span></label>
                       <input type="email" style={inp} value={form.email} onChange={e => set("email", e.target.value)} required placeholder="your@email.com" />
