@@ -622,7 +622,7 @@ export default function NewProductPage() {
               {/* Print Guide */}
               <div style={{ marginBottom: "20px" }}>
                 <label style={labelStyle}>Print Guide — Supported Methods</label>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+                <div className="checkout-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
                   {["DTF (Direct to Film)", "Screen Printing", "Embroidery", "DTG (Direct to Garment)", "Heat Transfer", "Sublimation", "Vinyl / HTV", "Laser Engraving"].map(method => {
                     const checked = form.print_guide_methods.includes(method);
                     return (

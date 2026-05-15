@@ -128,7 +128,7 @@ function UserModal({
           )}
 
           {/* Name row */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "12px" }}>
+          <div className="checkout-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "12px" }}>
             <div>
               <label style={lbl}>First Name *</label>
               <input style={inp} value={form.first_name} onChange={e => set("first_name", e.target.value)} required />
@@ -146,7 +146,7 @@ function UserModal({
           </div>
 
           {/* Role + Status row */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "12px" }}>
+          <div className="checkout-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "12px" }}>
             <div>
               <label style={lbl}>Role</label>
               <select style={inp} value={form.role} onChange={e => set("role", e.target.value)}>
@@ -361,7 +361,7 @@ export default function AdminUsersPage() {
       </div>
 
       {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "12px", marginBottom: "20px" }}>
+      <div className="admin-stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "12px", marginBottom: "20px" }}>
         {[
           { label: "Total Users",   value: stats.total,    color: "#2A2830" },
           { label: "Admins",        value: stats.admins,   color: "#E8242A" },

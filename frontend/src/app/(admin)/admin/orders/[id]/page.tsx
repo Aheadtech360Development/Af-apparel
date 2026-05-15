@@ -533,7 +533,7 @@ export default function AdminOrderDetailPage() {
       )}
 
       {/* ── 2-COLUMN LAYOUT ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 360px", gap: "20px", alignItems: "flex-start" }}>
+      <div className="admin-two-col" style={{ display: "grid", gridTemplateColumns: "1fr 360px", gap: "20px", alignItems: "flex-start" }}>
 
         {/* ── LEFT: Main content ── */}
         <div>
@@ -549,7 +549,7 @@ export default function AdminOrderDetailPage() {
               </div>
             )}
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: "8px", marginBottom: "16px" }}>
+            <div className="admin-courier-grid" style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: "8px", marginBottom: "16px" }}>
               {COURIERS.map(courier => (
                 <div key={courier.id} onClick={() => handleCourierSelect(courier.id)}
                   style={{ border: selectedCourier === courier.id ? "2px solid #1A5CFF" : "1.5px solid #E2E0DA", borderRadius: "8px", padding: "12px 8px", textAlign: "center" as const, cursor: "pointer", background: selectedCourier === courier.id ? "rgba(26,92,255,.05)" : "#fff", transition: "all .15s" }}>
@@ -560,7 +560,7 @@ export default function AdminOrderDetailPage() {
             </div>
 
             {selectedCourier && (
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "16px" }}>
+              <div className="checkout-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "16px" }}>
                 <div>
                   <label style={LabelStyle}>Service Type</label>
                   <select value={selectedService} onChange={e => setSelectedService(e.target.value)}

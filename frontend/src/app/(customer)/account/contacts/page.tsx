@@ -263,7 +263,7 @@ export default function ManageContactsPage() {
             {/* CONTACT ENTRY TAB */}
             {activeTab === "entry" && (
               <>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       First Name <span className="text-red-500">*</span>
@@ -306,7 +306,7 @@ export default function ManageContactsPage() {
                 </div>
 
                 {/* Phone + Ext */}
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                   <div className="col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-1">Phone #</label>
                     <input
@@ -431,7 +431,7 @@ export default function ManageContactsPage() {
                   <p className="text-xs text-gray-400 mt-1">City &amp; State auto-fill on valid ZIP</p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
                     <input
@@ -468,7 +468,7 @@ export default function ManageContactsPage() {
                   </select>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Home Phone</label>
                     <input

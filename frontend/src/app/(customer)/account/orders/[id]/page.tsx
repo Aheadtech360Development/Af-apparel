@@ -294,7 +294,7 @@ export default function OrderDetailPage() {
 
         {/* PO / tracking */}
         {(order.po_number || order.tracking_number) && (
-          <div className="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-gray-100">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3 pt-3 border-t border-gray-100">
             {order.po_number && (
               <div>
                 <p className="text-xs text-gray-400 mb-0.5">PO Number</p>

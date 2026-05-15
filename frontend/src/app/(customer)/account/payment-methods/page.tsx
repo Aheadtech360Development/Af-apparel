@@ -479,7 +479,7 @@ export default function PaymentMethodsPage() {
               />
               {cardErrors.number && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "2px" }}>{cardErrors.number}</p>}
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "10px" }}>
+            <div className="pm-exp-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "10px" }}>
               <div>
                 <label style={labelStyle}>Month <span style={{ color: "#E8242A" }}>*</span></label>
                 <input type="text" inputMode="numeric" maxLength={2} value={newCard.expMonth}
@@ -633,7 +633,7 @@ export default function PaymentMethodsPage() {
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+            <div className="pm-ach-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
               <div>
                 <label style={labelStyle}>Bank Name</label>
                 <input
@@ -668,7 +668,7 @@ export default function PaymentMethodsPage() {
               />
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+            <div className="pm-ach-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
               <div>
                 <label style={labelStyle}>Routing Number</label>
                 <input

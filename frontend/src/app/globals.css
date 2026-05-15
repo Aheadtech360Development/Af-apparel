@@ -446,3 +446,53 @@
   .admin-content .overflow-hidden { overflow-x: auto !important; }
   .admin-content .overflow-hidden table { min-width: 520px; }
 }
+
+/* ── Checkout & payment: 2-col form grids stack on mobile ────────────── */
+@media (max-width: 560px) {
+  .checkout-form-grid { grid-template-columns: 1fr !important; }
+}
+
+/* ── Payment methods: card expiry 3-col + ACH 2-col stack on mobile ──── */
+@media (max-width: 480px) {
+  .pm-exp-grid { grid-template-columns: 1fr 1fr !important; }
+  .pm-ach-grid { grid-template-columns: 1fr !important; }
+}
+
+/* ── Admin orders detail: courier selector wrap on mobile ────────────── */
+@media (max-width: 640px) {
+  .admin-courier-grid { grid-template-columns: repeat(3, 1fr) !important; }
+}
+
+/* ── Analytics: overview + side-by-side cards responsive ────────────── */
+@media (max-width: 1024px) {
+  .analytics-grid-3 { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media (max-width: 640px) {
+  .analytics-grid-3 { grid-template-columns: 1fr !important; }
+  .analytics-grid-2 { grid-template-columns: 1fr !important; }
+}
+@media (max-width: 768px) {
+  .analytics-grid-2 { grid-template-columns: 1fr !important; }
+}
+
+/* ── Admin collections: 3-col card grid ─────────────────────────────── */
+@media (max-width: 768px) {
+  .admin-collections-grid { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media (max-width: 480px) {
+  .admin-collections-grid { grid-template-columns: 1fr !important; }
+}
+
+/* ── Private Label page: hero + feature grids ────────────────────────── */
+@media (max-width: 768px) {
+  .pl-hero-grid { grid-template-columns: 1fr !important; gap: 24px !important; }
+  .pl-3col-grid  { grid-template-columns: 1fr 1fr !important; }
+}
+@media (max-width: 480px) {
+  .pl-3col-grid  { grid-template-columns: 1fr !important; }
+}
+
+/* ── Print Guide: 2-col method cards ────────────────────────────────── */
+@media (max-width: 560px) {
+  .print-guide-grid { grid-template-columns: 1fr !important; }
+}

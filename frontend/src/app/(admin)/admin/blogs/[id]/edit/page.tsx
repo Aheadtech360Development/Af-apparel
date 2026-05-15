@@ -207,7 +207,7 @@ export default function AdminBlogEditPage() {
       {/* Card Info */}
       <div style={cardSt}>
         <span style={sectionTitle}>CARD INFO</span>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "16px" }}>
+        <div className="checkout-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "16px" }}>
           <div>
             <label style={labelSt}>Title *</label>
             <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Blog post title" style={inputSt} />
@@ -237,7 +237,7 @@ export default function AdminBlogEditPage() {
           {coverUrl && <img src={coverUrl} alt="Cover" style={{ marginTop: "8px", maxHeight: "140px", borderRadius: "6px", border: "1px solid #E2E0DA" }} />}
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "16px", marginBottom: "16px" }}>
+        <div className="checkout-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "16px", marginBottom: "16px" }}>
           <div>
             <label style={labelSt}>Published Date</label>
             <input type="date" value={publishedDate} onChange={e => setPublishedDate(e.target.value)} style={inputSt} />

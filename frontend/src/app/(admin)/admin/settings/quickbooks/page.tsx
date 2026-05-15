@@ -79,7 +79,7 @@ export default function QuickBooksPage() {
       ) : data ? (
         <>
           {/* Summary */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="bg-white border border-gray-200 rounded-lg p-5">
               <p className="text-sm text-gray-500">Last Successful Sync</p>
               <p className="text-lg font-semibold text-gray-900 mt-1">

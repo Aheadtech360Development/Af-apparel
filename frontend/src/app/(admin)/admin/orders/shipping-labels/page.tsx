@@ -134,7 +134,7 @@ export default function ShippingLabelsPage() {
       </div>
 
       {/* Stats Cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "16px", marginBottom: "24px" }}>
+      <div className="admin-stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "16px", marginBottom: "24px" }}>
         {STAT_CARDS.map(c => (
           <div key={c.label} style={{ background: "#fff", border: "1px solid #E2E0DA", borderRadius: "10px", padding: "18px 20px", display: "flex", alignItems: "center", gap: "14px" }}>
             <div style={{ width: "42px", height: "42px", borderRadius: "10px", background: `rgba(${c.color === "#059669" ? "5,150,105" : c.color === "#D97706" ? "217,119,6" : "26,92,255"},.1)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", flexShrink: 0 }}>

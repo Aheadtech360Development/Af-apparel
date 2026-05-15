@@ -108,7 +108,7 @@ export default function AdminAbandonedCartsPage() {
       </div>
 
       {/* Summary cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white border border-gray-200 rounded-lg p-4">
           <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Active Abandoned</p>
           <p className="text-2xl font-bold text-orange-600 mt-1">{totalAbandoned}</p>

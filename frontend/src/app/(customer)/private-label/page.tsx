@@ -30,7 +30,7 @@ export default function PrivateLabelPage() {
       {/* Hero */}
       <div style={{ background: "#f4f3ef", padding: "56px 24px" }}>
         <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "48px", alignItems: "center" }}>
+          <div className="pl-hero-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "48px", alignItems: "center" }}>
             <div>
               <div style={{ display: "inline-block", background: "#0a1628", color: "#fff", fontSize: "12px", fontWeight: 700, padding: "4px 12px", borderRadius: "4px", marginBottom: "12px", letterSpacing: ".04em" }}>
                 Private Label Program
@@ -76,7 +76,7 @@ export default function PrivateLabelPage() {
             <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "26px", letterSpacing: ".04em", color: "#111", marginBottom: "8px" }}>Who Private Label Is For</h2>
             <p style={{ fontSize: "13.5px", color: "#666" }}>Not every business is ready for private label — here&apos;s who gets the most value</p>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "14px" }}>
+          <div className="pl-3col-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "14px" }}>
             {[
               { icon: <Shirt size={26} />, title: "Apparel Brands", body: "Building a clothing line and need consistent, branded blanks with your own label at scale." },
               { icon: <Store size={26} />, title: "Retailers", body: "Retailers wanting exclusive styles or house-brand basics that differentiate from standard wholesale." },
@@ -127,7 +127,7 @@ export default function PrivateLabelPage() {
             <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "26px", letterSpacing: ".04em", color: "#111", marginBottom: "8px" }}>Customization Options</h2>
             <p style={{ fontSize: "13.5px", color: "#666" }}>Everything you need to make the product fully yours</p>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "16px" }}>
+          <div className="pl-3col-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "16px" }}>
             {[
               {
                 tag: "Branding", title: "Labels & Tags",

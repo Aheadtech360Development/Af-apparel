@@ -259,7 +259,7 @@ export default function AccountProfilePage() {
           Web User Profile
         </h2>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Field label="First Name" required>
             <input
               type="text"
@@ -311,7 +311,7 @@ export default function AccountProfilePage() {
             />
           </Field>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="Company Name" required>
               <input
                 type="text"
@@ -331,7 +331,7 @@ export default function AccountProfilePage() {
             </Field>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="Phone">
               <input
                 type="tel"
@@ -350,7 +350,7 @@ export default function AccountProfilePage() {
             </Field>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="Tax ID #">
               <input
                 type="text"
@@ -424,7 +424,7 @@ export default function AccountProfilePage() {
             />
           </Field>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <Field label="PPAC #">
               <input
                 type="text"
@@ -488,7 +488,7 @@ export default function AccountProfilePage() {
               </Field>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 mt-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-3">
               <Field label="City">
                 <input
                   type="text"
@@ -511,7 +511,7 @@ export default function AccountProfilePage() {
               </Field>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 mt-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-3">
               <Field label="Postal Code">
                 <input
                   type="text"
@@ -533,7 +533,7 @@ export default function AccountProfilePage() {
               </Field>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 mt-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-3">
               <Field label="Number of Employees">
                 <select
                   value={companyForm.num_employees}

@@ -64,7 +64,7 @@ export default function AccountOverviewPage() {
         Welcome{profile ? `, ${profile.first_name}` : ""}
       </h1>
 
-      <div className="grid grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         {[
           { label: "Orders", href: "/account/orders" },
           { label: "Profile", href: "/account/profile" },

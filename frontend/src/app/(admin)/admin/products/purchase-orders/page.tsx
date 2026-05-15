@@ -264,7 +264,7 @@ export default function PurchaseOrdersPage() {
       </div>
 
       {/* Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px', marginBottom: '24px' }}>
+      <div className="admin-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px', marginBottom: '24px' }}>
         {([
           { label: 'Open POs',        value: String(stats.open),     icon: <ClipboardIcon size={24} color="#1A5CFF" />, color: '#1A5CFF' },
           { label: 'Pending Receipt', value: String(stats.pending),  icon: <TruckIcon size={24} color="#D97706" />, color: '#D97706' },
@@ -361,7 +361,7 @@ export default function PurchaseOrdersPage() {
             {/* Supplier */}
             <div style={{ background: '#F4F3EF', borderRadius: '8px', padding: '18px', marginBottom: '20px' }}>
               <div style={{ fontFamily: 'var(--font-bebas)', fontSize: '14px', letterSpacing: '.1em', color: '#7A7880', marginBottom: '14px' }}>SUPPLIER INFORMATION</div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '14px' }}>
+              <div className="checkout-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '14px' }}>
                 <div>
                   <label style={labelStyle}>Supplier Name *</label>
                   <input value={form.supplier_name} onChange={e => setForm(f => ({ ...f, supplier_name: e.target.value }))}
@@ -506,7 +506,7 @@ export default function PurchaseOrdersPage() {
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', background: '#F4F3EF', borderRadius: '8px', padding: '16px', marginBottom: '20px' }}>
+            <div className="checkout-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', background: '#F4F3EF', borderRadius: '8px', padding: '16px', marginBottom: '20px' }}>
               {[
                 { label: 'Supplier', value: selectedPO.supplier_name },
                 { label: 'Expected Date', value: selectedPO.expected_date ? new Date(selectedPO.expected_date).toLocaleDateString() : '—' },

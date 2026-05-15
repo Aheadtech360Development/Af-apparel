@@ -202,7 +202,7 @@ function TierFormFields({
 }) {
   return (
     <div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginBottom: "16px" }}>
+      <div className="checkout-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginBottom: "16px" }}>
         <div style={{ gridColumn: "1 / -1" }}>
           <label style={labelStyle}>Tier Name <span style={{ color: "#E8242A" }}>*</span></label>
           <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}

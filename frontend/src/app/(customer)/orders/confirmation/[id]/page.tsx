@@ -68,7 +68,7 @@ export default function OrderConfirmationPage() {
 
         {/* Order summary */}
         <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
-          <div className="grid grid-cols-2 gap-4 text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
             <div>
               <p className="text-gray-500">Order Number</p>
               <p className="font-semibold text-gray-900">{order.order_number}</p>

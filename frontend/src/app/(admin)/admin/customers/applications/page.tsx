@@ -72,7 +72,7 @@ function DetailModal({ app, onClose }: { app: Application; onClose: () => void }
           {/* Contact */}
           <section>
             <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Contact Information</h3>
-            <dl className="grid grid-cols-2 gap-3">
+            <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <DetailField label="First Name" value={app.first_name} />
               <DetailField label="Last Name" value={app.last_name} />
               <DetailField label="Email" value={app.email} />
@@ -85,7 +85,7 @@ function DetailModal({ app, onClose }: { app: Application; onClose: () => void }
           {/* Company */}
           <section>
             <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Company Details</h3>
-            <dl className="grid grid-cols-2 gap-3">
+            <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <DetailField label="Company Name" value={app.company_name} />
               <DetailField label="Business Type" value={app.business_type} />
               <DetailField label="Tax ID / EIN" value={app.tax_id} />
@@ -101,7 +101,7 @@ function DetailModal({ app, onClose }: { app: Application; onClose: () => void }
           {fullAddress && (
             <section>
               <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Address</h3>
-              <dl className="grid grid-cols-2 gap-3">
+              <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <DetailField label="Address Line 1" value={app.address_line1} />
                 <DetailField label="Address Line 2" value={app.address_line2} />
                 <DetailField label="City" value={app.city} />
@@ -115,7 +115,7 @@ function DetailModal({ app, onClose }: { app: Application; onClose: () => void }
           {/* Volume & Industry IDs */}
           <section>
             <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Volume & Industry</h3>
-            <dl className="grid grid-cols-2 gap-3">
+            <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <DetailField label="Expected Monthly Volume" value={app.expected_monthly_volume} />
               <DetailField label="Est. Annual Volume" value={app.estimated_annual_volume} />
               <DetailField label="PPAC #" value={app.ppac_number} />
@@ -127,7 +127,7 @@ function DetailModal({ app, onClose }: { app: Application; onClose: () => void }
           {/* Status */}
           <section>
             <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Application Status</h3>
-            <dl className="grid grid-cols-2 gap-3">
+            <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <dt className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</dt>
                 <dd className="mt-0.5">

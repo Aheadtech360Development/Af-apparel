@@ -282,7 +282,7 @@ export default function CheckoutPaymentPage() {
           {/* Manual ACH form — shown when no saved ACH, or user chose "use different account" */}
           {(isGuest || !savedAch || useNewAch) && (
             <div style={{ borderTop: savedAch && useNewAch ? "1px solid #F0EEE9" : "none", paddingTop: savedAch && useNewAch ? "16px" : "0" }}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+              <div className="checkout-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
                 <div>
                   <label style={lbl}>Bank Name <span style={{ color: "#E8242A" }}>*</span></label>
                   <input style={{ ...inp, borderColor: achErrors.bankName ? "#E8242A" : "#E2E0DA" }} value={achForm.bankName} onChange={e => { setAchForm(p => ({ ...p, bankName: e.target.value })); setAchErrors(p => ({ ...p, bankName: undefined })); }} placeholder="Chase, Wells Fargo, etc." />

@@ -388,7 +388,7 @@ export default function DiscountsPage() {
               </div>
 
               {/* Discount type + value */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+              <div className="checkout-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
                 <div>
                   <label style={labelStyle}>Discount Type *</label>
                   <select value={F.discount_type} onChange={e => set("discount_type", e.target.value)} style={inputStyle}>
@@ -414,7 +414,7 @@ export default function DiscountsPage() {
               </div>
 
               {/* Minimums */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+              <div className="checkout-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
                 <div>
                   <label style={labelStyle}>Min Order Amount ($)</label>
                   <input type="number" min="0" step="0.01" value={F.minimum_order_amount} onChange={e => set("minimum_order_amount", e.target.value)} placeholder="None" style={inputStyle} />
@@ -441,7 +441,7 @@ export default function DiscountsPage() {
               </div>
 
               {/* Date range */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+              <div className="checkout-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
                 <div>
                   <label style={labelStyle}>Start Date (optional)</label>
                   <input type="datetime-local" value={F.starts_at} onChange={e => set("starts_at", e.target.value)} style={inputStyle} />

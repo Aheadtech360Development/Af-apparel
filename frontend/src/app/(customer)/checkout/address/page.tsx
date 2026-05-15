@@ -403,7 +403,7 @@ export default function CheckoutAddressPage() {
         )}
 
         {showNewForm && (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+          <div className="checkout-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
             <div style={{ gridColumn: "1 / -1" }}>
               <label style={lbl}>{isGuest ? "Full Name" : "Contact Name"} <span style={{ color: "#E8242A" }}>*</span></label>
               <input

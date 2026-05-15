@@ -201,7 +201,7 @@ export default function PrintGuidePage() {
             <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "26px", letterSpacing: ".04em", color: "#111", marginBottom: "8px" }}>Decoration Method Guide</h2>
             <p style={{ fontSize: "13.5px", color: "#666" }}>Press settings and compatibility ratings for all AF core blanks</p>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: "20px" }}>
+          <div className="print-guide-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: "20px" }}>
             {METHODS.map(m => (
               <div key={m.name} style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: "6px", overflow: "hidden" }}>
                 {/* Header */}
