@@ -262,59 +262,90 @@ export function Header() {
           </div>
         </div> */}
 
-        {/* Mobile menu */}
-        {menuOpen && (
-          <div style={{ background: "#1B3A5C", borderTop: "1px solid rgba(255,255,255,.12)", padding: "12px 20px" }} className="md:hidden">
-            {[
-              { href: "/products", label: "Shop All" },
-              { href: "/products?category=t-shirts", label: "T-Shirts" },
-              { href: "/products?category=hoodies", label: "Hoodies" },
-              { href: "/products?category=sweatshirts", label: "Sweatshirts" },
-              { href: "#", label: "Resources" },
-            ].map(({ href, label }) => (
-              <Link key={href} href={href} onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 0", color: "#d3d0d0", fontSize: "13px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
-                {label}
-              </Link>
-            ))}
-            {isAdmin() && (
-              <Link href="/admin/dashboard" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 0", color: "#d3d0d0", fontSize: "13px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
-                Admin Panel
-              </Link>
-            )}
-            {isAuthenticated() && !isAdmin() && (
-              <>
-                <Link href="/quick-order" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 0", color: "#d3d0d0", fontSize: "13px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
-                  Quick Order
-                </Link>
-                <Link href="/account" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 0", color: "#d3d0d0", fontSize: "13px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
-                  My Account
-                </Link>
-                <Link href="/cart" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 0", color: "#d3d0d0", fontSize: "13px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
-                  Cart {cartCount > 0 && `(${cartCount})`}
-                </Link>
-              </>
-            )}
-            {!isAuthenticated() && (
-              <>
-                <Link href="/cart" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 0", color: "#d3d0d0", fontSize: "13px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
-                  Cart {cartCount > 0 && `(${cartCount})`}
-                </Link>
-                <Link href="/wholesale/register" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 0", color: "#7bb3ff", fontSize: "13px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
-                  Apply for Wholesale
-                </Link>
-                <Link href="/login" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 0", color: "#7bb3ff", fontSize: "13px", fontWeight: 700, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em" }}>
-                  Log In
-                </Link>
-              </>
-            )}
-            {isAuthenticated() && (
-              <button onClick={handleLogout} style={{ display: "block", width: "100%", textAlign: "left", padding: "10px 0", color: "#d3d0d0", fontSize: "13px", fontWeight: 600, background: "transparent", border: "none", cursor: "pointer", textTransform: "uppercase", letterSpacing: ".04em", borderTop: "1px solid rgba(255,255,255,.06)" }}>
-                Sign out
-              </button>
-            )}
-          </div>
-        )}
       </header>
+
+      {/* Mobile side drawer */}
+      {menuOpen && (
+        <div className="md:hidden" style={{ position: "fixed", inset: 0, zIndex: 200 }}>
+          {/* Backdrop */}
+          <div
+            style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.5)" }}
+            onClick={() => setMenuOpen(false)}
+          />
+          {/* Drawer */}
+          <div style={{
+            position: "fixed", left: 0, top: 0, bottom: 0, width: "280px",
+            background: "#1B3A5C", overflowY: "auto", zIndex: 201,
+            padding: "0 0 32px",
+            boxShadow: "4px 0 24px rgba(0,0,0,.25)",
+          }}>
+            {/* Drawer header */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,.1)" }}>
+              <img src="/Af-apparel logo.png" alt="AF Apparels" style={{ height: "40px", width: "auto", objectFit: "contain", filter: "brightness(0) invert(1)" }} />
+              <button
+                onClick={() => setMenuOpen(false)}
+                style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,.7)", fontSize: "22px", lineHeight: 1, padding: "4px" }}
+              >
+                ✕
+              </button>
+            </div>
+            {/* Links */}
+            <div style={{ padding: "12px 20px" }}>
+              {[
+                { href: "/products", label: "Shop All" },
+                { href: "/products?category=t-shirts", label: "T-Shirts" },
+                { href: "/products?category=hoodies", label: "Hoodies" },
+                { href: "/products?category=sweatshirts", label: "Sweatshirts" },
+                { href: "/about", label: "About Us" },
+                { href: "/contact", label: "Contact" },
+                { href: "/blog", label: "Blog" },
+              ].map(({ href, label }) => (
+                <Link key={href} href={href} onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "11px 0", color: "#d3d0d0", fontSize: "14px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+                  {label}
+                </Link>
+              ))}
+              {isAdmin() && (
+                <Link href="/admin/dashboard" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "11px 0", color: "#7bb3ff", fontSize: "14px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+                  Admin Panel
+                </Link>
+              )}
+              {isAuthenticated() && !isAdmin() && (
+                <>
+                  <Link href="/quick-order" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "11px 0", color: "#d3d0d0", fontSize: "14px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+                    Quick Order
+                  </Link>
+                  <Link href="/account" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "11px 0", color: "#d3d0d0", fontSize: "14px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+                    My Account
+                  </Link>
+                  <Link href="/cart" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "11px 0", color: "#d3d0d0", fontSize: "14px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+                    Cart {cartCount > 0 && `(${cartCount})`}
+                  </Link>
+                </>
+              )}
+              {!isAuthenticated() && (
+                <>
+                  <Link href="/cart" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "11px 0", color: "#d3d0d0", fontSize: "14px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+                    Cart {cartCount > 0 && `(${cartCount})`}
+                  </Link>
+                  <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "10px" }}>
+                    <Link href="/wholesale/register" onClick={() => setMenuOpen(false)} style={{ display: "block", background: "#E8242A", color: "#fff", padding: "12px 20px", borderRadius: "5px", fontWeight: 700, fontSize: "13px", textDecoration: "none", textAlign: "center", textTransform: "uppercase", letterSpacing: ".04em" }}>
+                      Apply for Wholesale
+                    </Link>
+                    <Link href="/login" onClick={() => setMenuOpen(false)} style={{ display: "block", background: "rgba(255,255,255,.1)", color: "#fff", padding: "12px 20px", borderRadius: "5px", fontWeight: 700, fontSize: "13px", textDecoration: "none", textAlign: "center", textTransform: "uppercase", letterSpacing: ".04em" }}>
+                      Log In
+                    </Link>
+                  </div>
+                </>
+              )}
+              {isAuthenticated() && (
+                <button onClick={handleLogout} style={{ marginTop: "20px", display: "block", width: "100%", textAlign: "center", padding: "12px", color: "#fff", fontSize: "13px", fontWeight: 600, background: "rgba(232,36,42,.3)", border: "1px solid rgba(232,36,42,.5)", borderRadius: "5px", cursor: "pointer", textTransform: "uppercase", letterSpacing: ".04em" }}>
+                  Sign Out
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

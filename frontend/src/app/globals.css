@@ -282,3 +282,74 @@
     grid-template-columns: 1fr !important;
   }
 }
+
+/* ── Hero section responsive ────────────────────────────────────────── */
+/* Image column: show on all screen sizes */
+.hero-img-col { display: flex; }
+@media (max-width: 1024px) {
+  /* On medium screens, show image as first item in the flex wrap */
+  .hero-img-col { order: -1; width: 100%; }
+  .hero-img-col > div { height: 220px !important; }
+  .hero-inner { padding: 32px 20px 32px !important; gap: 24px !important; }
+}
+@media (max-width: 640px) {
+  .hero-img-col > div { height: 180px !important; }
+  .hero-inner { padding: 24px 16px 24px !important; }
+}
+
+/* Hero stats: 2-column grid on narrow screens */
+@media (max-width: 600px) {
+  .hero-stats-strip {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px 0 !important;
+    padding-top: 16px !important;
+  }
+  .hero-stats-strip > * {
+    padding: 0 0 12px !important;
+    border-left: none !important;
+    border-bottom: 1px solid rgba(27,58,92,.08);
+  }
+  .hero-stats-strip > *:nth-child(even) { padding-left: 12px !important; border-left: 1px solid rgba(27,58,92,.1) !important; }
+  .hero-stats-strip > *:nth-last-child(-n+2) { border-bottom: none; }
+}
+
+/* ── Admin sidebar: hide on mobile, show via JS overlay ─────────────── */
+.admin-sidebar-desktop { display: block; }
+.admin-mobile-menu-btn { display: none; }
+@media (max-width: 768px) {
+  .admin-sidebar-desktop { display: none !important; }
+  .admin-mobile-menu-btn { display: flex !important; }
+}
+
+/* ── Admin layout: full width on mobile ─────────────────────────────── */
+@media (max-width: 768px) {
+  .admin-layout-root { flex-direction: column !important; }
+  .admin-layout-root > main { padding: 16px !important; padding-bottom: 80px !important; }
+}
+
+/* ── Table horizontal scroll utility ─────────────────────────────────── */
+.af-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+@media (max-width: 768px) {
+  /* Customer account: ensure content doesn't overflow the viewport */
+  .account-main { overflow-x: hidden; }
+  /* Any table inside account-main: scroll horizontally */
+  .account-main table { min-width: 520px; }
+  .account-main .overflow-hidden { overflow-x: auto !important; overflow-y: hidden; }
+  /* Statements: tighten mobile padding */
+  .account-main > div { padding-left: 0 !important; padding-right: 0 !important; }
+}
+
+/* ── WhoWeServe section padding on tiny screens ─────────────────────── */
+@media (max-width: 480px) {
+  .serve-grid-responsive { gap: 8px !important; }
+}
+
+/* ── General section container padding on mobile ───────────────────── */
+@media (max-width: 640px) {
+  section > div[style*="padding: 0 32px"],
+  section > div[style*="padding:0 32px"] {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+}

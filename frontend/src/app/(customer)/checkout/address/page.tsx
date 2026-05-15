@@ -529,7 +529,23 @@ export default function CheckoutAddressPage() {
                       {priceDisplay}
                     </span>
                   </div>
-                  <div style={{ fontSize: "12px", color: "#7A7880", marginTop: "3px" }}>{opt.sub}</div>
+                  {opt.id === "will_call" ? (
+                    <div style={{ marginTop: "6px" }}>
+                      <div style={{ display: "flex", alignItems: "flex-start", gap: "5px", marginBottom: "5px" }}>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#E8242A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: "1px" }}>
+                          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
+                        </svg>
+                        <span style={{ fontSize: "12px", fontWeight: 600, color: "#2A2830" }}>10719 Turbeville Rd, Dallas, TX 75243</span>
+                      </div>
+                      <div style={{ fontSize: "11px", color: "#7A7880", lineHeight: 1.6, paddingLeft: "18px" }}>
+                        <div>Mon–Fri, before 12 PM → same-day pickup by 4 PM</div>
+                        <div>Mon–Fri, after 12 PM → next business day by 12 PM</div>
+                        <div>Sat / Sun: Closed</div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: "12px", color: "#7A7880", marginTop: "3px" }}>{opt.sub}</div>
+                  )}
                   {note && (
                     <div style={{ fontSize: "11px", color: isFree ? "#059669" : "#7A7880", marginTop: "4px", fontWeight: isFree ? 600 : 400 }}>
                       {note}

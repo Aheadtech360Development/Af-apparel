@@ -39,6 +39,10 @@ export function AdminSidebar() {
   const [customersOpen, setCustomersOpen] = useState(isCustomersActive);
   const [settingsOpen, setSettingsOpen] = useState(isSettingsActive);
   const [contentOpen, setContentOpen] = useState(isContentActive);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Close mobile drawer on route change
+  useEffect(() => { setMobileOpen(false); }, [pathname]);
 
   useEffect(() => { if (isOrdersActive) setOrdersOpen(true); }, [isOrdersActive]);
   useEffect(() => { if (isProductsActive) setProductsOpen(true); }, [isProductsActive]);
@@ -86,8 +90,8 @@ export function AdminSidebar() {
     );
   }
 
-  return (
-    <aside style={{ width: "220px", flexShrink: 0, borderRight: "1px solid #E2E0DA", background: "#fff", minHeight: "calc(100vh - 68px)", padding: "8px 10px 32px" }}>
+  const sidebarInner = (
+    <div style={{ padding: "8px 10px 32px" }}>
 
       {/* ── OVERVIEW ── */}
       <div style={SECTION_HEAD}>Overview</div>
@@ -257,6 +261,52 @@ export function AdminSidebar() {
           <SubLink href="/admin/settings/audit-log" label="Audit Log" />
         </div>
       )}
-    </aside>
+    </div>
+  );
+
+  return (
+    <>
+      {/* Mobile hamburger button — fixed bottom-left */}
+      <button
+        className="admin-mobile-menu-btn"
+        onClick={() => setMobileOpen(true)}
+        aria-label="Open admin menu"
+        style={{
+          position: "fixed", bottom: "20px", left: "16px", zIndex: 150,
+          background: "#1B3A5C", color: "#fff", border: "none", borderRadius: "50%",
+          width: "48px", height: "48px", cursor: "pointer",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          boxShadow: "0 4px 16px rgba(0,0,0,.25)",
+        }}
+      >
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
+          <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
+
+      {/* Mobile overlay drawer */}
+      {mobileOpen && (
+        <div className="admin-mobile-menu-btn" style={{ position: "fixed", inset: 0, zIndex: 160 }}>
+          <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.5)" }} onClick={() => setMobileOpen(false)} />
+          <aside style={{
+            position: "fixed", left: 0, top: 0, bottom: 0, width: "260px",
+            background: "#fff", overflowY: "auto", zIndex: 161,
+            borderRight: "1px solid #E2E0DA",
+            boxShadow: "4px 0 24px rgba(0,0,0,.15)",
+          }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px", borderBottom: "1px solid #E2E0DA" }}>
+              <span style={{ fontSize: "12px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em", color: "#7A7880" }}>Admin</span>
+              <button onClick={() => setMobileOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: "18px", color: "#7A7880" }}>✕</button>
+            </div>
+            {sidebarInner}
+          </aside>
+        </div>
+      )}
+
+      {/* Desktop sidebar */}
+      <aside className="admin-sidebar-desktop" style={{ width: "220px", flexShrink: 0, borderRight: "1px solid #E2E0DA", background: "#fff", minHeight: "calc(100vh - 68px)" }}>
+        {sidebarInner}
+      </aside>
+    </>
   );
 }

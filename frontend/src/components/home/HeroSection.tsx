@@ -11,7 +11,7 @@ export default function HeroSection() {
 
   return (
     <section style={{ background: "#f4f3ef", padding: "0" }}>
-      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "48px 32px 44px", display: "flex", gap: "48px", alignItems: "center", flexWrap: "wrap" }}>
+      <div className="hero-inner" style={{ maxWidth: "1280px", margin: "0 auto", padding: "48px 32px 44px", display: "flex", gap: "48px", alignItems: "center", flexWrap: "wrap" }}>
         <div style={{ flex: "1.3", minWidth: "280px" }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(27,58,92,.06)", border: "1px solid rgba(27,58,92,.15)", color: "#1B3A5C", fontSize: "11px", fontWeight: 700, padding: "5px 14px", borderRadius: "2px", letterSpacing: ".08em", marginBottom: "18px", textTransform: "uppercase" }}>
             <Flag size={12} style={{ flexShrink: 0 }} />
@@ -39,7 +39,7 @@ export default function HeroSection() {
               Browse Products →
             </Link>
           </div>
-          <div style={{ display: "flex", gap: "0", borderTop: "1px solid rgba(27,58,92,.1)", paddingTop: "20px", flexWrap: "wrap" }}>
+          <div className="hero-stats-strip" style={{ display: "flex", gap: "0", borderTop: "1px solid rgba(27,58,92,.1)", paddingTop: "20px", flexWrap: "wrap" }}>
             {[
               { n: "2,000+", l: "Wholesale Accounts" },
               { n: "50+", l: "Colors Per Style" },
@@ -53,7 +53,7 @@ export default function HeroSection() {
             ))}
           </div>
         </div>
-        <div className="hidden lg:flex" style={{ flex: 1, minWidth: "240px", position: "relative" }}>
+        <div className="hero-img-col" style={{ flex: 1, minWidth: "240px", position: "relative" }}>
           <div style={{ border: "1px solid #CBD5E1", borderRadius: "15px", height: "400px", width: "100%", overflow: "hidden", position: "relative" }}>
             <Image
               src="/Hame page Hero.png"
