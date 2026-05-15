@@ -246,7 +246,7 @@ export default function LoginPage() {
               </div>
 
               {/* reCAPTCHA */}
-              <div style={{ marginBottom: "20px" }}>
+              <div className="recaptcha-wrap" style={{ marginBottom: "20px" }}>
                 <ReCAPTCHA
                   ref={recaptchaRef}
                   sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? ""}

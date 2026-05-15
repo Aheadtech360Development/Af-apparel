@@ -129,7 +129,7 @@ export default function AbandonedCartsPage() {
           {carts.map((cart) => (
             <div key={cart.id} className="bg-white border border-gray-200 rounded-lg overflow-hidden">
               {/* Header */}
-              <div className="px-5 py-4 flex items-center justify-between">
+              <div className="abandoned-cart-header px-5 py-4 flex items-center justify-between gap-3 flex-wrap">
                 <button
                   onClick={() => setExpandedId(expandedId === cart.id ? null : cart.id)}
                   className="text-left"
@@ -144,7 +144,7 @@ export default function AbandonedCartsPage() {
                   </p>
                 </button>
 
-                <div className="flex items-center gap-3">
+                <div className="abandoned-cart-actions flex items-center gap-3 flex-wrap">
                   <button
                     onClick={() => setExpandedId(expandedId === cart.id ? null : cart.id)}
                     className="text-sm text-gray-500 hover:text-gray-700"
@@ -169,8 +169,8 @@ export default function AbandonedCartsPage() {
 
               {/* Expandable items */}
               {expandedId === cart.id && (
-                <div className="border-t border-gray-100">
-                  <table className="w-full text-sm">
+                <div className="border-t border-gray-100 overflow-x-auto">
+                  <table className="w-full text-sm" style={{ minWidth: "500px" }}>
                     <thead className="bg-gray-50">
                       <tr>
                         <th className="text-left px-5 py-2 text-xs text-gray-500 font-medium">Product</th>

@@ -131,7 +131,7 @@ export default function InventoryListingPage() {
 
       {/* 3-step filter card */}
       <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-        <div className="grid grid-cols-3 divide-x divide-gray-200">
+        <div className="grid grid-cols-3 divide-x divide-gray-200 inventory-filter-grid">
           {/* Step 1 */}
           <div className="p-5">
             <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">
@@ -255,7 +255,8 @@ export default function InventoryListingPage() {
             </p>
           </div>
 
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto">
+          <table className="w-full text-sm" style={{ minWidth: "480px" }}>
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
                 <th className="text-left px-4 py-3 text-gray-600 font-medium text-xs uppercase">Style</th>
@@ -322,6 +323,7 @@ export default function InventoryListingPage() {
               </tr>
             </tbody>
           </table>
+          </div>
         </div>
       )}
 

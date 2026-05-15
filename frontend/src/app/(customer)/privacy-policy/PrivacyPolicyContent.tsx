@@ -32,10 +32,10 @@ export default function PrivacyPolicyPage() {
       </div>
 
       {/* Layout */}
-      <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "40px 24px", display: "grid", gridTemplateColumns: "200px 1fr", gap: "32px", alignItems: "start" }}>
+      <div className="privacy-layout" style={{ maxWidth: "1100px", margin: "0 auto", padding: "40px 24px", display: "grid", gridTemplateColumns: "200px 1fr", gap: "32px", alignItems: "start" }}>
 
         {/* Sidebar */}
-        <div style={{ position: "sticky", top: "24px" }}>
+        <div className="privacy-sidebar" style={{ position: "sticky", top: "24px" }}>
           <div style={{ background: "#F7F8FA", border: "1px solid #E5E7EB", borderRadius: "6px", overflow: "hidden" }}>
             <div style={{ padding: "12px 16px", fontSize: "11px", fontWeight: 700, color: "#6B7280", textTransform: "uppercase", letterSpacing: ".08em", borderBottom: "1px solid #E5E7EB" }}>Policies</div>
             {POLICIES.map(p => (
@@ -68,7 +68,8 @@ export default function PrivacyPolicyPage() {
               </div>
 
               <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>Shipping Methods &amp; Timelines</h3>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", marginBottom: "20px" }}>
+              <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", marginBottom: "20px", minWidth: "380px" }}>
                 <thead>
                   <tr style={{ background: "#F7F8FA" }}>
                     {["Method", "Estimated Delivery", "Cost"].map(h => <th key={h} style={{ padding: "10px 14px", textAlign: "left", fontWeight: 700, color: "#374151", borderBottom: "1px solid #E5E7EB", fontSize: "12px" }}>{h}</th>)}
@@ -89,6 +90,7 @@ export default function PrivacyPolicyPage() {
                   ))}
                 </tbody>
               </table>
+              </div>
 
               <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>Free Shipping Threshold</h3>
               <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>Standard ground shipping is complimentary on all orders totaling $500 or more (before tax). Orders under $500 are charged a flat shipping rate calculated at checkout based on weight and destination.</p>
@@ -140,7 +142,8 @@ export default function PrivacyPolicyPage() {
               <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>To apply, complete the account application form. You will need your business name, contact information, business type, and an estimate of your monthly volume. There is no fee to apply and no minimum purchase commitment required.</p>
 
               <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>Minimum Order Quantities (MOQ)</h3>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", marginBottom: "20px" }}>
+              <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", marginBottom: "20px", minWidth: "380px" }}>
                 <thead>
                   <tr style={{ background: "#F7F8FA" }}>
                     {["Order Type", "Minimum", "Notes"].map(h => <th key={h} style={{ padding: "10px 14px", textAlign: "left", fontWeight: 700, color: "#374151", borderBottom: "1px solid #E5E7EB", fontSize: "12px" }}>{h}</th>)}
@@ -160,6 +163,7 @@ export default function PrivacyPolicyPage() {
                   ))}
                 </tbody>
               </table>
+              </div>
 
               <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>Pricing &amp; Volume Discounts</h3>
               <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>AF Apparels pricing is tiered based on the total quantity in your cart. Volume discounts apply automatically — no coupon codes or negotiations required. Your per-unit price updates in real-time as you add quantities to your order. The tier structure is backend pricing logic and is not displayed in the interface.</p>

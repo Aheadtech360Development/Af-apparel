@@ -188,7 +188,7 @@ export default function ContactPage() {
             <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "26px", letterSpacing: ".04em", color: "#111", marginBottom: "8px" }}>Reach the Right Team</h2>
             <p style={{ fontSize: "13.5px", color: "#666" }}>Different questions, different experts — faster answers for you</p>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "16px" }}>
+          <div className="contact-dept-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "16px" }}>
             {[
               { icon: <Briefcase size={26} />, title: "Wholesale Sales", body: "New accounts, pricing questions, volume orders, and account applications.", email: "info@afblanks.com" },
               { icon: <Wrench size={26} />, title: "Account Support", body: "Existing orders, shipping status, returns, exchange requests, and account management.", email: "info@afblanks.com" },

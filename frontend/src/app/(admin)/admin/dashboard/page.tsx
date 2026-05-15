@@ -237,7 +237,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Stat Cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "16px", marginBottom: "24px" }}>
+      <div className="admin-dash-stat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "16px", marginBottom: "24px" }}>
         {statCards.map(stat => (
           <div key={stat.label} style={{ background: "#fff", border: "1px solid #E2E0DA", borderRadius: "10px", padding: "20px 24px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
@@ -259,7 +259,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Sparkline + Alerts Row */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "16px", marginBottom: "24px", alignItems: "start" }}>
+      <div className="admin-dash-kpi-row" style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "16px", marginBottom: "24px", alignItems: "start" }}>
         {/* Sparkline */}
         <div style={{ background: "#fff", border: "1px solid #E2E0DA", borderRadius: "10px", padding: "20px 24px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
@@ -288,7 +288,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Recent Orders */}
-      <div style={{ background: "#fff", border: "1px solid #E2E0DA", borderRadius: "10px", overflow: "hidden", marginBottom: "24px" }}>
+      <div className="admin-table-card" style={{ background: "#fff", border: "1px solid #E2E0DA", borderRadius: "10px", overflow: "hidden", marginBottom: "24px" }}>
         <div style={{ padding: "16px 24px", borderBottom: "1px solid #E2E0DA", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".05em", color: "#2A2830" }}>RECENT ORDERS</h2>
           <Link href="/admin/orders" style={{ fontSize: "12px", color: "#1A5CFF", textDecoration: "none", fontWeight: 700 }}>View all →</Link>
@@ -330,7 +330,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Recent Applications */}
-      <div style={{ background: "#fff", border: "1px solid #E2E0DA", borderRadius: "10px", overflow: "hidden" }}>
+      <div className="admin-table-card" style={{ background: "#fff", border: "1px solid #E2E0DA", borderRadius: "10px", overflow: "hidden" }}>
         <div style={{ padding: "16px 24px", borderBottom: "1px solid #E2E0DA", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".05em", color: "#2A2830" }}>RECENT APPLICATIONS</h2>
           <Link href="/admin/customers/applications" style={{ fontSize: "12px", color: "#1A5CFF", textDecoration: "none", fontWeight: 700 }}>View all →</Link>

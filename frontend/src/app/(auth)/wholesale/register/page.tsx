@@ -225,7 +225,7 @@ export default function WholesaleRegisterPage() {
       <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "48px 32px", display: "grid", gridTemplateColumns: "1fr 340px", gap: "28px", alignItems: "flex-start" }} className="register-grid-responsive">
 
         {/* Form card */}
-        <div style={{ background: "#fff", border: "1px solid #E2E0DA", borderRadius: "12px", padding: "40px" }}>
+        <div className="register-form-card" style={{ background: "#fff", border: "1px solid #E2E0DA", borderRadius: "12px", padding: "40px" }}>
           <form onSubmit={handleSubmit}>
             {error && (
               <div style={{ background: "#FFF0F0", border: "1px solid #fcc", borderRadius: "6px", padding: "12px 16px", fontSize: "13px", color: "#c0392b", marginBottom: "24px" }}>
@@ -236,7 +236,7 @@ export default function WholesaleRegisterPage() {
             {/* ── Company Information ── */}
             <div style={{ marginBottom: "32px" }}>
               <h3 style={sectionHeadStyle}>Company Information</h3>
-              <div style={gridStyle}>
+              <div className="register-form-row" style={gridStyle}>
                 <div style={{ gridColumn: "1 / -1" }}>
                   <label htmlFor="company_name" style={labelStyle}>Company Name {req}</label>
                   <input id="company_name" name="company_name" type="text" required value={form.company_name} onChange={handleChange} style={inputStyle} placeholder="Your Company LLC" />
@@ -312,7 +312,7 @@ export default function WholesaleRegisterPage() {
             {/* ── Contact Information ── */}
             <div style={{ marginBottom: "32px" }}>
               <h3 style={sectionHeadStyle}>Contact Information</h3>
-              <div style={gridStyle}>
+              <div className="register-form-row" style={gridStyle}>
                 <div>
                   <label htmlFor="first_name" style={labelStyle}>First Name {req}</label>
                   <input id="first_name" name="first_name" type="text" required value={form.first_name} onChange={handleChange} style={inputStyle} />
@@ -338,7 +338,7 @@ export default function WholesaleRegisterPage() {
             {/* ── Business Information ── */}
             <div style={{ marginBottom: "32px" }}>
               <h3 style={sectionHeadStyle}>Business Information</h3>
-              <div style={gridStyle}>
+              <div className="register-form-row" style={gridStyle}>
                 <div style={{ gridColumn: "1 / -1" }}>
                   <label htmlFor="primary_business" style={labelStyle}>What is your primary business activity? {req}</label>
                   <select id="primary_business" name="primary_business" required value={form.primary_business} onChange={handleChange} style={inputStyle}>
@@ -384,7 +384,7 @@ export default function WholesaleRegisterPage() {
             {/* ── Web Account Information ── */}
             <div style={{ marginBottom: "32px" }}>
               <h3 style={sectionHeadStyle}>Web Account Information</h3>
-              <div style={gridStyle}>
+              <div className="register-form-row" style={gridStyle}>
                 <div>
                   <label htmlFor="password" style={labelStyle}>Password {req}</label>
                   <input id="password" name="password" type="password" required minLength={8} value={form.password} onChange={handleChange} placeholder="Min. 8 characters" style={inputStyle} />
@@ -430,7 +430,7 @@ export default function WholesaleRegisterPage() {
               </div>
 
               {/* reCAPTCHA */}
-              <div style={{ marginBottom: "16px" }}>
+              <div className="recaptcha-wrap" style={{ marginBottom: "16px" }}>
                 <ReCAPTCHA
                   ref={recaptchaRef}
                   sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? ""}

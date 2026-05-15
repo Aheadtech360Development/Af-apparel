@@ -385,3 +385,64 @@
   .sales-history-controls > * { border-right: none !important; border-bottom: 1px solid #e5e7eb; }
   .sales-history-controls > *:last-child { border-bottom: none; }
 }
+
+/* ── Contact: departments grid ──────────────────────────────────────── */
+@media (max-width: 768px) {
+  .contact-dept-grid { grid-template-columns: 1fr !important; }
+}
+
+/* ── Inventory & Price List filter cards: stack steps ───────────────── */
+@media (max-width: 640px) {
+  .inventory-filter-grid { grid-template-columns: 1fr !important; }
+  .inventory-filter-grid > * { border-right: none !important; border-bottom: 1px solid #e5e7eb; }
+  .inventory-filter-grid > *:last-child { border-bottom: none; }
+  .price-list-ctrl-grid { grid-template-columns: 1fr !important; }
+  .price-list-ctrl-grid > * { border-right: none !important; border-bottom: 1px solid #e5e7eb; }
+  .price-list-ctrl-grid > *:last-child { border-bottom: none; }
+}
+
+/* ── Abandoned cart header: wrap actions on narrow screens ───────────── */
+@media (max-width: 560px) {
+  .abandoned-cart-header { align-items: flex-start !important; }
+  .abandoned-cart-actions { width: 100%; }
+}
+
+/* ── Privacy Policy: sidebar layout stacks on mobile ────────────────── */
+@media (max-width: 768px) {
+  .privacy-layout { grid-template-columns: 1fr !important; }
+  .privacy-sidebar { position: static !important; }
+}
+
+/* ── reCAPTCHA: scale widget on narrow screens ───────────────────────── */
+@media (max-width: 420px) {
+  .recaptcha-wrap {
+    transform: scale(0.85);
+    transform-origin: left top;
+    overflow: hidden;
+    height: 66px;
+    margin-bottom: 4px !important;
+  }
+}
+
+/* ── Apply for Wholesale: form card padding + 2-col grids ────────────── */
+@media (max-width: 640px) {
+  .register-form-card { padding: 24px 20px !important; }
+  .register-form-row  { grid-template-columns: 1fr !important; }
+}
+
+/* ── Admin Dashboard: stat cards + KPI row ───────────────────────────── */
+@media (max-width: 1024px) {
+  .admin-dash-stat-grid { grid-template-columns: repeat(2,1fr) !important; }
+}
+@media (max-width: 640px) {
+  .admin-dash-stat-grid { grid-template-columns: 1fr !important; }
+  .admin-dash-kpi-row   { grid-template-columns: 1fr !important; }
+}
+.admin-table-card { overflow-x: auto !important; }
+.admin-table-card table { min-width: 520px; }
+
+/* ── Admin panel: all pages — Tailwind overflow-hidden tables scroll ─── */
+@media (max-width: 768px) {
+  .admin-content .overflow-hidden { overflow-x: auto !important; }
+  .admin-content .overflow-hidden table { min-width: 520px; }
+}
