@@ -49,7 +49,7 @@ export default function InvoicePaymentPage() {
         if (isAuthenticated()) {
           const data = await apiClient.get<OrderDetail>(`/api/v1/orders/${orderNumber}`)
           setOrder(data)
-          if (data.payment_status === 'paid') setPaid(true)
+          if (data.payment_status === 'paid' && !(Number(data.balance_due) > 0)) setPaid(true)
         } else {
           // Not authenticated — use public invoice summary endpoint
           const apiBase = process.env.NEXT_PUBLIC_API_URL ?? ''
@@ -57,7 +57,7 @@ export default function InvoicePaymentPage() {
           if (!res.ok) throw new Error('not found')
           const data = await res.json()
           setOrder(data)
-          if (data.payment_status === 'paid') setPaid(true)
+          if (data.payment_status === 'paid' && !(Number(data.balance_due) > 0)) setPaid(true)
           setShowLoginPrompt(true)
         }
       } catch {

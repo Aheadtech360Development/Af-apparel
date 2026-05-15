@@ -759,7 +759,8 @@ export default function AdminOrderDetailPage() {
             </div>
           </div>
 
-          {/* INVOICE & PAYMENT */}
+          {/* INVOICE & PAYMENT — hidden once fully paid */}
+          {!order.is_fully_paid && (
           <div style={{ background: '#f8f9fa', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '16px', marginTop: '16px', display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' as const }}>
             <div style={{ flex: 1 }}>
               <p style={{ margin: 0, fontSize: '13px', fontWeight: 600, color: '#1B3A5C' }}>Invoice &amp; Payment</p>
@@ -767,34 +768,27 @@ export default function AdminOrderDetailPage() {
                 {order.invoice_sent_at
                   ? `Invoice sent ${new Date(order.invoice_sent_at).toLocaleDateString()}`
                   : 'Invoice not yet sent'}
-                {order.marked_paid_at && ` · Paid ${new Date(order.marked_paid_at).toLocaleDateString()}`}
-                {!order.is_fully_paid && Number(order.amount_paid) > 0 && (
+                {Number(order.amount_paid) > 0 && (
                   <span style={{ color: '#D97706', marginLeft: '6px' }}>
                     · ${Number(order.amount_paid).toFixed(2)} paid · ${Number(order.balance_due ?? 0).toFixed(2)} remaining
                   </span>
                 )}
               </p>
             </div>
-            {!order.is_fully_paid && (
-              <button
-                onClick={handleResendInvoice}
-                disabled={isResendingInvoice}
-                style={{ background: '#fff', color: '#1B3A5C', border: '1px solid #1B3A5C', padding: '8px 16px', borderRadius: '6px', fontSize: '13px', fontWeight: 700, cursor: isResendingInvoice ? 'not-allowed' : 'pointer', opacity: isResendingInvoice ? 0.6 : 1 }}>
-                {isResendingInvoice ? 'Sending…' : (order.invoice_sent_at ? 'Resend Invoice' : 'Send Invoice')}
-              </button>
-            )}
-            {!order.is_fully_paid && (
-              <button
-                onClick={handleMarkAsPaid}
-                disabled={isMarkingPaid}
-                style={{ background: '#10B981', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '6px', fontSize: '13px', fontWeight: 700, cursor: isMarkingPaid ? 'not-allowed' : 'pointer', opacity: isMarkingPaid ? 0.6 : 1 }}>
-                {isMarkingPaid ? 'Saving…' : '✓ Mark as Paid'}
-              </button>
-            )}
-            {order.is_fully_paid && (
-              <span style={{ background: '#D1FAE5', color: '#065F46', padding: '6px 14px', borderRadius: '20px', fontSize: '12px', fontWeight: 700 }}>PAID IN FULL</span>
-            )}
+            <button
+              onClick={handleResendInvoice}
+              disabled={isResendingInvoice}
+              style={{ background: '#fff', color: '#1B3A5C', border: '1px solid #1B3A5C', padding: '8px 16px', borderRadius: '6px', fontSize: '13px', fontWeight: 700, cursor: isResendingInvoice ? 'not-allowed' : 'pointer', opacity: isResendingInvoice ? 0.6 : 1 }}>
+              {isResendingInvoice ? 'Sending…' : (order.invoice_sent_at ? 'Resend Invoice' : 'Send Invoice')}
+            </button>
+            <button
+              onClick={handleMarkAsPaid}
+              disabled={isMarkingPaid}
+              style={{ background: '#10B981', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '6px', fontSize: '13px', fontWeight: 700, cursor: isMarkingPaid ? 'not-allowed' : 'pointer', opacity: isMarkingPaid ? 0.6 : 1 }}>
+              {isMarkingPaid ? 'Saving…' : '✓ Mark as Paid'}
+            </button>
           </div>
+          )}
 
           {/* TIMELINE */}
           <div style={{ ...CardStyle, padding: "24px", marginBottom: 0 }}>
