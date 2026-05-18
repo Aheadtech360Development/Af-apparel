@@ -35,6 +35,10 @@ interface TrackingResult {
   total: number;
   created_at: string;
   guest_name: string | null;
+  tracking_number: string | null;
+  tracking_url: string | null;
+  carrier: string | null;
+  courier_service: string | null;
   items: TrackingItem[];
 }
 
@@ -163,6 +167,31 @@ export default function TrackOrderPage() {
                 {statusInfo.label}
               </div>
             </div>
+
+            {/* Tracking info */}
+            {result.tracking_number && (
+              <div style={{ background: "rgba(5,150,105,.06)", border: "1px solid rgba(5,150,105,.2)", borderRadius: "8px", padding: "14px 16px", marginBottom: "20px" }}>
+                <div style={{ fontSize: "12px", fontWeight: 700, color: "#059669", marginBottom: "10px" }}>✓ Your order has shipped</div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 16px", fontSize: "13px", color: "#2A2830", marginBottom: result.tracking_url ? "12px" : "0" }}>
+                  {result.carrier && (
+                    <div>
+                      <span style={{ color: "#7A7880", fontWeight: 600, fontSize: "11px", textTransform: "uppercase", letterSpacing: ".06em" }}>Carrier </span>
+                      <div style={{ fontWeight: 600 }}>{result.carrier.toUpperCase()}{result.courier_service ? ` — ${result.courier_service}` : ""}</div>
+                    </div>
+                  )}
+                  <div>
+                    <span style={{ color: "#7A7880", fontWeight: 600, fontSize: "11px", textTransform: "uppercase", letterSpacing: ".06em" }}>Tracking # </span>
+                    <div style={{ fontFamily: "monospace", fontWeight: 600 }}>{result.tracking_number}</div>
+                  </div>
+                </div>
+                {result.tracking_url && (
+                  <a href={result.tracking_url} target="_blank" rel="noreferrer"
+                    style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "#059669", color: "#fff", padding: "8px 16px", borderRadius: "6px", fontSize: "13px", fontWeight: 700, textDecoration: "none" }}>
+                    Track Package →
+                  </a>
+                )}
+              </div>
+            )}
 
             {/* Items */}
             <div style={{ borderTop: "1px solid #F0EEE9", paddingTop: "16px", marginBottom: "16px" }}>
