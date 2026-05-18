@@ -616,18 +616,13 @@ export default function AdminOrderDetailPage() {
             <div style={{ marginBottom: "16px" }}>
               <label style={{ ...LabelStyle, marginBottom: "10px" }}>Generate Shipping Label via Shippo</label>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "8px", marginBottom: "14px" }}>
-                {(["fedex", "ups", "usps"] as const).map(carrier => {
-                  const labels: Record<string, { name: string; icon: string }> = {
-                    fedex: { name: "FedEx", icon: "FX" },
-                    ups:   { name: "UPS",   icon: "UPS" },
-                    usps:  { name: "USPS",  icon: "US" },
-                  };
-                  const active = selectedCarrier === carrier;
+                {([{ id: "fedex", name: "FedEx", icon: "FX" }, { id: "ups", name: "UPS", icon: "UPS" }, { id: "usps", name: "USPS", icon: "US" }]).map(carrier => {
+                  const active = selectedCarrier === carrier.id;
                   return (
-                    <div key={carrier} onClick={() => setSelectedCarrier(carrier)}
+                    <div key={carrier.id} onClick={() => setSelectedCarrier(carrier.id)}
                       style={{ border: active ? "2px solid #1A5CFF" : "1.5px solid #E2E0DA", borderRadius: "8px", padding: "14px 8px", textAlign: "center" as const, cursor: "pointer", background: active ? "rgba(26,92,255,.05)" : "#fff", transition: "all .15s" }}>
-                      <div style={{ fontSize: "13px", fontWeight: 800, color: active ? "#1A5CFF" : "#7A7880", marginBottom: "4px", letterSpacing: ".04em" }}>{labels[carrier].icon}</div>
-                      <div style={{ fontSize: "12px", fontWeight: 700, color: active ? "#1A5CFF" : "#2A2830" }}>{labels[carrier].name}</div>
+                      <div style={{ fontSize: "13px", fontWeight: 800, color: active ? "#1A5CFF" : "#7A7880", marginBottom: "4px", letterSpacing: ".04em" }}>{carrier.icon}</div>
+                      <div style={{ fontSize: "12px", fontWeight: 700, color: active ? "#1A5CFF" : "#2A2830" }}>{carrier.name}</div>
                     </div>
                   );
                 })}
