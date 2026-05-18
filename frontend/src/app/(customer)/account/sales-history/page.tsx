@@ -136,7 +136,7 @@ export default function SalesHistoryPage() {
 
   return (
     <div className="space-y-6 max-w-5xl">
-      <h1 className="text-2xl font-bold text-gray-900">Sales History</h1>
+      <h1 className="text-2xl font-bold text-gray-900">Purchase History</h1>
 
       {/* Controls card */}
       <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
@@ -148,7 +148,7 @@ export default function SalesHistoryPage() {
             </p>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Sales For</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Purchase For</label>
                 <select
                   value={selectedYear}
                   onChange={(e) => setSelectedYear(e.target.value)}
@@ -173,7 +173,7 @@ export default function SalesHistoryPage() {
                         className="h-4 w-4 text-blue-600 border-gray-300"
                       />
                       <span className="text-sm text-gray-700">
-                        {opt === "product" ? "Sales by Product" : "Sales by Price"}
+                        {opt === "product" ? "Purchase by Product" : "Purchase by Price"}
                       </span>
                     </label>
                   ))}
@@ -220,7 +220,7 @@ export default function SalesHistoryPage() {
 
       {generated && items.length === 0 && (
         <div className="text-center py-12 bg-white border border-gray-200 rounded-lg">
-          <p className="text-gray-400">No sales found for {resultYear}.</p>
+          <p className="text-gray-400">No purchases found for {resultYear}.</p>
         </div>
       )}
 
@@ -229,7 +229,7 @@ export default function SalesHistoryPage() {
         <div className="bg-white border border-gray-200 rounded-lg overflow-x-auto" id="print-area">
           <div className="px-5 py-3 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
             <p className="text-sm font-semibold text-gray-700">
-              {resultYear} — {resultDisplay === "product" ? "Sales by Product" : "Sales by Price"}
+              {resultYear} — {resultDisplay === "product" ? "Purchase by Product" : "Purchase by Price"}
             </p>
             <div className="text-sm text-gray-500 flex gap-4">
               <span>Units: <span className="font-semibold text-gray-900">{totalUnits.toLocaleString()}</span></span>
