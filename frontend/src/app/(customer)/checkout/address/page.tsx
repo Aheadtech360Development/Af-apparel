@@ -160,7 +160,6 @@ export default function CheckoutAddressPage() {
   }
 
   const selectedCost = methodCost(shippingMethod);
-  // Prefer the API-returned tax_amount (TaxJar or manual calc); fall back to rate-based
   const [apiTaxAmount, setApiTaxAmount] = useState(0);
 
   // Derive address fields for tax lookup
@@ -176,18 +175,12 @@ export default function CheckoutAddressPage() {
       setTaxInfo(null, 0, 0);
       return;
     }
-    const params = new URLSearchParams({
-      region: activeState.toUpperCase(),
-      zip_code: activeZip,
-      city: activeCity,
-      subtotal: String(subtotal),
-      shipping: String(selectedCost),
-      discount: String(couponDiscount),
-    });
-    apiClient.get<{ region: string; rate: number; tax_amount: number }>(`/api/v1/tax-rate?${params}`)
-      .then(res => {
-        const r = res as any;
-        const rate   = Number(r.rate ?? 0);
+    apiClient.post<{ tax_rate: number; tax_amount: number; region: string; taxable: boolean }>(
+      `/api/v1/tax/calculate`,
+      { subtotal, zip_code: activeZip, state: activeState.toUpperCase(), discount: couponDiscount },
+    )
+      .then(r => {
+        const rate   = Number(r.tax_rate ?? 0);
         const amount = Number(r.tax_amount ?? 0);
         if (rate > 0 || amount > 0) {
           setTaxRate({ region: r.region, rate });

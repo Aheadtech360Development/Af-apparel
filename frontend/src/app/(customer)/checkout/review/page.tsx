@@ -122,18 +122,17 @@ export default function CheckoutReviewPage() {
     }
     // Fallback: fetch fresh if navigated directly to review (store empty)
     if (!shippingAddress?.state) return;
-    const params = new URLSearchParams({
-      region: shippingAddress.state.toUpperCase(),
-      zip_code: shippingAddress.postal_code ?? "",
-      city: shippingAddress.city ?? "",
-      subtotal: String(subtotal),
-      shipping: String(shipping),
-      discount: String(couponDiscount),
-    });
-    apiClient.get<{ region: string; rate: number; tax_amount: number }>(`/api/v1/tax-rate?${params}`)
-      .then(res => {
-        const r = res as any;
-        const rate = Number(r.rate ?? 0);
+    apiClient.post<{ tax_rate: number; tax_amount: number; region: string; taxable: boolean }>(
+      `/api/v1/tax/calculate`,
+      {
+        subtotal,
+        zip_code: shippingAddress.postal_code ?? "",
+        state: shippingAddress.state.toUpperCase(),
+        discount: couponDiscount,
+      },
+    )
+      .then(r => {
+        const rate = Number(r.tax_rate ?? 0);
         const amount = Number(r.tax_amount ?? 0);
         setTaxRate(rate > 0 ? { region: r.region, rate } : null);
         if (amount > 0) setFreshTaxAmount(amount);
@@ -297,7 +296,7 @@ export default function CheckoutReviewPage() {
     ? "New Card (tokenized)"
     : "Credit Card";
 
-  // Priority: stored TaxJar amount → fresh re-fetch amount → rate × (subtotal+shipping-discount)
+  // Priority: stored tax amount → fresh re-fetch amount → rate × (subtotal-discount)
   const taxAmount = storedTaxAmount > 0
     ? storedTaxAmount
     : freshTaxAmount > 0
