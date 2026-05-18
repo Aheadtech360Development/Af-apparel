@@ -666,55 +666,6 @@ export default function AdminOrderDetailPage() {
               )}
             </div>
 
-            {/* Divider */}
-            <div style={{ borderTop: "1px solid #E2E0DA", margin: "4px 0 16px" }} />
-
-            {/* Manual courier fallback */}
-            <div>
-              <label style={{ ...LabelStyle, marginBottom: "10px" }}>Or Mark as Shipped Manually</label>
-              <div className="admin-courier-grid" style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: "8px", marginBottom: "16px" }}>
-                {COURIERS.map(courier => (
-                  <div key={courier.id} onClick={() => handleCourierSelect(courier.id)}
-                    style={{ border: selectedCourier === courier.id ? "2px solid #1A5CFF" : "1.5px solid #E2E0DA", borderRadius: "8px", padding: "12px 8px", textAlign: "center" as const, cursor: "pointer", background: selectedCourier === courier.id ? "rgba(26,92,255,.05)" : "#fff", transition: "all .15s" }}>
-                    <div style={{ fontSize: "13px", fontWeight: 800, color: selectedCourier === courier.id ? "#1A5CFF" : "#7A7880", marginBottom: "4px", letterSpacing: ".04em" }}>{courier.icon}</div>
-                    <div style={{ fontSize: "12px", fontWeight: 700, color: selectedCourier === courier.id ? "#1A5CFF" : "#2A2830" }}>{courier.name}</div>
-                  </div>
-                ))}
-              </div>
-
-              {selectedCourier && (
-                <div className="checkout-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "16px" }}>
-                  <div>
-                    <label style={LabelStyle}>Service Type</label>
-                    <select value={selectedService} onChange={e => setSelectedService(e.target.value)}
-                      style={{ width: "100%", padding: "10px 14px", border: "1.5px solid #E2E0DA", borderRadius: "6px", fontSize: "14px", fontFamily: "var(--font-jakarta)", background: "#fff" }}>
-                      <option value="">Select service…</option>
-                      {courierObj?.services.map(s => <option key={s} value={s}>{s}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label style={LabelStyle}>Tracking Number</label>
-                    <div style={{ display: "flex", gap: "8px" }}>
-                      <input value={trackingNumber} onChange={e => setTrackingNumber(e.target.value)}
-                        placeholder="Auto-generated or enter…"
-                        style={{ flex: 1, padding: "10px 14px", border: "1.5px solid #E2E0DA", borderRadius: "6px", fontSize: "13px", fontFamily: "var(--font-jakarta)", boxSizing: "border-box" as const }} />
-                      <button type="button" onClick={() => setTrackingNumber(generateTrackingNumber(selectedCourier))}
-                        title="Regenerate"
-                        style={{ padding: "10px 12px", border: "1.5px solid #E2E0DA", borderRadius: "6px", background: "#fff", cursor: "pointer", fontSize: "14px" }}>
-                        🔄
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {selectedCourier && selectedService && (
-                <button onClick={handleMarkShipped} disabled={isShipping}
-                  style={{ background: "#059669", color: "#fff", border: "none", padding: "12px 24px", borderRadius: "6px", fontSize: "14px", fontWeight: 700, cursor: "pointer", opacity: isShipping ? .6 : 1 }}>
-                  {isShipping ? "Marking shipped…" : `✓ Mark as Shipped via ${courierObj?.name} ${selectedService}`}
-                </button>
-              )}
-            </div>
           </div>}
 
           {/* STATUS UPDATE */}
