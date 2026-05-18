@@ -241,7 +241,19 @@ function CreateDraftModal({ onClose, onSuccess }: { onClose: () => void; onSucce
                           </tr>
                         </thead>
                         <tbody>
-                          {(selectedProduct.variants ?? []).map(v => {
+                          {[...(selectedProduct.variants ?? [])].sort((a, b) => {
+                            const SIZE_ORDER = ['XS','S','M','L','XL','2XL','3XL','4XL','5XL','6XL'];
+                            const sizeSort = (x: string | null, y: string | null) => {
+                              const ai = SIZE_ORDER.indexOf((x ?? '').toUpperCase());
+                              const bi = SIZE_ORDER.indexOf((y ?? '').toUpperCase());
+                              if (ai === -1 && bi === -1) return (x ?? '').localeCompare(y ?? '');
+                              if (ai === -1) return 1;
+                              if (bi === -1) return -1;
+                              return ai - bi;
+                            };
+                            const colorCmp = (a.color ?? '').localeCompare(b.color ?? '');
+                            return colorCmp !== 0 ? colorCmp : sizeSort(a.size, b.size);
+                          }).map(v => {
                             const retail = parseFloat(v.retail_price);
                             const discounted = applyDiscount(retail);
                             const hasDiscount = companyDiscount > 0;
@@ -286,17 +298,9 @@ function CreateDraftModal({ onClose, onSuccess }: { onClose: () => void; onSucce
                         onMouseEnter={e => (e.currentTarget.style.background = "#F4F3EF")}
                         onMouseLeave={e => (e.currentTarget.style.background = "#fff")}
                       >
-                        <div style={{ width: "48px", height: "48px", borderRadius: "6px", overflow: "hidden", background: "#F4F3EF", flexShrink: 0 }}>
-                          {p.primary_image?.url_thumbnail ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={p.primary_image.url_thumbnail} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={e => { e.currentTarget.style.display = "none"; }} />
-                          ) : (
-                            <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "22px" }}>👕</div>
-                          )}
-                        </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ fontWeight: 600, fontSize: "13px", color: "#2A2830", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
-                          <div style={{ fontSize: "11px", color: "#7A7880" }}>{p.categories?.[0]?.name ?? "Apparel"} · {p.variants?.length ?? 0} variants</div>
+                          <div style={{ fontSize: "11px", color: "#7A7880" }}>{p.variants?.length ?? 0} variants</div>
                         </div>
                         <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#aaa" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"/></svg>
                       </div>

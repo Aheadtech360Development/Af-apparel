@@ -374,6 +374,8 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
   const router = useRouter();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated());
   const authIsLoading = useAuthStore((s) => s.isLoading);
+  const user = useAuthStore((s) => s.user);
+  const isRetailUser = user?.account_type === "retail";
 
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [productLoading, setProductLoading] = useState(true);
@@ -761,7 +763,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
             {/* Pricing block — shown to all users */}
             <div style={{ background: "#F4F3EF", border: "1px solid #E2E0DA", borderRadius: "10px", padding: "20px", marginBottom: "16px" }}>
               <div style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".08em", color: "#7A7880", marginBottom: "8px" }}>
-                {isAuthenticated ? "Wholesale Price" : "Retail Price"}
+                {isAuthenticated && !isRetailUser ? "Wholesale Price" : "Retail Price"}
               </div>
               {primaryVariant?.effective_price ? (
                 <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
