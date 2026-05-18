@@ -37,6 +37,8 @@ interface AdminOrder {
   po_number: string | null;
   order_notes: string | null;
   tracking_number: string | null;
+  tracking_url?: string | null;
+  label_url?: string | null;
   courier: string | null;
   courier_service: string | null;
   shipped_at: string | null;
@@ -203,11 +205,25 @@ export default function AdminOrderDetailPage() {
   const [isCapturing, setIsCapturing] = useState(false);
   const [msg, setMsg] = useState<{ text: string; ok: boolean } | null>(null);
 
-  // Courier state
+  // Courier state (legacy manual shipping)
   const [selectedCourier, setSelectedCourier] = useState("");
   const [selectedService, setSelectedService] = useState("");
   const [trackingNumber, setTrackingNumber] = useState("");
   const [isShipping, setIsShipping] = useState(false);
+
+  // Shippo label generation state
+  const [selectedCarrier, setSelectedCarrier] = useState("");
+  const [labelLoading, setLabelLoading] = useState(false);
+  const [labelResult, setLabelResult] = useState<{
+    success?: boolean;
+    tracking_number?: string;
+    tracking_url?: string;
+    label_url?: string;
+    carrier?: string;
+    service?: string;
+    rate?: number;
+    error?: string;
+  } | null>(null);
 
   const [isVerifyingAch, setIsVerifyingAch] = useState(false);
   const [isResendingInvoice, setIsResendingInvoice] = useState(false);
@@ -244,6 +260,17 @@ export default function AdminOrderDetailPage() {
         if (o.courier_service) setSelectedService(o.courier_service);
         if (o.tracking_number) setTrackingNumber(o.tracking_number);
         if (o.payment_terms) setPaymentTerms(o.payment_terms);
+        if (o.tracking_number && o.label_url) {
+          setLabelResult({
+            success: true,
+            tracking_number: o.tracking_number,
+            tracking_url: o.tracking_url ?? undefined,
+            label_url: o.label_url,
+            carrier: o.courier ?? "",
+            service: o.courier_service ?? "",
+          });
+          setSelectedCarrier(o.courier ?? "");
+        }
 
         // Fetch customer stats and company registration info (best-effort)
         if (o.company_id) {
@@ -316,6 +343,41 @@ export default function AdminOrderDetailPage() {
     } catch {
       setMsg({ text: "Failed to mark as shipped.", ok: false });
     } finally { setIsShipping(false); }
+  }
+
+  async function handleGenerateLabel() {
+    if (!selectedCarrier) return;
+    setLabelLoading(true); setMsg(null); setLabelResult(null);
+    try {
+      const result = await apiClient.post<{
+        success?: boolean; tracking_number?: string; tracking_url?: string;
+        label_url?: string; carrier?: string; service?: string; rate?: number; error?: string;
+      }>(`/api/v1/admin/orders/${order?.id ?? id}/labels`, { carrier: selectedCarrier });
+      setLabelResult(result);
+      if (result.success) {
+        setMsg({ text: `Label generated — ${result.carrier?.toUpperCase()} ${result.service}`, ok: true });
+        setOrder(prev => prev ? {
+          ...prev,
+          status: "shipped",
+          tracking_number: result.tracking_number ?? prev.tracking_number,
+          tracking_url: result.tracking_url ?? prev.tracking_url,
+          label_url: result.label_url ?? prev.label_url,
+          courier: result.carrier ?? prev.courier,
+          courier_service: result.service ?? prev.courier_service,
+          shipped_at: prev.shipped_at ?? new Date().toISOString(),
+        } : prev);
+        setStatus("shipped");
+        if (result.tracking_number) setTracking(result.tracking_number);
+      } else {
+        setMsg({ text: result.error ?? "Label generation failed.", ok: false });
+      }
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : "Failed to generate label.";
+      setLabelResult({ success: false, error: errMsg });
+      setMsg({ text: errMsg, ok: false });
+    } finally {
+      setLabelLoading(false);
+    }
   }
 
   async function handleCapturePayment() {
@@ -541,6 +603,7 @@ export default function AdminOrderDetailPage() {
           {order.shipping_method !== "will_call" && <div style={{ ...CardStyle, padding: "24px" }}>
             <h3 style={{ ...SectionHead, fontSize: "18px", letterSpacing: ".05em", marginBottom: "14px" }}>SHIPPING & COURIER</h3>
 
+            {/* Already-shipped summary */}
             {order.status === "shipped" && order.courier && (
               <div style={{ fontSize: "12px", color: "#059669", fontWeight: 600, marginBottom: "14px", padding: "8px 12px", background: "rgba(5,150,105,.08)", borderRadius: "6px" }}>
                 ✓ Shipped via {courierDisplayName} {order.courier_service}
@@ -549,48 +612,114 @@ export default function AdminOrderDetailPage() {
               </div>
             )}
 
-            <div className="admin-courier-grid" style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: "8px", marginBottom: "16px" }}>
-              {COURIERS.map(courier => (
-                <div key={courier.id} onClick={() => handleCourierSelect(courier.id)}
-                  style={{ border: selectedCourier === courier.id ? "2px solid #1A5CFF" : "1.5px solid #E2E0DA", borderRadius: "8px", padding: "12px 8px", textAlign: "center" as const, cursor: "pointer", background: selectedCourier === courier.id ? "rgba(26,92,255,.05)" : "#fff", transition: "all .15s" }}>
-                  <div style={{ fontSize: "13px", fontWeight: 800, color: selectedCourier === courier.id ? "#1A5CFF" : "#7A7880", marginBottom: "4px", letterSpacing: ".04em" }}>{courier.icon}</div>
-                  <div style={{ fontSize: "12px", fontWeight: 700, color: selectedCourier === courier.id ? "#1A5CFF" : "#2A2830" }}>{courier.name}</div>
-                </div>
-              ))}
-            </div>
+            {/* Shippo label generation */}
+            <div style={{ marginBottom: "16px" }}>
+              <label style={{ ...LabelStyle, marginBottom: "10px" }}>Generate Shipping Label via Shippo</label>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "8px", marginBottom: "14px" }}>
+                {(["fedex", "ups", "usps"] as const).map(carrier => {
+                  const labels: Record<string, { name: string; icon: string }> = {
+                    fedex: { name: "FedEx", icon: "FX" },
+                    ups:   { name: "UPS",   icon: "UPS" },
+                    usps:  { name: "USPS",  icon: "US" },
+                  };
+                  const active = selectedCarrier === carrier;
+                  return (
+                    <div key={carrier} onClick={() => setSelectedCarrier(carrier)}
+                      style={{ border: active ? "2px solid #1A5CFF" : "1.5px solid #E2E0DA", borderRadius: "8px", padding: "14px 8px", textAlign: "center" as const, cursor: "pointer", background: active ? "rgba(26,92,255,.05)" : "#fff", transition: "all .15s" }}>
+                      <div style={{ fontSize: "13px", fontWeight: 800, color: active ? "#1A5CFF" : "#7A7880", marginBottom: "4px", letterSpacing: ".04em" }}>{labels[carrier].icon}</div>
+                      <div style={{ fontSize: "12px", fontWeight: 700, color: active ? "#1A5CFF" : "#2A2830" }}>{labels[carrier].name}</div>
+                    </div>
+                  );
+                })}
+              </div>
 
-            {selectedCourier && (
-              <div className="checkout-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "16px" }}>
-                <div>
-                  <label style={LabelStyle}>Service Type</label>
-                  <select value={selectedService} onChange={e => setSelectedService(e.target.value)}
-                    style={{ width: "100%", padding: "10px 14px", border: "1.5px solid #E2E0DA", borderRadius: "6px", fontSize: "14px", fontFamily: "var(--font-jakarta)", background: "#fff" }}>
-                    <option value="">Select service…</option>
-                    {courierObj?.services.map(s => <option key={s} value={s}>{s}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label style={LabelStyle}>Tracking Number</label>
-                  <div style={{ display: "flex", gap: "8px" }}>
-                    <input value={trackingNumber} onChange={e => setTrackingNumber(e.target.value)}
-                      placeholder="Auto-generated or enter…"
-                      style={{ flex: 1, padding: "10px 14px", border: "1.5px solid #E2E0DA", borderRadius: "6px", fontSize: "13px", fontFamily: "var(--font-jakarta)", boxSizing: "border-box" as const }} />
-                    <button type="button" onClick={() => setTrackingNumber(generateTrackingNumber(selectedCourier))}
-                      title="Regenerate"
-                      style={{ padding: "10px 12px", border: "1.5px solid #E2E0DA", borderRadius: "6px", background: "#fff", cursor: "pointer", fontSize: "14px" }}>
-                      🔄
-                    </button>
+              <button onClick={handleGenerateLabel} disabled={!selectedCarrier || labelLoading}
+                style={{ background: selectedCarrier ? "#1A5CFF" : "#E2E0DA", color: "#fff", border: "none", padding: "12px 24px", borderRadius: "6px", fontSize: "14px", fontWeight: 700, cursor: selectedCarrier ? "pointer" : "not-allowed", opacity: labelLoading ? .65 : 1, marginBottom: "14px" }}>
+                {labelLoading ? "Generating label…" : selectedCarrier ? `Generate ${selectedCarrier.toUpperCase()} Label` : "Select a carrier"}
+              </button>
+
+              {/* Label result */}
+              {labelResult && labelResult.success && (
+                <div style={{ background: "rgba(5,150,105,.06)", border: "1px solid rgba(5,150,105,.2)", borderRadius: "8px", padding: "14px 16px" }}>
+                  <div style={{ fontSize: "12px", fontWeight: 700, color: "#059669", marginBottom: "10px" }}>✓ Label generated</div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 16px", fontSize: "13px", color: "#2A2830", marginBottom: "12px" }}>
+                    {labelResult.carrier && <div><span style={{ color: "#7A7880", fontWeight: 600 }}>Carrier: </span>{labelResult.carrier.toUpperCase()}</div>}
+                    {labelResult.service && <div><span style={{ color: "#7A7880", fontWeight: 600 }}>Service: </span>{labelResult.service}</div>}
+                    {labelResult.tracking_number && <div style={{ gridColumn: "1 / -1" }}><span style={{ color: "#7A7880", fontWeight: 600 }}>Tracking: </span>{labelResult.tracking_number}</div>}
+                    {labelResult.rate != null && <div><span style={{ color: "#7A7880", fontWeight: 600 }}>Rate: </span>${Number(labelResult.rate).toFixed(2)}</div>}
+                  </div>
+                  <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" as const }}>
+                    {labelResult.label_url && (
+                      <a href={labelResult.label_url} target="_blank" rel="noreferrer"
+                        style={{ background: "#1A5CFF", color: "#fff", padding: "8px 16px", borderRadius: "6px", fontSize: "13px", fontWeight: 700, textDecoration: "none" }}>
+                        ↓ Download Label PDF
+                      </a>
+                    )}
+                    {labelResult.tracking_url && (
+                      <a href={labelResult.tracking_url} target="_blank" rel="noreferrer"
+                        style={{ background: "#fff", color: "#1A5CFF", padding: "8px 16px", borderRadius: "6px", fontSize: "13px", fontWeight: 700, textDecoration: "none", border: "1.5px solid #1A5CFF" }}>
+                        Track Package →
+                      </a>
+                    )}
                   </div>
                 </div>
-              </div>
-            )}
+              )}
+              {labelResult && !labelResult.success && (
+                <div style={{ background: "rgba(232,36,42,.06)", border: "1px solid rgba(232,36,42,.2)", borderRadius: "8px", padding: "12px 16px", fontSize: "13px", color: "#E8242A", fontWeight: 600 }}>
+                  ✗ {labelResult.error ?? "Label generation failed. Check that Shippo API key and shipping address are set."}
+                </div>
+              )}
+            </div>
 
-            {selectedCourier && selectedService && (
-              <button onClick={handleMarkShipped} disabled={isShipping}
-                style={{ background: "#059669", color: "#fff", border: "none", padding: "12px 24px", borderRadius: "6px", fontSize: "14px", fontWeight: 700, cursor: "pointer", opacity: isShipping ? .6 : 1 }}>
-                {isShipping ? "Marking shipped…" : `✓ Mark as Shipped via ${courierObj?.name} ${selectedService}`}
-              </button>
-            )}
+            {/* Divider */}
+            <div style={{ borderTop: "1px solid #E2E0DA", margin: "4px 0 16px" }} />
+
+            {/* Manual courier fallback */}
+            <div>
+              <label style={{ ...LabelStyle, marginBottom: "10px" }}>Or Mark as Shipped Manually</label>
+              <div className="admin-courier-grid" style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: "8px", marginBottom: "16px" }}>
+                {COURIERS.map(courier => (
+                  <div key={courier.id} onClick={() => handleCourierSelect(courier.id)}
+                    style={{ border: selectedCourier === courier.id ? "2px solid #1A5CFF" : "1.5px solid #E2E0DA", borderRadius: "8px", padding: "12px 8px", textAlign: "center" as const, cursor: "pointer", background: selectedCourier === courier.id ? "rgba(26,92,255,.05)" : "#fff", transition: "all .15s" }}>
+                    <div style={{ fontSize: "13px", fontWeight: 800, color: selectedCourier === courier.id ? "#1A5CFF" : "#7A7880", marginBottom: "4px", letterSpacing: ".04em" }}>{courier.icon}</div>
+                    <div style={{ fontSize: "12px", fontWeight: 700, color: selectedCourier === courier.id ? "#1A5CFF" : "#2A2830" }}>{courier.name}</div>
+                  </div>
+                ))}
+              </div>
+
+              {selectedCourier && (
+                <div className="checkout-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "16px" }}>
+                  <div>
+                    <label style={LabelStyle}>Service Type</label>
+                    <select value={selectedService} onChange={e => setSelectedService(e.target.value)}
+                      style={{ width: "100%", padding: "10px 14px", border: "1.5px solid #E2E0DA", borderRadius: "6px", fontSize: "14px", fontFamily: "var(--font-jakarta)", background: "#fff" }}>
+                      <option value="">Select service…</option>
+                      {courierObj?.services.map(s => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label style={LabelStyle}>Tracking Number</label>
+                    <div style={{ display: "flex", gap: "8px" }}>
+                      <input value={trackingNumber} onChange={e => setTrackingNumber(e.target.value)}
+                        placeholder="Auto-generated or enter…"
+                        style={{ flex: 1, padding: "10px 14px", border: "1.5px solid #E2E0DA", borderRadius: "6px", fontSize: "13px", fontFamily: "var(--font-jakarta)", boxSizing: "border-box" as const }} />
+                      <button type="button" onClick={() => setTrackingNumber(generateTrackingNumber(selectedCourier))}
+                        title="Regenerate"
+                        style={{ padding: "10px 12px", border: "1.5px solid #E2E0DA", borderRadius: "6px", background: "#fff", cursor: "pointer", fontSize: "14px" }}>
+                        🔄
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {selectedCourier && selectedService && (
+                <button onClick={handleMarkShipped} disabled={isShipping}
+                  style={{ background: "#059669", color: "#fff", border: "none", padding: "12px 24px", borderRadius: "6px", fontSize: "14px", fontWeight: 700, cursor: "pointer", opacity: isShipping ? .6 : 1 }}>
+                  {isShipping ? "Marking shipped…" : `✓ Mark as Shipped via ${courierObj?.name} ${selectedService}`}
+                </button>
+              )}
+            </div>
           </div>}
 
           {/* STATUS UPDATE */}
