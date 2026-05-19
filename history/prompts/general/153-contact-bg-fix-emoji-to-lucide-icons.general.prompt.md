@@ -24,7 +24,7 @@ files:
   - frontend/src/app/(customer)/private-label/page.tsx
   - frontend/src/app/(customer)/about/page.tsx
 tests:
-  - manual: contact hero shows dark navy #0a1628 background
+  - manual: contact hero shows dark navy #1b3a5c background
   - manual: contact CTA shows #f4f3ef with dark text
   - manual: header resources dropdown shows Lucide icons (no emojis)
   - manual: announcement bar shows Flag icon instead of 🇺🇸
@@ -36,7 +36,7 @@ tests:
 
 ## Prompt
 
-FIX 1: Contact page two sections had wrong backgrounds — hero (#111 → #0a1628), CTA (#1B3A5C → #f4f3ef) with light-bg text/color updates.
+FIX 1: Contact page two sections had wrong backgrounds — hero (#111 → #1b3a5c), CTA (#1B3A5C → #f4f3ef) with light-bg text/color updates.
 FIX 2: Replace ALL emojis with Lucide React icons across customer-facing frontend files.
 
 ## Response snapshot
@@ -44,7 +44,7 @@ FIX 2: Replace ALL emojis with Lucide React icons across customer-facing fronten
 Read all 8 explicitly listed files first. Only TrustStrip, HowItWorks, WhoWeServe, WhyChooseUs, CtaSection, Footer had no emojis.
 
 Changes per file:
-- ContactContent.tsx: hero #111→#0a1628; CTA #1B3A5C→#f4f3ef, heading/body/note colors; 🇺🇸 removed, 📞→Phone, ✓→Check
+- ContactContent.tsx: hero #111→#1b3a5c; CTA #1B3A5C→#f4f3ef, heading/body/note colors; 🇺🇸 removed, 📞→Phone, ✓→Check
 - Header.tsx: import Building2/Star/Printer/Tag/FileText/Ruler/PenLine/Mail from lucide-react; replaced 8 emoji strings with JSX icons
 - AnnouncementBar.tsx: import Flag; 🇺🇸→<Flag size={12} />; ✦→·
 - HeroSection.tsx: import Flag; 🇺🇸→<Flag size={12} /> in badge div

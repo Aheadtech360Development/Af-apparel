@@ -7,6 +7,10 @@ import { Header } from "@/components/layout/Header";
 export const metadata: Metadata = {
   title: "AF Apparels — Premium B2B Wholesale Blanks",
   description: "Factory-direct wholesale blank apparel. No minimums, same-day shipping from Dallas, TX.",
+  icons: {
+    icon: "/Af-apparel logo.png",
+    apple: "/Af-apparel logo.png",
+  },
 };
 
 export default function RootLayout({

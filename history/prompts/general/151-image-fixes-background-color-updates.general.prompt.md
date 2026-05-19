@@ -52,8 +52,8 @@ Changes made:
 2. HeroSection.tsx: `<img>` → `<Image fill>`, fixed path case (Page → page), added `priority`
 3. WhyChooseUs.tsx: `<img>` → `<Image fill>`, added `position: relative` to container
 4. about/page.tsx: replaced two emoji placeholder divs with `<Image fill>` using Our Story.png + Our Story-2.png
-5. private-label/page.tsx: replaced Shirt icon placeholder with `<Image fill>` using Private Label Direct Blanks.png; hero background #111 → #f4f3ef; heading #fff → #0a1628; body #9CA3AF → #444; badge dark navy bg; "Download Guide" button border/text dark; feature stats #555
-6. CtaSection.tsx: background #1B3A5C → #f4f3ef; heading #fff → #0a1628; body rgba(255,255,255,.55) → #444; "Browse Products First" border/text #0a1628
+5. private-label/page.tsx: replaced Shirt icon placeholder with `<Image fill>` using Private Label Direct Blanks.png; hero background #111 → #f4f3ef; heading #fff → #1b3a5c; body #9CA3AF → #444; badge dark navy bg; "Download Guide" button border/text dark; feature stats #555
+6. CtaSection.tsx: background #1B3A5C → #f4f3ef; heading #fff → #1b3a5c; body rgba(255,255,255,.55) → #444; "Browse Products First" border/text #1b3a5c
 
 ## Outcome
 

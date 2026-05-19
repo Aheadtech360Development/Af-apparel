@@ -96,7 +96,7 @@ function StyleCard({ sheet }: { sheet: StyleSheet }) {
       }}
     >
       {/* Image */}
-      <div style={{ height: "320px", background: "#F4F3EF", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+      <div style={{ height: "290px", background: "#F4F3EF", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
         {sheet.image_url ? (
           <img
             src={sheet.image_url}

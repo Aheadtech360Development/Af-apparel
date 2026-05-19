@@ -58,7 +58,7 @@ Fix 7 small issues across AF Apparels frontend and backend. Read ALL relevant fi
 
 **FIX 5 — About page certifications box** (`about/page.tsx`):
 - Replaced `ClipboardList` import with `FileText`
-- Replaced plain blue left-border box with gradient dark card (`#0a1628 → #1a3a5c`) with frosted icon container, white text, and red mailto/tel links
+- Replaced plain blue left-border box with gradient dark card (`#1b3a5c → #1a3a5c`) with frosted icon container, white text, and red mailto/tel links
 
 **FIX 6 — Price list conditional strikethrough** (`account/price-list/page.tsx`):
 - Was: always rendering `retail_price` with `line-through` and `unit_price` bold

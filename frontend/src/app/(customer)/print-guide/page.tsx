@@ -172,7 +172,7 @@ export default function PrintGuidePage() {
       </div>
 
       {/* Hero */}
-      <div style={{ background: "#0a1628", padding: "56px 24px" }}>
+      <div style={{ background: "#1b3a5c", padding: "56px 24px" }}>
         <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(45,140,255,.15)", color: "#2D8CFF", fontSize: "12px", fontWeight: 700, padding: "4px 12px", borderRadius: "4px", marginBottom: "12px", letterSpacing: ".04em" }}>
             <Microscope size={14} style={{ flexShrink: 0 }} />
@@ -205,7 +205,7 @@ export default function PrintGuidePage() {
             {METHODS.map(m => (
               <div key={m.name} style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: "6px", overflow: "hidden" }}>
                 {/* Header */}
-                <div style={{ background: "#0a1628", padding: "16px 20px", display: "flex", alignItems: "center", gap: "12px" }}>
+                <div style={{ background: "#1b3a5c", padding: "16px 20px", display: "flex", alignItems: "center", gap: "12px" }}>
                   <div style={{ color: "#9CA3AF", flexShrink: 0 }}>{m.icon}</div>
                   <div style={{ flex: 1 }}>
                     <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "18px", letterSpacing: ".04em", color: "#fff", marginBottom: "2px" }}>{m.name}</h3>
@@ -296,7 +296,7 @@ export default function PrintGuidePage() {
 
       {/* CTA */}
       <div style={{ background: "#f4f3ef", padding: "64px 24px", textAlign: "center" }}>
-        <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(28px,4vw,42px)", color: "#0a1628", letterSpacing: ".04em", marginBottom: "14px" }}>
+        <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(28px,4vw,42px)", color: "#1b3a5c", letterSpacing: ".04em", marginBottom: "14px" }}>
           QUESTIONS ABOUT YOUR SETUP?
         </h2>
         <p style={{ color: "#444", fontSize: "14px", marginBottom: "28px" }}>
@@ -306,7 +306,7 @@ export default function PrintGuidePage() {
           <a href="/contact" style={{ display: "inline-flex", alignItems: "center", background: "#E8242A", color: "#fff", padding: "12px 28px", fontFamily: "var(--font-bebas)", fontWeight: 700, fontSize: "15px", letterSpacing: ".05em", borderRadius: "3px", textDecoration: "none" }}>
             Contact Our Print Team →
           </a>
-          <a href="/products" style={{ display: "inline-flex", alignItems: "center", background: "none", color: "#0a1628", padding: "12px 28px", fontFamily: "var(--font-bebas)", fontWeight: 700, fontSize: "15px", letterSpacing: ".05em", borderRadius: "3px", border: "2px solid #0a1628", textDecoration: "none" }}>
+          <a href="/products" style={{ display: "inline-flex", alignItems: "center", background: "none", color: "#1b3a5c", padding: "12px 28px", fontFamily: "var(--font-bebas)", fontWeight: 700, fontSize: "15px", letterSpacing: ".05em", borderRadius: "3px", border: "2px solid #1b3a5c", textDecoration: "none" }}>
             Browse All Blanks
           </a>
         </div>

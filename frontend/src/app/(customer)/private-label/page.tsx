@@ -32,10 +32,10 @@ export default function PrivateLabelPage() {
         <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
           <div className="pl-hero-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "48px", alignItems: "center" }}>
             <div>
-              <div style={{ display: "inline-block", background: "#0a1628", color: "#fff", fontSize: "12px", fontWeight: 700, padding: "4px 12px", borderRadius: "4px", marginBottom: "12px", letterSpacing: ".04em" }}>
+              <div style={{ display: "inline-block", background: "#1b3a5c", color: "#fff", fontSize: "12px", fontWeight: 700, padding: "4px 12px", borderRadius: "4px", marginBottom: "12px", letterSpacing: ".04em" }}>
                 Private Label Program
               </div>
-              <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(22px,3vw,36px)", color: "#0a1628", margin: "12px 0 10px", lineHeight: 1.1, letterSpacing: ".04em" }}>
+              <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(22px,3vw,36px)", color: "#1b3a5c", margin: "12px 0 10px", lineHeight: 1.1, letterSpacing: ".04em" }}>
                 Build Your Brand on<br />Factory-Direct Blanks
               </h1>
               <p style={{ color: "#444", fontSize: "14px", lineHeight: 1.7, maxWidth: "460px" }}>
@@ -45,7 +45,7 @@ export default function PrivateLabelPage() {
                 <a href="/contact?dept=private-label" style={{ display: "inline-flex", alignItems: "center", background: "#E8242A", color: "#fff", padding: "12px 28px", fontFamily: "var(--font-bebas)", fontWeight: 700, fontSize: "15px", letterSpacing: ".05em", borderRadius: "3px", textDecoration: "none" }}>
                   Request a Quote →
                 </a>
-                <a href="#" style={{ display: "inline-flex", alignItems: "center", background: "none", color: "#0a1628", padding: "12px 28px", fontFamily: "var(--font-bebas)", fontWeight: 700, fontSize: "15px", letterSpacing: ".05em", borderRadius: "3px", border: "2px solid #0a1628", textDecoration: "none" }}>
+                <a href="#" style={{ display: "inline-flex", alignItems: "center", background: "none", color: "#1b3a5c", padding: "12px 28px", fontFamily: "var(--font-bebas)", fontWeight: 700, fontSize: "15px", letterSpacing: ".05em", borderRadius: "3px", border: "2px solid #1b3a5c", textDecoration: "none" }}>
                   Download Program Guide
                 </a>
               </div>
@@ -193,7 +193,7 @@ export default function PrivateLabelPage() {
 
       {/* CTA */}
       <div style={{ background: "#f4f3ef", padding: "56px 24px", textAlign: "center" }}>
-        <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(24px,3.5vw,36px)", color: "#0a1628", letterSpacing: ".04em", marginBottom: "14px" }}>
+        <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(24px,3.5vw,36px)", color: "#1b3a5c", letterSpacing: ".04em", marginBottom: "14px" }}>
           READY TO BUILD YOUR BRAND?
         </h2>
         <p style={{ color: "#444", fontSize: "14px", marginBottom: "24px" }}>
@@ -203,7 +203,7 @@ export default function PrivateLabelPage() {
           <a href="/contact?dept=private-label" style={{ display: "inline-flex", alignItems: "center", background: "#E8242A", color: "#fff", padding: "12px 28px", fontFamily: "var(--font-bebas)", fontWeight: 700, fontSize: "15px", letterSpacing: ".05em", borderRadius: "3px", textDecoration: "none" }}>
             Request a Private Label Quote →
           </a>
-          <a href="#" style={{ display: "inline-flex", alignItems: "center", background: "none", color: "#0a1628", padding: "12px 28px", fontFamily: "var(--font-bebas)", fontWeight: 700, fontSize: "15px", letterSpacing: ".05em", borderRadius: "3px", border: "2px solid #0a1628", textDecoration: "none" }}>
+          <a href="#" style={{ display: "inline-flex", alignItems: "center", background: "none", color: "#1b3a5c", padding: "12px 28px", fontFamily: "var(--font-bebas)", fontWeight: 700, fontSize: "15px", letterSpacing: ".05em", borderRadius: "3px", border: "2px solid #1b3a5c", textDecoration: "none" }}>
             Download Program Guide
           </a>
         </div>

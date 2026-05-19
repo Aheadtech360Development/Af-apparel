@@ -53,7 +53,7 @@ export default function ContactPage() {
       </div>
 
       {/* Hero */}
-      <div style={{ background: "#0a1628", padding: "56px 24px" }}>
+      <div style={{ background: "#1b3a5c", padding: "56px 24px" }}>
         <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(45,140,255,.15)", color: "#2D8CFF", fontSize: "12px", fontWeight: 700, padding: "4px 12px", borderRadius: "4px", marginBottom: "12px", letterSpacing: ".04em" }}>
             <Phone size={13} style={{ flexShrink: 0 }} />
@@ -241,7 +241,7 @@ export default function ContactPage() {
 
       {/* CTA */}
       <div style={{ background: "#f4f3ef", padding: "56px 24px", textAlign: "center" }}>
-        <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(28px,4vw,42px)", color: "#0a1628", letterSpacing: ".04em", marginBottom: "14px" }}>
+        <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(28px,4vw,42px)", color: "#1b3a5c", letterSpacing: ".04em", marginBottom: "14px" }}>
           NOT SURE WHERE TO START?
         </h2>
         <p style={{ color: "#444", fontSize: "14px", marginBottom: "28px" }}>

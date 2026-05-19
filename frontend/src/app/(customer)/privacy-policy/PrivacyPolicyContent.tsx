@@ -12,6 +12,73 @@ const POLICIES: { id: PolicyId; icon: React.ReactNode; label: string }[] = [
   { id: "privacy", icon: <Lock size={14} />, label: "Privacy Policy" },
 ];
 
+const TERMS_FAQS: { h: string; body?: string; multi?: string[] }[] = [
+  {
+    h: "WHAT PAYMENT METHODS ARE AVAILABLE?",
+    multi: [
+      "We accept cash (will call only), credit cards, approved company/personal checks, and cashier's checks. Term payments are offered for buyers that are approved by our credit department or that have built a sufficient credit history with AF Apparels.",
+      "For more information about term payments please contact the credit department at 469-367-9753.",
+    ],
+  },
+  {
+    h: "ARE THERE MINIMUMS?",
+    body: "We do not have any minimum order quantities.",
+  },
+  {
+    h: "WHERE DO I SUBMIT MY PO?",
+    body: "Please e-mail all POs to info@afblanks.com",
+  },
+  {
+    h: "HOW LONG WILL IT TAKE TO PROCESS MY ORDER?",
+    body: "Most orders, if placed before 1:00PM PDT will be completed same day. We strive to process orders for same day shipping/pickup but due to varying situations, this isn't always possible. If you need an order rushed please reach out to info@afblanks.com or call customer service at 469-367-9753 and we will do our best to accommodate your needs.",
+  },
+  {
+    h: "WHAT SHIPPING METHODS ARE AVAILABLE?",
+    body: "Orders are shipped via USPS/UPS / FedEx / OnTrac ground or a preferred carrier unless otherwise indicated at the time the order is placed. If you would like to use your own UPS or FedEx account, please include the information at the time of ordering.",
+  },
+  {
+    h: "DO YOU HAVE WILL CALL OPTIONS?",
+    multi: [
+      'Yes, please allow a minimum 3 hours from the time you place the order. For multiple orders please allow more time to complete all orders. Please note that the cutoff time is 1:00 PM PDT. Any orders placed after this time may not be available for same day pick up. Due to limited space, we can hold a will call order for 5 business days otherwise it may be restocked and subject to a 10% restocking fee. Please wait for your "Ready for Pickup" email before checking into the office for any pickup orders.',
+      "Will Call Hours: Monday–Friday, 8:30AM – 4:30PM PDT",
+    ],
+  },
+  {
+    h: "WILL I RECEIVE AN E-MAIL WHEN MY ORDER SHIPS?",
+    body: "Yes, you will receive an e-mail notification when your order is shipped. Please note the cutoff time for same day shipping is 1:00 PM PDT. Any orders placed after this time may be shipped the following business day.",
+  },
+  {
+    h: "WHAT IS YOUR CLAIM / RETURN POLICY?",
+    multi: [
+      "Please inspect all merchandise before washing, printing or any alterations. We cannot accept returns or exchanges that have been altered in any way. All claims must be made within 5 days of receipt of goods and must be submitted by e-mail to info@afblanks.com. All returned merchandise will be refused if not accompanied with a Return Authorization and are subject to a 10% restocking fee. Customers will be responsible for shipping costs on all returned items that AF Apparels is not at fault for.",
+      "General Inquiries: info@afblanks.com · Claims/Exchanges/Returns: info@afblanks.com",
+    ],
+  },
+  {
+    h: "WHAT IS YOUR TIME FRAME FOR RETURN REQUESTS?",
+    body: "Please inspect all merchandise before washing, printing or any alterations. All claims must be made within 5 days of receipt of goods. Please allow 2–3 business days to process return requests. Once your request has been approved you will receive a Return Authorization (RA). All returns/exchanges will be refused if not accompanied with a Return Authorization. All RA's are valid for 14 days. If the merchandise has not been received within this time a new return request will need to be submitted.",
+  },
+  {
+    h: "WHAT IF THE DELIVERED MERCHANDISE IS DAMAGED?",
+    body: "At AF Apparels, we stand behind our product and if any type of damage is received in an order, we will replace or refund the item(s) immediately. Any replacements will be shipped by original shipping method. Please note all claims must be made within 5 days of receipt of goods and we cannot replace or provide a refund for any item(s) that are altered in any way from its original condition.",
+  },
+  {
+    h: "WHAT IF I RECEIVED THE INCORRECT STYLE, SIZE, OR COLOR?",
+    body: "Please inspect all merchandise before washing, printing or any other alterations. It is the Buyer's responsibility to verify that the merchandise received matches what was ordered and resolve any claims with AF Apparels before the garments are altered. All claims must be made within 5 days of receipt of goods. Replacements will be shipped by original shipping method. Please contact our returns department by email at info@afblanks.com or by phone at 469-367-9753 in order to start the return authorization process.",
+  },
+  {
+    h: "WHO IS RESPONSIBLE FOR RETURN SHIPPING COSTS?",
+    body: "Customers will be responsible for shipping costs on all returned items that are not a result of AF error.",
+  },
+  {
+    h: "CAN I CANCEL AN ORDER?",
+    multi: [
+      "Once you have received a confirmation e-mail, your order cannot be cancelled. Please call customer service to make any changes or to cancel.",
+      "Customer Service: 469-367-9753 · Monday–Friday, 8:30AM – 5:00PM PDT",
+    ],
+  },
+];
+
 export default function PrivacyPolicyPage() {
   const [active, setActive] = useState<PolicyId>("shipping");
 
@@ -24,7 +91,7 @@ export default function PrivacyPolicyPage() {
       </div>
 
       {/* Hero */}
-      <div style={{ background: "#0a1628", padding: "36px 24px" }}>
+      <div style={{ background: "#1b3a5c", padding: "36px 24px" }}>
         <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
           <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(20px,2.8vw,32px)", color: "#fff", marginBottom: "6px", letterSpacing: ".04em" }}>Policies &amp; Legal</h1>
           <p style={{ color: "#6B7280", fontSize: "13px" }}>Clear, plain-English policies for all AF Apparels wholesale customers</p>
@@ -63,67 +130,19 @@ export default function PrivacyPolicyPage() {
               <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "28px", letterSpacing: ".04em", color: "#111", marginBottom: "4px" }}>Shipping &amp; Returns Policy</h2>
               <div style={{ fontSize: "11px", color: "#aaa", fontWeight: 600, marginBottom: "20px" }}>Last updated: January 2025</div>
 
-              <div style={{ background: "#dde8ff", borderLeft: "3px solid #2D8CFF", padding: "12px 16px", borderRadius: "0 4px 4px 0", fontSize: "13px", color: "#374151", marginBottom: "24px" }}>
-                📦 <strong>Key Point:</strong> All orders placed before 2:00 PM CT on business days ship same day from our Dallas, TX facility. Orders received after 2:00 PM CT ship the next business day.
+              <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>Shipping Policy</h3>
+              <h4 style={{ fontSize: "13px", fontWeight: 700, color: "#111", marginBottom: "8px" }}>WHAT SHIPPING METHODS ARE AVAILABLE?</h4>
+              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "24px" }}>Orders are shipped via USPS/UPS / FedEx / OnTrac ground or a preferred carrier unless otherwise indicated at the time the order is placed. If you would like to use your own UPS or FedEx account, please include the information at the time of ordering.</p>
+
+              <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>Refund Policy</h3>
+              <h4 style={{ fontSize: "13px", fontWeight: 700, color: "#111", marginBottom: "8px" }}>WHAT IS YOUR CLAIM / RETURN POLICY?</h4>
+              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "20px" }}>Please inspect all merchandise before washing, printing or any alterations. We cannot accept returns or exchanges that have been altered in any way. All claims must be made within 5 days of receipt of goods and must be submitted by e-mail to info@afblanks.com. All returned merchandise will be refused if not accompanied with a Return Authorization and are subject to a 10% restocking fee. Customers will be responsible for shipping costs on all returned items that AF Apparels is not at fault for.</p>
+
+              <div style={{ background: "#F7F8FA", border: "1px solid #E5E7EB", borderRadius: "6px", padding: "16px", fontSize: "13px", color: "#555", lineHeight: 1.8 }}>
+                <p style={{ margin: "0 0 4px" }}>General Inquiries: <a href="mailto:info@afblanks.com" style={{ color: "#1B3A5C" }}>info@afblanks.com</a></p>
+                <p style={{ margin: "0 0 4px" }}>Claims/Exchanges/Returns: <a href="mailto:info@afblanks.com" style={{ color: "#1B3A5C" }}>info@afblanks.com</a></p>
+                <p style={{ margin: 0 }}>Telephone: <a href="tel:4693679753" style={{ color: "#1B3A5C" }}>469-367-9753</a></p>
               </div>
-
-              <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>Shipping Methods &amp; Timelines</h3>
-              <div style={{ overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", marginBottom: "20px", minWidth: "380px" }}>
-                <thead>
-                  <tr style={{ background: "#F7F8FA" }}>
-                    {["Method", "Estimated Delivery", "Cost"].map(h => <th key={h} style={{ padding: "10px 14px", textAlign: "left", fontWeight: 700, color: "#374151", borderBottom: "1px solid #E5E7EB", fontSize: "12px" }}>{h}</th>)}
-                  </tr>
-                </thead>
-                <tbody>
-                  {[
-                    ["Standard Ground", "3–5 business days", "Free on orders over $500"],
-                    ["Expedited (2-Day)", "2 business days", "$45 flat"],
-                    ["Overnight", "1 business day", "Quote at checkout"],
-                    ["Freight / LTL", "Varies by destination", "Quote provided"],
-                  ].map(([m, d, c]) => (
-                    <tr key={m} style={{ borderBottom: "1px solid #F3F4F6" }}>
-                      <td style={{ padding: "10px 14px", fontWeight: 600, color: "#111" }}>{m}</td>
-                      <td style={{ padding: "10px 14px", color: "#555" }}>{d}</td>
-                      <td style={{ padding: "10px 14px", color: "#555" }}>{c}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              </div>
-
-              <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>Free Shipping Threshold</h3>
-              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>Standard ground shipping is complimentary on all orders totaling $500 or more (before tax). Orders under $500 are charged a flat shipping rate calculated at checkout based on weight and destination.</p>
-
-              <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>Order Processing</h3>
-              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>All orders are processed Monday through Friday, excluding federal holidays. Orders placed on weekends or holidays begin processing the next business day. You will receive a shipping confirmation email with tracking information once your order leaves our Dallas facility.</p>
-
-              <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>Shipping Carriers</h3>
-              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>We ship via UPS, FedEx, and regional carriers depending on destination and package size. Carrier selection is made at our discretion to ensure the fastest, most reliable delivery for your location. Freight shipments are coordinated through our logistics partners — contact us for freight quotes on pallet-size orders.</p>
-
-              <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>Returns Policy</h3>
-              <div style={{ background: "#fef3c7", borderLeft: "3px solid #d97706", padding: "12px 16px", borderRadius: "0 4px 4px 0", fontSize: "13px", color: "#374151", marginBottom: "12px" }}>
-                AF Apparels accepts returns on defective or incorrectly shipped items only. We do not accept returns on correctly shipped, undamaged merchandise due to the nature of wholesale bulk orders.
-              </div>
-              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>If you receive a shipment with defective goods, the wrong item, or incorrect quantities, contact us within <strong>7 business days of receipt</strong> to initiate a claim. Claims submitted after 7 days may not be eligible for replacement or credit.</p>
-
-              <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>Defective / Damaged Items</h3>
-              <ul style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, paddingLeft: "20px", marginBottom: "16px" }}>
-                <li style={{ marginBottom: "4px" }}>Contact info@afblanks.com with your order number and photos of the defective units</li>
-                <li style={{ marginBottom: "4px" }}>Include the quantity affected and a brief description of the defect</li>
-                <li style={{ marginBottom: "4px" }}>We will respond within 1 business day with resolution options</li>
-                <li style={{ marginBottom: "4px" }}>Resolution options: replacement units, store credit, or refund (at AF discretion based on claim)</li>
-                <li>Do not return items without prior authorization — unauthorized returns will not be accepted</li>
-              </ul>
-
-              <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>Incorrect Shipments</h3>
-              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>If your order arrives with incorrect items or quantities, we will ship the correct product at no charge and arrange pickup of the incorrect shipment. Contact us within 7 business days with your order number and a description of the discrepancy.</p>
-
-              <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>Refused Shipments</h3>
-              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>Refused or unclaimed shipments are subject to a 15% restocking fee plus return shipping costs. If a shipment is refused without prior authorization from AF Apparels, the restocking fee and shipping charges will be deducted from any credit issued.</p>
-
-              <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>International Shipping</h3>
-              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7 }}>AF Apparels currently ships to the continental United States and Canada. For Canadian shipments, duties and taxes are the responsibility of the buyer. Contact us for international freight inquiries outside of these regions.</p>
             </div>
           )}
 
@@ -198,26 +217,15 @@ export default function PrivacyPolicyPage() {
           {active === "terms" && (
             <div>
               <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "28px", letterSpacing: ".04em", color: "#111", marginBottom: "4px" }}>Terms &amp; Conditions</h2>
-              <div style={{ fontSize: "11px", color: "#aaa", fontWeight: 600, marginBottom: "20px" }}>Last updated: January 2025 · Effective for all orders placed on or after this date</div>
+              <div style={{ fontSize: "11px", color: "#aaa", fontWeight: 600, marginBottom: "20px" }}>Terms of service</div>
 
-              <div style={{ background: "#fee2e2", borderLeft: "3px solid #E8242A", padding: "12px 16px", borderRadius: "0 4px 4px 0", fontSize: "13px", color: "#374151", marginBottom: "24px" }}>
-                ⚠️ These Terms &amp; Conditions govern all transactions between American Fashion (AF Apparels) and wholesale account holders. By placing an order, you agree to these terms. Please review carefully before your first order.
-              </div>
-
-              {[
-                { n: "1", h: "Account Eligibility", body: "AF Apparels wholesale accounts are available to legally registered businesses operating in the United States or Canada. By applying for an account, you represent that your business is legitimate, registered, and that the information provided in your application is accurate. AF Apparels reserves the right to deny, suspend, or terminate any account at our discretion." },
-                { n: "2", h: "Use of the Platform", body: "Your wholesale account is for business use only. You may not resell access to the platform, share account credentials, or use your account for personal purchases. Accounts found in violation of these terms will be suspended and any pending orders cancelled." },
-                { n: "3", h: "Pricing & Payment Terms", body: null, multi: ["All prices listed are wholesale prices available exclusively to approved accounts. Prices are subject to change without notice. The price displayed at the time of checkout is the final price for that order. Payment is due according to the payment method selected at checkout (immediate for card/ACH; upon fund receipt for wire; NET 30 for qualifying accounts).", "Late payments on NET 30 accounts are subject to a 1.5% monthly finance charge (18% APR). Accounts with outstanding balances over 45 days may have their ordering privileges suspended until the balance is resolved."] },
-                { n: "4", h: "Product Use", body: "AF Apparels blanks are sold for decoration and resale. AF Apparels makes no warranty regarding the suitability of products for any specific decoration method beyond what is stated in our Print Guide. It is the buyer's responsibility to test products against their specific equipment and processes before committing to production runs." },
-                { n: "5", h: "Intellectual Property", body: "The AF Apparels brand, logo, product photography, and website content are the intellectual property of American Fashion LLC. You may not reproduce, distribute, or use our branding or imagery in your own marketing without written permission." },
-                { n: "6", h: "Limitation of Liability", body: "AF Apparels' liability for any claim arising from a transaction is limited to the value of the goods in question. We are not liable for indirect, consequential, or incidental damages including lost profits, production downtime, or client penalties arising from defective or delayed goods." },
-                { n: "7", h: "Governing Law", body: "These Terms & Conditions are governed by the laws of the State of Texas. Any disputes arising from transactions with AF Apparels shall be resolved in the courts of Dallas County, Texas." },
-                { n: "8", h: "Changes to Terms", body: "AF Apparels reserves the right to update these Terms & Conditions at any time. Updated terms are effective immediately upon posting. Continued use of the platform following an update constitutes acceptance of the revised terms." },
-                { n: "9", h: "Contact for Legal Matters", body: "For questions regarding these Terms & Conditions, contact: info@afblanks.com or write to AF Apparels, 10719 Turbeville Rd, Dallas, TX 75243." },
-              ].map(s => (
-                <div key={s.n}>
-                  <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>{s.n}. {s.h}</h3>
-                  {s.multi ? s.multi.map((p, i) => <p key={i} style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "12px" }}>{p}</p>) : <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "12px" }}>{s.body}</p>}
+              {TERMS_FAQS.map((item, i) => (
+                <div key={i}>
+                  <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>{item.h}</h3>
+                  {item.multi
+                    ? item.multi.map((p, j) => <p key={j} style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "12px" }}>{p}</p>)
+                    : <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "12px" }}>{item.body}</p>
+                  }
                 </div>
               ))}
             </div>
@@ -227,57 +235,97 @@ export default function PrivacyPolicyPage() {
           {active === "privacy" && (
             <div>
               <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "28px", letterSpacing: ".04em", color: "#111", marginBottom: "4px" }}>Privacy Policy</h2>
-              <div style={{ fontSize: "11px", color: "#aaa", fontWeight: 600, marginBottom: "20px" }}>Last updated: January 2025</div>
+              <div style={{ fontSize: "11px", color: "#aaa", fontWeight: 600, marginBottom: "20px" }}>Last updated: January 30, 2025</div>
 
-              <div style={{ background: "#dde8ff", borderLeft: "3px solid #2D8CFF", padding: "12px 16px", borderRadius: "0 4px 4px 0", fontSize: "13px", color: "#374151", marginBottom: "24px" }}>
-                🔒 <strong>Short Version:</strong> We collect only the information necessary to operate your wholesale account and fulfill your orders. We do not sell your data. We do not share it with third parties except as required to process payments and ship orders.
-              </div>
+              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>This Privacy Policy describes how AF Apparels Retail (the &ldquo;Site&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;, or &ldquo;our&rdquo;) collects, uses, and discloses your personal information when you visit, use our services, or make a purchase from retail.afapparels.com (the &ldquo;Site&rdquo;) or otherwise communicate with us regarding the Site (collectively, the &ldquo;Services&rdquo;). For purposes of this Privacy Policy, &ldquo;you&rdquo; and &ldquo;your&rdquo; means you as the user of the Services, whether you are a customer, website visitor, or another individual whose information we have collected pursuant to this Privacy Policy.</p>
+              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>Please read this Privacy Policy carefully. By using and accessing any of the Services, you agree to the collection, use, and disclosure of your information as described in this Privacy Policy. If you do not agree to this Privacy Policy, please do not use or access any of the Services.</p>
 
-              <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>1. Information We Collect</h3>
-              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "10px" }}>When you create an account or place an order, we collect:</p>
+              <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>Changes to This Privacy Policy</h3>
+              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>We may update this Privacy Policy from time to time, including to reflect changes to our practices or for other operational, legal, or regulatory reasons. We will post the revised Privacy Policy on the Site, update the &ldquo;Last updated&rdquo; date and take any other steps required by applicable law.</p>
+
+              <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>How We Collect and Use Your Personal Information</h3>
+              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "12px" }}>To provide the Services, we collect and have collected over the past 12 months personal information about you from a variety of sources, as set out below. The information that we collect and use varies depending on how you interact with us.</p>
+              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>In addition to the specific uses set out below, we may use information we collect about you to communicate with you, provide or improve the Services, comply with any applicable legal obligations, enforce any applicable terms of service, and to protect or defend the Services, our rights, and the rights of our users or others.</p>
+
+              <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>What Personal Information We Collect</h3>
+              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>The types of personal information we obtain about you depends on how you interact with our Site and use our Services. When we use the term &ldquo;personal information&rdquo;, we are referring to information that identifies, relates to, describes or can be associated with you. The following sections describe the categories and specific types of personal information we collect.</p>
+
+              <h4 style={{ fontSize: "13px", fontWeight: 700, color: "#111", marginBottom: "8px" }}>Information We Collect Directly from You</h4>
+              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "8px" }}>Information that you directly submit to us through our Services may include:</p>
               <ul style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, paddingLeft: "20px", marginBottom: "16px" }}>
-                <li style={{ marginBottom: "4px" }}>Business name, contact name, email address, and phone number</li>
-                <li style={{ marginBottom: "4px" }}>Shipping and billing addresses</li>
-                <li style={{ marginBottom: "4px" }}>Business type and estimated monthly volume (from account application)</li>
-                <li style={{ marginBottom: "4px" }}>Order history and transaction records</li>
-                <li style={{ marginBottom: "4px" }}>Payment information (processed securely — we do not store full card numbers)</li>
-                <li>Website usage data (pages visited, time on site, browser type) via cookies</li>
+                <li style={{ marginBottom: "4px" }}>Contact details including your name, address, phone number, and email.</li>
+                <li style={{ marginBottom: "4px" }}>Order information including your name, billing address, shipping address, payment confirmation, email address, and phone number.</li>
+                <li style={{ marginBottom: "4px" }}>Account information including your username, password, security questions and other information used for account security purposes.</li>
+                <li>Customer support information including the information you choose to include in communications with us, for example, when sending a message through the Services.</li>
               </ul>
+              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>Some features of the Services may require you to directly provide us with certain information about yourself. You may elect not to provide this information, but doing so may prevent you from using or accessing these features.</p>
 
-              <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>2. How We Use Your Information</h3>
-              <ul style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, paddingLeft: "20px", marginBottom: "16px" }}>
-                <li style={{ marginBottom: "4px" }}>Processing and fulfilling your orders</li>
-                <li style={{ marginBottom: "4px" }}>Sending order confirmations, shipping notifications, and account updates</li>
-                <li style={{ marginBottom: "4px" }}>Providing customer support and responding to inquiries</li>
-                <li style={{ marginBottom: "4px" }}>Improving our platform and product offerings based on usage patterns</li>
-                <li style={{ marginBottom: "4px" }}>Sending relevant product updates, new SKU announcements, and promotional offers (opt-out available)</li>
-                <li>Complying with legal obligations (tax records, fraud prevention)</li>
-              </ul>
+              <h4 style={{ fontSize: "13px", fontWeight: 700, color: "#111", marginBottom: "8px" }}>Information We Collect about Your Usage</h4>
+              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>We may also automatically collect certain information about your interaction with the Services (&ldquo;Usage Data&rdquo;). To do this, we may use cookies, pixels and similar technologies (&ldquo;Cookies&rdquo;). Usage Data may include information about how you access and use our Site and your account, including device information, browser information, information about your network connection, your IP address and other information regarding your interaction with the Services.</p>
 
-              <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>3. Information Sharing</h3>
-              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "10px" }}>We share your information only with:</p>
+              <h4 style={{ fontSize: "13px", fontWeight: 700, color: "#111", marginBottom: "8px" }}>Information We Obtain from Third Parties</h4>
+              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "8px" }}>Finally, we may obtain information about you from third parties, including from vendors and service providers who may collect information on our behalf, such as:</p>
               <ul style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, paddingLeft: "20px", marginBottom: "12px" }}>
-                <li style={{ marginBottom: "4px" }}><strong>Payment processors</strong> (Stripe, ACH partners) — to process transactions securely</li>
-                <li style={{ marginBottom: "4px" }}><strong>Shipping carriers</strong> (UPS, FedEx) — to fulfill and track your orders</li>
-                <li style={{ marginBottom: "4px" }}><strong>Accounting software</strong> — for internal financial record-keeping</li>
-                <li><strong>Legal authorities</strong> — when required by law or to prevent fraud</li>
+                <li style={{ marginBottom: "4px" }}>Companies who support our Site and Services, such as Shopify.</li>
+                <li>Our payment processors, who collect payment information (e.g., bank account, credit or debit card information, billing address) to process your payment in order to fulfill your orders and provide you with products or services you have requested, in order to perform our contract with you.</li>
               </ul>
-              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>We do not sell, rent, or trade your personal or business information to third parties for marketing purposes.</p>
+              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>When you visit our Site, open or click on emails we send you, or interact with our Services or advertisements, we, or third parties we work with, may automatically collect certain information using online tracking technologies such as pixels, web beacons, software developer kits, third-party libraries, and cookies. Any information we obtain from third parties will be treated in accordance with this Privacy Policy.</p>
 
-              <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>4. Data Security</h3>
-              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>Your data is stored on secure, encrypted servers. We use SSL/TLS encryption for all data transmission. Payment card data is processed by PCI-DSS compliant payment processors — we do not store full card numbers on our systems. Access to customer data is restricted to AF Apparels staff who need it to fulfill their job responsibilities.</p>
+              <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>How We Use Your Personal Information</h3>
+              <ul style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, paddingLeft: "20px", marginBottom: "16px" }}>
+                <li style={{ marginBottom: "4px" }}><strong>Providing Products and Services.</strong> We use your personal information to provide you with the Services in order to perform our contract with you, including to process your payments, fulfill your orders, to send notifications to you related to your account, purchases, returns, exchanges or other transactions, to create, maintain and otherwise manage your account, to arrange for shipping, and facilitate any returns and exchanges.</li>
+                <li style={{ marginBottom: "4px" }}><strong>Marketing and Advertising.</strong> We may use your personal information for marketing and promotional purposes, such as to send marketing, advertising and promotional communications by email, text message or postal mail, and to show you advertisements for products or services.</li>
+                <li style={{ marginBottom: "4px" }}><strong>Security and Fraud Prevention.</strong> We use your personal information to detect, investigate or take action regarding possible fraudulent, illegal or malicious activity. If you choose to use the Services and register an account, you are responsible for keeping your account credentials safe.</li>
+                <li><strong>Communicating with You and Service Improvement.</strong> We use your personal information to provide you with customer support and improve our Services.</li>
+              </ul>
 
-              <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>5. Cookies</h3>
-              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>Our platform uses cookies to maintain your login session, remember your cart, and analyze usage patterns. Essential cookies (login, cart) are required for the platform to function. Analytics cookies can be disabled in your browser settings without affecting your ability to use the platform.</p>
+              <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>Cookies</h3>
+              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "12px" }}>Like many websites, we use Cookies on our Site. We use Cookies to power and improve our Site and our Services (including to remember your actions and preferences), to run analytics and better understand user interaction with the Services. We may also permit third parties and service providers to use Cookies on our Site to better tailor the services, products and advertising on our Site and other websites.</p>
+              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "12px" }}>Most browsers automatically accept Cookies by default, but you can choose to set your browser to remove or reject Cookies through your browser controls. Please keep in mind that removing or blocking Cookies can negatively impact your user experience and may cause some of the Services, including certain features and general functionality, to work incorrectly or no longer be available.</p>
+              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>Our website also recognizes the Global Privacy Control (GPC) signal, which enables you to opt-out of certain uses or disclosures of your information.</p>
 
-              <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>6. Data Retention</h3>
-              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>We retain your account and order information for 7 years as required for tax and accounting purposes. If you close your account, your personal information will be removed from active systems within 90 days, subject to legal retention requirements.</p>
+              <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>How We Disclose Personal Information</h3>
+              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "8px" }}>In certain circumstances, we may disclose your personal information to third parties for contract fulfillment purposes, legitimate purposes and other reasons subject to this Privacy Policy. Such circumstances may include:</p>
+              <ul style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, paddingLeft: "20px", marginBottom: "16px" }}>
+                <li style={{ marginBottom: "4px" }}>With vendors or other third parties who perform services on our behalf (e.g., IT management, payment processing, data analytics, customer support, cloud storage, fulfillment and shipping).</li>
+                <li style={{ marginBottom: "4px" }}>With business and marketing partners to provide services and advertise to you.</li>
+                <li style={{ marginBottom: "4px" }}>When you direct, request us or otherwise consent to our disclosure of certain information to third parties, such as to ship you products or through your use of social media widgets or login integrations, with your consent.</li>
+                <li style={{ marginBottom: "4px" }}>With our affiliates or otherwise within our corporate group, in our legitimate interests to run a successful business.</li>
+                <li>In connection with a business transaction such as a merger or bankruptcy, to comply with any applicable legal obligations (including to respond to subpoenas, search warrants and similar requests), to enforce any applicable terms of service, and to protect or defend the Services, our rights, and the rights of our users or others.</li>
+              </ul>
+              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>We do not use or disclose sensitive personal information without your consent or for the purposes of inferring characteristics about you. We have &ldquo;sold&rdquo; and &ldquo;shared&rdquo; personal information over the preceding 12 months for the purpose of engaging in advertising and marketing activities with business and marketing partners.</p>
 
-              <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>7. Your Rights</h3>
-              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>You have the right to: access the data we hold about you; request correction of inaccurate data; request deletion of your data (subject to legal retention requirements); opt out of marketing communications at any time. To exercise any of these rights, contact info@afblanks.com.</p>
+              <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>Third Party Websites and Links</h3>
+              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>Our Site may provide links to websites or other online platforms operated by third parties. If you follow links to sites not affiliated or controlled by us, you should review their privacy and security policies and other terms and conditions. We do not guarantee and are not responsible for the privacy or security of such sites, including the accuracy, completeness, or reliability of information found on these sites. Our inclusion of such links does not, by itself, imply any endorsement of the content on such platforms or of their owners or operators, except as disclosed on the Services.</p>
 
-              <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>8. Contact</h3>
-              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7 }}>For privacy-related questions: info@afblanks.com or +1 (469) 367-9753.</p>
+              <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>Children&apos;s Data</h3>
+              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>The Services are not intended to be used by children, and we do not knowingly collect any personal information about children. If you are the parent or guardian of a child who has provided us with their personal information, you may contact us using the contact details set out below to request that it be deleted. As of the Effective Date of this Privacy Policy, we do not have actual knowledge that we &ldquo;share&rdquo; or &ldquo;sell&rdquo; personal information of individuals under 16 years of age.</p>
+
+              <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>Security and Retention of Your Information</h3>
+              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>Please be aware that no security measures are perfect or impenetrable, and we cannot guarantee &ldquo;perfect security.&rdquo; In addition, any information you send to us may not be secure while in transit. We recommend that you do not use insecure channels to communicate sensitive or confidential information to us. How long we retain your personal information depends on different factors, such as whether we need the information to maintain your account, to provide the Services, comply with legal obligations, resolve disputes or enforce other applicable contracts and policies.</p>
+
+              <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>Your Rights</h3>
+              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "8px" }}>Depending on where you live, you may have some or all of the rights listed below in relation to your personal information. However, these rights are not absolute, may apply only in certain circumstances and, in certain cases, we may decline your request as permitted by law.</p>
+              <ul style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, paddingLeft: "20px", marginBottom: "12px" }}>
+                <li style={{ marginBottom: "4px" }}><strong>Right to Access / Know:</strong> You may have a right to request access to personal information that we hold about you, including details relating to the ways in which we use and share your information.</li>
+                <li style={{ marginBottom: "4px" }}><strong>Right to Delete:</strong> You may have a right to request that we delete personal information we maintain about you.</li>
+                <li style={{ marginBottom: "4px" }}><strong>Right to Correct:</strong> You may have a right to request that we correct inaccurate personal information we maintain about you.</li>
+                <li style={{ marginBottom: "4px" }}><strong>Right of Portability:</strong> You may have a right to receive a copy of the personal information we hold about you and to request that we transfer it to a third party, in certain circumstances and with certain exceptions.</li>
+                <li style={{ marginBottom: "4px" }}><strong>Restriction of Processing:</strong> You may have the right to ask us to stop or restrict our processing of personal information.</li>
+                <li style={{ marginBottom: "4px" }}><strong>Withdrawal of Consent:</strong> Where we rely on consent to process your personal information, you may have the right to withdraw this consent.</li>
+                <li style={{ marginBottom: "4px" }}><strong>Appeal:</strong> You may have a right to appeal our decision if we decline to process your request. You can do so by replying directly to our denial.</li>
+                <li><strong>Managing Communication Preferences:</strong> We may send you promotional emails, and you may opt out of receiving these at any time by using the unsubscribe option displayed in our emails to you.</li>
+              </ul>
+              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>You may exercise any of these rights where indicated on our Site or by contacting us using the contact details provided below. We will not discriminate against you for exercising any of these rights.</p>
+
+              <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>Complaints</h3>
+              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>If you have complaints about how we process your personal information, please contact us using the contact details provided below. If you are not satisfied with our response to your complaint, depending on where you live you may have the right to appeal our decision by contacting us using the contact details set out below, or lodge your complaint with your local data protection authority.</p>
+
+              <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>International Users</h3>
+              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, marginBottom: "16px" }}>Please note that we may transfer, store and process your personal information outside the country you live in. Your personal information is also processed by staff and third party service providers and partners in these countries. If we transfer your personal information out of Europe, we will rely on recognized transfer mechanisms like the European Commission&apos;s Standard Contractual Clauses, or any equivalent contracts issued by the relevant competent authority of the UK, as relevant, unless the data transfer is to a country that has been determined to provide an adequate level of protection.</p>
+
+              <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", margin: "20px 0 10px" }}>Contact</h3>
+              <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7 }}>Should you have any questions about our privacy practices or this Privacy Policy, or if you would like to exercise any of the rights available to you, please call or email us at <a href="mailto:info.afapparel@gmail.com" style={{ color: "#1B3A5C" }}>info.afapparel@gmail.com</a> or contact us at 10719 Turbeville Road, Dallas, TX, 75243, US.</p>
             </div>
           )}
 

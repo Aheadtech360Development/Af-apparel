@@ -10,7 +10,7 @@ export default function CtaSection() {
   return (
     <div style={{ background: "#f4f3ef", padding: "52px 0", textAlign: "center" }}>
       <div style={{ maxWidth: "1140px", margin: "0 auto", padding: "0 24px" }}>
-        <h2 style={{ fontFamily: "'Barlow Semi Condensed', sans-serif", fontSize: "32px", fontWeight: 800, color: "#0a1628", marginBottom: "10px" }}>
+        <h2 style={{ fontFamily: "'Barlow Semi Condensed', sans-serif", fontSize: "32px", fontWeight: 800, color: "#1b3a5c", marginBottom: "10px" }}>
           Ready to Order at Factory-Direct Prices?
         </h2>
         <p style={{ fontSize: "14px", color: "#444", marginBottom: "24px", maxWidth: "480px", marginLeft: "auto", marginRight: "auto", lineHeight: 1.6 }}>
@@ -25,7 +25,7 @@ export default function CtaSection() {
           </Link>
           <Link
             href="/products"
-            style={{ background: "none", color: "#0a1628", padding: "12px 24px", fontSize: "14px", borderRadius: "3px", fontWeight: 700, textDecoration: "none", border: "1.5px solid #0a1628" }}
+            style={{ background: "none", color: "#1b3a5c", padding: "12px 24px", fontSize: "14px", borderRadius: "3px", fontWeight: 700, textDecoration: "none", border: "1.5px solid #1b3a5c" }}
           >
             Browse Products First
           </Link>

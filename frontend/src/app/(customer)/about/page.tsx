@@ -125,7 +125,7 @@ export default function AboutPage() {
             ))}
           </div>
           <div style={{ marginTop: "32px" }}>
-            <div style={{ background: "linear-gradient(135deg, #0a1628 0%, #1a3a5c 100%)", borderRadius: "12px", padding: "24px 28px", display: "flex", alignItems: "flex-start", gap: "16px" }}>
+            <div style={{ background: "linear-gradient(135deg, #1b3a5c 0%, #1a3a5c 100%)", borderRadius: "12px", padding: "24px 28px", display: "flex", alignItems: "flex-start", gap: "16px" }}>
               <div style={{ background: "rgba(255,255,255,0.1)", borderRadius: "8px", padding: "10px", flexShrink: 0 }}>
                 <FileText size={24} color="white" />
               </div>

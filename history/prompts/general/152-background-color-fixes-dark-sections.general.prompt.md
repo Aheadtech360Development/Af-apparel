@@ -19,8 +19,8 @@ files:
   - frontend/src/app/(customer)/print-guide/page.tsx
   - frontend/src/app/(customer)/private-label/page.tsx
 tests:
-  - manual: print-guide hero shows dark navy #0a1628 background
-  - manual: print-guide method card headers show dark navy #0a1628
+  - manual: print-guide hero shows dark navy #1b3a5c background
+  - manual: print-guide method card headers show dark navy #1b3a5c
   - manual: print-guide CTA shows #f4f3ef with dark text + dark button borders
   - manual: private-label bottom CTA shows #f4f3ef with dark text + dark button borders
 ---
@@ -28,7 +28,7 @@ tests:
 ## Prompt
 
 Fix background colors on specific pages:
-- CHANGE 1: Black/near-black backgrounds → #0a1628 (print-guide hero #111, method card headers #1F2937)
+- CHANGE 1: Black/near-black backgrounds → #1b3a5c (print-guide hero #111, method card headers #1F2937)
 - CHANGE 2: Pre-footer CTA sections → #f4f3ef with light-background text/button colors (print-guide CTA, private-label bottom CTA)
 
 ## Response snapshot
@@ -36,8 +36,8 @@ Fix background colors on specific pages:
 Read all files first. Found:
 - CtaSection.tsx: already #f4f3ef from previous session — no change needed
 - about/page.tsx: no black sections, no bottom CTA — no changes needed
-- print-guide/page.tsx: hero #111 → #0a1628; method card headers #1F2937 → #0a1628 (replace_all); CTA #1B3A5C → #f4f3ef, text/buttons updated
-- private-label/page.tsx: hero already fixed; bottom CTA #1B3A5C → #f4f3ef, heading #fff → #0a1628, body → #444, ghost button → dark navy border/text, contact line → #555
+- print-guide/page.tsx: hero #111 → #1b3a5c; method card headers #1F2937 → #1b3a5c (replace_all); CTA #1B3A5C → #f4f3ef, text/buttons updated
+- private-label/page.tsx: hero already fixed; bottom CTA #1B3A5C → #f4f3ef, heading #fff → #1b3a5c, body → #444, ghost button → dark navy border/text, contact line → #555
 
 ## Outcome
 
