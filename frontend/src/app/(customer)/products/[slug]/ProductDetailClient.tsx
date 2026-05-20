@@ -707,7 +707,6 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
             <div style={{ fontSize: "12px", color: "#7A7880", marginBottom: "14px", display: "flex", flexWrap: "wrap", gap: "6px", alignItems: "center" }}>
               {product.variants?.[0]?.sku && <span>{product.variants[0].sku}</span>}
               {(product as any).fabric && <><span style={{ color: "#ccc" }}>·</span><span>{(product as any).fabric}</span></>}
-              {(product as any).weight && <><span style={{ color: "#ccc" }}>·</span><span>{formatWeightGrams((product as any).weight)}</span></>}
               {uniqueColors.length > 0 && <><span style={{ color: "#ccc" }}>·</span><span>{uniqueColors.length} Colors</span></>}
             </div>
 
@@ -871,9 +870,14 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                             return (
                               <div key={variant.id} style={{ textAlign: "center", minWidth: "64px" }}>
                                 <div style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", color: "#7A7880", marginBottom: "4px" }}>{variant.size}</div>
-                                <div style={{ fontSize: "11px", color: "#aaa", marginBottom: "6px" }}>
+                                <div style={{ fontSize: "11px", color: "#aaa", marginBottom: "4px" }}>
                                   ${Number(variant.effective_price ?? variant.retail_price).toFixed(2)}
                                 </div>
+                                {(product as any).weight && (
+                                  <div style={{ fontSize: "10px", color: "#9ca3af", marginBottom: "4px" }}>
+                                    {formatWeightGrams((product as any).weight)}
+                                  </div>
+                                )}
                                 <input
                                   type="number"
                                   min="0"
