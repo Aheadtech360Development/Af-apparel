@@ -694,7 +694,7 @@ export default function AdminProductEditPage() {
                             }}
                           />
                         </th>
-                        {["Size", "SKU", "Price", "Compare Price", "Cost / Item", "Country of Origin", "Stock", ""].map(h => (
+                        {["Size", "SKU", "Price", "Compare Price", "Cost / Item", "Country of Origin", "Weight (g)", "Stock", ""].map(h => (
                           <th key={h} style={thStyle}>{h}</th>
                         ))}
                       </tr>
@@ -770,6 +770,25 @@ export default function AdminProductEditPage() {
                               onBlur={() => saveVariant(variant.id)}
                               placeholder="e.g. Bangladesh"
                               style={{ padding: "6px 8px", border: "1px solid #E2E0DA", borderRadius: "5px", fontSize: "12px", width: "140px" }}
+                            />
+                          </td>
+                          <td style={{ padding: "10px 16px" }}>
+                            <input
+                              type="number"
+                              value={getVariantValue(variant, "weight_grams")}
+                              onChange={e => {
+                                const val = e.target.value;
+                                product?.variants
+                                  .filter(v => v.size === variant.size)
+                                  .forEach(v => updateVariantEdit(v.id, "weight_grams", val));
+                              }}
+                              onBlur={() => {
+                                product?.variants
+                                  .filter(v => v.size === variant.size)
+                                  .forEach(v => { if (variantEdits[v.id]) saveVariant(v.id); });
+                              }}
+                              placeholder="e.g. 71"
+                              style={{ padding: "6px 8px", border: "1px solid #E2E0DA", borderRadius: "5px", fontSize: "12px", width: "70px" }}
                             />
                           </td>
                           <td style={{ padding: "10px 16px" }}>

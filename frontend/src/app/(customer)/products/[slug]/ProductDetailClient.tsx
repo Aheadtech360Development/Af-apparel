@@ -873,9 +873,9 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                                 <div style={{ fontSize: "11px", color: "#aaa", marginBottom: "4px" }}>
                                   ${Number(variant.effective_price ?? variant.retail_price).toFixed(2)}
                                 </div>
-                                {(product as any).weight && (
+                                {variant.weight_grams != null && variant.weight_grams > 0 && (
                                   <div style={{ fontSize: "10px", color: "#9ca3af", marginBottom: "4px" }}>
-                                    {formatWeightGrams((product as any).weight)}
+                                    {variant.weight_grams}g
                                   </div>
                                 )}
                                 <input
@@ -1108,7 +1108,14 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                       { label: "Sizes Available", value: uniqueSizes.join(", ") || "—" },
                       { label: "Variants", value: `${product.variants?.length ?? 0} options` },
                       ...(((product as any).fabric) ? [{ label: "Fabric", value: (product as any).fabric }] : []),
-                      ...(((product as any).weight) ? [{ label: "Weight", value: formatWeightGrams((product as any).weight) ?? "" }] : []),
+                      ...(() => {
+                        const ws = [...new Set(
+                          (product.variants ?? [])
+                            .filter(v => v.weight_grams != null && v.weight_grams > 0)
+                            .map(v => `${v.size}: ${v.weight_grams}g`)
+                        )];
+                        return ws.length ? [{ label: "Weight per Size", value: ws.join(", ") }] : [];
+                      })(),
                       ...(((product as any).product_code) ? [{ label: "Product Code", value: (product as any).product_code }] : []),
                     ].map(row => (
                       <tr key={row.label} style={{ borderBottom: "1px solid #F4F3EF" }}>

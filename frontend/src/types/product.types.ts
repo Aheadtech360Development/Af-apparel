@@ -32,6 +32,7 @@ export interface ProductVariant {
   msrp: string | null; // kept for guest pricing; hidden from admin UI
   cost_per_item: string | null;
   country_of_origin: string | null;
+  weight_grams: number | null;
   effective_price: string | null;
   status: "active" | "discontinued" | "out_of_stock";
   stock_quantity: number;
