@@ -12,6 +12,16 @@ import { cartService } from "@/services/cart.service";
 import { FactoryIcon, ZapIcon, PackageIcon, PaletteIcon } from "@/components/ui/icons";
 import { productsService } from "@/services/products.service";
 
+function formatWeightGrams(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  const s = raw.trim().toLowerCase();
+  if (s.includes("oz")) {
+    const num = parseFloat(s);
+    return isNaN(num) ? raw : `${Math.round(num * 28.3495)}g`;
+  }
+  return s.endsWith("g") ? raw : `${raw}g`;
+}
+
 // interface ProductDetailClientProps {
 //   product: ProductDetail;
 // }
@@ -697,7 +707,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
             <div style={{ fontSize: "12px", color: "#7A7880", marginBottom: "14px", display: "flex", flexWrap: "wrap", gap: "6px", alignItems: "center" }}>
               {product.variants?.[0]?.sku && <span>{product.variants[0].sku}</span>}
               {(product as any).fabric && <><span style={{ color: "#ccc" }}>·</span><span>{(product as any).fabric}</span></>}
-              {(product as any).weight && <><span style={{ color: "#ccc" }}>·</span><span>{(product as any).weight}</span></>}
+              {(product as any).weight && <><span style={{ color: "#ccc" }}>·</span><span>{formatWeightGrams((product as any).weight)}</span></>}
               {uniqueColors.length > 0 && <><span style={{ color: "#ccc" }}>·</span><span>{uniqueColors.length} Colors</span></>}
             </div>
 
@@ -1094,7 +1104,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                       { label: "Sizes Available", value: uniqueSizes.join(", ") || "—" },
                       { label: "Variants", value: `${product.variants?.length ?? 0} options` },
                       ...(((product as any).fabric) ? [{ label: "Fabric", value: (product as any).fabric }] : []),
-                      ...(((product as any).weight) ? [{ label: "Weight", value: (product as any).weight }] : []),
+                      ...(((product as any).weight) ? [{ label: "Weight", value: formatWeightGrams((product as any).weight) ?? "" }] : []),
                       ...(((product as any).product_code) ? [{ label: "Product Code", value: (product as any).product_code }] : []),
                     ].map(row => (
                       <tr key={row.label} style={{ borderBottom: "1px solid #F4F3EF" }}>

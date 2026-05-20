@@ -561,8 +561,8 @@ export default function NewProductPage() {
                 <input name="product_code" value={form.product_code} onChange={handleChange} placeholder="e.g. G5000, PC61" style={inputStyle} />
               </div>
               <div style={{ marginBottom: "14px" }}>
-                <label style={labelStyle}>Weight</label>
-                <input name="weight" value={form.weight} onChange={handleChange} placeholder="e.g. 5.3 oz, 6.1 oz" style={inputStyle} />
+                <label style={labelStyle}>Weight (g)</label>
+                <input name="weight" value={form.weight} onChange={handleChange} placeholder="e.g. 150, 175" style={inputStyle} />
               </div>
               <div style={{ marginBottom: "14px" }}>
                 <label style={labelStyle}>Category</label>

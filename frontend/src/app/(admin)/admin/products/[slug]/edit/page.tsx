@@ -889,11 +889,11 @@ export default function AdminProductEditPage() {
             </div>
 
             <div style={{ marginBottom: "14px" }}>
-              <label style={labelStyle}>Weight</label>
+              <label style={labelStyle}>Weight (g)</label>
               <input
                 value={(product as any).weight ?? ""}
                 onChange={e => setProduct(p => p ? { ...p, weight: e.target.value } as any : p)}
-                placeholder="e.g. 5.3 oz, 6.1 oz"
+                placeholder="e.g. 150, 175"
                 style={inputStyle}
               />
             </div>
