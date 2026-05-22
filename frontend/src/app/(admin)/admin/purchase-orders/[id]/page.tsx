@@ -150,7 +150,7 @@ export default function PODetailPage() {
       {/* PO Summary */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "16px", marginBottom: "28px" }}>
         {[
-          { label: "Order Date", value: po.order_date ? new Date(po.order_date).toLocaleDateString() : "—" },
+          { label: "Order Date", value: po.order_date ? new Date(po.order_date).toLocaleDateString() : new Date().toLocaleDateString() },
           { label: "Expected Delivery", value: po.expected_delivery ? new Date(po.expected_delivery).toLocaleDateString() : "—" },
           { label: "Total Expected", value: fmt(po.total_expected) },
           { label: "Total Received", value: fmt(po.total_received) },

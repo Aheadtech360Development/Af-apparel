@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { apiClient, ApiClientError } from "@/lib/api-client";
 
@@ -150,20 +150,23 @@ export default function CreatePOPage() {
 
   // ── Product search & variant load ────────────────────────────────────────────
 
-  const searchProducts = useCallback(async (blockKey: number, q: string) => {
+  const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const searchProducts = useCallback((blockKey: number, q: string) => {
     updateBlock(blockKey, { search_query: q, search_results: [] });
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
     if (q.length < 2) return;
-    try {
-      const data = await apiClient.get<{ items?: SearchProduct[] } | SearchProduct[]>(
-        `/api/v1/admin/products/?q=${encodeURIComponent(q)}&page_size=10`
-      );
-      const items: SearchProduct[] = Array.isArray(data)
-        ? (data as SearchProduct[])
-        : ((data as { items?: SearchProduct[] }).items ?? []);
-      updateBlock(blockKey, { search_results: items });
-    } catch {
-      updateBlock(blockKey, { search_results: [] });
-    }
+    searchTimerRef.current = setTimeout(async () => {
+      try {
+        const data = await apiClient.get<SearchProduct[]>(
+          `/api/v1/admin/products?q=${encodeURIComponent(q)}&page_size=10`
+        );
+        const items: SearchProduct[] = Array.isArray(data) ? data : [];
+        updateBlock(blockKey, { search_results: items });
+      } catch {
+        updateBlock(blockKey, { search_results: [] });
+      }
+    }, 300);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function selectProduct(blockKey: number, product: SearchProduct) {
