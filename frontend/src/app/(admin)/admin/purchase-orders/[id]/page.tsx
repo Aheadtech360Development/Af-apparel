@@ -16,6 +16,7 @@ const STATUS_COLORS: Record<string, { bg: string; color: string }> = {
 
 interface LineItem {
   id: string;
+  product_name: string | null;
   variant_sku: string | null;
   variant_color: string | null;
   variant_size: string | null;
@@ -86,10 +87,14 @@ export default function PODetailPage() {
   useEffect(() => { load(); }, [id]);
 
   async function markSent() {
+    if (!window.confirm("Mark this PO as Sent? This cannot be undone.")) return;
     setUpdatingStatus(true);
     try {
-      await apiClient.patch(`/api/v1/admin/purchase-orders/${id}/status`, { status: "sent" });
+      await apiClient.post(`/api/v1/admin/purchase-orders/${id}/mark-sent`);
       await load();
+      alert("PO marked as sent.");
+    } catch (err) {
+      alert(err instanceof ApiClientError ? err.message : "Failed to update status");
     } finally {
       setUpdatingStatus(false);
     }
@@ -194,7 +199,7 @@ export default function PODetailPage() {
           <tbody>
             {po.line_items.map(li => (
               <tr key={li.id} style={{ borderBottom: "1px solid #F3F4F6" }}>
-                <td style={{ padding: "13px 16px", fontSize: "13px", fontWeight: 500 }}>{li.new_product_name || "—"}</td>
+                <td style={{ padding: "13px 16px", fontSize: "13px", fontWeight: 500 }}>{li.product_name || li.new_product_name || "—"}</td>
                 <td style={{ padding: "13px 16px", fontSize: "12px", color: "#6B7280", fontFamily: "monospace" }}>{li.new_product_sku || li.variant_sku || "—"}</td>
                 <td style={{ padding: "13px 16px", fontSize: "13px" }}>{li.new_product_color || li.variant_color || "—"}</td>
                 <td style={{ padding: "13px 16px", fontSize: "13px" }}>{li.new_product_size || li.variant_size || "—"}</td>

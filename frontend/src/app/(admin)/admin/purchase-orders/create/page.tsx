@@ -268,14 +268,13 @@ export default function CreatePOPage() {
     sum + b.variant_rows.reduce((s, r) => s + r.qty_ordered * r.unit_cost_expected, 0), 0
   );
 
-  const reviewItems = buildLineItems() as Array<{
-    product_variant_id?: string;
-    new_product_name?: string;
-    new_product_color?: string;
-    new_product_size?: string;
-    qty_ordered: number;
-    unit_cost_expected: number;
-  }>;
+  const reviewRows: Array<{ productLabel: string; color: string; size: string; qty: number; cost: number }> = [];
+  for (const block of blocks) {
+    const productLabel = block.mode === "new" ? (block.new_product_name || "Unnamed product") : (block.product_name || "Unknown product");
+    for (const row of block.variant_rows.filter(r => r.qty_ordered > 0)) {
+      reviewRows.push({ productLabel, color: row.color, size: row.size, qty: row.qty_ordered, cost: row.unit_cost_expected });
+    }
+  }
 
   // ── Render ────────────────────────────────────────────────────────────────────
 
@@ -363,7 +362,7 @@ export default function CreatePOPage() {
 
           {/* Running total */}
           <div style={{ padding: "16px 20px", background: "#F0F4FF", borderRadius: "10px", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-            <span style={{ fontSize: "14px", color: "#374151" }}>Running Total ({buildLineItems().length} line items):</span>
+            <span style={{ fontSize: "14px", color: "#374151" }}>Running Total ({blocks.reduce((n, b) => n + b.variant_rows.filter(r => r.qty_ordered > 0).length, 0)} line items):</span>
             <span style={{ fontSize: "22px", fontWeight: 700, color: "#1B3A5C" }}>${total.toFixed(2)}</span>
           </div>
 
@@ -399,16 +398,16 @@ export default function CreatePOPage() {
               </tr>
             </thead>
             <tbody>
-              {reviewItems.length === 0 ? (
+              {reviewRows.length === 0 ? (
                 <tr><td colSpan={6} style={{ padding: "20px 14px", color: "#9CA3AF", fontSize: "13px" }}>No line items with qty &gt; 0 yet.</td></tr>
-              ) : reviewItems.map((it, i) => (
+              ) : reviewRows.map((it, i) => (
                 <tr key={i} style={{ borderBottom: "1px solid #F3F4F6" }}>
-                  <td style={{ padding: "12px 14px", fontSize: "13px" }}>{it.new_product_name || (it.product_variant_id ? `Variant ${it.product_variant_id.slice(0, 8)}…` : "—")}</td>
-                  <td style={{ padding: "12px 14px", fontSize: "13px", color: "#6B7280" }}>{it.new_product_color || "—"}</td>
-                  <td style={{ padding: "12px 14px", fontSize: "13px", color: "#6B7280" }}>{it.new_product_size || "—"}</td>
-                  <td style={{ padding: "12px 14px", fontSize: "13px" }}>{it.qty_ordered}</td>
-                  <td style={{ padding: "12px 14px", fontSize: "13px" }}>${it.unit_cost_expected.toFixed(2)}</td>
-                  <td style={{ padding: "12px 14px", fontSize: "13px", fontWeight: 600 }}>${(it.qty_ordered * it.unit_cost_expected).toFixed(2)}</td>
+                  <td style={{ padding: "12px 14px", fontSize: "13px" }}>{it.productLabel}</td>
+                  <td style={{ padding: "12px 14px", fontSize: "13px", color: "#6B7280" }}>{it.color || "—"}</td>
+                  <td style={{ padding: "12px 14px", fontSize: "13px", color: "#6B7280" }}>{it.size || "—"}</td>
+                  <td style={{ padding: "12px 14px", fontSize: "13px" }}>{it.qty}</td>
+                  <td style={{ padding: "12px 14px", fontSize: "13px" }}>${it.cost.toFixed(2)}</td>
+                  <td style={{ padding: "12px 14px", fontSize: "13px", fontWeight: 600 }}>${(it.qty * it.cost).toFixed(2)}</td>
                 </tr>
               ))}
             </tbody>
