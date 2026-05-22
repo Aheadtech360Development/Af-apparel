@@ -77,6 +77,7 @@ export default function PODetailPage() {
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [emailSending, setEmailSending] = useState(false);
 
   async function load() {
     const data = await apiClient.get<PO>(`/api/v1/admin/purchase-orders/${id}`);
@@ -85,6 +86,20 @@ export default function PODetailPage() {
   }
 
   useEffect(() => { load(); }, [id]);
+
+  async function handleSendEmail() {
+    if (!window.confirm(`Send PO email to ${po?.manufacturer_name || "manufacturer"}?`)) return;
+    setEmailSending(true);
+    try {
+      await apiClient.post(`/api/v1/admin/purchase-orders/${id}/send-email`);
+      alert("Email sent to manufacturer!");
+      await load();
+    } catch (err) {
+      alert(err instanceof ApiClientError ? err.message : "Failed to send email");
+    } finally {
+      setEmailSending(false);
+    }
+  }
 
   async function markSent() {
     if (!window.confirm("Mark this PO as Sent? This cannot be undone.")) return;
@@ -137,9 +152,14 @@ export default function PODetailPage() {
         </div>
         <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
           {po.status === "draft" && (
-            <button onClick={markSent} disabled={updatingStatus} style={{ padding: "9px 18px", borderRadius: "8px", border: "1px solid #D1D5DB", background: "#fff", fontSize: "13px", fontWeight: 600, cursor: "pointer", color: "#374151" }}>
-              Mark as Sent
-            </button>
+            <>
+              <button onClick={handleSendEmail} disabled={emailSending} style={{ padding: "9px 18px", borderRadius: "8px", background: "#1D4ED8", color: "#fff", border: "none", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}>
+                {emailSending ? "Sending…" : "Send Email to Manufacturer"}
+              </button>
+              <button onClick={markSent} disabled={updatingStatus} style={{ padding: "9px 18px", borderRadius: "8px", border: "1px solid #D1D5DB", background: "#fff", fontSize: "13px", fontWeight: 600, cursor: "pointer", color: "#374151" }}>
+                Mark as Sent
+              </button>
+            </>
           )}
           <button onClick={syncQB} disabled={syncing} style={{ padding: "9px 18px", borderRadius: "8px", background: "#1D4ED8", color: "#fff", border: "none", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}>
             {syncing ? "Syncing…" : "Sync to QB"}

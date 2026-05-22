@@ -100,6 +100,7 @@ export default function CreatePOPage() {
   const [notes, setNotes] = useState("");
   const [blocks, setBlocks] = useState<ProductBlock[]>([blankBlock()]);
   const [saving, setSaving] = useState(false);
+  const [emailSending, setEmailSending] = useState(false);
   const [showNewMfr, setShowNewMfr] = useState(false);
   const [newMfrName, setNewMfrName] = useState("");
 
@@ -240,26 +241,55 @@ export default function CreatePOPage() {
     return items;
   }
 
-  // ── Save ──────────────────────────────────────────────────────────────────────
+  // ── Save helpers ──────────────────────────────────────────────────────────────
 
-  async function save() {
-    if (!manufacturerId) { alert("Please select a manufacturer"); return; }
+  async function savePO(): Promise<{ id: string } | null> {
+    if (!manufacturerId) { alert("Please select a manufacturer"); return null; }
     const lineItems = buildLineItems();
-    if (lineItems.length === 0) { alert("Add at least one line item with qty > 0"); return; }
-    setSaving(true);
+    if (lineItems.length === 0) { alert("Add at least one line item with qty > 0"); return null; }
     try {
-      const data = await apiClient.post<{ id: string }>("/api/v1/admin/purchase-orders/", {
+      return await apiClient.post<{ id: string }>("/api/v1/admin/purchase-orders/", {
         manufacturer_id: manufacturerId,
         expected_delivery: expectedDelivery || null,
         notes: notes || null,
         line_items: lineItems,
       });
-      router.push(`/admin/purchase-orders/${data.id}`);
     } catch (err) {
       alert(err instanceof ApiClientError ? err.message : "Failed to create PO");
+      return null;
+    }
+  }
+
+  async function save() {
+    setSaving(true);
+    try {
+      const data = await savePO();
+      if (data) router.push(`/admin/purchase-orders/${data.id}`);
     } finally {
       setSaving(false);
     }
+  }
+
+  async function saveAndEmail() {
+    setSaving(true);
+    let poData: { id: string } | null = null;
+    try {
+      poData = await savePO();
+    } finally {
+      setSaving(false);
+    }
+    if (!poData) return;
+
+    setEmailSending(true);
+    try {
+      await apiClient.post(`/api/v1/admin/purchase-orders/${poData.id}/send-email`);
+      alert("PO saved and email sent to manufacturer!");
+    } catch {
+      alert("PO saved but email failed. You can resend from the PO detail page.");
+    } finally {
+      setEmailSending(false);
+    }
+    router.push(`/admin/purchase-orders/${poData.id}`);
   }
 
   // ── Running total ─────────────────────────────────────────────────────────────
@@ -419,9 +449,15 @@ export default function CreatePOPage() {
 
           <div style={{ display: "flex", justifyContent: "space-between", gap: "12px" }}>
             <button onClick={() => setStep(2)} style={{ ...BTN_SM, background: "#F3F4F6", color: "#374151" }}>← Back</button>
-            <button onClick={save} disabled={saving} style={BTN_PRIMARY}>
-              {saving ? "Saving…" : "Save as Draft"}
-            </button>
+            <div style={{ display: "flex", gap: "10px" }}>
+              <button onClick={save} disabled={saving || emailSending} style={BTN_PRIMARY}>
+                {saving ? "Saving…" : "Save as Draft"}
+              </button>
+              <button onClick={saveAndEmail} disabled={saving || emailSending}
+                style={{ ...BTN_PRIMARY, background: "#1D4ED8" }}>
+                {emailSending ? "Sending…" : saving ? "Saving…" : "Save & Send to Manufacturer"}
+              </button>
+            </div>
           </div>
         </div>
       )}
