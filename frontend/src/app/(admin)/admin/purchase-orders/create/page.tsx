@@ -1,41 +1,95 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { apiClient, ApiClientError } from "@/lib/api-client";
 
-interface Manufacturer { id: string; name: string; }
-interface Variant { id: string; sku: string; color: string | null; size: string | null; retail_price: string; }
-interface ProductHit { id: string; name: string; variants: Variant[]; }
+// ── Types ─────────────────────────────────────────────────────────────────────
 
-interface LineItem {
+interface Manufacturer { id: string; name: string; }
+
+interface SearchProduct { id: string; name: string; slug: string; }
+
+interface FullVariant {
+  id: string;
+  sku: string;
+  color: string | null;
+  size: string | null;
+  stock_quantity: number;
+  cost_per_item: string | null;
+}
+
+interface VariantRow {
   key: number;
-  product_variant_id: string | null;
-  label: string;
-  new_product_name: string;
-  new_product_sku: string;
-  new_product_size: string;
-  new_product_color: string;
+  variant_id: string | null;   // null = new variant
+  color: string;
+  size: string;
+  stock_quantity: number;
   qty_ordered: number;
   unit_cost_expected: number;
-  is_new: boolean;
+  is_new_variant: boolean;
 }
 
-let _key = 0;
-function newItem(): LineItem {
+interface ProductBlock {
+  key: number;
+  mode: "existing" | "new";
+  // Existing product
+  product_id: string | null;
+  product_name: string;
+  // New product
+  new_product_name: string;
+  new_sku_prefix: string;
+  // Variants
+  variant_rows: VariantRow[];
+  // Search state
+  search_query: string;
+  search_results: SearchProduct[];
+  loading_variants: boolean;
+}
+
+// ── Constants ─────────────────────────────────────────────────────────────────
+
+const SIZE_ORDER = ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL", "5XL"];
+const SIZE_OPTIONS = [...SIZE_ORDER, "Custom"];
+
+function sizeRank(s: string) {
+  const i = SIZE_ORDER.indexOf(s.toUpperCase());
+  return i === -1 ? 999 : i;
+}
+
+let _blockKey = 0;
+let _rowKey = 0;
+
+function blankBlock(): ProductBlock {
   return {
-    key: ++_key,
-    product_variant_id: null,
-    label: "",
+    key: ++_blockKey,
+    mode: "existing",
+    product_id: null,
+    product_name: "",
     new_product_name: "",
-    new_product_sku: "",
-    new_product_size: "",
-    new_product_color: "",
-    qty_ordered: 1,
-    unit_cost_expected: 0,
-    is_new: false,
+    new_sku_prefix: "",
+    variant_rows: [],
+    search_query: "",
+    search_results: [],
+    loading_variants: false,
   };
 }
+
+function blankRow(overrides: Partial<VariantRow> = {}): VariantRow {
+  return {
+    key: ++_rowKey,
+    variant_id: null,
+    color: "",
+    size: "M",
+    stock_quantity: 0,
+    qty_ordered: 0,
+    unit_cost_expected: 0,
+    is_new_variant: true,
+    ...overrides,
+  };
+}
+
+// ── Component ─────────────────────────────────────────────────────────────────
 
 export default function CreatePOPage() {
   const router = useRouter();
@@ -44,9 +98,7 @@ export default function CreatePOPage() {
   const [manufacturerId, setManufacturerId] = useState("");
   const [expectedDelivery, setExpectedDelivery] = useState("");
   const [notes, setNotes] = useState("");
-  const [lineItems, setLineItems] = useState<LineItem[]>([newItem()]);
-  const [productSearch, setProductSearch] = useState<Record<number, string>>({});
-  const [searchResults, setSearchResults] = useState<Record<number, ProductHit[]>>({});
+  const [blocks, setBlocks] = useState<ProductBlock[]>([blankBlock()]);
   const [saving, setSaving] = useState(false);
   const [showNewMfr, setShowNewMfr] = useState(false);
   const [newMfrName, setNewMfrName] = useState("");
@@ -56,30 +108,95 @@ export default function CreatePOPage() {
       .then(d => setManufacturers(Array.isArray(d) ? d : []));
   }, []);
 
-  async function searchProducts(key: number, q: string) {
-    setProductSearch(p => ({ ...p, [key]: q }));
-    if (q.length < 2) { setSearchResults(p => ({ ...p, [key]: [] })); return; }
-    const data = await apiClient.get<ProductHit[] | { items: ProductHit[] }>(
-      `/api/v1/admin/products/?search=${encodeURIComponent(q)}&page_size=10`
-    );
-    const items = Array.isArray(data) ? data : ((data as { items: ProductHit[] }).items || []);
-    setSearchResults(p => ({ ...p, [key]: items }));
+  // ── Block helpers ────────────────────────────────────────────────────────────
+
+  function updateBlock(key: number, patch: Partial<ProductBlock>) {
+    setBlocks(bs => bs.map(b => b.key === key ? { ...b, ...patch } : b));
   }
 
-  function selectVariant(key: number, product: ProductHit, variant: Variant) {
-    setLineItems(items => items.map(it => it.key === key ? {
-      ...it,
-      product_variant_id: variant.id,
-      label: `${product.name} — ${variant.color || ""} ${variant.size || ""}`.trim(),
-      is_new: false,
-    } : it));
-    setSearchResults(p => ({ ...p, [key]: [] }));
-    setProductSearch(p => ({ ...p, [key]: "" }));
+  function removeBlock(key: number) {
+    setBlocks(bs => bs.filter(b => b.key !== key));
   }
 
-  function updateItem(key: number, field: keyof LineItem, value: string | number | boolean | null) {
-    setLineItems(items => items.map(it => it.key === key ? { ...it, [field]: value } : it));
+  function updateRow(blockKey: number, rowKey: number, patch: Partial<VariantRow>) {
+    setBlocks(bs => bs.map(b => b.key === blockKey
+      ? { ...b, variant_rows: b.variant_rows.map(r => r.key === rowKey ? { ...r, ...patch } : r) }
+      : b
+    ));
   }
+
+  function removeRow(blockKey: number, rowKey: number) {
+    setBlocks(bs => bs.map(b => b.key === blockKey
+      ? { ...b, variant_rows: b.variant_rows.filter(r => r.key !== rowKey) }
+      : b
+    ));
+  }
+
+  function addNewVariantRow(blockKey: number) {
+    const block = blocks.find(b => b.key === blockKey);
+    const defaultCost = block?.variant_rows.find(r => r.unit_cost_expected > 0)?.unit_cost_expected ?? 0;
+    setBlocks(bs => bs.map(b => b.key === blockKey
+      ? { ...b, variant_rows: [...b.variant_rows, blankRow({ unit_cost_expected: defaultCost })] }
+      : b
+    ));
+  }
+
+  function applyCostToAll(blockKey: number, cost: number) {
+    setBlocks(bs => bs.map(b => b.key === blockKey
+      ? { ...b, variant_rows: b.variant_rows.map(r => ({ ...r, unit_cost_expected: cost })) }
+      : b
+    ));
+  }
+
+  // ── Product search & variant load ────────────────────────────────────────────
+
+  const searchProducts = useCallback(async (blockKey: number, q: string) => {
+    updateBlock(blockKey, { search_query: q, search_results: [] });
+    if (q.length < 2) return;
+    try {
+      const data = await apiClient.get<{ items?: SearchProduct[] } | SearchProduct[]>(
+        `/api/v1/admin/products/?q=${encodeURIComponent(q)}&page_size=10`
+      );
+      const items: SearchProduct[] = Array.isArray(data)
+        ? (data as SearchProduct[])
+        : ((data as { items?: SearchProduct[] }).items ?? []);
+      updateBlock(blockKey, { search_results: items });
+    } catch {
+      updateBlock(blockKey, { search_results: [] });
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function selectProduct(blockKey: number, product: SearchProduct) {
+    updateBlock(blockKey, {
+      search_query: product.name,
+      search_results: [],
+      product_id: product.id,
+      product_name: product.name,
+      loading_variants: true,
+      variant_rows: [],
+    });
+    try {
+      const detail = await apiClient.get<{ variants: FullVariant[] }>(
+        `/api/v1/admin/products/${product.slug}`
+      );
+      const variants: FullVariant[] = detail.variants ?? [];
+      const rows: VariantRow[] = variants
+        .sort((a, b) => sizeRank(a.size ?? "") - sizeRank(b.size ?? ""))
+        .map(v => blankRow({
+          variant_id: v.id,
+          color: v.color ?? "",
+          size: v.size ?? "",
+          stock_quantity: v.stock_quantity ?? 0,
+          unit_cost_expected: parseFloat(v.cost_per_item ?? "0") || 0,
+          is_new_variant: false,
+        }));
+      updateBlock(blockKey, { variant_rows: rows, loading_variants: false });
+    } catch {
+      updateBlock(blockKey, { loading_variants: false });
+    }
+  }
+
+  // ── Manufacturer add ──────────────────────────────────────────────────────────
 
   async function addManufacturer() {
     if (!newMfrName.trim()) return;
@@ -90,25 +207,49 @@ export default function CreatePOPage() {
     setShowNewMfr(false);
   }
 
+  // ── Build final line items ───────────────────────────────────────────────────
+
+  function buildLineItems() {
+    const items: object[] = [];
+    for (const block of blocks) {
+      const activeRows = block.variant_rows.filter(r => r.qty_ordered > 0);
+      for (const row of activeRows) {
+        if (block.mode === "existing" && !row.is_new_variant && row.variant_id) {
+          items.push({
+            product_variant_id: row.variant_id,
+            qty_ordered: row.qty_ordered,
+            unit_cost_expected: row.unit_cost_expected,
+          });
+        } else {
+          items.push({
+            new_product_name: block.mode === "new" ? block.new_product_name : block.product_name,
+            new_product_sku: block.mode === "new" && block.new_sku_prefix
+              ? `${block.new_sku_prefix}-${row.color}-${row.size}`.toUpperCase()
+              : null,
+            new_product_color: row.color || null,
+            new_product_size: row.size || null,
+            qty_ordered: row.qty_ordered,
+            unit_cost_expected: row.unit_cost_expected,
+          });
+        }
+      }
+    }
+    return items;
+  }
+
+  // ── Save ──────────────────────────────────────────────────────────────────────
+
   async function save() {
     if (!manufacturerId) { alert("Please select a manufacturer"); return; }
-    const validItems = lineItems.filter(it => it.product_variant_id || it.new_product_name);
-    if (validItems.length === 0) { alert("Add at least one line item"); return; }
+    const lineItems = buildLineItems();
+    if (lineItems.length === 0) { alert("Add at least one line item with qty > 0"); return; }
     setSaving(true);
     try {
       const data = await apiClient.post<{ id: string }>("/api/v1/admin/purchase-orders/", {
         manufacturer_id: manufacturerId,
         expected_delivery: expectedDelivery || null,
         notes: notes || null,
-        line_items: validItems.map(it => ({
-          product_variant_id: it.product_variant_id,
-          new_product_name: it.new_product_name || null,
-          new_product_sku: it.new_product_sku || null,
-          new_product_size: it.new_product_size || null,
-          new_product_color: it.new_product_color || null,
-          qty_ordered: it.qty_ordered,
-          unit_cost_expected: it.unit_cost_expected,
-        })),
+        line_items: lineItems,
       });
       router.push(`/admin/purchase-orders/${data.id}`);
     } catch (err) {
@@ -118,10 +259,25 @@ export default function CreatePOPage() {
     }
   }
 
-  const total = lineItems.reduce((s, it) => s + it.qty_ordered * it.unit_cost_expected, 0);
+  // ── Running total ─────────────────────────────────────────────────────────────
+
+  const total = blocks.reduce((sum, b) =>
+    sum + b.variant_rows.reduce((s, r) => s + r.qty_ordered * r.unit_cost_expected, 0), 0
+  );
+
+  const reviewItems = buildLineItems() as Array<{
+    product_variant_id?: string;
+    new_product_name?: string;
+    new_product_color?: string;
+    new_product_size?: string;
+    qty_ordered: number;
+    unit_cost_expected: number;
+  }>;
+
+  // ── Render ────────────────────────────────────────────────────────────────────
 
   return (
-    <div style={{ padding: "32px", maxWidth: "900px", margin: "0 auto" }}>
+    <div style={{ padding: "32px", maxWidth: "1000px", margin: "0 auto" }}>
       <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "28px" }}>
         <button onClick={() => router.back()} style={{ background: "none", border: "none", cursor: "pointer", color: "#6B7280", fontSize: "13px" }}>← Back</button>
         <h1 style={{ fontSize: "22px", fontWeight: 700, color: "#1B3A5C", letterSpacing: ".04em" }}>CREATE PURCHASE ORDER</h1>
@@ -140,7 +296,7 @@ export default function CreatePOPage() {
         ))}
       </div>
 
-      {/* Step 1: PO Info */}
+      {/* ── Step 1: PO Info ─────────────────────────────────────────────────── */}
       {step === 1 && (
         <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: "10px", padding: "28px" }}>
           <h2 style={{ fontSize: "15px", fontWeight: 700, color: "#1B3A5C", marginBottom: "20px" }}>PO Information</h2>
@@ -178,112 +334,44 @@ export default function CreatePOPage() {
         </div>
       )}
 
-      {/* Step 2: Line Items */}
+      {/* ── Step 2: Line Items ──────────────────────────────────────────────── */}
       {step === 2 && (
-        <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: "10px", padding: "28px" }}>
-          <h2 style={{ fontSize: "15px", fontWeight: 700, color: "#1B3A5C", marginBottom: "20px" }}>Line Items</h2>
-
-          {lineItems.map((item, idx) => (
-            <div key={item.key} style={{ border: "1px solid #E5E7EB", borderRadius: "8px", padding: "16px", marginBottom: "12px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
-                <span style={{ fontSize: "13px", fontWeight: 600, color: "#374151" }}>Item {idx + 1}</span>
-                <button onClick={() => setLineItems(l => l.filter(it => it.key !== item.key))}
-                  style={{ background: "none", border: "none", cursor: "pointer", color: "#EF4444", fontSize: "18px", lineHeight: 1 }}>×</button>
-              </div>
-
-              {/* Toggle: existing / new product */}
-              <div style={{ display: "flex", gap: "8px", marginBottom: "12px" }}>
-                <button onClick={() => updateItem(item.key, "is_new", false)} style={{
-                  padding: "5px 14px", borderRadius: "6px", border: "1px solid", fontSize: "12px", fontWeight: 600, cursor: "pointer",
-                  background: !item.is_new ? "#1B3A5C" : "#fff", color: !item.is_new ? "#fff" : "#6B7280",
-                  borderColor: !item.is_new ? "#1B3A5C" : "#D1D5DB",
-                }}>Search Existing</button>
-                <button onClick={() => updateItem(item.key, "is_new", true)} style={{
-                  padding: "5px 14px", borderRadius: "6px", border: "1px solid", fontSize: "12px", fontWeight: 600, cursor: "pointer",
-                  background: item.is_new ? "#1B3A5C" : "#fff", color: item.is_new ? "#fff" : "#6B7280",
-                  borderColor: item.is_new ? "#1B3A5C" : "#D1D5DB",
-                }}>New Product</button>
-              </div>
-
-              {!item.is_new ? (
-                <div style={{ position: "relative", marginBottom: "12px" }}>
-                  {item.product_variant_id ? (
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                      <span style={{ fontSize: "13px", color: "#374151", flex: 1 }}>{item.label}</span>
-                      <button onClick={() => updateItem(item.key, "product_variant_id", null)} style={{ background: "none", border: "none", cursor: "pointer", color: "#6B7280", fontSize: "12px" }}>Change</button>
-                    </div>
-                  ) : (
-                    <>
-                      <input
-                        value={productSearch[item.key] || ""}
-                        onChange={e => searchProducts(item.key, e.target.value)}
-                        placeholder="Search by product name or SKU…"
-                        style={INPUT}
-                      />
-                      {(searchResults[item.key] || []).length > 0 && (
-                        <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "#fff", border: "1px solid #E5E7EB", borderRadius: "8px", zIndex: 10, maxHeight: "240px", overflowY: "auto", boxShadow: "0 4px 16px rgba(0,0,0,.1)" }}>
-                          {(searchResults[item.key] ?? []).map(product =>
-                            product.variants.map(v => (
-                              <button key={v.id} onClick={() => selectVariant(item.key, product, v)}
-                                style={{ display: "block", width: "100%", textAlign: "left", padding: "10px 14px", border: "none", background: "none", cursor: "pointer", fontSize: "13px", borderBottom: "1px solid #F3F4F6" }}
-                                onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = "#F9FAFB"}
-                                onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = "transparent"}
-                              >
-                                <strong>{product.name}</strong> — {v.color} / {v.size} <span style={{ color: "#9CA3AF" }}>({v.sku})</span>
-                              </button>
-                            ))
-                          )}
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
-              ) : (
-                <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: "8px", marginBottom: "12px" }}>
-                  <input value={item.new_product_name} onChange={e => updateItem(item.key, "new_product_name", e.target.value)} placeholder="Product Name *" style={INPUT} />
-                  <input value={item.new_product_sku} onChange={e => updateItem(item.key, "new_product_sku", e.target.value)} placeholder="SKU" style={INPUT} />
-                  <input value={item.new_product_color} onChange={e => updateItem(item.key, "new_product_color", e.target.value)} placeholder="Color" style={INPUT} />
-                  <input value={item.new_product_size} onChange={e => updateItem(item.key, "new_product_size", e.target.value)} placeholder="Size" style={INPUT} />
-                </div>
-              )}
-
-              <div style={{ display: "grid", gridTemplateColumns: "120px 160px auto", gap: "8px", alignItems: "center" }}>
-                <div>
-                  <label style={{ fontSize: "11px", color: "#6B7280", display: "block", marginBottom: "4px" }}>QTY ORDERED</label>
-                  <input type="number" min={1} value={item.qty_ordered}
-                    onChange={e => updateItem(item.key, "qty_ordered", parseInt(e.target.value) || 1)}
-                    style={INPUT} />
-                </div>
-                <div>
-                  <label style={{ fontSize: "11px", color: "#6B7280", display: "block", marginBottom: "4px" }}>UNIT COST ($)</label>
-                  <input type="number" min={0} step={0.01} value={item.unit_cost_expected}
-                    onChange={e => updateItem(item.key, "unit_cost_expected", parseFloat(e.target.value) || 0)}
-                    style={INPUT} />
-                </div>
-                <div style={{ paddingTop: "16px", fontSize: "13px", fontWeight: 600, color: "#374151" }}>
-                  = ${(item.qty_ordered * item.unit_cost_expected).toFixed(2)}
-                </div>
-              </div>
-            </div>
+        <div>
+          {blocks.map((block, bIdx) => (
+            <ProductBlockEditor
+              key={block.key}
+              block={block}
+              blockIndex={bIdx}
+              onUpdate={patch => updateBlock(block.key, patch)}
+              onRemove={() => removeBlock(block.key)}
+              onSearchChange={q => searchProducts(block.key, q)}
+              onSelectProduct={p => selectProduct(block.key, p)}
+              onUpdateRow={(rk, patch) => updateRow(block.key, rk, patch)}
+              onRemoveRow={rk => removeRow(block.key, rk)}
+              onAddNewVariant={() => addNewVariantRow(block.key)}
+              onApplyCostToAll={cost => applyCostToAll(block.key, cost)}
+            />
           ))}
 
-          <button onClick={() => setLineItems(l => [...l, newItem()])} style={{ ...BTN_SM, width: "100%", marginTop: "4px" }}>
-            + Add Line Item
+          <button onClick={() => setBlocks(bs => [...bs, blankBlock()])}
+            style={{ ...BTN_SM, width: "100%", marginBottom: "20px" }}>
+            + Add Another Product
           </button>
 
-          <div style={{ marginTop: "20px", padding: "16px", background: "#F9FAFB", borderRadius: "8px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ fontSize: "14px", color: "#6B7280" }}>Running Total:</span>
-            <span style={{ fontSize: "20px", fontWeight: 700, color: "#1B3A5C" }}>${total.toFixed(2)}</span>
+          {/* Running total */}
+          <div style={{ padding: "16px 20px", background: "#F0F4FF", borderRadius: "10px", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+            <span style={{ fontSize: "14px", color: "#374151" }}>Running Total ({buildLineItems().length} line items):</span>
+            <span style={{ fontSize: "22px", fontWeight: 700, color: "#1B3A5C" }}>${total.toFixed(2)}</span>
           </div>
 
-          <div style={{ marginTop: "20px", display: "flex", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
             <button onClick={() => setStep(1)} style={{ ...BTN_SM, background: "#F3F4F6", color: "#374151" }}>← Back</button>
             <button onClick={() => setStep(3)} style={BTN_PRIMARY}>Next: Review →</button>
           </div>
         </div>
       )}
 
-      {/* Step 3: Review */}
+      {/* ── Step 3: Review ──────────────────────────────────────────────────── */}
       {step === 3 && (
         <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: "10px", padding: "28px" }}>
           <h2 style={{ fontSize: "15px", fontWeight: 700, color: "#1B3A5C", marginBottom: "20px" }}>Review & Save</h2>
@@ -302,15 +390,19 @@ export default function CreatePOPage() {
           <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: "20px" }}>
             <thead>
               <tr style={{ background: "#F9FAFB", borderBottom: "1px solid #E5E7EB" }}>
-                {["PRODUCT", "QTY", "UNIT COST", "TOTAL"].map(h => (
+                {["PRODUCT / VARIANT", "COLOR", "SIZE", "QTY", "UNIT COST", "TOTAL"].map(h => (
                   <th key={h} style={{ padding: "10px 14px", textAlign: "left", fontSize: "11px", fontWeight: 700, color: "#6B7280", letterSpacing: ".07em" }}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {lineItems.filter(it => it.product_variant_id || it.new_product_name).map(it => (
-                <tr key={it.key} style={{ borderBottom: "1px solid #F3F4F6" }}>
-                  <td style={{ padding: "12px 14px", fontSize: "13px" }}>{it.label || it.new_product_name}</td>
+              {reviewItems.length === 0 ? (
+                <tr><td colSpan={6} style={{ padding: "20px 14px", color: "#9CA3AF", fontSize: "13px" }}>No line items with qty &gt; 0 yet.</td></tr>
+              ) : reviewItems.map((it, i) => (
+                <tr key={i} style={{ borderBottom: "1px solid #F3F4F6" }}>
+                  <td style={{ padding: "12px 14px", fontSize: "13px" }}>{it.new_product_name || (it.product_variant_id ? `Variant ${it.product_variant_id.slice(0, 8)}…` : "—")}</td>
+                  <td style={{ padding: "12px 14px", fontSize: "13px", color: "#6B7280" }}>{it.new_product_color || "—"}</td>
+                  <td style={{ padding: "12px 14px", fontSize: "13px", color: "#6B7280" }}>{it.new_product_size || "—"}</td>
                   <td style={{ padding: "12px 14px", fontSize: "13px" }}>{it.qty_ordered}</td>
                   <td style={{ padding: "12px 14px", fontSize: "13px" }}>${it.unit_cost_expected.toFixed(2)}</td>
                   <td style={{ padding: "12px 14px", fontSize: "13px", fontWeight: 600 }}>${(it.qty_ordered * it.unit_cost_expected).toFixed(2)}</td>
@@ -334,6 +426,204 @@ export default function CreatePOPage() {
     </div>
   );
 }
+
+// ── ProductBlockEditor sub-component ─────────────────────────────────────────
+
+interface BlockEditorProps {
+  block: ProductBlock;
+  blockIndex: number;
+  onUpdate: (patch: Partial<ProductBlock>) => void;
+  onRemove: () => void;
+  onSearchChange: (q: string) => void;
+  onSelectProduct: (p: SearchProduct) => void;
+  onUpdateRow: (rowKey: number, patch: Partial<VariantRow>) => void;
+  onRemoveRow: (rowKey: number) => void;
+  onAddNewVariant: () => void;
+  onApplyCostToAll: (cost: number) => void;
+}
+
+function ProductBlockEditor({
+  block, blockIndex, onUpdate, onRemove,
+  onSearchChange, onSelectProduct,
+  onUpdateRow, onRemoveRow, onAddNewVariant, onApplyCostToAll,
+}: BlockEditorProps) {
+  const [applyCostVal, setApplyCostVal] = useState("");
+
+  return (
+    <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: "10px", padding: "24px", marginBottom: "16px" }}>
+      {/* Block header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+        <span style={{ fontSize: "14px", fontWeight: 700, color: "#1B3A5C" }}>Product {blockIndex + 1}</span>
+        <button onClick={onRemove} style={{ background: "none", border: "none", cursor: "pointer", color: "#9CA3AF", fontSize: "18px" }}>×</button>
+      </div>
+
+      {/* Mode toggle */}
+      <div style={{ display: "flex", gap: "6px", marginBottom: "16px" }}>
+        {(["existing", "new"] as const).map(m => (
+          <button key={m} onClick={() => onUpdate({ mode: m, variant_rows: [], product_id: null, search_query: "", search_results: [] })}
+            style={{
+              padding: "6px 16px", borderRadius: "6px", border: "1px solid", fontSize: "12px", fontWeight: 600, cursor: "pointer",
+              background: block.mode === m ? "#1B3A5C" : "#fff",
+              color: block.mode === m ? "#fff" : "#6B7280",
+              borderColor: block.mode === m ? "#1B3A5C" : "#D1D5DB",
+            }}>
+            {m === "existing" ? "Search Existing" : "New Product"}
+          </button>
+        ))}
+      </div>
+
+      {/* ── Search Existing mode ─────────────────────────────────────────── */}
+      {block.mode === "existing" && (
+        <>
+          {block.product_id ? (
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px", padding: "10px 14px", background: "#F0F4FF", borderRadius: "8px" }}>
+              <span style={{ flex: 1, fontWeight: 600, fontSize: "14px" }}>{block.product_name}</span>
+              <button onClick={() => onUpdate({ product_id: null, product_name: "", variant_rows: [], search_query: "" })}
+                style={{ background: "none", border: "none", cursor: "pointer", fontSize: "12px", color: "#6B7280" }}>
+                Change product
+              </button>
+            </div>
+          ) : (
+            <div style={{ position: "relative", marginBottom: "16px" }}>
+              <input
+                value={block.search_query}
+                onChange={e => onSearchChange(e.target.value)}
+                placeholder="Search by product name or SKU…"
+                style={INPUT}
+              />
+              {block.search_results.length > 0 && (
+                <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "#fff", border: "1px solid #E5E7EB", borderRadius: "8px", zIndex: 20, maxHeight: "220px", overflowY: "auto", boxShadow: "0 4px 16px rgba(0,0,0,.12)" }}>
+                  {block.search_results.map(p => (
+                    <button key={p.id} onClick={() => onSelectProduct(p)}
+                      style={{ display: "block", width: "100%", textAlign: "left", padding: "11px 14px", border: "none", background: "none", cursor: "pointer", fontSize: "13px", borderBottom: "1px solid #F3F4F6" }}
+                      onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = "#F9FAFB"}
+                      onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = "transparent"}
+                    >
+                      {p.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {block.loading_variants && (
+                <div style={{ position: "absolute", top: "100%", left: 0, padding: "10px 14px", fontSize: "13px", color: "#9CA3AF" }}>
+                  Loading variants…
+                </div>
+              )}
+            </div>
+          )}
+        </>
+      )}
+
+      {/* ── New Product mode ─────────────────────────────────────────────── */}
+      {block.mode === "new" && (
+        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "12px", marginBottom: "16px" }}>
+          <div>
+            <label style={LBL}>Product Name *</label>
+            <input value={block.new_product_name} onChange={e => onUpdate({ new_product_name: e.target.value })}
+              placeholder="e.g. 1001 Premium Unisex Tee" style={INPUT} />
+          </div>
+          <div>
+            <label style={LBL}>Style / SKU Prefix</label>
+            <input value={block.new_sku_prefix} onChange={e => onUpdate({ new_sku_prefix: e.target.value })}
+              placeholder="e.g. 1001" style={INPUT} />
+          </div>
+        </div>
+      )}
+
+      {/* ── Variant table ─────────────────────────────────────────────────── */}
+      {(block.variant_rows.length > 0 || block.mode === "new") && (
+        <>
+          {/* Apply cost to all */}
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
+            <span style={{ fontSize: "12px", color: "#6B7280" }}>Apply cost to all:</span>
+            <input
+              type="number" min={0} step={0.01}
+              value={applyCostVal}
+              onChange={e => setApplyCostVal(e.target.value)}
+              placeholder="$0.00"
+              style={{ ...INPUT, width: "90px" }}
+            />
+            <button onClick={() => { onApplyCostToAll(parseFloat(applyCostVal) || 0); }}
+              style={{ ...BTN_SM, padding: "6px 12px", fontSize: "11px" }}>Apply</button>
+          </div>
+
+          <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: "8px" }}>
+            <thead>
+              <tr style={{ background: "#F9FAFB", borderBottom: "1px solid #E5E7EB" }}>
+                {["COLOR", "SIZE", "CURRENT STOCK", "QTY ORDERED", "UNIT COST ($)", ""].map(h => (
+                  <th key={h} style={{ padding: "9px 12px", textAlign: "left", fontSize: "11px", fontWeight: 700, color: "#6B7280", letterSpacing: ".06em" }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {block.variant_rows.map(row => (
+                <tr key={row.key} style={{ borderBottom: "1px solid #F3F4F6" }}>
+                  <td style={{ padding: "8px 12px" }}>
+                    {row.is_new_variant ? (
+                      <input value={row.color} onChange={e => onUpdateRow(row.key, { color: e.target.value })}
+                        placeholder="Color" style={{ ...INPUT, width: "100px" }} />
+                    ) : (
+                      <span style={{ fontSize: "13px" }}>{row.color || "—"}</span>
+                    )}
+                  </td>
+                  <td style={{ padding: "8px 12px" }}>
+                    {row.is_new_variant ? (
+                      <select value={row.size} onChange={e => onUpdateRow(row.key, { size: e.target.value })}
+                        style={{ ...SELECT, width: "90px" }}>
+                        {SIZE_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
+                      </select>
+                    ) : (
+                      <span style={{ fontSize: "13px" }}>{row.size || "—"}</span>
+                    )}
+                  </td>
+                  <td style={{ padding: "8px 12px", fontSize: "13px", color: row.stock_quantity > 0 ? "#374151" : "#9CA3AF" }}>
+                    {row.stock_quantity}
+                  </td>
+                  <td style={{ padding: "8px 12px" }}>
+                    <input type="number" min={0}
+                      value={row.qty_ordered === 0 ? "" : row.qty_ordered}
+                      onChange={e => onUpdateRow(row.key, { qty_ordered: parseInt(e.target.value) || 0 })}
+                      placeholder="0"
+                      style={{ ...INPUT, width: "80px", background: row.qty_ordered > 0 ? "#F0F4FF" : "#fff" }}
+                    />
+                  </td>
+                  <td style={{ padding: "8px 12px" }}>
+                    <input type="number" min={0} step={0.01}
+                      value={row.unit_cost_expected === 0 ? "" : row.unit_cost_expected}
+                      onChange={e => onUpdateRow(row.key, { unit_cost_expected: parseFloat(e.target.value) || 0 })}
+                      placeholder="0.00"
+                      style={{ ...INPUT, width: "90px" }}
+                    />
+                  </td>
+                  <td style={{ padding: "8px 12px" }}>
+                    {row.is_new_variant && (
+                      <button onClick={() => onRemoveRow(row.key)}
+                        style={{ background: "none", border: "none", cursor: "pointer", color: "#EF4444", fontSize: "16px" }}>×</button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <button onClick={onAddNewVariant}
+            style={{ fontSize: "12px", color: "#1A5CFF", background: "none", border: "1px dashed #93C5FD", borderRadius: "6px", padding: "6px 14px", cursor: "pointer", width: "100%", marginBottom: "4px" }}>
+            + Add New Variant (New Color or Size)
+          </button>
+        </>
+      )}
+
+      {/* Prompt to search if no variants yet */}
+      {block.mode === "existing" && !block.product_id && block.variant_rows.length === 0 && (
+        <div style={{ padding: "20px", textAlign: "center", color: "#9CA3AF", fontSize: "13px" }}>
+          Search and select a product above to see its variants.
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Styles ────────────────────────────────────────────────────────────────────
 
 const LBL: React.CSSProperties = { fontSize: "12px", fontWeight: 600, color: "#374151", display: "block", marginBottom: "6px" };
 const INPUT: React.CSSProperties = { width: "100%", padding: "9px 12px", border: "1px solid #D1D5DB", borderRadius: "7px", fontSize: "13px", boxSizing: "border-box", outline: "none" };
