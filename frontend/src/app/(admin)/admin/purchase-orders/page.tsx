@@ -100,7 +100,7 @@ export default function PurchaseOrdersPage() {
             ) : pos.length === 0 ? (
               <tr><td colSpan={8} style={{ padding: "40px", textAlign: "center", color: "#9CA3AF" }}>No purchase orders yet. <Link href="/admin/purchase-orders/create" style={{ color: "#1A5CFF" }}>Create one →</Link></td></tr>
             ) : pos.map(po => {
-              const sc = STATUS_COLORS[po.status] || STATUS_COLORS.draft;
+              const sc = STATUS_COLORS[po.status] ?? STATUS_COLORS.draft!;
               return (
                 <tr key={po.id} style={{ borderBottom: "1px solid #F3F4F6", cursor: "pointer" }}
                   onClick={() => window.location.href = `/admin/purchase-orders/${po.id}`}
