@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+import { apiClient } from "@/lib/api-client";
 
 const STATUS_COLORS: Record<string, { bg: string; color: string }> = {
   draft:      { bg: "#F3F4F6", color: "#6B7280" },
@@ -34,11 +33,7 @@ export default function PurchaseOrdersPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    fetch(`${API}/api/v1/admin/purchase-orders/`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then(r => r.json())
+    apiClient.get<PO[]>("/api/v1/admin/purchase-orders/")
       .then(data => { setPos(Array.isArray(data) ? data : []); setLoading(false); })
       .catch(() => setLoading(false));
   }, []);

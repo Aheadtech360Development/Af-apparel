@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+import { apiClient, ApiClientError } from "@/lib/api-client";
 
 interface LineItem {
   id: string;
@@ -53,11 +52,7 @@ export default function ReceiveItemsPage() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    fetch(`${API}/api/v1/admin/purchase-orders/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then(r => r.json())
+    apiClient.get<PO>(`/api/v1/admin/purchase-orders/${id}`)
       .then((data: PO) => {
         setPo(data);
         setRows(data.line_items.map(li => ({
@@ -77,34 +72,23 @@ export default function ReceiveItemsPage() {
     const activeRows = rows.filter(r => r.qty_receiving > 0);
     if (activeRows.length === 0) { alert("Enter at least 1 qty to receive"); return; }
     setSaving(true);
-    const token = localStorage.getItem("token");
     try {
-      const r = await fetch(`${API}/api/v1/admin/purchase-orders/${id}/receive`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({
-          received_date: receivedDate,
-          notes: notes || null,
-          items: activeRows.map(row => ({
-            po_line_item_id: row.po_line_item_id,
-            qty_received: row.qty_receiving,
-            unit_cost_actual: row.unit_cost_actual,
-          })),
-        }),
+      await apiClient.post(`/api/v1/admin/purchase-orders/${id}/receive`, {
+        received_date: receivedDate,
+        notes: notes || null,
+        items: activeRows.map(row => ({
+          po_line_item_id: row.po_line_item_id,
+          qty_received: row.qty_receiving,
+          unit_cost_actual: row.unit_cost_actual,
+        })),
       });
-      const data = await r.json();
-      if (r.ok) {
-        const syncQB = window.confirm("Items received and inventory updated! Sync to QuickBooks now?");
-        if (syncQB) {
-          await fetch(`${API}/api/v1/admin/purchase-orders/${id}/sync-qb`, {
-            method: "POST",
-            headers: { Authorization: `Bearer ${token}` },
-          });
-        }
-        router.push(`/admin/purchase-orders/${id}`);
-      } else {
-        alert(data.detail || "Failed to record receiving");
+      const syncQB = window.confirm("Items received and inventory updated! Sync to QuickBooks now?");
+      if (syncQB) {
+        await apiClient.post(`/api/v1/admin/purchase-orders/${id}/sync-qb`);
       }
+      router.push(`/admin/purchase-orders/${id}`);
+    } catch (err) {
+      alert(err instanceof ApiClientError ? err.message : "Failed to record receiving");
     } finally {
       setSaving(false);
     }

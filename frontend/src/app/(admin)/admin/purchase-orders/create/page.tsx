@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+import { apiClient, ApiClientError } from "@/lib/api-client";
 
 interface Manufacturer { id: string; name: string; }
 interface Variant { id: string; sku: string; color: string | null; size: string | null; retail_price: string; }
@@ -53,23 +52,17 @@ export default function CreatePOPage() {
   const [newMfrName, setNewMfrName] = useState("");
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    fetch(`${API}/api/v1/admin/purchase-orders/manufacturers`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then(r => r.json())
+    apiClient.get<Manufacturer[]>("/api/v1/admin/purchase-orders/manufacturers")
       .then(d => setManufacturers(Array.isArray(d) ? d : []));
   }, []);
 
   async function searchProducts(key: number, q: string) {
     setProductSearch(p => ({ ...p, [key]: q }));
     if (q.length < 2) { setSearchResults(p => ({ ...p, [key]: [] })); return; }
-    const token = localStorage.getItem("token");
-    const r = await fetch(`${API}/api/v1/admin/products/?search=${encodeURIComponent(q)}&page_size=10`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await r.json();
-    const items = Array.isArray(data) ? data : (data.items || []);
+    const data = await apiClient.get<ProductHit[] | { items: ProductHit[] }>(
+      `/api/v1/admin/products/?search=${encodeURIComponent(q)}&page_size=10`
+    );
+    const items = Array.isArray(data) ? data : ((data as { items: ProductHit[] }).items || []);
     setSearchResults(p => ({ ...p, [key]: items }));
   }
 
@@ -90,13 +83,7 @@ export default function CreatePOPage() {
 
   async function addManufacturer() {
     if (!newMfrName.trim()) return;
-    const token = localStorage.getItem("token");
-    const r = await fetch(`${API}/api/v1/admin/purchase-orders/manufacturers`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ name: newMfrName }),
-    });
-    const data = await r.json();
+    const data = await apiClient.post<Manufacturer>("/api/v1/admin/purchase-orders/manufacturers", { name: newMfrName });
     setManufacturers(m => [...m, data]);
     setManufacturerId(data.id);
     setNewMfrName("");
@@ -108,29 +95,24 @@ export default function CreatePOPage() {
     const validItems = lineItems.filter(it => it.product_variant_id || it.new_product_name);
     if (validItems.length === 0) { alert("Add at least one line item"); return; }
     setSaving(true);
-    const token = localStorage.getItem("token");
     try {
-      const r = await fetch(`${API}/api/v1/admin/purchase-orders/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({
-          manufacturer_id: manufacturerId,
-          expected_delivery: expectedDelivery || null,
-          notes: notes || null,
-          line_items: validItems.map(it => ({
-            product_variant_id: it.product_variant_id,
-            new_product_name: it.new_product_name || null,
-            new_product_sku: it.new_product_sku || null,
-            new_product_size: it.new_product_size || null,
-            new_product_color: it.new_product_color || null,
-            qty_ordered: it.qty_ordered,
-            unit_cost_expected: it.unit_cost_expected,
-          })),
-        }),
+      const data = await apiClient.post<{ id: string }>("/api/v1/admin/purchase-orders/", {
+        manufacturer_id: manufacturerId,
+        expected_delivery: expectedDelivery || null,
+        notes: notes || null,
+        line_items: validItems.map(it => ({
+          product_variant_id: it.product_variant_id,
+          new_product_name: it.new_product_name || null,
+          new_product_sku: it.new_product_sku || null,
+          new_product_size: it.new_product_size || null,
+          new_product_color: it.new_product_color || null,
+          qty_ordered: it.qty_ordered,
+          unit_cost_expected: it.unit_cost_expected,
+        })),
       });
-      const data = await r.json();
-      if (r.ok) router.push(`/admin/purchase-orders/${data.id}`);
-      else alert(data.detail || "Failed to create PO");
+      router.push(`/admin/purchase-orders/${data.id}`);
+    } catch (err) {
+      alert(err instanceof ApiClientError ? err.message : "Failed to create PO");
     } finally {
       setSaving(false);
     }

@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+import { apiClient, ApiClientError } from "@/lib/api-client";
 
 interface Manufacturer {
   id: string;
@@ -25,11 +24,7 @@ export default function ManufacturersPage() {
   const [saving, setSaving] = useState(false);
 
   async function load() {
-    const token = localStorage.getItem("token");
-    const r = await fetch(`${API}/api/v1/admin/purchase-orders/manufacturers`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await r.json();
+    const data = await apiClient.get<Manufacturer[]>("/api/v1/admin/purchase-orders/manufacturers");
     setManufacturers(Array.isArray(data) ? data : []);
     setLoading(false);
   }
@@ -42,28 +37,23 @@ export default function ManufacturersPage() {
   async function save() {
     if (!form.name.trim()) { alert("Name is required"); return; }
     setSaving(true);
-    const token = localStorage.getItem("token");
-    const url = editing
-      ? `${API}/api/v1/admin/purchase-orders/manufacturers/${editing.id}`
-      : `${API}/api/v1/admin/purchase-orders/manufacturers`;
-    const method = editing ? "PUT" : "POST";
-    const r = await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify(form),
-    });
-    if (r.ok) { setShowModal(false); await load(); }
-    else { const d = await r.json(); alert(d.detail || "Failed to save"); }
+    try {
+      if (editing) {
+        await apiClient.put(`/api/v1/admin/purchase-orders/manufacturers/${editing.id}`, form);
+      } else {
+        await apiClient.post(`/api/v1/admin/purchase-orders/manufacturers`, form);
+      }
+      setShowModal(false);
+      await load();
+    } catch (err) {
+      alert(err instanceof ApiClientError ? err.message : "Failed to save");
+    }
     setSaving(false);
   }
 
   async function del(id: string, name: string) {
     if (!confirm(`Delete "${name}"?`)) return;
-    const token = localStorage.getItem("token");
-    await fetch(`${API}/api/v1/admin/purchase-orders/manufacturers/${id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    await apiClient.delete(`/api/v1/admin/purchase-orders/manufacturers/${id}`);
     await load();
   }
 

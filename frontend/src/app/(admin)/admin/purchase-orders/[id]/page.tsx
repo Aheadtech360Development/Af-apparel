@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+import { apiClient, ApiClientError } from "@/lib/api-client";
 
 const STATUS_COLORS: Record<string, { bg: string; color: string }> = {
   draft:     { bg: "#F3F4F6", color: "#6B7280" },
@@ -79,11 +78,7 @@ export default function PODetailPage() {
   const [updatingStatus, setUpdatingStatus] = useState(false);
 
   async function load() {
-    const token = localStorage.getItem("token");
-    const r = await fetch(`${API}/api/v1/admin/purchase-orders/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await r.json();
+    const data = await apiClient.get<PO>(`/api/v1/admin/purchase-orders/${id}`);
     setPo(data);
     setLoading(false);
   }
@@ -92,27 +87,22 @@ export default function PODetailPage() {
 
   async function markSent() {
     setUpdatingStatus(true);
-    const token = localStorage.getItem("token");
-    await fetch(`${API}/api/v1/admin/purchase-orders/${id}/status`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ status: "sent" }),
-    });
-    await load();
-    setUpdatingStatus(false);
+    try {
+      await apiClient.patch(`/api/v1/admin/purchase-orders/${id}/status`, { status: "sent" });
+      await load();
+    } finally {
+      setUpdatingStatus(false);
+    }
   }
 
   async function syncQB() {
     setSyncing(true);
-    const token = localStorage.getItem("token");
     try {
-      const r = await fetch(`${API}/api/v1/admin/purchase-orders/${id}/sync-qb`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await r.json();
-      if (r.ok) { alert(`Synced to QB! ID: ${data.qb_id}`); await load(); }
-      else alert(data.detail || "QB sync failed");
+      const data = await apiClient.post<{ qb_id: string }>(`/api/v1/admin/purchase-orders/${id}/sync-qb`);
+      alert(`Synced to QB! ID: ${data.qb_id}`);
+      await load();
+    } catch (err) {
+      alert(err instanceof ApiClientError ? err.message : "QB sync failed");
     } finally {
       setSyncing(false);
     }
