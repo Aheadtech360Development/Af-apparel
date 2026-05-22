@@ -240,7 +240,7 @@ export default function CreatePOPage() {
                       />
                       {(searchResults[item.key] || []).length > 0 && (
                         <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "#fff", border: "1px solid #E5E7EB", borderRadius: "8px", zIndex: 10, maxHeight: "240px", overflowY: "auto", boxShadow: "0 4px 16px rgba(0,0,0,.1)" }}>
-                          {searchResults[item.key].map(product =>
+                          {(searchResults[item.key] ?? []).map(product =>
                             product.variants.map(v => (
                               <button key={v.id} onClick={() => selectVariant(item.key, product, v)}
                                 style={{ display: "block", width: "100%", textAlign: "left", padding: "10px 14px", border: "none", background: "none", cursor: "pointer", fontSize: "13px", borderBottom: "1px solid #F3F4F6" }}
