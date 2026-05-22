@@ -5,7 +5,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import {
   BarChartIcon, PackageIcon, BuildingIcon, ShirtIcon,
-  SettingsIcon, BookIcon, SearchIcon, RefreshIcon, UsersIcon, TrendingUpIcon, TruckIcon,
+  SettingsIcon, BookIcon, SearchIcon, RefreshIcon, UsersIcon, TrendingUpIcon, TruckIcon, ShoppingCartIcon,
 } from "@/components/ui/icons";
 
 const SECTION_HEAD: React.CSSProperties = {
@@ -29,7 +29,7 @@ const SUB_LINK_BASE: React.CSSProperties = {
 export function AdminSidebar() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const isOrdersActive = pathname.startsWith("/admin/orders") || pathname === "/admin/abandoned-carts";
+  const isOrdersActive = pathname.startsWith("/admin/orders") || pathname === "/admin/abandoned-carts" || pathname.startsWith("/admin/purchase-orders");
   const isProductsActive = pathname.startsWith("/admin/products") || pathname.startsWith("/admin/inventory");
   const isCustomersActive = pathname.startsWith("/admin/customers");
   const isSettingsActive = pathname.startsWith("/admin/settings") || pathname.startsWith("/admin/users") || pathname === "/admin/analytics";
@@ -130,6 +130,7 @@ export function AdminSidebar() {
       )}
 
       <NavLink href="/admin/returns" label="Returns (RMA)" icon={<RefreshIcon size={15} color="currentColor" />} />
+      <NavLink href="/admin/purchase-orders" label="Purchase Orders" icon={<ShoppingCartIcon size={15} color="currentColor" />} />
 
       {/* ── CUSTOMERS ── */}
       <div style={SECTION_HEAD}>Customers</div>
@@ -192,7 +193,6 @@ export function AdminSidebar() {
           <SubLink href="/admin/products/collections" label="Collections" />
           <SubLink href="/admin/products/reviews" label="Reviews" />
           <SubLink href="/admin/inventory" label="Inventory" />
-          <SubLink href="/admin/products/purchase-orders" label="Purchase Orders" />
         </div>
       )}
 
