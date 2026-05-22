@@ -121,7 +121,7 @@ export default function PODetailPage() {
   if (loading) return <div style={{ padding: "32px", color: "#9CA3AF" }}>Loading…</div>;
   if (!po) return <div style={{ padding: "32px", color: "#EF4444" }}>PO not found.</div>;
 
-  const sc = STATUS_COLORS[po.status] || STATUS_COLORS.draft;
+  const sc = STATUS_COLORS[po.status] ?? STATUS_COLORS.draft!;
   const canReceive = !["closed", "cancelled"].includes(po.status);
 
   return (
