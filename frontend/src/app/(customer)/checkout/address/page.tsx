@@ -1,7 +1,7 @@
 // frontend/src/app/(customer)/checkout/address/page.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiClient } from "@/lib/api-client";
 import { useCheckoutStore, type ShippingMethod } from "@/stores/checkout.store";
@@ -92,6 +92,7 @@ export default function CheckoutAddressPage() {
   const [liveRatesLoading, setLiveRatesLoading] = useState(false);
   const [selectedLiveRateId, setSelectedLiveRateId] = useState<string | null>(null);
   const [cartItemsForShipping, setCartItemsForShipping] = useState<Array<{ variant_id: string; quantity: number }>>([]);
+  const ratesDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [form, setForm] = useState({
     company: companyName || "",
@@ -208,24 +209,20 @@ export default function CheckoutAddressPage() {
   const activeZip   = showNewForm ? form.zip   : (savedActive?.postal_code ?? "");
   const activeCity  = showNewForm ? form.city  : (savedActive?.city ?? "");
 
-  // Fetch live Shippo rates — only when ZIP is exactly 5 digits and state is set
-  useEffect(() => {
-    if (shippingTypeForUser !== "live_shippo") return;
-    const zip = activeZip.trim();
-    const state = activeState.trim();
-    if (zip.length !== 5 || !/^\d{5}$/.test(zip) || !state) return;
+  function fetchLiveRates(zip: string, state: string) {
+    if (!zip || zip.length !== 5 || !/^\d{5}$/.test(zip)) return;
+    if (!state || state.length < 2) return;
 
-    const timer = setTimeout(() => {
-      setLiveRatesLoading(true);
-      setLiveRates([]);
-      setSelectedLiveRateId(null);
+    setLiveRatesLoading(true);
+    setLiveRates([]);
+    setSelectedLiveRateId(null);
 
-      apiClient.post<{ rates: LiveRate[]; error?: string }>("/api/v1/shipping/live-rates", {
-        to_zip: zip,
-        to_state: state,
-        to_city: activeCity || undefined,
-        cart_items: cartItemsForShipping.length > 0 ? cartItemsForShipping : undefined,
-      })
+    apiClient.post<{ rates: LiveRate[]; error?: string }>("/api/v1/shipping/live-rates", {
+      to_zip: zip,
+      to_state: state,
+      to_city: activeCity || undefined,
+      cart_items: cartItemsForShipping.length > 0 ? cartItemsForShipping : undefined,
+    })
       .then(r => {
         const rates = r.rates || [];
         setLiveRates(rates);
@@ -235,11 +232,24 @@ export default function CheckoutAddressPage() {
           setTierShipping(first.cost);
         }
       })
-        .catch(() => setLiveRates([]))
-        .finally(() => setLiveRatesLoading(false));
-    }, 300);
+      .catch(() => setLiveRates([]))
+      .finally(() => setLiveRatesLoading(false));
+  }
 
-    return () => clearTimeout(timer);
+  // Trigger live rates fetch — debounced 800ms, only fires on exactly 5-digit ZIP
+  useEffect(() => {
+    if (shippingTypeForUser !== "live_shippo") return;
+
+    if (ratesDebounceRef.current) clearTimeout(ratesDebounceRef.current);
+
+    ratesDebounceRef.current = setTimeout(() => {
+      fetchLiveRates(activeZip.trim(), activeState.trim());
+    }, 800);
+
+    return () => {
+      if (ratesDebounceRef.current) clearTimeout(ratesDebounceRef.current);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shippingTypeForUser, activeZip, activeState, activeCity, cartItemsForShipping]);
 
   useEffect(() => {
