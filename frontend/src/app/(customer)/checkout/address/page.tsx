@@ -208,23 +208,24 @@ export default function CheckoutAddressPage() {
   const activeZip   = showNewForm ? form.zip   : (savedActive?.postal_code ?? "");
   const activeCity  = showNewForm ? form.city  : (savedActive?.city ?? "");
 
-  // Fetch live Shippo rates when ZIP is ready and shipping type is live_shippo
+  // Fetch live Shippo rates — only when ZIP is exactly 5 digits and state is set
   useEffect(() => {
     if (shippingTypeForUser !== "live_shippo") return;
     const zip = activeZip.trim();
     const state = activeState.trim();
-    if (zip.length < 5 || !state) return;
+    if (zip.length !== 5 || !/^\d{5}$/.test(zip) || !state) return;
 
-    setLiveRatesLoading(true);
-    setLiveRates([]);
-    setSelectedLiveRateId(null);
+    const timer = setTimeout(() => {
+      setLiveRatesLoading(true);
+      setLiveRates([]);
+      setSelectedLiveRateId(null);
 
-    apiClient.post<{ rates: LiveRate[]; error?: string }>("/api/v1/shipping/live-rates", {
-      to_zip: zip,
-      to_state: state,
-      to_city: activeCity || undefined,
-      cart_items: cartItemsForShipping.length > 0 ? cartItemsForShipping : undefined,
-    })
+      apiClient.post<{ rates: LiveRate[]; error?: string }>("/api/v1/shipping/live-rates", {
+        to_zip: zip,
+        to_state: state,
+        to_city: activeCity || undefined,
+        cart_items: cartItemsForShipping.length > 0 ? cartItemsForShipping : undefined,
+      })
       .then(r => {
         const rates = r.rates || [];
         setLiveRates(rates);
@@ -234,8 +235,11 @@ export default function CheckoutAddressPage() {
           setTierShipping(first.cost);
         }
       })
-      .catch(() => setLiveRates([]))
-      .finally(() => setLiveRatesLoading(false));
+        .catch(() => setLiveRates([]))
+        .finally(() => setLiveRatesLoading(false));
+    }, 300);
+
+    return () => clearTimeout(timer);
   }, [shippingTypeForUser, activeZip, activeState, activeCity, cartItemsForShipping]);
 
   useEffect(() => {
