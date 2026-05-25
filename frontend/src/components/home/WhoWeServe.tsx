@@ -10,7 +10,7 @@ export default function WhoWeServe() {
 
   return (
     <section style={{ padding: "80px 0", background: "#1B3A5C" }}>
-      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 32px" }}>
+      <div style={{ maxWidth: "1500px", margin: "0 auto", padding: "0 32px" }}>
         <div style={{ marginBottom: "44px", textAlign: "center" }}>
           <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(32px,3.5vw,48px)", color: "#fff", letterSpacing: ".01em", lineHeight: 1, marginBottom: "10px" }}>Who We Serve</h2>
           <p style={{ fontSize: "15px", color: "#d3d0d0", fontWeight: 500 }}>Built for businesses that move volume</p>

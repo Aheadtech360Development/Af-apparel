@@ -277,7 +277,7 @@ export default function QuickOrderPage() {
     >
       {/* ══ PAGE HEADER ══════════════════════════════════════════════════ */}
       <div className="qo-header-pad" style={{ background: "#1B3A5C", padding: "32px 32px 28px", borderBottom: "3px solid #E8242A" }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "1500px", margin: "0 auto" }}>
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "24px", flexWrap: "wrap" }}>
             <div>
               <div style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".14em", color: "rgba(255,255,255,.5)", marginBottom: "6px" }}>Wholesale</div>
@@ -295,7 +295,7 @@ export default function QuickOrderPage() {
                   <div key={step.n} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                       <span style={{ width: "20px", height: "20px", borderRadius: "50%", background: "#1A5CFF", color: "#fff", fontSize: "10px", fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{step.n}</span>
-                      <span style={{ fontSize: "12px", color: "#888", fontWeight: 500 }}>{step.label}</span>
+                      <span style={{ fontSize: "12px", color: "#7A7880", fontWeight: 500 }}>{step.label}</span>
                     </div>
                     {i < arr.length - 1 && <span style={{ color: "#333", fontSize: "12px", marginLeft: "2px" }}>→</span>}
                   </div>
@@ -306,9 +306,9 @@ export default function QuickOrderPage() {
             {/* Header CTA */}
             <div style={{ display: "flex", alignItems: "center", gap: "12px", flexShrink: 0, paddingTop: "4px" }}>
               {grandTotals.units > 0 && (
-                <div style={{ padding: "8px 14px", background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", borderRadius: "7px", fontSize: "13px", color: "#aaa", whiteSpace: "nowrap", textAlign: "center" }}>
+                <div style={{ padding: "8px 14px", background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", borderRadius: "7px", fontSize: "13px", color: "#7A7880", whiteSpace: "nowrap", textAlign: "center" }}>
                   <div style={{ fontFamily: "var(--font-bebas)", fontSize: "22px", color: "#C9A84C", lineHeight: 1 }}>{formatCurrency(grandTotals.price)}</div>
-                  <div style={{ fontSize: "11px", color: "#666" }}>{grandTotals.units} unit{grandTotals.units !== 1 ? "s" : ""}</div>
+                  <div style={{ fontSize: "11px", color: "#7A7880" }}>{grandTotals.units} unit{grandTotals.units !== 1 ? "s" : ""}</div>
                 </div>
               )}
               <button
@@ -333,7 +333,7 @@ export default function QuickOrderPage() {
 
       {/* ══ TOOLBAR ══════════════════════════════════════════════════════ */}
       <div className="qo-toolbar-pad" style={{ background: "#fff", borderBottom: "1px solid #E2E0DA", padding: "0 32px" }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto", height: "44px", display: "flex", alignItems: "center", gap: "16px" }}>
+        <div style={{ maxWidth: "1500px", margin: "0 auto", height: "44px", display: "flex", alignItems: "center", gap: "16px" }}>
           <span style={{ fontSize: "12px", fontWeight: 600, color: "#7A7880" }}>
             {rows.length} line{rows.length !== 1 ? "s" : ""}
           </span>
@@ -368,19 +368,19 @@ export default function QuickOrderPage() {
 
       {/* ══ COLUMN HEADERS ═══════════════════════════════════════════════ */}
       <div className="qo-col-header-pad" style={{ background: "#F4F3EF", padding: "0 32px" }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "1500px", margin: "0 auto" }}>
           <div style={{ display: "grid", gridTemplateColumns: "28px 28px 1fr 220px 40px", gap: "0", padding: "8px 12px 6px", alignItems: "center" }}>
             <div />
             <div />
-            <div style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em", color: "#bbb" }}>Product</div>
-            <div style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em", color: "#bbb" }}>Color</div>
+            <div style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em", color: "#7A7880" }}>Product</div>
+            <div style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em", color: "#7A7880" }}>Color</div>
             <div />
           </div>
         </div>
       </div>
 
       {/* ══ ROWS ═════════════════════════════════════════════════════════ */}
-      <div className="qo-rows-pad" style={{ flex: 1, maxWidth: "1200px", width: "100%", margin: "0 auto", padding: "8px 32px 120px" }}>
+      <div className="qo-rows-pad" style={{ flex: 1, maxWidth: "1500px", width: "100%", margin: "0 auto", padding: "8px 32px 120px" }}>
         <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
           {rows.map((row, rowIdx) => {
             const colors = getRowColors(row);
@@ -443,7 +443,7 @@ export default function QuickOrderPage() {
                     {row.searchQuery && !row.selectedProduct && (
                       <button
                         onClick={() => updateRow(row.id, { searchQuery: "", searchResults: [], showDropdown: false })}
-                        style={{ position: "absolute", right: "12px", background: "none", border: "none", cursor: "pointer", color: "#bbb", fontSize: "16px", lineHeight: 1, padding: 0 }}
+                        style={{ position: "absolute", right: "12px", background: "none", border: "none", cursor: "pointer", color: "#7A7880", fontSize: "16px", lineHeight: 1, padding: 0 }}
                       >×</button>
                     )}
 
@@ -499,7 +499,7 @@ export default function QuickOrderPage() {
                   {/* Color column */}
                   <div style={{ padding: "0 12px", borderRight: "1px solid #F4F3EF", height: "52px", display: "flex", alignItems: "center" }}>
                     {row.isLoadingDetail ? (
-                      <span style={{ fontSize: "12px", color: "#bbb" }}>Loading…</span>
+                      <span style={{ fontSize: "12px", color: "#7A7880" }}>Loading…</span>
                     ) : colors.length > 0 ? (
                       <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
                         {colors.slice(0, 8).map((c) => {
@@ -536,7 +536,7 @@ export default function QuickOrderPage() {
                         )}
                       </div>
                     ) : hasProduct ? (
-                      <span style={{ fontSize: "12px", color: "#bbb" }}>No colors</span>
+                      <span style={{ fontSize: "12px", color: "#7A7880" }}>No colors</span>
                     ) : (
                       <span style={{ fontSize: "12px", color: "#ddd" }}>—</span>
                     )}
@@ -562,7 +562,7 @@ export default function QuickOrderPage() {
                 {hasProduct && (
                   <div style={{ padding: "14px 68px 16px 68px" }}>
                     {row.isLoadingDetail ? (
-                      <div style={{ fontSize: "13px", color: "#bbb", padding: "4px 0" }}>Loading product details…</div>
+                      <div style={{ fontSize: "13px", color: "#7A7880", padding: "4px 0" }}>Loading product details…</div>
                     ) : (
                       <>
                         {/* Product summary bar */}
@@ -584,7 +584,7 @@ export default function QuickOrderPage() {
                               {row.selectedProduct?.name}
                             </div>
                             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "2px", flexWrap: "wrap" }}>
-                              <span style={{ fontSize: "11px", color: "#aaa", fontFamily: "monospace" }}>
+                              <span style={{ fontSize: "11px", color: "#7A7880", fontFamily: "monospace" }}>
                                 {row.selectedProduct?.variants[0]?.sku ?? row.selectedProduct?.slug}
                               </span>
                             </div>
@@ -628,7 +628,7 @@ export default function QuickOrderPage() {
                                 )}
                                 <button
                                   onClick={() => toggleColor(row.id, color)}
-                                  style={{ marginLeft: "auto", fontSize: "11px", color: "#aaa", background: "none", border: "none", cursor: "pointer", padding: "2px 6px" }}
+                                  style={{ marginLeft: "auto", fontSize: "11px", color: "#7A7880", background: "none", border: "none", cursor: "pointer", padding: "2px 6px" }}
                                   title="Collapse color"
                                 >
                                   ▲ collapse
@@ -712,7 +712,7 @@ export default function QuickOrderPage() {
                                   </table>
                                 </div>
                               ) : (
-                                <div style={{ fontSize: "12px", color: "#bbb", padding: "4px 0" }}>No sizes available</div>
+                                <div style={{ fontSize: "12px", color: "#7A7880", padding: "4px 0" }}>No sizes available</div>
                               )}
                             </div>
                           );

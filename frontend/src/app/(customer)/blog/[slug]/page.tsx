@@ -137,7 +137,7 @@ function renderBlock(block: Block): React.ReactNode {
         <figure key={block.id} style={{ marginBottom: "28px" }}>
           {url ? <img src={url} alt={alt} style={{ width: "100%", borderRadius: "10px", border: "1px solid #E2E0DA" }} /> : null}
           {caption ? <figcaption style={{ textAlign: "center", fontSize: "13px", color: "#7A7880", marginTop: "8px" }}>{caption}</figcaption> : null}
-          {description ? <p style={{ fontSize: "14px", color: "#555", marginTop: "8px", lineHeight: 1.6 }}>{description}</p> : null}
+          {description ? <p style={{ fontSize: "14px", color: "#7A7880", marginTop: "8px", lineHeight: 1.6 }}>{description}</p> : null}
         </figure>
       );
     }
@@ -233,7 +233,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                   {item.question}
                   <span style={{ fontSize: "18px", color: "#E8242A", marginLeft: "12px" }}>+</span>
                 </summary>
-                <p style={{ fontSize: "15px", color: "#555", lineHeight: 1.7, marginTop: "12px", paddingRight: "24px" }}>
+                <p style={{ fontSize: "15px", color: "#7A7880", lineHeight: 1.7, marginTop: "12px", paddingRight: "24px" }}>
                   {item.answer}
                 </p>
               </details>
@@ -245,7 +245,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       {/* Related Posts */}
       {related.length > 0 && (
         <div style={{ background: "#F9F8F4", borderTop: "1px solid #E2E0DA", padding: "48px 0" }}>
-          <div style={{ maxWidth: "1140px", margin: "0 auto", padding: "0 24px" }}>
+          <div style={{ maxWidth: "1500px", margin: "0 auto", padding: "0 24px" }}>
             <h2 style={{ fontFamily: "'Barlow Semi Condensed', sans-serif", fontSize: "24px", fontWeight: 700, color: "#1B3A5C", marginBottom: "24px" }}>
               Related Posts
             </h2>

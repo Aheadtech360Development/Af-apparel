@@ -337,7 +337,7 @@ export default function PaymentMethodsPage() {
       </div>
 
       {loading ? (
-        <div style={{ padding: "32px 0", textAlign: "center", color: "#aaa", fontSize: "13px" }}>
+        <div style={{ padding: "32px 0", textAlign: "center", color: "#7A7880", fontSize: "13px" }}>
           Loading payment methods…
         </div>
       ) : methods.length === 0 ? (
@@ -353,7 +353,7 @@ export default function PaymentMethodsPage() {
             </svg>
           </div>
           <p style={{ fontSize: "14px", fontWeight: 700, color: "#2A2830", marginBottom: "4px" }}>No saved cards yet</p>
-          <p style={{ fontSize: "12px", color: "#aaa" }}>Cards are saved automatically when you complete a checkout.</p>
+          <p style={{ fontSize: "12px", color: "#7A7880" }}>Cards are saved automatically when you complete a checkout.</p>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "24px" }}>
@@ -395,7 +395,7 @@ export default function PaymentMethodsPage() {
                     Expires {method.exp_month}/{method.exp_year}
                   </span>
                   {method.name && (
-                    <span style={{ fontSize: "12px", color: "#aaa" }}>{method.name}</span>
+                    <span style={{ fontSize: "12px", color: "#7A7880" }}>{method.name}</span>
                   )}
                 </div>
               </div>
@@ -447,7 +447,7 @@ export default function PaymentMethodsPage() {
               Add New Card
             </span>
             <button type="button" onClick={() => { setShowAddForm(false); setNewCard(emptyCard); setCardErrors({}); }}
-              style={{ background: "none", border: "none", cursor: "pointer", color: "#aaa", fontSize: "18px", lineHeight: 1 }}>
+              style={{ background: "none", border: "none", cursor: "pointer", color: "#7A7880", fontSize: "18px", lineHeight: 1 }}>
               ✕
             </button>
           </div>
@@ -501,7 +501,7 @@ export default function PaymentMethodsPage() {
             </div>
           </div>
 
-          <p style={{ fontSize: "11px", color: "#aaa", marginTop: "12px" }}>
+          <p style={{ fontSize: "11px", color: "#7A7880", marginTop: "12px" }}>
             Card details are encrypted and processed securely via QuickBooks Payments.
           </p>
 
@@ -543,7 +543,7 @@ export default function PaymentMethodsPage() {
       </div>
 
       {achLoading ? (
-        <div style={{ padding: "24px 0", textAlign: "center", color: "#aaa", fontSize: "13px" }}>
+        <div style={{ padding: "24px 0", textAlign: "center", color: "#7A7880", fontSize: "13px" }}>
           Loading…
         </div>
       ) : achAccount && !showAchForm ? (
@@ -577,7 +577,7 @@ export default function PaymentMethodsPage() {
                 </span>
               )}
               {achAccount.routing_last4 && (
-                <span style={{ fontSize: "12px", color: "#aaa" }}>Routing •••• {achAccount.routing_last4}</span>
+                <span style={{ fontSize: "12px", color: "#7A7880" }}>Routing •••• {achAccount.routing_last4}</span>
               )}
             </div>
           </div>
@@ -612,7 +612,7 @@ export default function PaymentMethodsPage() {
             </svg>
           </div>
           <p style={{ fontSize: "14px", fontWeight: 700, color: "#2A2830", marginBottom: "4px" }}>No bank account on file</p>
-          <p style={{ fontSize: "12px", color: "#aaa" }}>Add your bank details for ACH wire transfers.</p>
+          <p style={{ fontSize: "12px", color: "#7A7880" }}>Add your bank details for ACH wire transfers.</p>
         </div>
       ) : null}
 
@@ -627,7 +627,7 @@ export default function PaymentMethodsPage() {
               {achAccount ? "Edit Bank Account" : "Add Bank Account"}
             </span>
             <button type="button" onClick={() => setShowAchForm(false)}
-              style={{ background: "none", border: "none", cursor: "pointer", color: "#aaa", fontSize: "18px", lineHeight: 1 }}>
+              style={{ background: "none", border: "none", cursor: "pointer", color: "#7A7880", fontSize: "18px", lineHeight: 1 }}>
               ✕
             </button>
           </div>
@@ -696,7 +696,7 @@ export default function PaymentMethodsPage() {
             </div>
           </div>
 
-          <p style={{ fontSize: "11px", color: "#aaa", marginTop: "12px" }}>
+          <p style={{ fontSize: "11px", color: "#7A7880", marginTop: "12px" }}>
             Your full routing and account numbers are not stored — only the last 4 digits are saved for identification.
           </p>
 

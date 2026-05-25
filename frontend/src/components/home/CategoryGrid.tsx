@@ -35,7 +35,7 @@ export default function CategoryGrid({ categories }: CategoryGridProps) {
 
   return (
     <section style={{ padding: "80px 0", background: "#F4F3EF" }}>
-      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 32px" }}>
+      <div style={{ maxWidth: "1500px", margin: "0 auto", padding: "0 32px" }}>
         <div style={{ marginBottom: "44px" }}>
           <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(32px,3.5vw,48px)", color: "#2A2830", letterSpacing: ".01em", lineHeight: 1, marginBottom: "10px" }}>Shop by Category</h2>
           <p style={{ fontSize: "15px", color: "#7A7880", fontWeight: 500 }}>Browse our full range of print-ready blank apparel</p>
@@ -45,7 +45,7 @@ export default function CategoryGrid({ categories }: CategoryGridProps) {
             <Link key={cat.id} href={`/products?category=${cat.slug}`}
               style={{ background: "#fff", border: "1px solid #E2E0DA", borderRadius: "10px", overflow: "hidden", cursor: "pointer", transition: "all .25s", textDecoration: "none", display: "block" }}
               className="cat-card-hover">
-              <div style={{ height: "250px", display: "flex", alignItems: "center", justifyContent: "center", background: "white", position: "relative" }}>
+              <div style={{ height: "360px", display: "flex", alignItems: "center", justifyContent: "center", background: "#fff", position: "relative" }}>
                 {(cat as any).image_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img

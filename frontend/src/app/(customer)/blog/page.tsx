@@ -55,7 +55,7 @@ export default async function BlogListingPage() {
     <div style={{ background: "#fff", minHeight: "100vh" }}>
       {/* Hero */}
       <div style={{ background: "#1B3A5C", padding: "48px 0 40px", borderBottom: "3px solid #E8242A" }}>
-        <div style={{ maxWidth: "1140px", margin: "0 auto", padding: "0 24px" }}>
+        <div style={{ maxWidth: "1500px", margin: "0 auto", padding: "0 24px" }}>
           <h1 style={{ fontFamily: "'Barlow Semi Condensed', sans-serif", fontSize: "38px", fontWeight: 800, color: "#fff", marginBottom: "8px" }}>
             AF Apparels Blog
           </h1>
@@ -71,7 +71,7 @@ export default async function BlogListingPage() {
       `}</style>
 
       {/* Posts Grid */}
-      <div style={{ maxWidth: "1140px", margin: "0 auto", padding: "48px 24px" }}>
+      <div style={{ maxWidth: "1500px", margin: "0 auto", padding: "48px 24px" }}>
         {posts.length === 0 ? (
           <div style={{ textAlign: "center", padding: "64px 0", color: "#7A7880" }}>
             <p style={{ fontSize: "16px" }}>No posts yet. Check back soon!</p>
@@ -110,7 +110,7 @@ export default async function BlogListingPage() {
                         {post.excerpt.length > 110 ? post.excerpt.slice(0, 110) + "…" : post.excerpt}
                       </p>
                     )}
-                    <div style={{ display: "flex", gap: "12px", alignItems: "center", fontSize: "12px", color: "#aaa" }}>
+                    <div style={{ display: "flex", gap: "12px", alignItems: "center", fontSize: "12px", color: "#7A7880" }}>
                       {post.published_date && <span>{new Date(post.published_date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>}
                       {post.read_time && <span>· {post.read_time}</span>}
                     </div>

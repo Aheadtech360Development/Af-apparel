@@ -133,7 +133,7 @@ export default function AccountOrdersPage() {
           </thead>
           <tbody>
             {isLoading && orders.length === 0 ? (
-              <tr><td colSpan={8} style={{ padding: "40px", textAlign: "center", color: "#bbb", fontSize: "14px" }}>Loading…</td></tr>
+              <tr><td colSpan={8} style={{ padding: "40px", textAlign: "center", color: "#7A7880", fontSize: "14px" }}>Loading…</td></tr>
             ) : orders.length === 0 ? (
               <tr>
                 <td colSpan={7} className="py-10 text-center text-gray-400">

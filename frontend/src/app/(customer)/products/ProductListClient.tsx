@@ -234,7 +234,7 @@ export function ProductListClient({
     <div>
       {/* Gender */}
       <div style={{ marginBottom: "24px" }}>
-        <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "11px", letterSpacing: ".14em", color: "#aaa", marginBottom: "12px", textTransform: "uppercase" }}>
+        <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "11px", letterSpacing: ".14em", color: "#7A7880", marginBottom: "12px", textTransform: "uppercase" }}>
           Gender
         </h4>
         {[
@@ -256,7 +256,7 @@ export function ProductListClient({
 
       {/* In Stock */}
       <div style={{ marginBottom: "24px" }}>
-        <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "11px", letterSpacing: ".14em", color: "#aaa", marginBottom: "12px", textTransform: "uppercase" }}>
+        <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "11px", letterSpacing: ".14em", color: "#7A7880", marginBottom: "12px", textTransform: "uppercase" }}>
           Availability
         </h4>
         <div
@@ -269,7 +269,7 @@ export function ProductListClient({
 
       {/* Category */}
       <div style={{ marginBottom: "24px" }}>
-        <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "11px", letterSpacing: ".14em", color: "#aaa", marginBottom: "12px", textTransform: "uppercase" }}>
+        <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "11px", letterSpacing: ".14em", color: "#7A7880", marginBottom: "12px", textTransform: "uppercase" }}>
           Category
         </h4>
         <div
@@ -299,7 +299,7 @@ export function ProductListClient({
       {/* Color swatches */}
       {colors.length > 0 && (
         <div style={{ marginBottom: "24px" }}>
-          <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "11px", letterSpacing: ".14em", color: "#aaa", marginBottom: "12px", textTransform: "uppercase" }}>Color</h4>
+          <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "11px", letterSpacing: ".14em", color: "#7A7880", marginBottom: "12px", textTransform: "uppercase" }}>Color</h4>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
             {colors.map((color) => {
               const hex = swatchColor(color);
@@ -329,7 +329,7 @@ export function ProductListClient({
       {/* Size pills */}
       {sizes.length > 0 && (
         <div style={{ marginBottom: "24px" }}>
-          <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "11px", letterSpacing: ".14em", color: "#aaa", marginBottom: "12px", textTransform: "uppercase" }}>Size</h4>
+          <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "11px", letterSpacing: ".14em", color: "#7A7880", marginBottom: "12px", textTransform: "uppercase" }}>Size</h4>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
             {sizes.map((size) => {
               const sel = currentSize === size;
@@ -355,7 +355,7 @@ export function ProductListClient({
 
       {/* Price Range */}
       <div style={{ marginBottom: "24px" }}>
-        <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "11px", letterSpacing: ".14em", color: "#aaa", marginBottom: "12px", textTransform: "uppercase" }}>
+        <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "11px", letterSpacing: ".14em", color: "#7A7880", marginBottom: "12px", textTransform: "uppercase" }}>
           Price Range
         </h4>
         <div style={{ padding: "0 2px" }}>
@@ -364,7 +364,7 @@ export function ProductListClient({
             <span>${localPriceMax}</span>
           </div>
           <div style={{ marginBottom: "8px" }}>
-            <label style={{ fontSize: "11px", color: "#aaa", marginBottom: "4px", display: "block" }}>Min</label>
+            <label style={{ fontSize: "11px", color: "#7A7880", marginBottom: "4px", display: "block" }}>Min</label>
             <input
               type="range"
               min={0}
@@ -376,7 +376,7 @@ export function ProductListClient({
             />
           </div>
           <div style={{ marginBottom: "10px" }}>
-            <label style={{ fontSize: "11px", color: "#aaa", marginBottom: "4px", display: "block" }}>Max</label>
+            <label style={{ fontSize: "11px", color: "#7A7880", marginBottom: "4px", display: "block" }}>Max</label>
             <input
               type="range"
               min={0}
@@ -396,7 +396,7 @@ export function ProductListClient({
           {(currentPriceMin || currentPriceMax) && (
             <button
               onClick={() => router.push(buildFilterUrl({ price_min: null, price_max: null }))}
-              style={{ width: "100%", marginTop: "4px", padding: "5px 0", background: "none", color: "#aaa", border: "1px solid #E2E0DA", borderRadius: "5px", fontSize: "11px", fontWeight: 600, cursor: "pointer" }}
+              style={{ width: "100%", marginTop: "4px", padding: "5px 0", background: "none", color: "#7A7880", border: "1px solid #E2E0DA", borderRadius: "5px", fontSize: "11px", fontWeight: 600, cursor: "pointer" }}
             >
               Reset Price
             </button>
@@ -406,13 +406,13 @@ export function ProductListClient({
 
       {/* Inventory */}
       <div style={{ marginBottom: "24px" }}>
-        <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "11px", letterSpacing: ".14em", color: "#aaa", marginBottom: "12px", textTransform: "uppercase" }}>
+        <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "11px", letterSpacing: ".14em", color: "#7A7880", marginBottom: "12px", textTransform: "uppercase" }}>
           Min. Inventory
         </h4>
         <div style={{ padding: "0 2px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#2A2830", fontWeight: 700, marginBottom: "8px" }}>
             <span>≥ {localMinStock} units</span>
-            <span style={{ fontSize: "10px", color: "#aaa", fontWeight: 500 }}>per product</span>
+            <span style={{ fontSize: "10px", color: "#7A7880", fontWeight: 500 }}>per product</span>
           </div>
           <input
             type="range"
@@ -423,7 +423,7 @@ export function ProductListClient({
             onChange={e => setLocalMinStock(Number(e.target.value))}
             style={{ width: "100%", accentColor: "#1A5CFF" }}
           />
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "10px", color: "#bbb", marginTop: "4px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "10px", color: "#7A7880", marginTop: "4px" }}>
             <span>0</span><span>200+</span>
           </div>
         </div>
@@ -431,7 +431,7 @@ export function ProductListClient({
 
       {/* Product Code */}
       <div style={{ marginBottom: "24px" }}>
-        <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "11px", letterSpacing: ".14em", color: "#aaa", marginBottom: "12px", textTransform: "uppercase" }}>
+        <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "11px", letterSpacing: ".14em", color: "#7A7880", marginBottom: "12px", textTransform: "uppercase" }}>
           Product Code
         </h4>
         <div style={{ display: "flex", gap: "6px" }}>
@@ -453,7 +453,7 @@ export function ProductListClient({
         {currentProductCode && (
           <button
             onClick={() => { setLocalCode(""); router.push(buildFilterUrl({ product_code: null })); }}
-            style={{ marginTop: "6px", fontSize: "11px", color: "#aaa", background: "none", border: "none", cursor: "pointer", padding: 0 }}
+            style={{ marginTop: "6px", fontSize: "11px", color: "#7A7880", background: "none", border: "none", cursor: "pointer", padding: 0 }}
           >
             ✕ Clear code
           </button>
@@ -495,7 +495,7 @@ export function ProductListClient({
   });
 
   return (
-    <div style={{ display: "flex", alignItems: "flex-start", minHeight: "600px" }}>
+    <div style={{ display: "flex", alignItems: "flex-start", minHeight: "600px", maxWidth: "1500px", margin: "0 auto" }}>
 
       {/* ── Desktop sidebar ── */}
       <aside
@@ -584,7 +584,7 @@ export function ProductListClient({
                 >
                   {bulkDownloading ? "Queuing…" : "Bulk Download"}
                 </button>
-                <button onClick={() => setSelected(new Set())} style={{ fontSize: "12px", color: "#aaa", background: "none", border: "none", cursor: "pointer" }}>
+                <button onClick={() => setSelected(new Set())} style={{ fontSize: "12px", color: "#7A7880", background: "none", border: "none", cursor: "pointer" }}>
                   Clear
                 </button>
               </div>
@@ -636,7 +636,7 @@ export function ProductListClient({
                     className="prod-card-hover"
                   >
                     {/* Image area */}
-                    <div style={{ background: "white", height: "200px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "#bbb", fontSize: "12px", fontWeight: 600, position: "relative" }}>
+                    <div style={{ background: "#fff", height: "200px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "#7A7880", fontSize: "12px", fontWeight: 600, position: "relative" }}>
                       {primaryImage ? (
                         <Image
                           src={primaryImage.url_medium_webp ?? primaryImage.url_medium}
@@ -659,7 +659,7 @@ export function ProductListClient({
 
                     {/* Body */}
                     <div style={{ padding: "14px 16px" }}>
-                      <div style={{ fontSize: "10px", color: "#aaa", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: "3px", fontWeight: 600 }}>
+                      <div style={{ fontSize: "10px", color: "#7A7880", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: "3px", fontWeight: 600 }}>
                         {[
                           (product as any).fabric,
                           (product as any).product_code,
@@ -687,7 +687,7 @@ export function ProductListClient({
                             />
                           ))}
                           {extraColors > 0 && (
-                            <span style={{ fontSize: "10px", color: "#aaa", fontWeight: 600 }}>+{extraColors}</span>
+                            <span style={{ fontSize: "10px", color: "#7A7880", fontWeight: 600 }}>+{extraColors}</span>
                           )}
                         </div>
                       )}

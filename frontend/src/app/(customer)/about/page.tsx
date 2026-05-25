@@ -25,7 +25,7 @@ export default function AboutPage() {
 
       {/* Page Hero */}
       <div style={{ background: "#1B3A5C", padding: "36px 0", borderBottom: "3px solid #E8242A" }}>
-        <div style={{ maxWidth: "1140px", margin: "0 auto", padding: "0 24px" }}>
+        <div style={{ maxWidth: "1500px", margin: "0 auto", padding: "0 24px" }}>
           <h1 style={{ fontFamily: "'Barlow Semi Condensed', sans-serif", fontSize: "32px", fontWeight: 800, color: "#fff", marginBottom: "6px" }}>About AF Apparels</h1>
           <p style={{ fontSize: "14px", color: "rgba(255,255,255,.55)", maxWidth: "500px" }}>Factory-direct wholesale blank apparel. Dallas, TX. Serving the US print industry since 2010.</p>
         </div>
@@ -33,7 +33,7 @@ export default function AboutPage() {
 
       {/* Stats */}
       <div style={{ background: "#fff", padding: "40px 0" }}>
-        <div style={{ maxWidth: "1140px", margin: "0 auto", padding: "0 24px" }}>
+        <div style={{ maxWidth: "1500px", margin: "0 auto", padding: "0 24px" }}>
           <div className="about-stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "16px", marginBottom: "40px" }}>
             {[
               { n: "2,000+", l: "Wholesale Accounts" },
@@ -105,7 +105,7 @@ export default function AboutPage() {
 
       {/* Certifications */}
       <div style={{ background: "#F4F6F9", padding: "36px 0" }}>
-        <div style={{ maxWidth: "1140px", margin: "0 auto", padding: "0 24px" }}>
+        <div style={{ maxWidth: "1500px", margin: "0 auto", padding: "0 24px" }}>
           <div style={{ textAlign: "center", marginBottom: "36px" }}>
             <h2 style={{ fontFamily: "'Barlow Semi Condensed', sans-serif", fontSize: "28px", fontWeight: 800, color: "#0F172A", marginBottom: "8px" }}>Certifications &amp; Compliance</h2>
             <p style={{ fontSize: "14px", color: "#64748B", maxWidth: "560px", margin: "0 auto", lineHeight: 1.6 }}>Every AF product meets international production, environmental, and ethical standards.</p>
@@ -127,10 +127,10 @@ export default function AboutPage() {
           <div style={{ marginTop: "32px" }}>
             <div style={{ background: "linear-gradient(135deg, #1b3a5c 0%, #1a3a5c 100%)", borderRadius: "12px", padding: "24px 28px", display: "flex", alignItems: "flex-start", gap: "16px" }}>
               <div style={{ background: "rgba(255,255,255,0.1)", borderRadius: "8px", padding: "10px", flexShrink: 0 }}>
-                <FileText size={24} color="white" />
+                <FileText size={24} color="#fff" />
               </div>
               <div>
-                <p style={{ color: "white", fontWeight: "700", fontSize: "15px", margin: "0 0 6px" }}>
+                <p style={{ color: "#fff", fontWeight: "700", fontSize: "15px", margin: "0 0 6px" }}>
                   Corporate &amp; Institutional Buyers
                 </p>
                 <p style={{ color: "rgba(255,255,255,0.75)", fontSize: "14px", margin: 0, lineHeight: "1.6" }}>

@@ -29,7 +29,7 @@ export default function PrivateLabelPage() {
 
       {/* Hero */}
       <div style={{ background: "#f4f3ef", padding: "56px 24px" }}>
-        <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "1500px", margin: "0 auto" }}>
           <div className="pl-hero-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "48px", alignItems: "center" }}>
             <div>
               <div style={{ display: "inline-block", background: "#1b3a5c", color: "#fff", fontSize: "12px", fontWeight: 700, padding: "4px 12px", borderRadius: "4px", marginBottom: "12px", letterSpacing: ".04em" }}>
@@ -38,7 +38,7 @@ export default function PrivateLabelPage() {
               <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(22px,3vw,36px)", color: "#1b3a5c", margin: "12px 0 10px", lineHeight: 1.1, letterSpacing: ".04em" }}>
                 Build Your Brand on<br />Factory-Direct Blanks
               </h1>
-              <p style={{ color: "#444", fontSize: "14px", lineHeight: 1.7, maxWidth: "460px" }}>
+              <p style={{ color: "#7A7880", fontSize: "14px", lineHeight: 1.7, maxWidth: "460px" }}>
                 Custom neck labels, exclusive colorways, unique styles — all manufactured to your spec and delivered direct from our Dallas facility. Your brand, our infrastructure, no middlemen.
               </p>
               <div style={{ display: "flex", gap: "10px", marginTop: "22px", flexWrap: "wrap" }}>
@@ -50,9 +50,9 @@ export default function PrivateLabelPage() {
                 </a>
               </div>
               <div style={{ display: "flex", gap: "24px", marginTop: "22px", flexWrap: "wrap" }}>
-                <div style={{ fontSize: "12px", color: "#555", display: "flex", alignItems: "center", gap: "5px" }}><Package size={13} style={{ flexShrink: 0 }} /> <span><span style={{ fontWeight: 600 }}>Min. 2,500 units</span> per style/color</span></div>
-                <div style={{ fontSize: "12px", color: "#555", display: "flex", alignItems: "center", gap: "5px" }}><Calendar size={13} style={{ flexShrink: 0 }} /> <span><span style={{ fontWeight: 600 }}>45–60 day</span> lead time</span></div>
-                <div style={{ fontSize: "12px", color: "#555", display: "flex", alignItems: "center", gap: "5px" }}><Globe size={13} style={{ flexShrink: 0 }} /> <span><span style={{ fontWeight: 600 }}>WRAP & GOTS</span> certified</span></div>
+                <div style={{ fontSize: "12px", color: "#7A7880", display: "flex", alignItems: "center", gap: "5px" }}><Package size={13} style={{ flexShrink: 0 }} /> <span><span style={{ fontWeight: 600 }}>Min. 2,500 units</span> per style/color</span></div>
+                <div style={{ fontSize: "12px", color: "#7A7880", display: "flex", alignItems: "center", gap: "5px" }}><Calendar size={13} style={{ flexShrink: 0 }} /> <span><span style={{ fontWeight: 600 }}>45–60 day</span> lead time</span></div>
+                <div style={{ fontSize: "12px", color: "#7A7880", display: "flex", alignItems: "center", gap: "5px" }}><Globe size={13} style={{ flexShrink: 0 }} /> <span><span style={{ fontWeight: 600 }}>WRAP & GOTS</span> certified</span></div>
               </div>
             </div>
             <div style={{ border: "1px solid #ddd", borderRadius: "15px", height: "380px", overflow: "hidden", position: "relative" }}>
@@ -71,10 +71,10 @@ export default function PrivateLabelPage() {
 
       {/* Who Private Label Is For */}
       <div style={{ background: "#fff", padding: "56px 24px" }}>
-        <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "1500px", margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: "32px" }}>
             <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "26px", letterSpacing: ".04em", color: "#111", marginBottom: "8px" }}>Who Private Label Is For</h2>
-            <p style={{ fontSize: "13.5px", color: "#666" }}>Not every business is ready for private label — here&apos;s who gets the most value</p>
+            <p style={{ fontSize: "13.5px", color: "#7A7880" }}>Not every business is ready for private label — here&apos;s who gets the most value</p>
           </div>
           <div className="pl-3col-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "14px" }}>
             {[
@@ -85,7 +85,7 @@ export default function PrivateLabelPage() {
               <div key={wi} style={{ background: "#F7F8FA", border: "1px solid #eee", borderRadius: "6px", padding: "20px", textAlign: "center" }}>
                 <div style={{ display: "flex", justifyContent: "center", marginBottom: "10px", color: "#2D8CFF" }}>{w.icon}</div>
                 <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "13px", letterSpacing: ".06em", color: "#111", marginBottom: "6px" }}>{w.title}</h4>
-                <p style={{ fontSize: "12px", color: "#666", lineHeight: 1.6 }}>{w.body}</p>
+                <p style={{ fontSize: "12px", color: "#7A7880", lineHeight: 1.6 }}>{w.body}</p>
               </div>
             ))}
           </div>
@@ -94,10 +94,10 @@ export default function PrivateLabelPage() {
 
       {/* How It Works */}
       <div style={{ background: "#F7F8FA", padding: "56px 24px" }}>
-        <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "1500px", margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: "32px" }}>
             <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "26px", letterSpacing: ".04em", color: "#111", marginBottom: "8px" }}>How It Works</h2>
-            <p style={{ fontSize: "13.5px", color: "#666" }}>From inquiry to your branded product on shelf — a clear, 5-step process</p>
+            <p style={{ fontSize: "13.5px", color: "#7A7880" }}>From inquiry to your branded product on shelf — a clear, 5-step process</p>
           </div>
           <div style={{ display: "flex", gap: "8px", alignItems: "stretch", flexWrap: "wrap", justifyContent: "center" }}>
             {[
@@ -111,7 +111,7 @@ export default function PrivateLabelPage() {
                 <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: "6px", padding: "24px 16px", width: "170px", textAlign: "center" }}>
                   <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "#2D8CFF", color: "#fff", fontFamily: "var(--font-bebas)", fontSize: "20px", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px" }}>{s.n}</div>
                   <div style={{ fontFamily: "var(--font-bebas)", fontSize: "13px", letterSpacing: ".06em", color: "#111", marginBottom: "6px" }}>{s.title}</div>
-                  <p style={{ fontSize: "11px", color: "#555", lineHeight: 1.5 }}>{s.body}</p>
+                  <p style={{ fontSize: "11px", color: "#7A7880", lineHeight: 1.5 }}>{s.body}</p>
                 </div>
                 {i < 4 && <div style={{ color: "#D1D5DB", fontSize: "20px", padding: "0 4px" }}>→</div>}
               </div>
@@ -122,10 +122,10 @@ export default function PrivateLabelPage() {
 
       {/* Customization Options */}
       <div style={{ background: "#fff", padding: "56px 24px" }}>
-        <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "1500px", margin: "0 auto" }}>
           <div style={{ marginBottom: "32px" }}>
             <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "26px", letterSpacing: ".04em", color: "#111", marginBottom: "8px" }}>Customization Options</h2>
-            <p style={{ fontSize: "13.5px", color: "#666" }}>Everything you need to make the product fully yours</p>
+            <p style={{ fontSize: "13.5px", color: "#7A7880" }}>Everything you need to make the product fully yours</p>
           </div>
           <div className="pl-3col-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "16px" }}>
             {[
@@ -148,10 +148,10 @@ export default function PrivateLabelPage() {
               <div key={o.title} style={{ border: "1px solid #E5E7EB", borderRadius: "6px", padding: "20px" }}>
                 <div style={{ display: "inline-block", background: "#dde8ff", color: "#2D8CFF", fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "3px", marginBottom: "10px", textTransform: "uppercase", letterSpacing: ".05em" }}>{o.tag}</div>
                 <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".04em", color: "#111", marginBottom: "8px" }}>{o.title}</h4>
-                <p style={{ fontSize: "12.5px", color: "#555", lineHeight: 1.6, marginBottom: "12px" }}>{o.body}</p>
+                <p style={{ fontSize: "12.5px", color: "#7A7880", lineHeight: 1.6, marginBottom: "12px" }}>{o.body}</p>
                 <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
                   {o.items.map(it => (
-                    <li key={it} style={{ fontSize: "12px", color: "#555", padding: "3px 0 3px 14px", position: "relative" }}>
+                    <li key={it} style={{ fontSize: "12px", color: "#7A7880", padding: "3px 0 3px 14px", position: "relative" }}>
                       <span style={{ position: "absolute", left: 0, color: "#059669" }}>✓</span>{it}
                     </li>
                   ))}
@@ -164,10 +164,10 @@ export default function PrivateLabelPage() {
 
       {/* Program Specifications */}
       <div style={{ background: "#F7F8FA", padding: "56px 24px" }}>
-        <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "1500px", margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: "32px" }}>
             <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "26px", letterSpacing: ".04em", color: "#111", marginBottom: "8px" }}>Program Specifications</h2>
-            <p style={{ fontSize: "13.5px", color: "#666" }}>Everything you need to know before starting your private label inquiry</p>
+            <p style={{ fontSize: "13.5px", color: "#7A7880" }}>Everything you need to know before starting your private label inquiry</p>
           </div>
           <div style={{ maxWidth: "680px", margin: "0 auto", background: "#fff", border: "1px solid #E5E7EB", borderRadius: "6px", overflow: "hidden" }}>
             {[
@@ -196,7 +196,7 @@ export default function PrivateLabelPage() {
         <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(24px,3.5vw,36px)", color: "#1b3a5c", letterSpacing: ".04em", marginBottom: "14px" }}>
           READY TO BUILD YOUR BRAND?
         </h2>
-        <p style={{ color: "#444", fontSize: "14px", marginBottom: "24px" }}>
+        <p style={{ color: "#2A2830", fontSize: "14px", marginBottom: "24px" }}>
           Tell us about your project and our private label team will respond within 1 business day with pricing, timeline, and next steps.
         </p>
         <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap", marginBottom: "14px" }}>
@@ -207,7 +207,7 @@ export default function PrivateLabelPage() {
             Download Program Guide
           </a>
         </div>
-        <div style={{ fontSize: "11px", color: "#555" }}>
+        <div style={{ fontSize: "11px", color: "#7A7880" }}>
           📞 +1 (469) 367-9753 &nbsp;·&nbsp; info@afblanks.com &nbsp;·&nbsp; Response within 1 business day
         </div>
       </div>

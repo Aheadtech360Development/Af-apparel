@@ -45,7 +45,7 @@ export default function ReviewsPage() {
     <div style={{ minHeight: "100vh", background: "#F4F3EF", fontFamily: "var(--font-jakarta)" }}>
       {/* Hero */}
       <div style={{ background: "#1B3A5C", padding: "48px 32px 40px" }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "1500px", margin: "0 auto" }}>
           <div style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".12em", color: "rgba(255,255,255,.5)", marginBottom: "6px" }}>Wholesale Community</div>
           <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(32px,5vw,56px)", color: "#fff", letterSpacing: ".02em", lineHeight: 1, marginBottom: "12px" }}>
             Customer Reviews
@@ -56,9 +56,9 @@ export default function ReviewsPage() {
         </div>
       </div>
 
-      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "40px 32px" }}>
+      <div style={{ maxWidth: "1500px", margin: "0 auto", padding: "40px 32px" }}>
         {loading ? (
-          <div style={{ textAlign: "center", padding: "60px", color: "#aaa" }}>Loading reviews…</div>
+          <div style={{ textAlign: "center", padding: "60px", color: "#7A7880" }}>Loading reviews…</div>
         ) : reviews.length === 0 ? (
           <div style={{ textAlign: "center", padding: "60px", background: "#fff", borderRadius: "12px", border: "1px solid #E2E0DA" }}>
             <div style={{ fontSize: "48px", marginBottom: "12px" }}>★</div>
@@ -77,7 +77,7 @@ export default function ReviewsPage() {
                     <StarRow rating={r.rating} />
                     {r.title && <div style={{ fontWeight: 700, fontSize: "14px", color: "#2A2830", marginTop: "4px" }}>{r.title}</div>}
                   </div>
-                  <div style={{ fontSize: "11px", color: "#aaa" }}>{new Date(r.created_at).toLocaleDateString()}</div>
+                  <div style={{ fontSize: "11px", color: "#7A7880" }}>{new Date(r.created_at).toLocaleDateString()}</div>
                 </div>
                 <p style={{ fontSize: "14px", color: "#2A2830", lineHeight: 1.65, marginBottom: "12px" }}>{r.body}</p>
                 {r.product_slug && (

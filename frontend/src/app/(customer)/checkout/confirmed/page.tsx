@@ -61,7 +61,7 @@ export default function CheckoutConfirmedPage() {
 
   if (!ready || !confirmedOrderNumber) {
     return (
-      <div style={{ textAlign: "center", padding: "60px 0", color: "#aaa", fontSize: "14px" }}>
+      <div style={{ textAlign: "center", padding: "60px 0", color: "#7A7880", fontSize: "14px" }}>
         Loading&hellip;
       </div>
     );

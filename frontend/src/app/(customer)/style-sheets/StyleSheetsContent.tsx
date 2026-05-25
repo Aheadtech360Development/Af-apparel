@@ -46,7 +46,7 @@ export default function StyleSheetsPage() {
       </div>
 
       {/* Grid */}
-      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "48px 32px" }}>
+      <div style={{ maxWidth: "1500px", margin: "0 auto", padding: "48px 32px" }}>
         {loading ? (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "24px" }}>
             {Array.from({ length: 8 }).map((_, i) => (

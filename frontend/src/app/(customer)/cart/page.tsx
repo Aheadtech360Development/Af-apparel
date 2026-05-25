@@ -319,7 +319,7 @@ export default function CartPage() {
   if (isLoading) {
     return (
       <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F4F3EF" }}>
-        <p style={{ color: "#aaa", fontSize: "14px" }}>Loading cart…</p>
+        <p style={{ color: "#7A7880", fontSize: "14px" }}>Loading cart…</p>
       </div>
     );
   }
@@ -338,7 +338,7 @@ export default function CartPage() {
 
       {/* Header bar */}
       <div style={{ display: "none", background: "#1B3A5C", borderBottom: "3px solid #E8242A", padding: "20px 32px 18px" }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "1500px", margin: "0 auto" }}>
           <div style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".14em", color: "rgba(255,255,255,.5)", marginBottom: "4px" }}>Wholesale</div>
           <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(24px,4vw,40px)", color: "#fff", letterSpacing: ".03em", lineHeight: 1 }}>
             Shopping Cart
@@ -346,7 +346,7 @@ export default function CartPage() {
         </div>
       </div>
 
-      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "28px 24px 0" }}>
+      <div style={{ maxWidth: "1500px", margin: "0 auto", padding: "28px 24px 0" }}>
         {isEmpty ? (
           /* ── Empty state ── */
           <div style={{ textAlign: "center", padding: "80px 24px", background: "#fff", borderRadius: "12px", border: "1.5px dashed #E2E0DA" }}>
@@ -431,7 +431,7 @@ export default function CartPage() {
                           <span style={{ color: "#ccc" }}>·</span>
                           {hasDiscount ? (
                             <>
-                              <span style={{ textDecoration: "line-through", color: "#bbb" }}>{formatCurrency(retailPrice)}</span>
+                              <span style={{ textDecoration: "line-through", color: "#7A7880" }}>{formatCurrency(retailPrice)}</span>
                               <span style={{ fontWeight: 700, color: "#059669" }}>{formatCurrency(group.unitPrice)}/unit</span>
                             </>
                           ) : (
@@ -457,12 +457,12 @@ export default function CartPage() {
                             }} />
                             {/* Color name */}
                             <span style={{ fontWeight: 700, color: "#2A2830", minWidth: "64px" }}>{color}</span>
-                            <span style={{ color: "#bbb" }}>—</span>
+                            <span style={{ color: "#7A7880" }}>—</span>
                             {/* Sizes */}
                             <span style={{ color: "#7A7880", flex: 1 }}>
                               {sizes.map(({ size, qty }) => `${size}:${qty}`).join(" / ")}
                             </span>
-                            <span style={{ color: "#bbb" }}>—</span>
+                            <span style={{ color: "#7A7880" }}>—</span>
                             {/* Color units */}
                             <span style={{ fontWeight: 700, color: "#2A2830", whiteSpace: "nowrap" }}>{units} units</span>
                           </div>
@@ -707,7 +707,7 @@ function OrderSummary({
       {/* Divider + accepted cards */}
       <div style={{ borderTop: "1.5px solid #F0EEE9" }} />
       <div style={{ padding: "14px 20px" }}>
-        <p style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".08em", color: "#bbb", marginBottom: "10px" }}>Accepted Payment</p>
+        <p style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".08em", color: "#7A7880", marginBottom: "10px" }}>Accepted Payment</p>
         <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
           {[
             { label: "VISA", bg: "#1A1F71", color: "#fff", font: "800" },

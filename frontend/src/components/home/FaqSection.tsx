@@ -9,7 +9,7 @@ export default function FaqSection() {
 
   return (
     <section style={{ padding: "80px 0", background: "#fff" }}>
-      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 32px" }}>
+      <div style={{ maxWidth: "1500px", margin: "0 auto", padding: "0 32px" }}>
         <div style={{ marginBottom: "44px", textAlign: "center" }}>
           <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(32px,3.5vw,48px)", color: "#2A2830", letterSpacing: ".01em", lineHeight: 1 }}>Frequently Asked Questions</h2>
         </div>
@@ -18,7 +18,7 @@ export default function FaqSection() {
             <details key={i} style={{ border: "1px solid #E2E0DA", borderRadius: "8px", marginBottom: "8px", background: "#fff", overflow: "hidden" }}>
               <summary style={{ padding: "18px 22px", fontSize: "15px", fontWeight: 600, cursor: "pointer", listStyle: "none", display: "flex", justifyContent: "space-between", alignItems: "center", color: "#2A2830" }}>
                 {faq.q}
-                <span style={{ fontSize: "18px", color: "#aaa", fontWeight: 300, marginLeft: "16px", flexShrink: 0 }}>＋</span>
+                <span style={{ fontSize: "18px", color: "#7A7880", fontWeight: 300, marginLeft: "16px", flexShrink: 0 }}>＋</span>
               </summary>
               <div style={{ padding: "14px 22px 18px", fontSize: "15px", color: "#7A7880", lineHeight: 1.75, borderTop: "1px solid #E2E0DA", fontWeight: 500 }}>
                 {faq.a}

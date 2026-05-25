@@ -48,7 +48,7 @@ export function Footer() {
 
   return (
     <footer style={{ background: "#1B3A5C", borderTop: "1px solid rgba(255,255,255,.08)" }}>
-      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "52px 32px 40px", display: "grid", gridTemplateColumns: "1.8fr 1fr 1fr 1fr 1fr", gap: "32px" }} className="footer-grid-responsive">
+      <div style={{ maxWidth: "1500px", margin: "0 auto", padding: "52px 32px 40px", display: "grid", gridTemplateColumns: "1.8fr 1fr 1fr 1fr 1fr", gap: "32px" }} className="footer-grid-responsive">
         <div>
           <p style={{ fontSize: "15px", color: "#d3d0d0", lineHeight: 1.75, fontWeight: 500 }}>
             Factory-direct wholesale blank apparel. Serving 2,000+ businesses across the US from our Dallas, TX warehouse.<br /><br />
@@ -71,7 +71,7 @@ export function Footer() {
           </div>
         ))}
       </div>
-      <div style={{ borderTop: "1px solid rgba(255,255,255,.04)", padding: "18px 32px", maxWidth: "1280px", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
+      <div style={{ borderTop: "1px solid rgba(255,255,255,.04)", padding: "18px 32px", maxWidth: "1500px", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
         <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", alignItems: "center" }}>
           <span style={{ fontSize: "11px", color: "#d3d0d0", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".07em", marginRight: "6px" }}>Accepted:</span>
           {["VISA", "MC", "AMEX", "ACH", "WIRE", "NET 30"].map(m => (

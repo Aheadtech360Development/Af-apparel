@@ -131,7 +131,7 @@ const METHODS = [
     icon: <BookOpen size={22} />,
     name: "After-Print Care Guide",
     sub: "Instructions for end customers",
-    compat: { label: "📋 Info", color: "#555", bg: "#f0f0f0" },
+    compat: { label: "📋 Info", color: "#7A7880", bg: "#f0f0f0" },
     intro: "Share these care instructions with your end customers to maximize decoration durability and reduce returns.",
     specs: [
       ["Wash Temperature", "Cold water (30°C / 86°F max)"],
@@ -173,7 +173,7 @@ export default function PrintGuidePage() {
 
       {/* Hero */}
       <div style={{ background: "#1b3a5c", padding: "56px 24px" }}>
-        <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "1500px", margin: "0 auto" }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(45,140,255,.15)", color: "#2D8CFF", fontSize: "12px", fontWeight: 700, padding: "4px 12px", borderRadius: "4px", marginBottom: "12px", letterSpacing: ".04em" }}>
             <Microscope size={14} style={{ flexShrink: 0 }} />
             Tested in our Dallas facility + validated by 200+ print shops
@@ -196,10 +196,10 @@ export default function PrintGuidePage() {
 
       {/* Method Cards */}
       <div style={{ background: "#F7F8FA", padding: "56px 24px" }}>
-        <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "1500px", margin: "0 auto" }}>
           <div style={{ marginBottom: "32px" }}>
             <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "26px", letterSpacing: ".04em", color: "#111", marginBottom: "8px" }}>Decoration Method Guide</h2>
-            <p style={{ fontSize: "13.5px", color: "#666" }}>Press settings and compatibility ratings for all AF core blanks</p>
+            <p style={{ fontSize: "13.5px", color: "#7A7880" }}>Press settings and compatibility ratings for all AF core blanks</p>
           </div>
           <div className="print-guide-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: "20px" }}>
             {METHODS.map(m => (
@@ -222,7 +222,7 @@ export default function PrintGuidePage() {
                     </div>
                   )}
                   {"intro" in m && m.intro && (
-                    <p style={{ fontSize: "12.5px", color: "#555", lineHeight: 1.6, marginBottom: "14px" }}>{m.intro}</p>
+                    <p style={{ fontSize: "12.5px", color: "#7A7880", lineHeight: 1.6, marginBottom: "14px" }}>{m.intro}</p>
                   )}
                   <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12.5px", marginBottom: "16px" }}>
                     <tbody>
@@ -238,7 +238,7 @@ export default function PrintGuidePage() {
                     <div style={{ fontSize: "11px", fontWeight: 700, color: "#374151", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: "8px" }}>{m.tipsTitle}</div>
                     <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
                       {m.tips.map(tip => (
-                        <li key={tip} style={{ fontSize: "12px", color: "#555", padding: "3px 0 3px 14px", position: "relative", lineHeight: 1.5 }}>
+                        <li key={tip} style={{ fontSize: "12px", color: "#7A7880", padding: "3px 0 3px 14px", position: "relative", lineHeight: 1.5 }}>
                           <span style={{ position: "absolute", left: 0, color: "#2D8CFF", fontWeight: 700 }}>›</span>{tip}
                         </li>
                       ))}
@@ -253,10 +253,10 @@ export default function PrintGuidePage() {
 
       {/* Fabric Compatibility Matrix */}
       <div style={{ background: "#fff", borderTop: "1px solid #E5E7EB", borderBottom: "1px solid #E5E7EB", padding: "56px 24px" }}>
-        <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "1500px", margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: "32px" }}>
             <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "26px", letterSpacing: ".04em", color: "#111", marginBottom: "8px" }}>Fabric Compatibility Matrix</h2>
-            <p style={{ fontSize: "13.5px", color: "#666" }}>At-a-glance compatibility ratings for all AF core blanks by decoration method</p>
+            <p style={{ fontSize: "13.5px", color: "#7A7880" }}>At-a-glance compatibility ratings for all AF core blanks by decoration method</p>
           </div>
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", minWidth: "680px" }}>
@@ -273,7 +273,7 @@ export default function PrintGuidePage() {
                   <tr key={row.sku} style={{ borderBottom: i < MATRIX.length - 1 ? "1px solid #F3F4F6" : "none" }}>
                     <td style={{ padding: "12px 16px", fontWeight: 700, color: "#111", fontSize: "13px" }}>
                       {row.sku}<br />
-                      <span style={{ fontSize: "11px", color: "#aaa", fontWeight: 400 }}>{row.fabric}</span>
+                      <span style={{ fontSize: "11px", color: "#7A7880", fontWeight: 400 }}>{row.fabric}</span>
                     </td>
                     {[row.dtf, row.screen, row.sub, row.emb, row.htv].map((stars, j) => (
                       <td key={j} style={{ padding: "12px 16px", textAlign: "center", fontSize: "11px", color: stars.startsWith("★★☆") ? "#dc2626" : stars.startsWith("★★★★★") ? "#059669" : "#d97706" }}>
@@ -285,7 +285,7 @@ export default function PrintGuidePage() {
               </tbody>
             </table>
           </div>
-          <div style={{ display: "flex", gap: "16px", marginTop: "14px", flexWrap: "wrap", fontSize: "12px", color: "#555" }}>
+          <div style={{ display: "flex", gap: "16px", marginTop: "14px", flexWrap: "wrap", fontSize: "12px", color: "#7A7880" }}>
             <span style={{ color: "#059669" }}>★★★★★ Best — highly recommended</span>
             <span style={{ color: "#d97706" }}>★★★★☆ Good — works well</span>
             <span style={{ color: "#d97706" }}>★★★☆☆ Limited — test first</span>
@@ -299,7 +299,7 @@ export default function PrintGuidePage() {
         <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(28px,4vw,42px)", color: "#1b3a5c", letterSpacing: ".04em", marginBottom: "14px" }}>
           QUESTIONS ABOUT YOUR SETUP?
         </h2>
-        <p style={{ color: "#444", fontSize: "14px", marginBottom: "28px" }}>
+        <p style={{ color: "#2A2830", fontSize: "14px", marginBottom: "28px" }}>
           Our team has worked with 2,000+ print shops. Contact us with your specific decoration method and garment — we&apos;ll give you exact settings.
         </p>
         <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
@@ -310,7 +310,7 @@ export default function PrintGuidePage() {
             Browse All Blanks
           </a>
         </div>
-        <div style={{ color: "#555", fontSize: "11px", marginTop: "16px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
+        <div style={{ color: "#7A7880", fontSize: "11px", marginTop: "16px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
           <Phone size={12} style={{ flexShrink: 0 }} />
           +1 (469) 367-9753 · info@afblanks.com
         </div>

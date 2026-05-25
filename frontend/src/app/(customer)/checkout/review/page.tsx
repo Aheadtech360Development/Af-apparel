@@ -440,7 +440,7 @@ export default function CheckoutReviewPage() {
       )}
       {/* Loading state for wholesale cart */}
       {!isGuest && !cart && (
-        <div style={{ ...sectionCard, textAlign: "center", color: "#bbb", fontSize: "13px" }}>
+        <div style={{ ...sectionCard, textAlign: "center", color: "#7A7880", fontSize: "13px" }}>
           Loading order items…
         </div>
       )}
@@ -549,7 +549,7 @@ export default function CheckoutReviewPage() {
         </button>
       </div>
 
-      <p style={{ textAlign: "center", fontSize: "11px", color: "#aaa", marginTop: "12px" }}>
+      <p style={{ textAlign: "center", fontSize: "11px", color: "#7A7880", marginTop: "12px" }}>
         By placing your order you agree to our Terms of Service and wholesale pricing agreement.
       </p>
     </div>

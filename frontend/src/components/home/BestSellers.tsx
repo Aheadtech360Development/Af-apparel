@@ -96,7 +96,7 @@ export function BestSellers() {
 
   return (
     <section style={{ padding: "80px 0", background: "#fff" }}>
-      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 32px" }}>
+      <div style={{ maxWidth: "1500px", margin: "0 auto", padding: "0 32px" }}>
 
         {/* Section header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "40px" }}>
@@ -165,7 +165,7 @@ export function BestSellers() {
                 {/* Body */}
                 <div style={{ padding: "14px 16px" }}>
                   {/* Category/fabric label */}
-                  <div style={{ fontSize: "11px", color: "#aaa", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: "4px", fontWeight: 600 }}>
+                  <div style={{ fontSize: "11px", color: "#7A7880", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: "4px", fontWeight: 600 }}>
                     {[product.fabric, product.product_code, product.weight].filter(Boolean).join(" · ") || product.categories?.[0]?.name || "Apparel"}
                   </div>
 
@@ -190,7 +190,7 @@ export function BestSellers() {
                         />
                       ))}
                       {extraColors > 0 && (
-                        <span style={{ fontSize: "11px", color: "#aaa", fontWeight: 600 }}>+{extraColors}</span>
+                        <span style={{ fontSize: "11px", color: "#7A7880", fontWeight: 600 }}>+{extraColors}</span>
                       )}
                     </div>
                   )}

@@ -10,7 +10,7 @@ export default function HowItWorks() {
 
   return (
     <section style={{ padding: "80px 0", background: "#F4F3EF" }}>
-      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 32px" }}>
+      <div style={{ maxWidth: "1500px", margin: "0 auto", padding: "0 32px" }}>
         <div style={{ marginBottom: "44px", textAlign: "center" }}>
           <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(32px,3.5vw,48px)", color: "#2A2830", letterSpacing: ".01em", lineHeight: 1, marginBottom: "10px" }}>How It Works</h2>
           <p style={{ fontSize: "15px", color: "#7A7880", fontWeight: 500 }}>Wholesale ordering in 4 simple steps</p>

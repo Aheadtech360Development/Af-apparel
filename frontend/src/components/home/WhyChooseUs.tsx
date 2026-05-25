@@ -11,7 +11,7 @@ export default function WhyChooseUs() {
 
   return (
     <section style={{ padding: "60px 0", background: "#F4F6F9" }}>
-      <div style={{ maxWidth: "1140px", margin: "0 auto", padding: "0 24px" }}>
+      <div style={{ maxWidth: "1500px", margin: "0 auto", padding: "0 24px" }}>
         <div style={{ display: "flex", gap: "48px", alignItems: "center", flexWrap: "wrap" }}>
           <div style={{ flex: "1.2", minWidth: "260px" }}>
             <div style={{ marginBottom: "36px" }}>

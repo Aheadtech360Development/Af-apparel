@@ -94,7 +94,7 @@ export function Header() {
 
       {/* Main header */}
       <header style={{ background: "#f4f3ef", borderBottom: "3px solid #E8242A" }} className="sticky top-0 z-40">
-        <div className="header-inner" style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 32px", display: "flex", alignItems: "center", justifyContent: "space-between", height: "100px", gap: "24px" }}>
+        <div className="header-inner" style={{ maxWidth: "1500px", margin: "0 auto", padding: "0 32px", display: "flex", alignItems: "center", justifyContent: "space-between", height: "100px", gap: "24px" }}>
 
           {/* Logo */}
           <Link href="/" className="header-logo" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
@@ -248,7 +248,7 @@ export function Header() {
 
         {/* Browse Bar */}
         {/* <div style={{ background: "#1B3A5C" }} className="hidden md:block">
-          <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 32px", display: "flex", alignItems: "center", overflowX: "auto" }}>
+          <div style={{ maxWidth: "1500px", margin: "0 auto", padding: "0 32px", display: "flex", alignItems: "center", overflowX: "auto" }}>
             <span style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".08em", color: "rgba(255,255,255,.45)", whiteSpace: "nowrap", padding: "8px 14px 8px 0", flexShrink: 0 }}>Browse:</span>
             {BROWSE_LINKS.map(({ href, label }) => (
               <Link key={label} href={href}

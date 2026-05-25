@@ -54,7 +54,7 @@ export default function ContactPage() {
 
       {/* Hero */}
       <div style={{ background: "#1b3a5c", padding: "56px 24px" }}>
-        <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "1500px", margin: "0 auto" }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(45,140,255,.15)", color: "#2D8CFF", fontSize: "12px", fontWeight: 700, padding: "4px 12px", borderRadius: "4px", marginBottom: "12px", letterSpacing: ".04em" }}>
             <Phone size={13} style={{ flexShrink: 0 }} />
             We respond within 4 business hours
@@ -70,7 +70,7 @@ export default function ContactPage() {
 
       {/* Main Contact */}
       <div style={{ background: "#F7F8FA", padding: "56px 24px" }}>
-        <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "1500px", margin: "0 auto" }}>
           <div className="contact-main-grid" style={{ display: "grid", gridTemplateColumns: "1fr 360px", gap: "32px", alignItems: "start" }}>
 
             {/* Form */}
@@ -124,7 +124,7 @@ export default function ContactPage() {
                   <button type="submit" disabled={status === "sending"} style={{ width: "100%", background: "#E8242A", color: "#fff", border: "none", borderRadius: "3px", padding: "13px", fontSize: "14px", fontFamily: "var(--font-bebas)", fontWeight: 700, cursor: "pointer", letterSpacing: ".05em", opacity: status === "sending" ? 0.7 : 1 }}>
                     {status === "sending" ? "Sending…" : "Send Message →"}
                   </button>
-                  <div style={{ fontSize: "11px", color: "#aaa", textAlign: "center", marginTop: "10px", display: "flex", alignItems: "center", justifyContent: "center", gap: "5px" }}>
+                  <div style={{ fontSize: "11px", color: "#7A7880", textAlign: "center", marginTop: "10px", display: "flex", alignItems: "center", justifyContent: "center", gap: "5px" }}>
                     <Check size={12} style={{ flexShrink: 0 }} />
                     We respond within 4 business hours Mon–Fri &nbsp;·&nbsp; <span style={{ color: "#E8242A" }}>*</span> Required
                   </div>
@@ -138,21 +138,21 @@ export default function ContactPage() {
                 <div style={{ flexShrink: 0, color: "#2D8CFF", marginTop: "2px" }}><Phone size={20} /></div>
                 <div>
                   <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "14px", letterSpacing: ".04em", color: "#111", marginBottom: "4px" }}>Phone</h4>
-                  <p style={{ fontSize: "12.5px", color: "#555", lineHeight: 1.6 }}>+1 (469) 367-9753<br />Mon–Fri, 8AM–6PM CT<br />Same-day callback for wholesale accounts</p>
+                  <p style={{ fontSize: "12.5px", color: "#7A7880", lineHeight: 1.6 }}>+1 (469) 367-9753<br />Mon–Fri, 8AM–6PM CT<br />Same-day callback for wholesale accounts</p>
                 </div>
               </div>
               <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: "6px", padding: "16px", display: "flex", gap: "12px", alignItems: "flex-start" }}>
                 <div style={{ flexShrink: 0, color: "#2D8CFF", marginTop: "2px" }}><Mail size={20} /></div>
                 <div>
                   <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "14px", letterSpacing: ".04em", color: "#111", marginBottom: "4px" }}>Email</h4>
-                  <p style={{ fontSize: "12.5px", color: "#555", lineHeight: 1.6 }}>info@afblanks.com<br />Response within 4 business hours<br />Large orders: include SKU and quantity in subject</p>
+                  <p style={{ fontSize: "12.5px", color: "#7A7880", lineHeight: 1.6 }}>info@afblanks.com<br />Response within 4 business hours<br />Large orders: include SKU and quantity in subject</p>
                 </div>
               </div>
               <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: "6px", padding: "16px", display: "flex", gap: "12px", alignItems: "flex-start" }}>
                 <div style={{ flexShrink: 0, color: "#2D8CFF", marginTop: "2px" }}><MapPin size={20} /></div>
                 <div>
                   <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "14px", letterSpacing: ".04em", color: "#111", marginBottom: "4px" }}>Facility & Shipping Hub</h4>
-                  <p style={{ fontSize: "12.5px", color: "#555", lineHeight: 1.6 }}>10719 Turbeville Rd<br />Dallas, TX 75243<br />Orders before 12 PM CT ship same day</p>
+                  <p style={{ fontSize: "12.5px", color: "#7A7880", lineHeight: 1.6 }}>10719 Turbeville Rd<br />Dallas, TX 75243<br />Orders before 12 PM CT ship same day</p>
                 </div>
               </div>
               <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: "6px", padding: "16px", display: "flex", gap: "12px", alignItems: "flex-start" }}>
@@ -168,7 +168,7 @@ export default function ContactPage() {
                         ["Federal Holidays", "Closed"],
                       ].map(([day, hrs]) => (
                         <tr key={day}>
-                          <td style={{ padding: "3px 0", color: "#555", width: "55%" }}>{day}</td>
+                          <td style={{ padding: "3px 0", color: "#7A7880", width: "55%" }}>{day}</td>
                           <td style={{ padding: "3px 0", color: hrs === "Closed" ? "#aaa" : "#111", fontWeight: hrs === "Closed" ? 400 : 600 }}>{hrs}</td>
                         </tr>
                       ))}
@@ -183,10 +183,10 @@ export default function ContactPage() {
 
       {/* Departments */}
       <div style={{ background: "#fff", padding: "56px 24px" }}>
-        <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "1500px", margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: "32px" }}>
             <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "26px", letterSpacing: ".04em", color: "#111", marginBottom: "8px" }}>Reach the Right Team</h2>
-            <p style={{ fontSize: "13.5px", color: "#666" }}>Different questions, different experts — faster answers for you</p>
+            <p style={{ fontSize: "13.5px", color: "#7A7880" }}>Different questions, different experts — faster answers for you</p>
           </div>
           <div className="contact-dept-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "16px" }}>
             {[
@@ -197,7 +197,7 @@ export default function ContactPage() {
               <div key={di} style={{ background: "#F7F8FA", border: "1px solid #E5E7EB", borderRadius: "6px", padding: "20px", textAlign: "center" }}>
                 <div style={{ display: "flex", justifyContent: "center", marginBottom: "10px", color: "#2D8CFF" }}>{d.icon}</div>
                 <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "14px", letterSpacing: ".06em", color: "#111", marginBottom: "6px" }}>{d.title}</h4>
-                <p style={{ fontSize: "12px", color: "#555", lineHeight: 1.6, marginBottom: "10px" }}>{d.body}</p>
+                <p style={{ fontSize: "12px", color: "#7A7880", lineHeight: 1.6, marginBottom: "10px" }}>{d.body}</p>
                 <div style={{ fontSize: "12px", color: "#2D8CFF", fontWeight: 600 }}>{d.email}</div>
               </div>
             ))}
@@ -207,7 +207,7 @@ export default function ContactPage() {
 
       {/* FAQ */}
       <div style={{ background: "#F7F8FA", padding: "56px 24px" }}>
-        <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "1500px", margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: "32px" }}>
             <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "26px", letterSpacing: ".04em", color: "#111" }}>Quick Answers</h2>
           </div>
@@ -232,7 +232,7 @@ export default function ContactPage() {
             ].map(f => (
               <details key={f.q} style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: "4px" }}>
                 <summary style={{ padding: "14px 16px", fontSize: "13.5px", fontWeight: 700, color: "#111", cursor: "pointer", listStyle: "none" }}>{f.q}</summary>
-                <div style={{ padding: "0 16px 14px", fontSize: "13px", color: "#555", lineHeight: 1.6 }}>{f.a}</div>
+                <div style={{ padding: "0 16px 14px", fontSize: "13px", color: "#7A7880", lineHeight: 1.6 }}>{f.a}</div>
               </details>
             ))}
           </div>
@@ -244,7 +244,7 @@ export default function ContactPage() {
         <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(28px,4vw,42px)", color: "#1b3a5c", letterSpacing: ".04em", marginBottom: "14px" }}>
           NOT SURE WHERE TO START?
         </h2>
-        <p style={{ color: "#444", fontSize: "14px", marginBottom: "28px" }}>
+        <p style={{ color: "#2A2830", fontSize: "14px", marginBottom: "28px" }}>
           Apply for a wholesale account and our team will reach out to walk you through everything.
         </p>
         <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
@@ -252,7 +252,7 @@ export default function ContactPage() {
             Apply for Wholesale →
           </a>
         </div>
-        <div style={{ fontSize: "11px", color: "#666", marginTop: "16px" }}>
+        <div style={{ fontSize: "11px", color: "#7A7880", marginTop: "16px" }}>
           Free · No commitment · Approved within 24 hours
         </div>
       </div>

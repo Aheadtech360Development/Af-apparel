@@ -442,7 +442,7 @@ export default function CheckoutAddressPage() {
                     <div style={{ fontSize: "12px", color: "#7A7880" }}>
                       {addr.line1}{addr.line2 ? `, ${addr.line2}` : ""}, {addr.city}, {addr.state} {addr.postal_code}
                     </div>
-                    {addr.phone && <div style={{ fontSize: "11px", color: "#aaa", marginTop: "2px" }}>{addr.phone}</div>}
+                    {addr.phone && <div style={{ fontSize: "11px", color: "#7A7880", marginTop: "2px" }}>{addr.phone}</div>}
                   </div>
                 </label>
               );
@@ -563,7 +563,7 @@ export default function CheckoutAddressPage() {
             </div>
 
             <div>
-              <label style={lbl}>Phone <span style={{ fontSize: "10px", color: "#aaa", textTransform: "none", letterSpacing: 0 }}>(for shipping updates)</span></label>
+              <label style={lbl}>Phone <span style={{ fontSize: "10px", color: "#7A7880", textTransform: "none", letterSpacing: 0 }}>(for shipping updates)</span></label>
               <input
                 style={inp}
                 type="tel"
@@ -670,7 +670,7 @@ export default function CheckoutAddressPage() {
                                   )}
                                   <div>
                                     <div style={{ fontSize: "12px", fontWeight: 700, color: "#2A2830" }}>{rate.service}</div>
-                                    {rate.days != null && <div style={{ fontSize: "11px", color: "#aaa", marginTop: "1px" }}>{rate.days} business day{rate.days !== 1 ? "s" : ""}</div>}
+                                    {rate.days != null && <div style={{ fontSize: "11px", color: "#7A7880", marginTop: "1px" }}>{rate.days} business day{rate.days !== 1 ? "s" : ""}</div>}
                                   </div>
                                 </div>
                                 <span style={{ fontSize: "13px", fontWeight: 800, color: "#2A2830" }}>{formatCurrency(rate.cost)}</span>

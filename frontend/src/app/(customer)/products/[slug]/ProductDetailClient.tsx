@@ -323,7 +323,7 @@ function ReviewsTab({ productId, isAuthenticated }: { productId: string; isAuthe
                   )}
                 </div>
               </div>
-              <div style={{ fontSize: "11px", color: "#aaa", flexShrink: 0 }}>{new Date(r.created_at).toLocaleDateString()}</div>
+              <div style={{ fontSize: "11px", color: "#7A7880", flexShrink: 0 }}>{new Date(r.created_at).toLocaleDateString()}</div>
             </div>
             {/* Stars + title */}
             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: r.title ? "4px" : "8px" }}>
@@ -453,7 +453,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
 
   if (productLoading || !product) {
     return (
-      <div style={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center", color: "#aaa" }}>
+      <div style={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center", color: "#7A7880" }}>
         Loading…
       </div>
     );
@@ -581,7 +581,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
 
       {/* Breadcrumb */}
       <div className="pd-breadcrumb" style={{ background: "#F4F3EF", borderBottom: "1px solid #E2E0DA", padding: "12px 32px" }}>
-        <div style={{ maxWidth: "1280px", margin: "0 auto", display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#7A7880", flexWrap: "wrap" }}>
+        <div style={{ maxWidth: "1500px", margin: "0 auto", display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#7A7880", flexWrap: "wrap" }}>
           <Link href="/" style={{ color: "#7A7880", textDecoration: "none" }}>Home</Link>
           <span>/</span>
           <Link href="/products" style={{ color: "#7A7880", textDecoration: "none" }}>Products</Link>
@@ -599,7 +599,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
       </div>
 
       {/* Main content */}
-      <div className="pd-main-pad" style={{ maxWidth: "1280px", margin: "0 auto", padding: "40px 32px" }}>
+      <div className="pd-main-pad" style={{ maxWidth: "1500px", margin: "0 auto", padding: "40px 32px" }}>
         <div className="product-detail-grid" style={{}}>
 
           {/* ── LEFT: Image Gallery ─────────────────────────────────────── */}
@@ -774,7 +774,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                 <div style={{ fontFamily: "var(--font-bebas)", fontSize: "18px", color: "#fff", letterSpacing: ".04em", marginBottom: "6px" }}>
                   Wholesale Pricing Locked
                 </div>
-                <p style={{ fontSize: "13px", color: "#555", marginBottom: "16px", lineHeight: 1.5 }}>
+                <p style={{ fontSize: "13px", color: "#7A7880", marginBottom: "16px", lineHeight: 1.5 }}>
                   Log in to your approved wholesale account to see factory-direct pricing and place orders.
                 </p>
                 <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
@@ -796,7 +796,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
               {primaryVariant?.effective_price ? (
                 <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
                   {Number(primaryVariant.retail_price) > Number(primaryVariant.effective_price) && (
-                    <div style={{ fontSize: "14px", color: "#999", textDecoration: "line-through" }}>
+                    <div style={{ fontSize: "14px", color: "#7A7880", textDecoration: "line-through" }}>
                       {formatCurrency(Number(primaryVariant.retail_price))}
                     </div>
                   )}
@@ -877,7 +877,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                         <div style={{ width: "18px", height: "18px", borderRadius: "50%", background: hex, border: isLight ? "1px solid #E2E0DA" : "none", flexShrink: 0 }} />
                         <span style={{ fontWeight: 700, fontSize: "14px", color: "#2A2830" }}>{group.color}</span>
                         <span style={{ fontSize: "12px", color: "#7A7880", marginLeft: "auto" }}>{group.variants.length} sizes</span>
-                        <span style={{ fontSize: "11px", color: "#aaa", transition: "transform .2s", transform: expanded ? "rotate(180deg)" : "rotate(0deg)", display: "inline-block" }}>▼</span>
+                        <span style={{ fontSize: "11px", color: "#7A7880", transition: "transform .2s", transform: expanded ? "rotate(180deg)" : "rotate(0deg)", display: "inline-block" }}>▼</span>
                       </div>
 
                       {/* Size inputs */}
@@ -889,7 +889,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                             return (
                               <div key={variant.id} style={{ textAlign: "center", minWidth: "64px" }}>
                                 <div style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", color: "#7A7880", marginBottom: "4px" }}>{variant.size}</div>
-                                <div style={{ fontSize: "11px", color: "#aaa", marginBottom: "4px" }}>
+                                <div style={{ fontSize: "11px", color: "#7A7880", marginBottom: "4px" }}>
                                   ${Number(variant.effective_price ?? variant.retail_price).toFixed(2)}
                                 </div>
                                 {variant.weight_grams != null && variant.weight_grams > 0 && (
@@ -951,7 +951,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                     <span style={{ fontSize: "13px", color: "#7A7880", fontWeight: 500 }}>Price Per Unit</span>
                     <span style={{ fontWeight: 700, fontSize: "15px", color: "#2A2830" }}>${pricePerUnit.toFixed(2)}</span>
                   </div>
-                  <div style={{ fontSize: "11px", color: "#aaa", marginBottom: "12px", fontStyle: "italic" }}>
+                  <div style={{ fontSize: "11px", color: "#7A7880", marginBottom: "12px", fontStyle: "italic" }}>
                     {isAuthenticated ? "Tier pricing applies at checkout" : "Retail pricing — log in for wholesale rates"}
                   </div>
                   <div style={{ display: "flex", justifyContent: "space-between", borderTop: "1px solid #E2E0DA", paddingTop: "12px" }}>
@@ -970,7 +970,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                       <span style={{ fontSize: "13px", color: "#7A7880", fontWeight: 500 }}>Price Per Unit</span>
                       <span style={{ fontWeight: 700, fontSize: "15px", color: "#2A2830" }}>${pricePerUnit.toFixed(2)}</span>
                     </div>
-                    <div style={{ fontSize: "11px", color: "#aaa", marginBottom: "12px", fontStyle: "italic" }}>
+                    <div style={{ fontSize: "11px", color: "#7A7880", marginBottom: "12px", fontStyle: "italic" }}>
                       Tier pricing applies at checkout
                     </div>
                     <div style={{ display: "flex", justifyContent: "space-between", borderTop: "1px solid #E2E0DA", paddingTop: "12px" }}>
@@ -1159,7 +1159,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                   const methods: string[] = ((product as any).print_guide as any)?.methods ?? [];
                   if (methods.length === 0) {
                     return (
-                      <div style={{ background: "#F4F3EF", border: "1px solid #E2E0DA", borderRadius: "10px", padding: "32px", textAlign: "center", color: "#aaa", fontSize: "14px" }}>
+                      <div style={{ background: "#F4F3EF", border: "1px solid #E2E0DA", borderRadius: "10px", padding: "32px", textAlign: "center", color: "#7A7880", fontSize: "14px" }}>
                         Print compatibility information coming soon.
                       </div>
                     );
@@ -1189,7 +1189,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                   const rows: any[] = ((product as any).size_chart_data as any[]) ?? [];
                   if (rows.length === 0) {
                     return (
-                      <div style={{ padding: "32px", textAlign: "center", background: "#F4F3EF", borderRadius: "10px", border: "1px solid #E2E0DA", color: "#aaa", fontSize: "14px" }}>
+                      <div style={{ padding: "32px", textAlign: "center", background: "#F4F3EF", borderRadius: "10px", border: "1px solid #E2E0DA", color: "#7A7880", fontSize: "14px" }}>
                         Size chart coming soon.
                       </div>
                     );

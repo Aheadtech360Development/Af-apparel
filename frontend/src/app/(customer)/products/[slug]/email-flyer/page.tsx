@@ -100,7 +100,7 @@ export default function EmailFlyerPage() {
   }
 
   if (!product) {
-    return <div style={{ fontFamily: "var(--font-jakarta)", maxWidth: "640px", margin: "80px auto", padding: "0 24px", textAlign: "center", color: "#aaa" }}>Loading…</div>;
+    return <div style={{ fontFamily: "var(--font-jakarta)", maxWidth: "640px", margin: "80px auto", padding: "0 24px", textAlign: "center", color: "#7A7880" }}>Loading…</div>;
   }
 
   const previewHtml = `
@@ -168,7 +168,7 @@ export default function EmailFlyerPage() {
             required
             style={inputStyle}
           />
-          <div style={{ fontSize: "11px", color: "#aaa", marginTop: "4px" }}>Separate multiple addresses with commas</div>
+          <div style={{ fontSize: "11px", color: "#7A7880", marginTop: "4px" }}>Separate multiple addresses with commas</div>
         </div>
 
         <div style={{ marginBottom: "16px" }}>
@@ -217,7 +217,7 @@ export default function EmailFlyerPage() {
             onExpired={() => setRecaptchaToken(null)}
           />
           {!recaptchaToken && (
-            <p style={{ fontSize: "11px", color: "#aaa", marginTop: "6px" }}>Please complete the verification above to send.</p>
+            <p style={{ fontSize: "11px", color: "#7A7880", marginTop: "6px" }}>Please complete the verification above to send.</p>
           )}
         </div>
 
@@ -269,7 +269,7 @@ export default function EmailFlyerPage() {
           >
             <div style={{ padding: "16px 20px", borderBottom: "1px solid #E2E0DA", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <span style={{ fontWeight: 700, fontSize: "14px", color: "#2A2830" }}>Email Preview</span>
-              <button onClick={() => setShowPreview(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "#aaa", fontSize: "20px", lineHeight: 1 }}>✕</button>
+              <button onClick={() => setShowPreview(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "#7A7880", fontSize: "20px", lineHeight: 1 }}>✕</button>
             </div>
             <div style={{ padding: "20px" }}>
               <div style={{ marginBottom: "12px", fontSize: "12px", color: "#7A7880" }}>

@@ -230,7 +230,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
       <div
         className="account-layout-wrapper"
         style={{
-          maxWidth: "1100px",
+          maxWidth: "1500px",
           margin: "0 auto",
           padding: "32px 16px",
           display: "flex",

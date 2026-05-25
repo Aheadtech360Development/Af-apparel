@@ -166,7 +166,7 @@ export default function CheckoutPaymentPage() {
 
   if (loadingCards) {
     return (
-      <div style={{ textAlign: "center", padding: "60px 0", color: "#aaa", fontSize: "14px" }}>
+      <div style={{ textAlign: "center", padding: "60px 0", color: "#7A7880", fontSize: "14px" }}>
         Loading payment methods…
       </div>
     );

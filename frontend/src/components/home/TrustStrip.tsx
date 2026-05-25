@@ -12,7 +12,7 @@ const items = [
 export default function TrustStrip() {
   return (
     <div style={{ background: "#fff", borderBottom: "1px solid #E2E0DA", padding: "18px 0" }}>
-      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 32px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+      <div style={{ maxWidth: "1500px", margin: "0 auto", padding: "0 32px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
         {items.map(({ Icon, text }) => (
           <div key={text} style={{ display: "flex", alignItems: "center", gap: "10px", flex: 1, minWidth: "140px", justifyContent: "center", padding: "6px 12px" }}>
             <Icon size={18} color="#2A2830" />
