@@ -349,7 +349,17 @@ function groupVariantsByColor(variants: ProductVariant[]) {
     const color = v.color ?? "Default";
     if (!seen.has(color)) {
       seen.add(color);
-      groups.push({ color, variants: variants.filter(x => (x.color ?? "Default") === color) });
+      const colorVariants = variants
+        .filter(x => (x.color ?? "Default") === color)
+        .sort((a, b) => {
+          const ai = SIZE_ORDER.indexOf((a.size || "").toUpperCase());
+          const bi = SIZE_ORDER.indexOf((b.size || "").toUpperCase());
+          if (ai === -1 && bi === -1) return (a.size || "").localeCompare(b.size || "");
+          if (ai === -1) return 1;
+          if (bi === -1) return -1;
+          return ai - bi;
+        });
+      groups.push({ color, variants: colorVariants });
     }
   }
   return groups;
@@ -518,8 +528,10 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
         const v = product?.variants?.find(x => x.id === variant_id);
         if (!v) continue;
         const idx = guestCart.findIndex(i => i.variant_id === variant_id);
-        const primaryImg = product?.images?.find(i => i.is_primary) ?? product?.images?.[0];
-        const entry = { variant_id, quantity, product_id: product!.id, product_name: product!.name, slug: product!.slug, color: v.color, size: v.size, unit_price: Number(v.effective_price ?? v.retail_price), image_url: primaryImg?.url_thumbnail ?? null };
+        const colorImg = product?.images?.find(
+          i => i.alt_text?.toLowerCase() === v.color?.toLowerCase()
+        ) ?? product?.images?.find(i => i.is_primary) ?? product?.images?.[0];
+        const entry = { variant_id, quantity, product_id: product!.id, product_name: product!.name, slug: product!.slug, color: v.color, size: v.size, unit_price: Number(v.effective_price ?? v.retail_price), image_url: colorImg?.url_thumbnail ?? null };
         if (idx >= 0) guestCart[idx]!.quantity += quantity;
         else guestCart.push(entry);
       }

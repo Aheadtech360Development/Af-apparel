@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { productsService } from "@/services/products.service";
 import { ProductListClient } from "./ProductListClient";
+import { sortSizes } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Products — AF Apparels Wholesale",
@@ -42,13 +43,16 @@ export default async function ProductsPage({ searchParams }: PageProps) {
       ? productsResult.value
       : { items: [], total: 0, page: 1, page_size: 24, pages: 0 };
 
-  const sizes = Array.from(
-    new Set(
-      productData.items.flatMap((p) =>
-        p.variants?.map((v) => v.size).filter(Boolean) ?? []
+  const sizes = sortSizes(
+    Array.from(
+      new Set(
+        productData.items.flatMap((p) =>
+          p.variants?.map((v) => v.size).filter(Boolean) ?? []
+        )
       )
-    )
-  ).sort() as string[];
+    ) as string[],
+    s => s
+  );
 
   const colors = Array.from(
     new Set(
