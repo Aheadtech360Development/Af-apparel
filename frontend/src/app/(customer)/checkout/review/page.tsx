@@ -257,6 +257,11 @@ export default function CheckoutReviewPage() {
       };
 
       console.log("[Review] Wholesale basePayload:", JSON.stringify(basePayload, null, 2));
+      console.log("[Review] Final shipping fields in payload:", {
+        shipping_rate_id: (basePayload as Record<string, unknown>).shipping_rate_id,
+        shipping_carrier: (basePayload as Record<string, unknown>).shipping_carrier,
+        shipping_service: (basePayload as Record<string, unknown>).shipping_service,
+      });
       const order = await ordersService.confirmOrder(
         paymentMethod === "ach"
           ? {

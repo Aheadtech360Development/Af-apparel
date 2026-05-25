@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
 
 interface ShippingAddress {
   line1: string;
@@ -134,37 +135,49 @@ const initialState = {
   confirmedPaymentMethod: "card",
 };
 
-export const useCheckoutStore = create<CheckoutState>((set) => ({
-  ...initialState,
-  setAddressId: (id) => set({ addressId: id }),
-  setShippingAddress: (address) => set({ shippingAddress: address }),
-  setCompanyName: (v) => set({ companyName: v }),
-  setContactName: (v) => set({ contactName: v }),
-  setShippingPhone: (v) => set({ shippingPhone: v }),
-  setShippingMethod: (m) => set({ shippingMethod: m }),
-  setShippingCost: (cost) => set({ shippingCost: cost }),
-  setShippingType: (t) => set({ shippingType: t }),
-  setSelectedRate: (r) => set({ selectedRate: r }),
-  setTaxInfo: (region, rate, amount = 0) => set({ taxRegion: region, taxRate: rate, taxAmount: amount }),
-  setPaymentMethod: (m) => set({ paymentMethod: m }),
-  setAchInfo: (bankName, accountHolder, routingNumber, accountLast4, accountType) =>
-    set({ achBankName: bankName, achAccountHolder: accountHolder, achRoutingNumber: routingNumber, achAccountLast4: accountLast4, achAccountType: accountType }),
-  setPoNumber: (po) => set({ poNumber: po }),
-  setOrderNotes: (notes) => set({ orderNotes: notes }),
-  setQbToken: (token) => set({ qbToken: token, savedCardId: null }),
-  setSavedCardId: (id) => set({ savedCardId: id, qbToken: null }),
-  setPaymentIntent: (id, secret) => set({ paymentIntentId: id, clientSecret: secret }),
-  setConfirmedOrder: ({ id, number, total, units, colorSummary, productName, shippingMethod, shippingCost, paymentMethod }) =>
-    set({
-      confirmedOrderId: id,
-      confirmedOrderNumber: number,
-      confirmedOrderTotal: total,
-      confirmedUnits: units,
-      confirmedColorSummary: colorSummary,
-      confirmedProductName: productName,
-      confirmedShippingMethod: shippingMethod,
-      confirmedShippingCost: shippingCost ?? 0,
-      confirmedPaymentMethod: paymentMethod ?? "card",
+export const useCheckoutStore = create<CheckoutState>()(
+  persist(
+    (set) => ({
+      ...initialState,
+      setAddressId: (id) => set({ addressId: id }),
+      setShippingAddress: (address) => set({ shippingAddress: address }),
+      setCompanyName: (v) => set({ companyName: v }),
+      setContactName: (v) => set({ contactName: v }),
+      setShippingPhone: (v) => set({ shippingPhone: v }),
+      setShippingMethod: (m) => set({ shippingMethod: m }),
+      setShippingCost: (cost) => set({ shippingCost: cost }),
+      setShippingType: (t) => set({ shippingType: t }),
+      setSelectedRate: (r) => set({ selectedRate: r }),
+      setTaxInfo: (region, rate, amount = 0) => set({ taxRegion: region, taxRate: rate, taxAmount: amount }),
+      setPaymentMethod: (m) => set({ paymentMethod: m }),
+      setAchInfo: (bankName, accountHolder, routingNumber, accountLast4, accountType) =>
+        set({ achBankName: bankName, achAccountHolder: accountHolder, achRoutingNumber: routingNumber, achAccountLast4: accountLast4, achAccountType: accountType }),
+      setPoNumber: (po) => set({ poNumber: po }),
+      setOrderNotes: (notes) => set({ orderNotes: notes }),
+      setQbToken: (token) => set({ qbToken: token, savedCardId: null }),
+      setSavedCardId: (id) => set({ savedCardId: id, qbToken: null }),
+      setPaymentIntent: (id, secret) => set({ paymentIntentId: id, clientSecret: secret }),
+      setConfirmedOrder: ({ id, number, total, units, colorSummary, productName, shippingMethod, shippingCost, paymentMethod }) =>
+        set({
+          confirmedOrderId: id,
+          confirmedOrderNumber: number,
+          confirmedOrderTotal: total,
+          confirmedUnits: units,
+          confirmedColorSummary: colorSummary,
+          confirmedProductName: productName,
+          confirmedShippingMethod: shippingMethod,
+          confirmedShippingCost: shippingCost ?? 0,
+          confirmedPaymentMethod: paymentMethod ?? "card",
+        }),
+      reset: () => set(initialState),
     }),
-  reset: () => set(initialState),
-}));
+    {
+      name: "af-checkout",
+      storage: createJSONStorage(() => sessionStorage),
+      partialize: (state) => ({
+        shippingType: state.shippingType,
+        selectedRate: state.selectedRate,
+      }),
+    }
+  )
+);
