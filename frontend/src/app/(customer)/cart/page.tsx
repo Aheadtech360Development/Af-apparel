@@ -4,7 +4,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, sortSizes } from "@/lib/utils";
 import { cartService } from "@/services/cart.service";
 import { apiClient } from "@/lib/api-client";
 import { useAuthStore } from "@/stores/auth.store";
@@ -87,7 +87,7 @@ function groupByProduct(items: CartItem[]): ProductGroup[] {
 
     const colorGroups = Array.from(colorMap.entries()).map(([color, cItems]) => ({
       color,
-      sizes: cItems.map(i => ({ size: i.size ?? "One Size", qty: i.quantity })),
+      sizes: sortSizes(cItems.map(i => ({ size: i.size ?? "One Size", qty: i.quantity })), item => item.size),
       units: cItems.reduce((s, i) => s + i.quantity, 0),
     }));
 
@@ -378,6 +378,10 @@ export default function CartPage() {
 
               {groups.map((group) => {
                 const isRemoving = removingProductId === group.productId;
+                const firstColor = group.colorGroups[0]?.color;
+                const groupImageUrl = (firstColor
+                  ? (group.items.find(i => i.color === firstColor)?.product_image_url ?? group.items[0]?.product_image_url)
+                  : group.items[0]?.product_image_url) ?? null;
                 return (
                   <div
                     key={group.productId}
@@ -392,12 +396,12 @@ export default function CartPage() {
                   >
                     {/* ── Product header (image + title) ── */}
                     <div style={{ display: "flex", gap: "14px", marginBottom: "4px", alignItems: "flex-start" }}>
-                      {/* Product image */}
+                      {/* Product image — color-matched: use image from first color group's item */}
                       <div style={{ width: "72px", height: "72px", borderRadius: "8px", overflow: "hidden", background: "#F4F3EF", border: "1px solid #E2E0DA", flexShrink: 0 }}>
-                        {group.items[0]?.product_image_url ? (
+                        {groupImageUrl ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img
-                            src={group.items[0].product_image_url}
+                            src={groupImageUrl}
                             alt={group.productName}
                             style={{ width: "100%", height: "100%", objectFit: "contain" }}
                           />

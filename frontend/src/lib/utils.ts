@@ -74,3 +74,16 @@ export function sortSizes<T>(items: T[], getSize: (item: T) => string): T[] {
     return ai - bi;
   });
 }
+
+export function sortVariantsBySize<T extends { size?: string | null }>(variants: T[]): T[] {
+  return [...variants].sort((a, b) => {
+    const as = (a.size || '').toUpperCase();
+    const bs = (b.size || '').toUpperCase();
+    const ai = SIZE_ORDER.indexOf(as);
+    const bi = SIZE_ORDER.indexOf(bs);
+    if (ai === -1 && bi === -1) return as.localeCompare(bs);
+    if (ai === -1) return 1;
+    if (bi === -1) return -1;
+    return ai - bi;
+  });
+}

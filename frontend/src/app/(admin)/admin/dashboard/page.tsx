@@ -33,6 +33,7 @@ interface DashboardState {
   recentOrders: RecentOrder[];
   recentApplications: Application[];
   dailyCounts: number[];
+  conversionRate: number;
 }
 
 const STATUS_STYLE: Record<string, { bg: string; color: string }> = {
@@ -108,6 +109,13 @@ const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 export default function AdminDashboard() {
   const [state, setState] = useState<Partial<DashboardState>>({});
   const [loading, setLoading] = useState(true);
+  const [showPasswordWarning, setShowPasswordWarning] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setShowPasswordWarning(!localStorage.getItem("pw_warning_dismissed"));
+    }
+  }, []);
 
   useEffect(() => {
     Promise.allSettled([
@@ -116,7 +124,8 @@ export default function AdminDashboard() {
       apiClient.get("/api/v1/admin/reports/inventory?low_stock_only=true"),
       apiClient.get("/api/v1/admin/orders?page_size=10"),
       apiClient.get("/api/v1/admin/orders?status=pending&page_size=50"),
-    ]).then(([salesRes, appsRes, stockRes, ordersRes, pendingRes]) => {
+      apiClient.get("/api/v1/admin/analytics?period=7d"),
+    ]).then(([salesRes, appsRes, stockRes, ordersRes, pendingRes, analyticsRes]) => {
       const s: Partial<DashboardState> = {};
 
       if (salesRes.status === "fulfilled") {
@@ -173,6 +182,10 @@ export default function AdminDashboard() {
         s.pendingOrders = items.length;
       }
 
+      if (analyticsRes.status === "fulfilled") {
+        s.conversionRate = (analyticsRes.value as any)?.overview?.conversion_rate ?? 0;
+      }
+
       setState(s);
     }).finally(() => setLoading(false));
   }, []);
@@ -225,7 +238,7 @@ export default function AdminDashboard() {
       up: false,
       sub: `avg $${(state.avgOrderValue ?? 0).toFixed(0)}`,
     },
-    { label: "Conversion Rate", value: "3.8%", change: "+0.4%", up: true, sub: "vs prev week" },
+    { label: "Conversion Rate", value: `${(state.conversionRate ?? 0).toFixed(1)}%`, change: "", up: true, sub: "paid / total orders" },
   ];
 
   return (
@@ -235,6 +248,29 @@ export default function AdminDashboard() {
         <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "32px", color: "#2A2830", letterSpacing: ".03em", lineHeight: 1 }}>Dashboard</h1>
         <p style={{ fontSize: "13px", color: "#7A7880", marginTop: "4px" }}>Last 7 days overview</p>
       </div>
+
+      {/* Security warning banner */}
+      {showPasswordWarning && (
+        <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: "8px", padding: "12px 16px", marginBottom: "20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
+          <div style={{ fontSize: "13px", color: "#991B1B" }}>
+            <strong>⚠️ Security Alert:</strong>
+            <span style={{ marginLeft: "8px" }}>
+              Your admin password was found in a public data breach. Please change it in{" "}
+              <a href="/admin/settings" style={{ color: "#DC2626", fontWeight: 700 }}>Settings</a>{" "}
+              immediately.
+            </span>
+          </div>
+          <button
+            onClick={() => {
+              localStorage.setItem("pw_warning_dismissed", "1");
+              setShowPasswordWarning(false);
+            }}
+            style={{ background: "none", border: "none", cursor: "pointer", fontSize: "18px", color: "#F87171", flexShrink: 0, lineHeight: 1 }}
+          >
+            ×
+          </button>
+        </div>
+      )}
 
       {/* Stat Cards */}
       <div className="admin-dash-stat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "16px", marginBottom: "24px" }}>
@@ -246,13 +282,15 @@ export default function AdminDashboard() {
                 <div style={{ fontFamily: "var(--font-bebas)", fontSize: "32px", color: "#2A2830", lineHeight: 1 }}>{stat.value}</div>
                 <div style={{ fontSize: "11px", color: "#aaa", marginTop: "4px" }}>{stat.sub}</div>
               </div>
-              <span style={{
-                background: stat.up ? "rgba(5,150,105,.1)" : "rgba(232,36,42,.1)",
-                color: stat.up ? "#059669" : "#E8242A",
-                padding: "4px 10px", borderRadius: "20px", fontSize: "12px", fontWeight: 700,
-              }}>
-                {stat.up ? "↑" : "↓"} {stat.change}
-              </span>
+              {stat.change && (
+                <span style={{
+                  background: stat.up ? "rgba(5,150,105,.1)" : "rgba(232,36,42,.1)",
+                  color: stat.up ? "#059669" : "#E8242A",
+                  padding: "4px 10px", borderRadius: "20px", fontSize: "12px", fontWeight: 700,
+                }}>
+                  {stat.up ? "↑" : "↓"} {stat.change}
+                </span>
+              )}
             </div>
           </div>
         ))}
