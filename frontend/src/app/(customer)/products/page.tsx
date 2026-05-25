@@ -63,7 +63,7 @@ export default async function ProductsPage({ searchParams }: PageProps) {
   ).sort() as string[];
 
   return (
-    <div style={{ minHeight: "100vh", background: "#fff", fontFamily: "var(--font-jakarta)" }}>
+    <div style={{ minHeight: "100vh", background: "#fff", fontFamily: "var(--font-jakarta)", maxWidth: "1500px", overflowX: "hidden" }}>
       {/* Banner */}
       <div style={{ display: "none", background: "#1B3A5C", padding: "28px 32px", borderBottom: "3px solid #E8242A" }}>
         <div style={{ maxWidth: "1280px", margin: "0 auto" }}>

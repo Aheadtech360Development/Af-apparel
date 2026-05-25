@@ -136,7 +136,7 @@ export function BestSellers() {
                 className="prod-card-hover"
               >
                 {/* Image area — matches collection card */}
-                <div style={{ background: "white", height: "250px", position: "relative", overflow: "hidden" }}>
+                <div style={{ background: "white", height: "360px", position: "relative", overflow: "hidden" }}>
                   {imgSrc ? (
                     <Image
                       src={imgSrc}
