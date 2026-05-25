@@ -11,6 +11,13 @@ interface ShippingAddress {
 
 export type ShippingMethod = "standard" | "expedited" | "will_call";
 
+export interface SelectedLiveRate {
+  rate_id: string;
+  carrier: string;
+  service: string;
+  price: number;
+}
+
 interface CheckoutState {
   // Step 1 — shipping
   addressId: string | null;
@@ -20,6 +27,8 @@ interface CheckoutState {
   shippingPhone: string;
   shippingMethod: ShippingMethod;
   shippingCost: number;
+  shippingType: string;
+  selectedRate: SelectedLiveRate | null;
 
   // Step 1 extras (PO + notes kept for backward compat)
   poNumber: string;
@@ -64,6 +73,8 @@ interface CheckoutState {
   setShippingPhone: (v: string) => void;
   setShippingMethod: (m: ShippingMethod) => void;
   setShippingCost: (cost: number) => void;
+  setShippingType: (t: string) => void;
+  setSelectedRate: (r: SelectedLiveRate | null) => void;
   setTaxInfo: (region: string | null, rate: number, amount?: number) => void;
   setPaymentMethod: (m: "card" | "ach") => void;
   setAchInfo: (bankName: string, accountHolder: string, routingNumber: string, accountLast4: string, accountType: string) => void;
@@ -95,6 +106,8 @@ const initialState = {
   shippingPhone: "",
   shippingMethod: "standard" as ShippingMethod,
   shippingCost: 0,
+  shippingType: "",
+  selectedRate: null,
   taxRegion: null,
   taxRate: 0,
   taxAmount: 0,
@@ -130,6 +143,8 @@ export const useCheckoutStore = create<CheckoutState>((set) => ({
   setShippingPhone: (v) => set({ shippingPhone: v }),
   setShippingMethod: (m) => set({ shippingMethod: m }),
   setShippingCost: (cost) => set({ shippingCost: cost }),
+  setShippingType: (t) => set({ shippingType: t }),
+  setSelectedRate: (r) => set({ selectedRate: r }),
   setTaxInfo: (region, rate, amount = 0) => set({ taxRegion: region, taxRate: rate, taxAmount: amount }),
   setPaymentMethod: (m) => set({ paymentMethod: m }),
   setAchInfo: (bankName, accountHolder, routingNumber, accountLast4, accountType) =>

@@ -39,6 +39,8 @@ interface AdminOrder {
   tracking_number: string | null;
   tracking_url?: string | null;
   label_url?: string | null;
+  carrier?: string | null;
+  shipping_rate_id?: string | null;
   courier: string | null;
   courier_service: string | null;
   shipped_at: string | null;
@@ -260,6 +262,7 @@ export default function AdminOrderDetailPage() {
         if (o.courier_service) setSelectedService(o.courier_service);
         if (o.tracking_number) setTrackingNumber(o.tracking_number);
         if (o.payment_terms) setPaymentTerms(o.payment_terms);
+        const _cMap: Record<string, string> = { USPS: "usps", UPS: "ups", FedEx: "fedex" };
         if (o.tracking_number && o.label_url) {
           setLabelResult({
             success: true,
@@ -269,7 +272,11 @@ export default function AdminOrderDetailPage() {
             carrier: o.courier ?? "",
             service: o.courier_service ?? "",
           });
-          setSelectedCarrier(o.courier ?? "");
+          const raw = o.courier ?? "";
+          setSelectedCarrier(_cMap[raw] ?? raw.toLowerCase());
+        } else if (o.carrier) {
+          // Pre-select the carrier the customer chose at checkout
+          setSelectedCarrier(_cMap[o.carrier] ?? o.carrier.toLowerCase());
         }
 
         // Fetch customer stats and company registration info (best-effort)
@@ -615,6 +622,11 @@ export default function AdminOrderDetailPage() {
             {/* Shippo label generation */}
             <div style={{ marginBottom: "16px" }}>
               <label style={{ ...LabelStyle, marginBottom: "10px" }}>Generate Shipping Label via Shippo</label>
+              {order.carrier && order.courier_service && (
+                <div style={{ background: "rgba(26,92,255,.06)", border: "1px solid rgba(26,92,255,.2)", borderRadius: "8px", padding: "10px 14px", marginBottom: "12px", fontSize: "12px", color: "#1A5CFF", fontWeight: 600 }}>
+                  Customer selected: {order.carrier} {order.courier_service} — ${Number(order.shipping_cost).toFixed(2)}
+                </div>
+              )}
               <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "8px", marginBottom: "14px" }}>
                 {([{ id: "fedex", name: "FedEx", icon: "FX" }, { id: "ups", name: "UPS", icon: "UPS" }, { id: "usps", name: "USPS", icon: "US" }]).map(carrier => {
                   const active = selectedCarrier === carrier.id;

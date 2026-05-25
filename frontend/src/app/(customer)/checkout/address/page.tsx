@@ -79,6 +79,8 @@ export default function CheckoutAddressPage() {
     shippingMethod, setShippingMethod,
     setShippingCost,
     setTaxInfo,
+    setShippingType,
+    setSelectedRate,
   } = useCheckoutStore();
 
   const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([]);
@@ -303,6 +305,12 @@ export default function CheckoutAddressPage() {
 
   function handleContinue() {
     setShippingCost(methodCost(shippingMethod));
+    setShippingType(shippingTypeForUser);
+    if (shippingTypeForUser === "live_shippo" && selectedLiveRate) {
+      setSelectedRate({ rate_id: selectedLiveRate.rate_id, carrier: selectedLiveRate.carrier, service: selectedLiveRate.service, price: selectedLiveRate.cost });
+    } else {
+      setSelectedRate(null);
+    }
 
     if (isGuest) {
       if (!validate()) return;

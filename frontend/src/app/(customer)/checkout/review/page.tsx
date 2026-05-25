@@ -55,6 +55,8 @@ export default function CheckoutReviewPage() {
     taxAmount: storedTaxAmount,
     paymentMethod,
     achBankName, achAccountHolder, achRoutingNumber, achAccountLast4, achAccountType,
+    shippingType,
+    selectedRate,
   } = useCheckoutStore();
   const clearCart = useCartStore((s) => s.clearCart);
   const { isAuthenticated, isLoading: authIsLoading } = useAuthStore();
@@ -188,6 +190,11 @@ export default function CheckoutReviewPage() {
           tax_rate: taxRate?.rate ?? undefined,
           tax_region: taxRate?.region ?? undefined,
           shipping_cost: shippingCost > 0 ? shippingCost : undefined,
+          ...(selectedRate && shippingType === "live_shippo" ? {
+            shipping_rate_id: selectedRate.rate_id,
+            shipping_carrier: selectedRate.carrier,
+            shipping_service: selectedRate.service,
+          } : {}),
         });
 
         const guestSubtotal = guestEntries.reduce((s, e) => s + e.unit_price * e.quantity, 0);
@@ -239,6 +246,11 @@ export default function CheckoutReviewPage() {
         tax_rate: taxRate?.rate ?? undefined,
         tax_region: taxRate?.region ?? undefined,
         shipping_cost: shippingCost > 0 ? shippingCost : undefined,
+        ...(selectedRate && shippingType === "live_shippo" ? {
+          shipping_rate_id: selectedRate.rate_id,
+          shipping_carrier: selectedRate.carrier,
+          shipping_service: selectedRate.service,
+        } : {}),
       };
 
       const order = await ordersService.confirmOrder(
