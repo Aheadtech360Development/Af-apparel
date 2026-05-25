@@ -17,6 +17,13 @@ interface LiveRate {
   days: number | null;
 }
 
+const CARRIER_LOGOS: Record<string, string> = {
+  USPS: "https://shippo-static.s3.amazonaws.com/providers/75/USPS.png",
+  UPS: "https://shippo-static.s3.amazonaws.com/providers/75/UPS.png",
+  FedEx: "https://shippo-static.s3.amazonaws.com/providers/75/FedEx.png",
+  DHL: "https://shippo-static.s3.amazonaws.com/providers/75/DHL_Express.png",
+};
+
 const US_STATES = [
   "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA",
   "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ",
@@ -84,6 +91,7 @@ export default function CheckoutAddressPage() {
   const [liveRates, setLiveRates] = useState<LiveRate[]>([]);
   const [liveRatesLoading, setLiveRatesLoading] = useState(false);
   const [selectedLiveRateId, setSelectedLiveRateId] = useState<string | null>(null);
+  const [cartItemsForShipping, setCartItemsForShipping] = useState<Array<{ variant_id: string; quantity: number }>>([]);
 
   const [form, setForm] = useState({
     company: companyName || "",
@@ -120,10 +128,13 @@ export default function CheckoutAddressPage() {
       let guestSubtotal = 0;
       let guestUnits = 0;
       try {
-        const guestCart = JSON.parse(localStorage.getItem("af_guest_cart") || "[]") as Array<{ unit_price: number; quantity: number }>;
+        const guestCart = JSON.parse(localStorage.getItem("af_guest_cart") || "[]") as Array<{ variant_id?: string; unit_price: number; quantity: number }>;
         guestSubtotal = guestCart.reduce((s, i) => s + i.unit_price * i.quantity, 0);
         guestUnits = guestCart.reduce((s, i) => s + i.quantity, 0);
         setSubtotal(guestSubtotal);
+        setCartItemsForShipping(
+          guestCart.filter(i => i.variant_id).map(i => ({ variant_id: i.variant_id!, quantity: i.quantity }))
+        );
       } catch { /* ignore */ }
       setShowNewForm(true);
       if (shippingTypeForUser !== "live_shippo") {
@@ -153,6 +164,7 @@ export default function CheckoutAddressPage() {
     } else {
       cartService.getCart().then(c => {
         setSubtotal(Number(c.subtotal));
+        setCartItemsForShipping(c.items.map(i => ({ variant_id: i.variant_id, quantity: i.quantity })));
         const hasTier = (c.validation as (typeof c.validation & { has_shipping_tier?: boolean }))?.has_shipping_tier ?? false;
         setTierShipping(hasTier ? Number(c.validation?.estimated_shipping ?? 0) : null);
       }).catch(() => {
@@ -211,6 +223,7 @@ export default function CheckoutAddressPage() {
       to_zip: zip,
       to_state: state,
       to_city: activeCity || undefined,
+      cart_items: cartItemsForShipping.length > 0 ? cartItemsForShipping : undefined,
     })
       .then(r => {
         const rates = r.rates || [];
@@ -223,7 +236,7 @@ export default function CheckoutAddressPage() {
       })
       .catch(() => setLiveRates([]))
       .finally(() => setLiveRatesLoading(false));
-  }, [shippingTypeForUser, activeZip, activeState, activeCity]);
+  }, [shippingTypeForUser, activeZip, activeState, activeCity, cartItemsForShipping]);
 
   useEffect(() => {
     if (!activeState) {
@@ -633,10 +646,17 @@ export default function CheckoutAddressPage() {
                                   }}>
                                     {isRateSelected && <div style={{ width: "4px", height: "4px", borderRadius: "50%", background: "#fff" }} />}
                                   </div>
+                                  {CARRIER_LOGOS[rate.carrier] && (
+                                    // eslint-disable-next-line @next/next/no-img-element
+                                    <img
+                                      src={CARRIER_LOGOS[rate.carrier]}
+                                      alt={rate.carrier}
+                                      style={{ height: "22px", width: "auto", objectFit: "contain", flexShrink: 0 }}
+                                    />
+                                  )}
                                   <div>
-                                    <span style={{ fontSize: "12px", fontWeight: 700, color: "#2A2830" }}>{rate.carrier}</span>
-                                    <span style={{ fontSize: "12px", color: "#7A7880", marginLeft: "6px" }}>{rate.service}</span>
-                                    {rate.days && <span style={{ fontSize: "11px", color: "#aaa", marginLeft: "6px" }}>· {rate.days} day{rate.days !== 1 ? "s" : ""}</span>}
+                                    <div style={{ fontSize: "12px", fontWeight: 700, color: "#2A2830" }}>{rate.service}</div>
+                                    {rate.days != null && <div style={{ fontSize: "11px", color: "#aaa", marginTop: "1px" }}>{rate.days} business day{rate.days !== 1 ? "s" : ""}</div>}
                                   </div>
                                 </div>
                                 <span style={{ fontSize: "13px", fontWeight: 800, color: "#2A2830" }}>{formatCurrency(rate.cost)}</span>
