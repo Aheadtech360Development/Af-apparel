@@ -26,7 +26,7 @@ interface DiscountGroup {
   applies_to_ids: string[];
   min_req_type: "none" | "amount" | "quantity";
   min_req_value: number;
-  shipping_type: "store_default" | "flat_rate";
+  shipping_type: "store_default" | "flat_rate" | "live_shippo";
   shipping_amount: number;
   shipping_calc_type: "units" | "order_value";
   shipping_cutoff_time: string;
@@ -60,7 +60,7 @@ const EMPTY_GROUP_FORM: Omit<DiscountGroup, "id" | "created_at" | "applies_to_id
   applies_to: "store",
   min_req_type: "none",
   min_req_value: 0,
-  shipping_type: "store_default",
+  shipping_type: "store_default" as "store_default" | "flat_rate" | "live_shippo",
   shipping_amount: 0,
   status: "enabled",
 };
@@ -363,7 +363,7 @@ export default function DiscountGroupsPage() {
       applies_to: g.applies_to,
       min_req_type: g.min_req_type,
       min_req_value: g.min_req_value,
-      shipping_type: ((g.shipping_type as string) === "custom_brackets" ? "flat_rate" : g.shipping_type) as "store_default" | "flat_rate",
+      shipping_type: ((g.shipping_type as string) === "custom_brackets" ? "flat_rate" : g.shipping_type) as "store_default" | "flat_rate" | "live_shippo",
       shipping_amount: g.shipping_amount,
       status: g.status,
     });
@@ -611,7 +611,9 @@ export default function DiscountGroupsPage() {
                       <td style={{ padding: "13px 16px", color: "#7A7880" }}>
                         {g.shipping_type === "flat_rate"
                           ? `${g.shipping_brackets?.length ?? 0} bracket${(g.shipping_brackets?.length ?? 0) !== 1 ? "s" : ""} (${g.shipping_calc_type === "units" ? "by units" : "by order $"})`
-                          : "Store default"}
+                          : g.shipping_type === "live_shippo"
+                            ? "Live rates (Shippo)"
+                            : "Store default"}
                       </td>
                       <td style={{ padding: "13px 16px" }}>
                         <span style={{ background: g.status === "enabled" ? "rgba(5,150,105,.1)" : "rgba(0,0,0,.06)", color: g.status === "enabled" ? "#059669" : "#7A7880", padding: "3px 10px", borderRadius: "20px", fontSize: "11px", fontWeight: 700, textTransform: "capitalize" }}>{g.status}</span>
@@ -1140,6 +1142,25 @@ export default function DiscountGroupsPage() {
                     </div>
                   )}
                 </div>
+
+                {/* Live Shippo Rates */}
+                <div>
+                  <label style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 14px", background: groupForm.shipping_type === "live_shippo" ? "rgba(26,92,255,.06)" : "#fff", border: `1.5px solid ${groupForm.shipping_type === "live_shippo" ? "#1A5CFF" : "#E2E0DA"}`, borderRadius: "7px", cursor: "pointer" }}>
+                    <input type="radio" name="shipping_type" value="live_shippo" checked={groupForm.shipping_type === "live_shippo"} onChange={() => setGroupForm(f => ({ ...f, shipping_type: "live_shippo" }))} style={{ accentColor: "#1A5CFF" }} />
+                    <div>
+                      <div style={{ fontSize: "13px", fontWeight: 600, color: "#2A2830" }}>Live Shipping Rates (via Shippo)</div>
+                      <div style={{ fontSize: "11px", color: "#7A7880" }}>Real-time carrier rates fetched at checkout for this group</div>
+                    </div>
+                  </label>
+                  {groupForm.shipping_type === "live_shippo" && (
+                    <div style={{ marginTop: "8px", marginLeft: "12px", border: "1px solid #E2E0DA", borderRadius: "8px", background: "#fff", padding: "12px 14px" }}>
+                      <p style={{ fontSize: "12px", color: "#2A2830", lineHeight: 1.6, margin: 0 }}>
+                        Customers in this group will see live carrier rates (USPS, UPS, FedEx) at checkout and can select their preferred service.
+                      </p>
+                    </div>
+                  )}
+                </div>
+
               </div>
             </div>
 

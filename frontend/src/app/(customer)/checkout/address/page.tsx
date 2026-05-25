@@ -9,6 +9,14 @@ import { useAuthStore } from "@/stores/auth.store";
 import { cartService } from "@/services/cart.service";
 import { formatCurrency } from "@/lib/utils";
 
+interface LiveRate {
+  rate_id: string;
+  carrier: string;
+  service: string;
+  cost: number;
+  days: number | null;
+}
+
 const US_STATES = [
   "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA",
   "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ",
@@ -72,6 +80,10 @@ export default function CheckoutAddressPage() {
   const [subtotal, setSubtotal] = useState(0);
   const [tierShipping, setTierShipping] = useState<number | null>(null);
   const [taxRate, setTaxRate] = useState<{ region: string; rate: number } | null>(null);
+  const [shippingTypeForUser, setShippingTypeForUser] = useState<string>("store_default");
+  const [liveRates, setLiveRates] = useState<LiveRate[]>([]);
+  const [liveRatesLoading, setLiveRatesLoading] = useState(false);
+  const [selectedLiveRateId, setSelectedLiveRateId] = useState<string | null>(null);
 
   const [form, setForm] = useState({
     company: companyName || "",
@@ -86,6 +98,14 @@ export default function CheckoutAddressPage() {
   });
   const [errors, setErrors] = useState<Partial<typeof form>>({});
   const [couponDiscount, setCouponDiscount] = useState(0);
+
+  // Fetch the shipping type applicable to the current user
+  useEffect(() => {
+    if (authIsLoading) return;
+    apiClient.get<{ shipping_type: string }>("/api/v1/shipping/shipping-type")
+      .then(r => setShippingTypeForUser(r.shipping_type || "store_default"))
+      .catch(() => setShippingTypeForUser("store_default"));
+  }, [authIsLoading]);
 
   // Load saved addresses + cart (subtotal + tier-based shipping)
   useEffect(() => {
@@ -106,10 +126,12 @@ export default function CheckoutAddressPage() {
         setSubtotal(guestSubtotal);
       } catch { /* ignore */ }
       setShowNewForm(true);
-      const sp = new URLSearchParams({ units: String(guestUnits), subtotal: String(guestSubtotal) });
-      apiClient.get<{ estimated_shipping: number }>(`/api/v1/guest/shipping-estimate?${sp}`)
-        .then(est => setTierShipping(Number(est.estimated_shipping ?? 9.99)))
-        .catch(() => setTierShipping(9.99));
+      if (shippingTypeForUser !== "live_shippo") {
+        const sp = new URLSearchParams({ units: String(guestUnits), subtotal: String(guestSubtotal) });
+        apiClient.get<{ estimated_shipping: number }>(`/api/v1/guest/shipping-estimate?${sp}`)
+          .then(est => setTierShipping(Number(est.estimated_shipping ?? 9.99)))
+          .catch(() => setTierShipping(9.99));
+      }
 
       // Restore from sessionStorage if returning to this step
       try {
@@ -151,10 +173,16 @@ export default function CheckoutAddressPage() {
     }
   }, [authIsLoading, isGuest]);
 
+  // Selected live rate cost (null when no rate selected)
+  const selectedLiveRate = liveRates.find(r => r.rate_id === selectedLiveRateId) ?? liveRates[0] ?? null;
+
   // Compute the shipping cost for a given method
   function methodCost(method: ShippingMethod): number {
-    const base = tierShipping ?? 0;
     if (method === "will_call") return 0;
+    if (shippingTypeForUser === "live_shippo" && method === "standard") {
+      return selectedLiveRate ? selectedLiveRate.cost : 0;
+    }
+    const base = tierShipping ?? 0;
     if (method === "expedited") return base + EXPEDITED_SURCHARGE;
     return base; // standard
   }
@@ -167,6 +195,35 @@ export default function CheckoutAddressPage() {
   const activeState = showNewForm ? form.state : (savedActive?.state ?? "");
   const activeZip   = showNewForm ? form.zip   : (savedActive?.postal_code ?? "");
   const activeCity  = showNewForm ? form.city  : (savedActive?.city ?? "");
+
+  // Fetch live Shippo rates when ZIP is ready and shipping type is live_shippo
+  useEffect(() => {
+    if (shippingTypeForUser !== "live_shippo") return;
+    const zip = activeZip.trim();
+    const state = activeState.trim();
+    if (zip.length < 5 || !state) return;
+
+    setLiveRatesLoading(true);
+    setLiveRates([]);
+    setSelectedLiveRateId(null);
+
+    apiClient.post<{ rates: LiveRate[]; error?: string }>("/api/v1/shipping/live-rates", {
+      to_zip: zip,
+      to_state: state,
+      to_city: activeCity || undefined,
+    })
+      .then(r => {
+        const rates = r.rates || [];
+        setLiveRates(rates);
+        const first = rates[0];
+        if (first) {
+          setSelectedLiveRateId(first.rate_id);
+          setTierShipping(first.cost);
+        }
+      })
+      .catch(() => setLiveRates([]))
+      .finally(() => setLiveRatesLoading(false));
+  }, [shippingTypeForUser, activeZip, activeState, activeCity]);
 
   useEffect(() => {
     if (!activeState) {
@@ -279,6 +336,13 @@ export default function CheckoutAddressPage() {
   function shippingOptionLabel(method: ShippingMethod): { price: string; note?: string } {
     if (method === "will_call") {
       return { price: "FREE", note: "Pick up from our warehouse — no shipping charge." };
+    }
+    // Live Shippo rates mode
+    if (shippingTypeForUser === "live_shippo" && method === "standard") {
+      if (liveRatesLoading) return { price: "Fetching rates…" };
+      if (selectedLiveRate) return { price: formatCurrency(selectedLiveRate.cost), note: `${selectedLiveRate.carrier} ${selectedLiveRate.service}${selectedLiveRate.days ? ` · est. ${selectedLiveRate.days} day${selectedLiveRate.days !== 1 ? "s" : ""}` : ""}` };
+      if (liveRates.length === 0 && activeZip.length >= 5) return { price: "Unavailable", note: "Enter your address to get shipping rates." };
+      return { price: "Enter address", note: "Live carrier rates will appear once your ZIP and state are filled in." };
     }
     // No tier assigned yet
     if (tierShipping === null) {
@@ -536,6 +600,57 @@ export default function CheckoutAddressPage() {
                         <div>Sat / Sun: Closed</div>
                       </div>
                     </div>
+                  ) : shippingTypeForUser === "live_shippo" && opt.id === "standard" && isSelected ? (
+                    <div style={{ marginTop: "8px" }}>
+                      <div style={{ fontSize: "12px", color: "#7A7880", marginBottom: "8px" }}>{opt.sub}</div>
+                      {liveRatesLoading && (
+                        <div style={{ fontSize: "12px", color: "#7A7880", padding: "8px 0" }}>Fetching live carrier rates…</div>
+                      )}
+                      {!liveRatesLoading && liveRates.length > 0 && (
+                        <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                          {liveRates.map(rate => {
+                            const isRateSelected = selectedLiveRateId === rate.rate_id;
+                            return (
+                              <label
+                                key={rate.rate_id}
+                                onClick={() => {
+                                  setSelectedLiveRateId(rate.rate_id);
+                                  setTierShipping(rate.cost);
+                                }}
+                                style={{
+                                  display: "flex", alignItems: "center", justifyContent: "space-between",
+                                  padding: "10px 14px", borderRadius: "8px", cursor: "pointer",
+                                  border: `1.5px solid ${isRateSelected ? "#E8242A" : "#E2E0DA"}`,
+                                  background: isRateSelected ? "rgba(232,36,42,.03)" : "#fff",
+                                }}
+                              >
+                                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                  <div style={{
+                                    width: "14px", height: "14px", borderRadius: "50%", flexShrink: 0,
+                                    border: `2px solid ${isRateSelected ? "#E8242A" : "#E2E0DA"}`,
+                                    background: isRateSelected ? "#E8242A" : "#fff",
+                                    display: "flex", alignItems: "center", justifyContent: "center",
+                                  }}>
+                                    {isRateSelected && <div style={{ width: "4px", height: "4px", borderRadius: "50%", background: "#fff" }} />}
+                                  </div>
+                                  <div>
+                                    <span style={{ fontSize: "12px", fontWeight: 700, color: "#2A2830" }}>{rate.carrier}</span>
+                                    <span style={{ fontSize: "12px", color: "#7A7880", marginLeft: "6px" }}>{rate.service}</span>
+                                    {rate.days && <span style={{ fontSize: "11px", color: "#aaa", marginLeft: "6px" }}>· {rate.days} day{rate.days !== 1 ? "s" : ""}</span>}
+                                  </div>
+                                </div>
+                                <span style={{ fontSize: "13px", fontWeight: 800, color: "#2A2830" }}>{formatCurrency(rate.cost)}</span>
+                              </label>
+                            );
+                          })}
+                        </div>
+                      )}
+                      {!liveRatesLoading && liveRates.length === 0 && activeZip.length >= 5 && (
+                        <div style={{ fontSize: "12px", color: "#7A7880", padding: "6px 0" }}>
+                          No rates available for this address. Please verify your ZIP and state.
+                        </div>
+                      )}
+                    </div>
                   ) : (
                     <div style={{ fontSize: "12px", color: "#7A7880", marginTop: "3px" }}>{opt.sub}</div>
                   )}
@@ -562,15 +677,19 @@ export default function CheckoutAddressPage() {
             <span style={{ fontWeight: 600, color: "#2A2830" }}>{formatCurrency(subtotal)}</span>
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#7A7880" }}>
-            <span>Shipping ({SHIPPING_OPTIONS.find(o => o.id === shippingMethod)?.label})</span>
+            <span>Shipping ({shippingTypeForUser === "live_shippo" && shippingMethod === "standard" && selectedLiveRate ? `${selectedLiveRate.carrier} ${selectedLiveRate.service}` : SHIPPING_OPTIONS.find(o => o.id === shippingMethod)?.label})</span>
             <span style={{ fontWeight: 600, color: (shippingMethod === "will_call" || (tierShipping !== null && selectedCost === 0)) ? "#059669" : "#2A2830" }}>
               {shippingMethod === "will_call"
                 ? "FREE"
-                : tierShipping === null
-                  ? <span style={{ color: "#7A7880", fontWeight: 400 }}>Calculated at checkout</span>
-                  : selectedCost === 0
-                    ? "FREE"
-                    : formatCurrency(selectedCost)}
+                : shippingTypeForUser === "live_shippo" && shippingMethod === "standard"
+                  ? selectedLiveRate
+                    ? formatCurrency(selectedLiveRate.cost)
+                    : <span style={{ color: "#7A7880", fontWeight: 400 }}>Select a carrier above</span>
+                  : tierShipping === null
+                    ? <span style={{ color: "#7A7880", fontWeight: 400 }}>Calculated at checkout</span>
+                    : selectedCost === 0
+                      ? "FREE"
+                      : formatCurrency(selectedCost)}
             </span>
           </div>
           {couponDiscount > 0 && (
@@ -588,7 +707,7 @@ export default function CheckoutAddressPage() {
           <div style={{ borderTop: "1px solid #F0EEE9", paddingTop: "8px", display: "flex", justifyContent: "space-between" }}>
             <span style={{ fontSize: "14px", fontWeight: 800, color: "#2A2830" }}>Total</span>
             <span style={{ fontFamily: "var(--font-bebas)", fontSize: "20px", color: "#E8242A", letterSpacing: ".02em" }}>
-              {(tierShipping !== null || shippingMethod === "will_call") ? formatCurrency(orderTotal) : `${formatCurrency(subtotal)}+`}
+              {(tierShipping !== null || shippingMethod === "will_call" || (shippingTypeForUser === "live_shippo" && selectedLiveRate)) ? formatCurrency(orderTotal) : `${formatCurrency(subtotal)}+`}
             </span>
           </div>
         </div>

@@ -148,7 +148,7 @@ export default function StandardShippingPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const [shippingType, setShippingType] = useState<"store_default" | "flat_rate">("store_default");
+  const [shippingType, setShippingType] = useState<"store_default" | "flat_rate" | "live_shippo">("store_default");
   const [shippingAmount, setShippingAmount] = useState(0);
   const [calcType, setCalcType] = useState<"units" | "order_value">("order_value");
   const [cutoffTime, setCutoffTime] = useState("");
@@ -165,7 +165,7 @@ export default function StandardShippingPage() {
       const settings = await apiClient.get<Record<string, string>>("/api/v1/admin/settings");
       if (settings?.standard_shipping) {
         const cfg = JSON.parse(settings.standard_shipping);
-        setShippingType(cfg.shipping_type === "flat_rate" ? "flat_rate" : "store_default");
+        setShippingType(cfg.shipping_type === "flat_rate" ? "flat_rate" : cfg.shipping_type === "live_shippo" ? "live_shippo" : "store_default");
         setShippingAmount(Number(cfg.shipping_amount ?? 0));
         setCalcType(cfg.calc_type === "units" ? "units" : "order_value");
         setCutoffTime(cfg.cutoff_time ?? "");
@@ -181,7 +181,7 @@ export default function StandardShippingPage() {
       await apiClient.patch("/api/v1/admin/settings", {
         standard_shipping: JSON.stringify({
           shipping_type: shippingType,
-          shipping_amount: shippingAmount,
+          shipping_amount: shippingType === "store_default" ? shippingAmount : 0,
           calc_type: calcType,
           cutoff_time: cutoffTime,
           brackets: shippingType === "flat_rate" ? brackets : [],
@@ -225,7 +225,7 @@ export default function StandardShippingPage() {
       {/* Info banner */}
       <div style={{ background: "rgba(26,92,255,.04)", border: "1px solid rgba(26,92,255,.15)", borderRadius: "8px", padding: "14px 18px", marginBottom: "24px", fontSize: "13px", color: "#2A2830", lineHeight: 1.7 }}>
         <strong>Standard Shipping</strong> — applies to customers who are not in any discount group and have no shipping tier assigned, including logged-out users.
-        Configure a flat rate or bracket-based shipping rate for these customers.
+        Configure a flat rate, bracket-based rate, or live carrier rates via Shippo for these customers.
       </div>
 
       {loading ? (
@@ -258,6 +258,27 @@ export default function StandardShippingPage() {
                     )}
                   </div>
                   <p style={{ fontSize: "11px", color: "#7A7880", marginTop: "6px" }}>Set 0.00 for free shipping on all standard orders.</p>
+                </div>
+              )}
+            </div>
+
+            {/* Live Shippo Rates option */}
+            <div>
+              <label style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 14px", background: shippingType === "live_shippo" ? "rgba(26,92,255,.06)" : "#fff", border: `1.5px solid ${shippingType === "live_shippo" ? "#1A5CFF" : "#E2E0DA"}`, borderRadius: "7px", cursor: "pointer" }}>
+                <input type="radio" name="shipping_type" value="live_shippo" checked={shippingType === "live_shippo"} onChange={() => setShippingType("live_shippo")} style={{ accentColor: "#1A5CFF" }} />
+                <div>
+                  <div style={{ fontSize: "13px", fontWeight: 600, color: "#2A2830" }}>Live Shipping Rates (via Shippo)</div>
+                  <div style={{ fontSize: "11px", color: "#7A7880" }}>Real-time carrier rates fetched at checkout based on the customer&apos;s address</div>
+                </div>
+              </label>
+              {shippingType === "live_shippo" && (
+                <div style={{ marginTop: "10px", marginLeft: "12px", border: "1px solid #E2E0DA", borderRadius: "8px", background: "#fff", padding: "14px 16px" }}>
+                  <p style={{ fontSize: "12px", color: "#2A2830", lineHeight: 1.6, margin: 0 }}>
+                    Customers will see a list of available carrier services (USPS, UPS, FedEx) with live pricing at checkout. They can select their preferred service before placing the order.
+                  </p>
+                  <p style={{ fontSize: "11px", color: "#7A7880", marginTop: "8px", marginBottom: 0 }}>
+                    Requires a valid <strong>SHIPPO_API_KEY</strong> configured in your environment.
+                  </p>
                 </div>
               )}
             </div>
