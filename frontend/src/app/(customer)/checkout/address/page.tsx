@@ -305,10 +305,14 @@ export default function CheckoutAddressPage() {
 
   function handleContinue() {
     setShippingCost(methodCost(shippingMethod));
+    console.log("[Address] shippingTypeForUser:", shippingTypeForUser, "selectedLiveRate:", selectedLiveRate);
     setShippingType(shippingTypeForUser);
     if (shippingTypeForUser === "live_shippo" && selectedLiveRate) {
-      setSelectedRate({ rate_id: selectedLiveRate.rate_id, carrier: selectedLiveRate.carrier, service: selectedLiveRate.service, price: selectedLiveRate.cost });
+      const rateToSave = { rate_id: selectedLiveRate.rate_id, carrier: selectedLiveRate.carrier, service: selectedLiveRate.service, price: selectedLiveRate.cost };
+      console.log("[Address] saving selectedRate:", rateToSave);
+      setSelectedRate(rateToSave);
     } else {
+      console.log("[Address] clearing selectedRate (shippingType not live_shippo or no rate selected)");
       setSelectedRate(null);
     }
 

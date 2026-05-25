@@ -157,12 +157,13 @@ export default function CheckoutReviewPage() {
     if (!shippingAddress) return;
     setIsPlacing(true);
     setError(null);
+    console.log("[Review] Checkout shipping data:", { shippingType, selectedRate });
 
     try {
       if (isGuest) {
         // ── Guest checkout ─────────────────────────────────────────────────
         const guestData = JSON.parse(sessionStorage.getItem("af_guest_checkout") || "{}");
-        const order = await apiClient.post<{ order_id: string; order_number: string; total: number }>("/api/v1/guest/checkout", {
+        const guestPayload = {
           guest_name: guestData.name || contactName || "Guest",
           guest_email: guestData.email || "",
           guest_phone: guestData.phone || shippingPhone || undefined,
@@ -195,7 +196,9 @@ export default function CheckoutReviewPage() {
             shipping_carrier: selectedRate.carrier,
             shipping_service: selectedRate.service,
           } : {}),
-        });
+        };
+        console.log("[Review] Guest order payload:", JSON.stringify(guestPayload, null, 2));
+        const order = await apiClient.post<{ order_id: string; order_number: string; total: number }>("/api/v1/guest/checkout", guestPayload);
 
         const guestSubtotal = guestEntries.reduce((s, e) => s + e.unit_price * e.quantity, 0);
         const productName = guestEntries[0]?.product_name ?? "Your Order";
@@ -253,6 +256,7 @@ export default function CheckoutReviewPage() {
         } : {}),
       };
 
+      console.log("[Review] Wholesale basePayload:", JSON.stringify(basePayload, null, 2));
       const order = await ordersService.confirmOrder(
         paymentMethod === "ach"
           ? {
