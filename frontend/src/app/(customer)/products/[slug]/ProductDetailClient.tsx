@@ -4,7 +4,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, SIZE_ORDER } from "@/lib/utils";
 import type { ProductDetail, ProductVariant } from "@/types/product.types";
 import { useAuthStore } from "@/stores/auth.store";
 import { apiClient } from "@/lib/api-client";
@@ -426,7 +426,14 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
   const colorGroups = useMemo(() => groupVariantsByColor(product?.variants ?? []), [product?.variants]);
   const uniqueColors = colorGroups.map(g => g.color);
   const uniqueSizes = useMemo(
-    () => Array.from(new Set(product?.variants?.map(v => v.size).filter(Boolean) ?? [])) as string[],
+    () => Array.from(new Set(product?.variants?.map(v => v.size).filter(Boolean) ?? [])).sort((a, b) => {
+      const ai = SIZE_ORDER.indexOf((a || '').toUpperCase());
+      const bi = SIZE_ORDER.indexOf((b || '').toUpperCase());
+      if (ai === -1 && bi === -1) return (a || '').localeCompare(b || '');
+      if (ai === -1) return 1;
+      if (bi === -1) return -1;
+      return ai - bi;
+    }) as string[],
     [product?.variants]
   );
   const totalUnits = useMemo(

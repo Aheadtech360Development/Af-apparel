@@ -22,6 +22,7 @@ interface AnalyticsData {
     revenue_change_percent: number;
     orders_change_percent: number;
     customers_change_percent: number;
+    conversion_rate?: number;
   };
   revenue_chart: { date: string; revenue: number; orders: number }[];
   order_status_breakdown: { status: string; count: number; revenue: number }[];
@@ -253,6 +254,11 @@ export default function AnalyticsPage() {
               label="New Customers"
               value={data.overview.new_customers}
               color="#F97316"
+            />
+            <StatCard
+              label="Conversion Rate"
+              value={`${data.overview.conversion_rate ?? 0}%`}
+              color="#06B6D4"
             />
             {/* Guest vs Wholesale */}
             <div style={{ ...card }}>

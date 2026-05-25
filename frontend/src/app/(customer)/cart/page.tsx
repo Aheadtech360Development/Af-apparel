@@ -582,10 +582,10 @@ function OrderSummary({
 }) {
   const tax = 0;
   const couponDiscount = appliedCoupon?.discount_amount ?? 0;
-  const total = subtotal + (hasShippingTier ? estimatedShipping : 0) + tax - couponDiscount;
+  const total = subtotal + tax - couponDiscount;
 
   const usp: { icon: ReactNode; text: string }[] = [
-    { icon: <TruckIcon size={14} color="currentColor" />, text: "Orders before 2 PM CT ship same day" },
+    { icon: <TruckIcon size={14} color="currentColor" />, text: "Orders before 12 PM CT ship same day" },
     { icon: <LockIcon size={14} color="currentColor" />, text: "Secure checkout — SSL encrypted" },
     { icon: <PhoneIcon size={14} color="currentColor" />, text: "+1 (469) 367-9753" },
     { icon: <MailIcon size={14} color="currentColor" />, text: "info@afblanks.com" },
@@ -605,14 +605,8 @@ function OrderSummary({
           <span style={{ fontWeight: 600, color: "#2A2830" }}>{formatCurrency(subtotal)}</span>
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#7A7880" }}>
-          <span>Shipping (Standard Ground)</span>
-          <span style={{ fontWeight: 600, color: (hasShippingTier && estimatedShipping === 0) ? "#059669" : "#2A2830" }}>
-            {!hasShippingTier
-              ? <span style={{ color: "#7A7880", fontWeight: 400 }}>Calculated at checkout</span>
-              : estimatedShipping === 0
-                ? "FREE"
-                : formatCurrency(estimatedShipping)}
-          </span>
+          <span>Shipping</span>
+          <span style={{ color: "#7A7880", fontWeight: 400 }}>Calculated at checkout</span>
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#7A7880" }}>
           <span>Tax</span>

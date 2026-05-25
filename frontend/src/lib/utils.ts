@@ -61,3 +61,16 @@ export function getInitials(name: string): string {
     .toUpperCase()
     .slice(0, 2);
 }
+
+export const SIZE_ORDER = ['XS','S','M','L','XL','2XL','3XL','4XL','5XL','6XL'];
+
+export function sortSizes<T>(items: T[], getSize: (item: T) => string): T[] {
+  return [...items].sort((a, b) => {
+    const ai = SIZE_ORDER.indexOf(getSize(a).toUpperCase());
+    const bi = SIZE_ORDER.indexOf(getSize(b).toUpperCase());
+    if (ai === -1 && bi === -1) return getSize(a).localeCompare(getSize(b));
+    if (ai === -1) return 1;
+    if (bi === -1) return -1;
+    return ai - bi;
+  });
+}

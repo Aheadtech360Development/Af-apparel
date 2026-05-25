@@ -15,6 +15,7 @@ interface Collection {
   image?: string | null;      // legacy fallback
   image_url?: string | null;  // from CategoryOut schema
   is_active?: boolean;
+  sort_order?: number;
 }
 
 const labelStyle: React.CSSProperties = {
@@ -35,7 +36,7 @@ export default function CollectionsPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState({ name: "", slug: "", description: "", image_url: "" });
+  const [form, setForm] = useState({ name: "", slug: "", description: "", image_url: "", sort_order: 0 });
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -56,20 +57,20 @@ export default function CollectionsPage() {
 
   function openCreate() {
     setEditingId(null);
-    setForm({ name: "", slug: "", description: "", image_url: "" });
+    setForm({ name: "", slug: "", description: "", image_url: "", sort_order: 0 });
     setShowModal(true);
   }
 
   function openEdit(col: Collection) {
     setEditingId(col.id);
-    setForm({ name: col.name, slug: col.slug, description: col.description ?? "", image_url: col.image_url ?? col.image ?? "" });
+    setForm({ name: col.name, slug: col.slug, description: col.description ?? "", image_url: col.image_url ?? col.image ?? "", sort_order: col.sort_order ?? 0 });
     setShowModal(true);
   }
 
   function closeModal() {
     setShowModal(false);
     setEditingId(null);
-    setForm({ name: "", slug: "", description: "", image_url: "" });
+    setForm({ name: "", slug: "", description: "", image_url: "", sort_order: 0 });
   }
 
   async function handleImageFile(file: File) {
@@ -95,6 +96,7 @@ export default function CollectionsPage() {
         slug: form.slug || generateSlug(form.name),
         description: form.description || null,
         image_url: form.image_url.trim() || null,
+        sort_order: form.sort_order || 0,
       };
       if (editingId) {
         await apiClient.patch(`/api/v1/admin/products/categories/${editingId}`, payload);
@@ -318,6 +320,19 @@ export default function CollectionsPage() {
                   </button>
                 )}
               </div>
+            </div>
+
+            <div style={{ marginBottom: "22px" }}>
+              <label style={labelStyle}>Sort Order</label>
+              <input
+                type="number"
+                min={0}
+                value={form.sort_order}
+                onChange={e => setForm(f => ({ ...f, sort_order: parseInt(e.target.value) || 0 }))}
+                style={inputStyle}
+                placeholder="0"
+              />
+              <p style={{ fontSize: "11px", color: "#888", marginTop: "4px" }}>Lower numbers appear first</p>
             </div>
 
             <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
