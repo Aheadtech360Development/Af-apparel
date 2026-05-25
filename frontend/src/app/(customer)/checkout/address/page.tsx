@@ -307,13 +307,16 @@ export default function CheckoutAddressPage() {
     setShippingCost(methodCost(shippingMethod));
     console.log("[Address] shippingTypeForUser:", shippingTypeForUser, "selectedLiveRate:", selectedLiveRate);
     setShippingType(shippingTypeForUser);
+    sessionStorage.setItem('checkout_shipping_type', shippingTypeForUser);
     if (shippingTypeForUser === "live_shippo" && selectedLiveRate) {
       const rateToSave = { rate_id: selectedLiveRate.rate_id, carrier: selectedLiveRate.carrier, service: selectedLiveRate.service, price: selectedLiveRate.cost };
       console.log("[Address] saving selectedRate:", rateToSave);
       setSelectedRate(rateToSave);
+      sessionStorage.setItem('checkout_selected_rate', JSON.stringify(rateToSave));
     } else {
       console.log("[Address] clearing selectedRate (shippingType not live_shippo or no rate selected)");
       setSelectedRate(null);
+      sessionStorage.removeItem('checkout_selected_rate');
     }
 
     if (isGuest) {

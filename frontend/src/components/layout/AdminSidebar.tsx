@@ -275,7 +275,7 @@ export function AdminSidebar() {
           position: "fixed", bottom: "20px", left: "16px", zIndex: 150,
           background: "#1B3A5C", color: "#fff", border: "none", borderRadius: "50%",
           width: "48px", height: "48px", cursor: "pointer",
-          display: "flex", alignItems: "center", justifyContent: "center",
+          alignItems: "center", justifyContent: "center",
           boxShadow: "0 4px 16px rgba(0,0,0,.25)",
         }}
       >

@@ -62,6 +62,14 @@ export default function CheckoutReviewPage() {
   const { isAuthenticated, isLoading: authIsLoading } = useAuthStore();
   const isGuest = !authIsLoading && !isAuthenticated();
 
+  useEffect(() => {
+    const store = useCheckoutStore.getState();
+    console.log("Review page store state:", {
+      shippingType: store.shippingType,
+      selectedRate: store.selectedRate,
+    });
+  }, []);
+
   const [cart, setCart] = useState<Cart | null>(null);
   const [guestEntries, setGuestEntries] = useState<GuestCartEntry[]>([]);
   const [savedCards, setSavedCards] = useState<SavedCard[]>([]);
@@ -157,6 +165,13 @@ export default function CheckoutReviewPage() {
     if (!shippingAddress) return;
     setIsPlacing(true);
     setError(null);
+
+    // Belt-and-suspenders: read from store first, fall back to sessionStorage
+    const _storeSnap = useCheckoutStore.getState();
+    const shippingType = _storeSnap.shippingType || sessionStorage.getItem('checkout_shipping_type') || "";
+    const _savedRateStr = sessionStorage.getItem('checkout_selected_rate');
+    const selectedRate = _storeSnap.selectedRate || (_savedRateStr ? (() => { try { return JSON.parse(_savedRateStr); } catch { return null; } })() : null);
+
     console.log("[Review] Checkout shipping data:", { shippingType, selectedRate });
 
     try {
