@@ -152,7 +152,7 @@ export default function ContactPage() {
                 <div style={{ flexShrink: 0, color: "#2D8CFF", marginTop: "2px" }}><MapPin size={20} /></div>
                 <div>
                   <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "14px", letterSpacing: ".04em", color: "#111", marginBottom: "4px" }}>Facility & Shipping Hub</h4>
-                  <p style={{ fontSize: "12.5px", color: "#555", lineHeight: 1.6 }}>10719 Turbeville Rd<br />Dallas, TX 75243<br />Orders before 2 PM CT ship same day</p>
+                  <p style={{ fontSize: "12.5px", color: "#555", lineHeight: 1.6 }}>10719 Turbeville Rd<br />Dallas, TX 75243<br />Orders before 12 PM CT ship same day</p>
                 </div>
               </div>
               <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: "6px", padding: "16px", display: "flex", gap: "12px", alignItems: "flex-start" }}>
