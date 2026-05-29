@@ -638,7 +638,11 @@ export default function AdminOrderDetailPage() {
                 </div>
               )}
               <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "8px", marginBottom: "14px" }}>
-                {([{ id: "fedex", name: "FedEx", icon: "FX" }, { id: "ups", name: "UPS", icon: "UPS" }, { id: "usps", name: "USPS", icon: "US" }]).map(carrier => {
+                {([
+                  { id: "fedex", name: "FedEx", logo: "https://shippo-static.s3.amazonaws.com/providers/75/FedEx.png" },
+                  { id: "ups",   name: "UPS",   logo: "https://shippo-static.s3.amazonaws.com/providers/75/UPS.png" },
+                  { id: "usps",  name: "USPS",  logo: "https://shippo-static.s3.amazonaws.com/providers/75/USPS.png" },
+                ]).map(carrier => {
                   const active = selectedCarrier === carrier.id;
                   const isCustomerChoice = customerCarrier === carrier.id;
                   const isDisabled = !!customerCarrier && !isCustomerChoice;
@@ -652,9 +656,11 @@ export default function AdminOrderDetailPage() {
                         background: active ? "rgba(26,92,255,.05)" : isDisabled ? "#FAFAF8" : "#fff",
                         opacity: isDisabled ? 0.4 : 1,
                         transition: "all .15s",
+                        display: "flex", flexDirection: "column" as const, alignItems: "center", justifyContent: "center", gap: "6px",
                       }}>
-                      <div style={{ fontSize: "13px", fontWeight: 800, color: active ? "#1A5CFF" : "#7A7880", marginBottom: "4px", letterSpacing: ".04em" }}>{carrier.icon}</div>
-                      <div style={{ fontSize: "12px", fontWeight: 700, color: active ? "#1A5CFF" : "#2A2830" }}>{carrier.name}</div>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={carrier.logo} alt={carrier.name} style={{ height: "28px", width: "auto", objectFit: "contain", filter: isDisabled ? "grayscale(1)" : "none" }} />
+                      <div style={{ fontSize: "11px", fontWeight: 700, color: active ? "#1A5CFF" : "#7A7880" }}>{carrier.name}</div>
                     </div>
                   );
                 })}
