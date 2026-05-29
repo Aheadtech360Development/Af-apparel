@@ -520,9 +520,8 @@ async def get_admin_product(slug: str, db: AsyncSession = Depends(get_db)):
 
 @router.delete("/{product_id}", status_code=200)
 async def delete_product(product_id: UUID, db: AsyncSession = Depends(get_db)):
-    from sqlalchemy import update as _update
+    from sqlalchemy import text as _text
     from sqlalchemy.exc import IntegrityError
-    from app.models.purchase_order import POLineItem
 
     try:
         result = await db.execute(
@@ -540,15 +539,17 @@ async def delete_product(product_id: UUID, db: AsyncSession = Depends(get_db)):
         if not product:
             raise NotFoundError(f"Product {product_id} not found")
 
-        # Pre-NULL PO line item references for all variants (prevents FK IntegrityError on hard delete)
-        variant_uuids = [v.id for v in product.variants]
-        if variant_uuids:
-            logger.info("delete_product %s: nulling %d PO line item references", product_id, len(variant_uuids))
-            await db.execute(
-                _update(POLineItem)
-                .where(POLineItem.product_variant_id.in_(variant_uuids))
-                .values(product_variant_id=None)
-            )
+        # Pre-NULL PO line item references for all variants (prevents FK IntegrityError on hard delete).
+        # Per-row individual updates avoid asyncpg array-binding issues entirely.
+        variant_ids = [str(v.id) for v in product.variants]
+        if variant_ids:
+            logger.info("delete_product %s: nulling %d PO line item references", product_id, len(variant_ids))
+            for vid in variant_ids:
+                await db.execute(
+                    _text("UPDATE po_line_items SET product_variant_id = NULL WHERE product_variant_id = :vid::uuid"),
+                    {"vid": vid},
+                )
+            await db.flush()
 
         try:
             await db.delete(product)
@@ -585,9 +586,8 @@ async def delete_variants_bulk(
     db: AsyncSession = Depends(get_db),
 ):
     """Bulk variant delete — hard delete with soft (discontinued) fallback for FK constraints."""
-    from sqlalchemy import update as _update
+    from sqlalchemy import text as _text
     from sqlalchemy.exc import IntegrityError
-    from app.models.purchase_order import POLineItem
     import uuid as _uuid
 
     try:
@@ -611,14 +611,16 @@ async def delete_variants_bulk(
         if not variants:
             return {"success": True, "deleted": 0, "discontinued": 0}
 
-        # Pre-NULL PO line item references for all selected variants (ORM update avoids asyncpg casting issues)
-        valid_uuids = [v.id for v in variants]
-        logger.info("delete_variants_bulk %s: nulling PO refs for %d variants", product_id, len(valid_uuids))
-        await db.execute(
-            _update(POLineItem)
-            .where(POLineItem.product_variant_id.in_(valid_uuids))
-            .values(product_variant_id=None)
-        )
+        # Pre-NULL PO line item references for all selected variants.
+        # Per-row individual updates avoid asyncpg array-binding issues entirely.
+        valid_ids = [str(v.id) for v in variants]
+        logger.info("delete_variants_bulk %s: nulling PO refs for %d variants", product_id, len(valid_ids))
+        for vid in valid_ids:
+            await db.execute(
+                _text("UPDATE po_line_items SET product_variant_id = NULL WHERE product_variant_id = :vid::uuid"),
+                {"vid": vid},
+            )
+        await db.flush()
 
         try:
             for variant in variants:
