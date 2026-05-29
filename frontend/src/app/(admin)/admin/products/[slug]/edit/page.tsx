@@ -204,11 +204,13 @@ export default function AdminProductEditPage() {
   const groupedVariants = useMemo<VariantGroup[]>(() => {
     if (!product?.variants) return [];
     const map: Record<string, ProductVariant[]> = {};
-    product.variants.forEach(v => {
-      const color = v.color ?? "No Color";
-      if (!map[color]) map[color] = [];
-      map[color].push(v);
-    });
+    product.variants
+      .filter(v => v.status !== "discontinued")
+      .forEach(v => {
+        const color = v.color ?? "No Color";
+        if (!map[color]) map[color] = [];
+        map[color].push(v);
+      });
     return Object.entries(map).map(([color, variants]) => ({
       color,
       variants: [...variants].sort((a, b) => {
@@ -279,8 +281,15 @@ export default function AdminProductEditPage() {
 
   async function handleDeleteVariant(variantId: string) {
     if (!product) return;
-    if (!confirm("Mark this variant as discontinued?")) return;
-    await adminService.deleteVariant(product.id, variantId);
+    if (!confirm("Delete this variant? This cannot be undone.")) return;
+    try {
+      const result = await adminService.deleteVariantsBulk(product.id, [variantId]);
+      if (result?.discontinued && result.discontinued > 0) {
+        alert("Variant has order history and was discontinued instead of deleted.");
+      }
+    } catch (err: unknown) {
+      alert(`Delete failed: ${err instanceof Error ? err.message : "Server error"}`);
+    }
     setProduct(prev => prev ? {
       ...prev,
       variants: prev.variants.filter(v => v.id !== variantId),
