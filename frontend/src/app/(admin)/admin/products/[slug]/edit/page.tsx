@@ -410,6 +410,7 @@ export default function AdminProductEditPage() {
         care_instructions: (product as any).care_instructions ?? null,
         print_guide: (product as any).print_guide ?? null,
         size_chart_data: (product as any).size_chart_data ?? null,
+        highlight_text: (product as any).highlight_text ?? null,
       });
       await Promise.all([...variantSaves, productSave]);
       setVariantEdits({});
@@ -517,6 +518,21 @@ export default function AdminProductEditPage() {
                 value={product.name}
                 onChange={e => setProduct(p => p ? { ...p, name: e.target.value } : p)}
                 style={{ ...inputStyle, fontSize: "16px", fontWeight: 600 }}
+              />
+            </div>
+            <div style={{ marginBottom: "18px" }}>
+              <label style={labelStyle}>
+                Highlight Box Text
+                <span style={{ fontWeight: 400, textTransform: "none", letterSpacing: 0, color: "#B0ADBA", marginLeft: "8px" }}>
+                  shown in blue box on product page
+                </span>
+              </label>
+              <textarea
+                value={(product as any).highlight_text ?? ""}
+                onChange={e => setProduct(p => p ? { ...p, highlight_text: e.target.value } as any : p)}
+                rows={3}
+                placeholder="e.g. Print-optimized CVC Blend. Tested for DTF transfers, screen printing, and embroidery. Consistent shrinkage below 3%."
+                style={{ ...inputStyle, resize: "vertical", lineHeight: 1.6 }}
               />
             </div>
             <div>

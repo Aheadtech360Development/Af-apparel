@@ -75,6 +75,9 @@ export interface ProductDetail {
   fabric?: string | null;
   product_code?: string | null;
   weight?: string | null;
+  highlight_text?: string | null;
+  review_count?: number;
+  avg_rating?: number;
 }
 
 /** Product asset (flyer, spec sheet). */

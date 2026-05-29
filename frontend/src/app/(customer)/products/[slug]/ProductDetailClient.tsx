@@ -730,21 +730,29 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
             </div>
 
             {/* Stars */}
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "20px" }}>
-              <div style={{ display: "flex", gap: "2px" }}>
-                {[1, 2, 3, 4, 5].map(s => (
-                  <svg key={s} width="14" height="14" viewBox="0 0 24 24" fill={s <= 4 ? "#C9A84C" : "#E2E0DA"}>
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                  </svg>
-                ))}
+            {((product as any).review_count ?? 0) > 0 ? (
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "20px" }}>
+                <div style={{ display: "flex", gap: "2px" }}>
+                  {[1, 2, 3, 4, 5].map(s => (
+                    <svg key={s} width="14" height="14" viewBox="0 0 24 24" fill={s <= Math.round((product as any).avg_rating ?? 0) ? "#C9A84C" : "#E2E0DA"}>
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                    </svg>
+                  ))}
+                </div>
+                <span style={{ fontSize: "12px", color: "#7A7880" }}>
+                  {(product as any).avg_rating ?? 0} ({(product as any).review_count ?? 0} review{(product as any).review_count !== 1 ? "s" : ""})
+                </span>
               </div>
-              <span style={{ fontSize: "12px", color: "#7A7880" }}>4.8 (124 reviews)</span>
-            </div>
+            ) : (
+              <div style={{ fontSize: "12px", color: "#B0ADBA", marginBottom: "20px" }}>No reviews yet</div>
+            )}
 
-            {/* Stars wale div ke baad yeh add karo */}
-            <div style={{ background: "rgba(26,92,255,.05)", border: "1px solid rgba(26,92,255,.15)", borderRadius: "8px", padding: "12px 16px", marginBottom: "20px", fontSize: "13px", color: "#2A2830", lineHeight: 1.6 }}>
-              ✅ <strong>Print-optimized {(product as any).fabric ?? "ring-spun cotton"}.</strong> Tested for DTF transfers, screen printing, and embroidery. Consistent shrinkage below 3%. {uniqueColors.length} colorways.
-            </div>
+            {/* Highlight box — editable from admin; hidden when empty */}
+            {(product as any).highlight_text ? (
+              <div style={{ background: "rgba(26,92,255,.05)", border: "1px solid rgba(26,92,255,.15)", borderRadius: "8px", padding: "12px 16px", marginBottom: "20px", fontSize: "13px", color: "#2A2830", lineHeight: 1.6 }}>
+                ✅ {(product as any).highlight_text}
+              </div>
+            ) : null}
 
             {/* Pricing */}
             {/* {isAuthenticated ? (
