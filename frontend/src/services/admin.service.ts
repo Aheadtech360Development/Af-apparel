@@ -102,6 +102,13 @@ export const adminService = {
     return apiClient.delete(`/api/v1/admin/products/${productId}/variants/${variantId}`);
   },
 
+  async deleteVariantsBulk(productId: string, variantIds: string[]) {
+    return apiClient.delete<{ success: boolean; deleted: number; discontinued: number; message?: string }>(
+      `/api/v1/admin/products/${productId}/variants`,
+      { body: JSON.stringify({ variant_ids: variantIds }) },
+    );
+  },
+
   async bulkAction(ids: string[], action: string) {
     return apiClient.post("/api/v1/admin/products/bulk-action", { ids, action });
   },

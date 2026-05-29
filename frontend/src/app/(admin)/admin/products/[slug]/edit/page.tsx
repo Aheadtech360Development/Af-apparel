@@ -151,7 +151,14 @@ export default function AdminProductEditPage() {
   async function handleBulkDeleteVariants() {
     if (!product || selectedVariantIds.size === 0) return;
     if (!confirm(`Delete ${selectedVariantIds.size} selected variant(s)? This cannot be undone.`)) return;
-    await Promise.all([...selectedVariantIds].map(vid => adminService.deleteVariant(product.id, vid)));
+    try {
+      const result = await adminService.deleteVariantsBulk(product.id, [...selectedVariantIds]);
+      if (result?.discontinued && result.discontinued > 0) {
+        alert(`${result.discontinued} variant(s) have order history and were discontinued instead of deleted.`);
+      }
+    } catch (err: unknown) {
+      alert(`Delete failed: ${err instanceof Error ? err.message : "Server error"}`);
+    }
     setSelectedVariantIds(new Set());
     await load();
   }
