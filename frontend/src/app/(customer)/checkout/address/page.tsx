@@ -256,29 +256,47 @@ export default function CheckoutAddressPage() {
 
   useEffect(() => {
     if (!activeState) {
+      console.log("[Tax] Skipping — activeState is empty", { activeZip, subtotal, selectedAddressId });
       setTaxRate(null);
       setApiTaxAmount(0);
       setTaxInfo(null, 0, 0);
       return;
     }
-    apiClient.post<{ tax_rate: number; tax_amount: number; region: string; taxable: boolean }>(
+    if (subtotal <= 0) {
+      console.log("[Tax] Skipping — subtotal is 0", { activeState, activeZip });
+      return;
+    }
+    console.log("[Tax] Calling /api/v1/tax/calculate", {
+      state: activeState.toUpperCase(),
+      zip: activeZip,
+      subtotal,
+      discount: couponDiscount,
+    });
+    apiClient.post<{ tax_rate: number; tax_amount: number; region: string; taxable: boolean; source?: string }>(
       `/api/v1/tax/calculate`,
       { subtotal, zip_code: activeZip, state: activeState.toUpperCase(), discount: couponDiscount },
     )
       .then(r => {
         const rate   = Number(r.tax_rate ?? 0);
         const amount = Number(r.tax_amount ?? 0);
+        console.log("[Tax] Response:", { source: r.source, region: r.region, rate, amount });
         if (rate > 0 || amount > 0) {
           setTaxRate({ region: r.region, rate });
           setApiTaxAmount(amount);
           setTaxInfo(r.region, rate, amount);
         } else {
+          console.warn("[Tax] $0 result — source:", r.source, "state:", activeState, "zip:", activeZip);
           setTaxRate(null);
           setApiTaxAmount(0);
           setTaxInfo(null, 0, 0);
         }
       })
-      .catch(() => { setTaxRate(null); setApiTaxAmount(0); setTaxInfo(null, 0, 0); });
+      .catch(err => {
+        console.error("[Tax] Request failed:", err);
+        setTaxRate(null);
+        setApiTaxAmount(0);
+        setTaxInfo(null, 0, 0);
+      });
   }, [activeState, activeZip, subtotal, selectedAddressId, couponDiscount]);
 
   const taxableBase = Math.max(0, subtotal - couponDiscount); // shipping not taxed
