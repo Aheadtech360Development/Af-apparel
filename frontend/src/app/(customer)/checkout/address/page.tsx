@@ -266,6 +266,7 @@ export default function CheckoutAddressPage() {
       console.log("[Tax] Skipping — subtotal is 0", { activeState, activeZip });
       return;
     }
+    console.log("[Tax] zip_code value:", activeZip, "type:", typeof activeZip, "length:", activeZip?.length);
     console.log("[Tax] Calling /api/v1/tax/calculate", {
       state: activeState.toUpperCase(),
       zip: activeZip,
