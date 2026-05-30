@@ -57,7 +57,7 @@ export default function PrivateLabelPage() {
             </div>
             <div style={{ border: "1px solid #ddd", borderRadius: "15px", height: "380px", overflow: "hidden", position: "relative" }}>
               <Image
-                src="/Private Label Direct Blanks.png"
+                src="/Private-Label-Direct-Blanks.png"
                 alt="AF Apparels Private Label Direct Blanks"
                 fill
                 sizes="(max-width: 1100px) 45vw, 480px"

@@ -54,7 +54,7 @@ export default function HeroSection() {
           </div>
         </div>
         <div className="hero-img-col" style={{ flex: 1, minWidth: "240px", position: "relative" }}>
-          <div style={{ border: "1px solid #CBD5E1", borderRadius: "15px", height: "400px", width: "100%", overflow: "hidden", position: "relative" }}>
+          <div style={{ border: "1px solid #CBD5E1", borderRadius: "15px", height: "610px", width: "100%", overflow: "hidden", position: "relative" }}>
             <Image
               src="/Hame page Hero.png"
               alt=""
