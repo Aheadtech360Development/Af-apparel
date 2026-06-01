@@ -4,7 +4,7 @@ export default function HowItWorks() {
   const steps = [
     { n: "01", icon: <EditIcon size={30} color="#2A2830" />, h: "Apply for Access", p: "Submit your business details. Free to apply. Approved within 24 hours. No commitment required." },
     { n: "02", icon: <ClipboardIcon size={30} color="#2A2830" />, h: "Browse & Build Order", p: "Select colors, enter quantities across sizes. Real-time stock and pricing shown in your account." },
-    { n: "03", icon: <TruckIcon size={30} color="#2A2830" />, h: "Checkout & Ship", p: "Pay via card, ACH, wire, or NET 30. Orders before 2 PM CT ship from Dallas same day." },
+    { n: "03", icon: <TruckIcon size={30} color="#2A2830" />, h: "Checkout & Ship", p: "Pay via card, ACH, wire, or NET 30. Orders before 12 PM CT ship from Dallas same day." },
     { n: "04", icon: <RefreshIcon size={30} color="#2A2830" />, h: "Reorder Easily", p: "Full order history saved in your account. Reorder a previous color breakdown in one click." },
   ];
 

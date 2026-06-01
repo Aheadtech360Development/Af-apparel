@@ -494,7 +494,7 @@ export default function WholesaleRegisterPage() {
           {[
             { icon: <FactoryIcon size={20} color="#aaa" />, h: "Factory-Direct Pricing", p: "No distributors. Pay factory price — better margins on every order." },
             { icon: <PackageIcon size={20} color="#aaa" />, h: "No Minimums", p: "Order 1 unit or 10,000. In-stock items ship same day from Dallas." },
-            { icon: <ZapIcon size={20} color="#aaa" />, h: "Same-Day Shipping", p: "Orders before 2 PM CT ship the same day. Dallas, TX warehouse." },
+            { icon: <ZapIcon size={20} color="#aaa" />, h: "Same-Day Shipping", p: "Orders before 12 PM CT ship the same day. Dallas, TX warehouse." },
             { icon: <PaletteIcon size={20} color="#aaa" />, h: "Print-Optimized Blanks", p: "Every fabric tested for DTF, screen printing, and embroidery." },
             { icon: <CreditCardIcon size={20} color="#aaa" />, h: "NET 30 Terms Available", p: "Qualifying accounts can access NET 30 payment terms." },
             { icon: <UsersIcon size={20} color="#aaa" />, h: "Dedicated Support", p: "Real account manager — not a ticket queue. Phone + email." },
