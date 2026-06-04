@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/auth.store";
@@ -104,8 +105,8 @@ export function Header() {
         <div className="header-inner" style={{ maxWidth: "1500px", margin: "0 auto", padding: "0 32px", display: "flex", alignItems: "center", justifyContent: "space-between", height: "72px", gap: "24px" }}>
 
           {/* Logo */}
-          <Link href="/" style={{ display: "flex", alignItems: "center", textDecoration: "none", gap: "10px" }}>
-            <span style={{ fontFamily: "'Fraunces', serif", fontSize: "22px", fontWeight: 600, color: "#1C3557", letterSpacing: "-0.01em" }}>AF Blanks</span>
+          <Link href="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
+            <Image src="/Af-apparel logo.png" alt="AF Blanks" height={48} width={160} style={{ objectFit: "contain" }} />
           </Link>
 
           {/* Desktop Nav */}
@@ -256,7 +257,7 @@ export function Header() {
           }}>
             {/* Drawer header */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 24px", borderBottom: "1px solid #E2E2DE" }}>
-              <span style={{ fontFamily: "'Fraunces', serif", fontSize: "20px", fontWeight: 600, color: "#1C3557" }}>AF Blanks</span>
+              <Image src="/Af-apparel logo.png" alt="AF Blanks" height={40} width={130} style={{ objectFit: "contain" }} />
               <button
                 onClick={() => setMenuOpen(false)}
                 style={{ background: "none", border: "none", cursor: "pointer", color: "#6B6B6B", fontSize: "20px", lineHeight: 1, padding: "4px" }}

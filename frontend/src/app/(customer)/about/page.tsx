@@ -66,19 +66,10 @@ export default function AboutPage() {
               </p>
             </div>
             <div>
-              <div style={{ border: "1px solid #E2E2DE", height: "320px", overflow: "hidden", position: "relative", marginBottom: "16px" }}>
+              <div style={{ border: "1px solid #E2E2DE", height: "360px", overflow: "hidden", position: "relative" }}>
                 <Image
                   src="/Our Store.png"
                   alt="AF Apparels Dallas Warehouse"
-                  fill
-                  sizes="(max-width: 900px) 100vw, 50vw"
-                  style={{ objectFit: "cover" }}
-                />
-              </div>
-              <div style={{ border: "1px solid #E2E2DE", height: "280px", overflow: "hidden", position: "relative" }}>
-                <Image
-                  src="/Our Story-2.png"
-                  alt="AF Apparels Fulfillment"
                   fill
                   sizes="(max-width: 900px) 100vw, 50vw"
                   style={{ objectFit: "cover" }}
@@ -92,20 +83,22 @@ export default function AboutPage() {
       {/* TIMELINE */}
       <div style={{ background: "#FFFFFF", padding: "64px 24px", borderTop: "1px solid #E2E2DE" }}>
         <div style={{ maxWidth: "1500px", margin: "0 auto" }}>
-          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.12em", color: "#6B6B6B", marginBottom: "40px" }}>History</p>
-          <div style={{ position: "relative", paddingLeft: "32px", borderLeft: "2px solid #E2E2DE" }}>
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.12em", color: "#6B6B6B", marginBottom: 0 }}>History</p>
+          <div style={{ maxWidth: "680px", margin: "32px auto 0" }}>
             {[
               { year: "2010", title: "Founded in Dallas", body: "First warehouse opened. Started with cotton tees for the Texas print market." },
               { year: "2015", title: "ISO 9000 Certified", body: "Quality standards locked in. GOTS and Oeko-Tex certifications followed." },
               { year: "2019", title: "500+ Active Accounts", body: "Expanded to hoodies, sweatshirts, and polos. Started shipping nationwide." },
               { year: "2023", title: "Private Label Program", body: "Started making custom-label apparel for brands. Min 2,500 pcs/style/color." },
               { year: "2025", title: "2,000+ Accounts Nationwide", body: "Serving print shops, decorators, brands, and corporate buyers in all 50 states." },
-            ].map((item, i) => (
-              <div key={item.year} style={{ marginBottom: i < 4 ? "32px" : 0, position: "relative" }}>
-                <div style={{ position: "absolute", left: "-40px", top: "4px", width: "14px", height: "14px", background: "#1C3557", border: "3px solid #FFFFFF", borderRadius: "50%", boxShadow: "0 0 0 2px #1C3557" }} />
-                <div style={{ fontFamily: "'Fraunces', serif", fontSize: "18px", fontWeight: 600, color: "#1C3557", marginBottom: "4px" }}>{item.year}</div>
-                <h4 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "15px", fontWeight: 600, color: "#1A1A1A", marginBottom: "4px" }}>{item.title}</h4>
-                <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#6B6B6B", lineHeight: 1.6 }}>{item.body}</p>
+            ].map((item, i, arr) => (
+              <div key={item.year} style={{ display: "flex", gap: "28px", paddingBottom: "32px", paddingLeft: "28px", borderLeft: `1px solid ${i < arr.length - 1 ? "#E2E2DE" : "transparent"}`, marginLeft: "20px", position: "relative" }}>
+                <div style={{ position: "absolute", left: "-5px", top: "4px", width: "9px", height: "9px", borderRadius: "50%", background: "#1C3557" }} />
+                <div style={{ fontFamily: "'Fraunces', serif", fontSize: "18px", fontWeight: 700, color: "#1C3557", minWidth: "52px" }}>{item.year}</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 600, color: "#1A1A1A", marginBottom: "4px" }}>{item.title}</div>
+                  <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#6B6B6B", lineHeight: 1.55 }}>{item.body}</p>
+                </div>
               </div>
             ))}
           </div>
