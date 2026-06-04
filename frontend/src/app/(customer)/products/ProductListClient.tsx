@@ -230,94 +230,102 @@ export function ProductListClient({
   }
 
   // Sidebar content (shared by desktop & mobile drawer)
+  const filterHeaderStyle: React.CSSProperties = {
+    fontFamily: "'DM Sans', sans-serif",
+    fontSize: "11px",
+    fontWeight: 600,
+    letterSpacing: "0.1em",
+    textTransform: "uppercase",
+    color: "#1A1A1A",
+    marginBottom: "12px",
+  };
+  const filterGroupStyle: React.CSSProperties = { marginBottom: "28px" };
+
   const sidebarContent = (
     <div>
       {/* Gender */}
-      <div style={{ marginBottom: "24px" }}>
-        <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "11px", letterSpacing: ".14em", color: "#7A7880", marginBottom: "12px", textTransform: "uppercase" }}>
-          Gender
-        </h4>
+      <div style={filterGroupStyle}>
+        <h4 style={filterHeaderStyle}>Gender</h4>
         {[
           { label: "Men's", value: "mens" },
           { label: "Women's", value: "womens" },
           { label: "Youth", value: "youth" },
           { label: "Unisex", value: "unisex" },
         ].map(g => (
-          <div
-            key={g.value}
-            onClick={() => handleGenderClick(g.value)}
-            style={{ fontSize: "13px", color: currentGender === g.value ? "#1A5CFF" : "#7A7880", padding: "6px 10px", borderRadius: "6px", cursor: "pointer", fontWeight: currentGender === g.value ? 700 : 500, background: currentGender === g.value ? "rgba(26,92,255,.06)" : "transparent", display: "flex", alignItems: "center", justifyContent: "space-between" }}
-          >
+          <label key={g.value} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: "#1A1A1A", marginBottom: "8px", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>
+            <input
+              type="checkbox"
+              checked={currentGender === g.value}
+              onChange={() => handleGenderClick(g.value)}
+              style={{ accentColor: "#1C3557", cursor: "pointer" }}
+            />
             {g.label}
-            {currentGender === g.value && <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="1,5.5 3.8,9 10,1.5" stroke="#1A5CFF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-          </div>
+          </label>
         ))}
       </div>
 
-      {/* In Stock */}
-      <div style={{ marginBottom: "24px" }}>
-        <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "11px", letterSpacing: ".14em", color: "#7A7880", marginBottom: "12px", textTransform: "uppercase" }}>
-          Availability
-        </h4>
-        <div
-          onClick={handleInStockClick}
-          style={{ fontSize: "13px", color: currentInStock === "true" ? "#1A5CFF" : "#7A7880", padding: "6px 10px", borderRadius: "6px", cursor: "pointer", fontWeight: currentInStock === "true" ? 700 : 500, background: currentInStock === "true" ? "rgba(26,92,255,.06)" : "transparent", display: "flex", alignItems: "center", gap: "8px" }}
-        >
-          <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="#059669" /></svg> In Stock Only
-        </div>
+      {/* Availability */}
+      <div style={filterGroupStyle}>
+        <h4 style={filterHeaderStyle}>Availability</h4>
+        <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: "#1A1A1A", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>
+          <input
+            type="checkbox"
+            checked={currentInStock === "true"}
+            onChange={handleInStockClick}
+            style={{ accentColor: "#1C3557", cursor: "pointer" }}
+          />
+          In Stock Only
+        </label>
       </div>
 
       {/* Category */}
-      <div style={{ marginBottom: "24px" }}>
-        <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "11px", letterSpacing: ".14em", color: "#7A7880", marginBottom: "12px", textTransform: "uppercase" }}>
-          Category
-        </h4>
-        <div
-          onClick={() => handleCategoryClick("")}
-          style={{ fontSize: "13px", color: currentCategory === "" ? "#1A5CFF" : "#7A7880", padding: "6px 10px", borderRadius: "6px", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", fontWeight: currentCategory === "" ? 700 : 500, background: currentCategory === "" ? "rgba(26,92,255,.06)" : "transparent" }}
-        >
-          <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-            {currentCategory === "" && <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="1,5.5 3.8,9 10,1.5" stroke="#1A5CFF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-            All Products
-          </span>
-          <span style={{ fontSize: "11px", color: currentCategory === "" ? "#1A5CFF" : "#bbb", background: currentCategory === "" ? "rgba(26,92,255,.1)" : "#f5f5f5", padding: "2px 6px", borderRadius: "10px" }}>{total}</span>
-        </div>
+      <div style={filterGroupStyle}>
+        <h4 style={filterHeaderStyle}>Category</h4>
+        <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: "#1A1A1A", marginBottom: "8px", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>
+          <input
+            type="checkbox"
+            checked={currentCategory === ""}
+            onChange={() => handleCategoryClick("")}
+            style={{ accentColor: "#1C3557", cursor: "pointer" }}
+          />
+          All Products
+          <span style={{ marginLeft: "auto", fontSize: "11px", color: "#6B6B6B", fontFamily: "'DM Sans', sans-serif" }}>{total}</span>
+        </label>
         {categories.map((cat) => (
-          <div
-            key={cat.id}
-            onClick={() => handleCategoryClick(cat.slug)}
-            style={{ fontSize: "13px", color: currentCategory === cat.slug ? "#1A5CFF" : "#7A7880", padding: "6px 10px", borderRadius: "6px", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", fontWeight: currentCategory === cat.slug ? 700 : 500, background: currentCategory === cat.slug ? "rgba(26,92,255,.06)" : "transparent" }}
-          >
-            <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-              {currentCategory === cat.slug && <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="1,5.5 3.8,9 10,1.5" stroke="#1A5CFF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-              {cat.name}
-            </span>
-          </div>
+          <label key={cat.id} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: "#1A1A1A", marginBottom: "8px", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>
+            <input
+              type="checkbox"
+              checked={currentCategory === cat.slug}
+              onChange={() => handleCategoryClick(cat.slug)}
+              style={{ accentColor: "#1C3557", cursor: "pointer" }}
+            />
+            {cat.name}
+          </label>
         ))}
       </div>
 
       {/* Color swatches */}
       {colors.length > 0 && (
-        <div style={{ marginBottom: "24px" }}>
-          <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "11px", letterSpacing: ".14em", color: "#7A7880", marginBottom: "12px", textTransform: "uppercase" }}>Color</h4>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+        <div style={filterGroupStyle}>
+          <h4 style={filterHeaderStyle}>Color</h4>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
             {colors.map((color) => {
               const hex = swatchColor(color);
-              const selected = currentColor === color;
+              const isSelected = currentColor === color;
               return (
                 <button
                   key={color}
                   onClick={() => handleColorClick(color)}
                   title={color}
                   style={{
-                    width: "24px", height: "24px", borderRadius: "50%",
+                    width: "20px", height: "20px", borderRadius: "50%",
                     background: hex,
-                    border: selected ? "2px solid transparent" : "2px solid rgba(0,0,0,.1)",
+                    border: "1px solid #E2E2DE",
                     cursor: "pointer",
-                    boxShadow: selected ? "0 0 0 2px #fff, 0 0 0 4px #1A5CFF" : "none",
-                    transition: "transform .15s",
+                    outline: isSelected ? "2px solid #1C3557" : "none",
+                    outlineOffset: "2px",
                     flexShrink: 0,
-                    outline: "none",
+                    padding: 0,
                   }}
                 />
               );
@@ -326,11 +334,11 @@ export function ProductListClient({
         </div>
       )}
 
-      {/* Size pills */}
+      {/* Size chips */}
       {sizes.length > 0 && (
-        <div style={{ marginBottom: "24px" }}>
-          <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "11px", letterSpacing: ".14em", color: "#7A7880", marginBottom: "12px", textTransform: "uppercase" }}>Size</h4>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
+        <div style={filterGroupStyle}>
+          <h4 style={filterHeaderStyle}>Size</h4>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
             {sizes.map((size) => {
               const sel = currentSize === size;
               return (
@@ -338,11 +346,15 @@ export function ProductListClient({
                   key={size}
                   onClick={() => handleSizeClick(size)}
                   style={{
-                    padding: "5px 12px", borderRadius: "20px", fontSize: "12px", fontWeight: 600,
-                    border: `1.5px solid ${sel ? "#2A2830" : "#E2E0DA"}`,
-                    background: sel ? "#2A2830" : "#fff",
-                    color: sel ? "#fff" : "#7A7880",
-                    cursor: "pointer", transition: "all .15s",
+                    padding: "5px 10px",
+                    borderRadius: 0,
+                    fontSize: "12px",
+                    fontFamily: "'DM Sans', sans-serif",
+                    border: `1px solid ${sel ? "#1C3557" : "#E2E2DE"}`,
+                    background: sel ? "#1C3557" : "#FFFFFF",
+                    color: sel ? "#FFFFFF" : "#1A1A1A",
+                    cursor: "pointer",
+                    transition: "all .12s",
                   }}
                 >
                   {size}
@@ -354,86 +366,56 @@ export function ProductListClient({
       )}
 
       {/* Price Range */}
-      <div style={{ marginBottom: "24px" }}>
-        <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "11px", letterSpacing: ".14em", color: "#7A7880", marginBottom: "12px", textTransform: "uppercase" }}>
-          Price Range
-        </h4>
-        <div style={{ padding: "0 2px" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#2A2830", fontWeight: 700, marginBottom: "8px" }}>
-            <span>${localPriceMin}</span>
-            <span>${localPriceMax}</span>
-          </div>
-          <div style={{ marginBottom: "8px" }}>
-            <label style={{ fontSize: "11px", color: "#7A7880", marginBottom: "4px", display: "block" }}>Min</label>
-            <input
-              type="range"
-              min={0}
-              max={500}
-              step={5}
-              value={localPriceMin}
-              onChange={e => setLocalPriceMin(Math.min(Number(e.target.value), localPriceMax - 5))}
-              style={{ width: "100%", accentColor: "#1A5CFF" }}
-            />
-          </div>
-          <div style={{ marginBottom: "10px" }}>
-            <label style={{ fontSize: "11px", color: "#7A7880", marginBottom: "4px", display: "block" }}>Max</label>
-            <input
-              type="range"
-              min={0}
-              max={500}
-              step={5}
-              value={localPriceMax}
-              onChange={e => setLocalPriceMax(Math.max(Number(e.target.value), localPriceMin + 5))}
-              style={{ width: "100%", accentColor: "#1A5CFF" }}
-            />
-          </div>
+      <div style={filterGroupStyle}>
+        <h4 style={filterHeaderStyle}>Price Range</h4>
+        <input
+          type="range"
+          min={0} max={500} step={5}
+          value={localPriceMax}
+          onChange={e => setLocalPriceMax(Math.max(Number(e.target.value), localPriceMin + 5))}
+          style={{ width: "100%", accentColor: "#1C3557", marginBottom: "10px" }}
+        />
+        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+          <input
+            type="text"
+            value={localPriceMin}
+            onChange={e => setLocalPriceMin(Number(e.target.value.replace(/\D/g, "")) || 0)}
+            style={{ width: "70px", border: "1px solid #E2E2DE", padding: "6px 8px", fontSize: "12px", fontFamily: "'DM Sans', sans-serif", outline: "none" }}
+          />
+          <span style={{ fontSize: "12px", color: "#6B6B6B" }}>–</span>
+          <input
+            type="text"
+            value={localPriceMax}
+            onChange={e => setLocalPriceMax(Number(e.target.value.replace(/\D/g, "")) || 0)}
+            style={{ width: "70px", border: "1px solid #E2E2DE", padding: "6px 8px", fontSize: "12px", fontFamily: "'DM Sans', sans-serif", outline: "none" }}
+          />
           <button
             onClick={applyPriceFilter}
-            style={{ width: "100%", padding: "6px 0", background: "#1A5CFF", color: "#fff", border: "none", borderRadius: "5px", fontSize: "12px", fontWeight: 700, cursor: "pointer" }}
+            style={{ background: "#1C3557", color: "#fff", border: "none", padding: "7px 14px", fontSize: "12px", fontFamily: "'DM Sans', sans-serif", cursor: "pointer" }}
           >
-            Apply Price
+            Apply
           </button>
-          {(currentPriceMin || currentPriceMax) && (
-            <button
-              onClick={() => router.push(buildFilterUrl({ price_min: null, price_max: null }))}
-              style={{ width: "100%", marginTop: "4px", padding: "5px 0", background: "none", color: "#7A7880", border: "1px solid #E2E0DA", borderRadius: "5px", fontSize: "11px", fontWeight: 600, cursor: "pointer" }}
-            >
-              Reset Price
-            </button>
-          )}
         </div>
       </div>
 
-      {/* Inventory */}
-      <div style={{ marginBottom: "24px" }}>
-        <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "11px", letterSpacing: ".14em", color: "#7A7880", marginBottom: "12px", textTransform: "uppercase" }}>
-          Min. Inventory
-        </h4>
-        <div style={{ padding: "0 2px" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#2A2830", fontWeight: 700, marginBottom: "8px" }}>
-            <span>≥ {localMinStock} units</span>
-            <span style={{ fontSize: "10px", color: "#7A7880", fontWeight: 500 }}>per product</span>
-          </div>
-          <input
-            type="range"
-            min={0}
-            max={200}
-            step={10}
-            value={localMinStock}
-            onChange={e => setLocalMinStock(Number(e.target.value))}
-            style={{ width: "100%", accentColor: "#1A5CFF" }}
-          />
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "10px", color: "#7A7880", marginTop: "4px" }}>
-            <span>0</span><span>200+</span>
-          </div>
+      {/* Min. Inventory */}
+      <div style={filterGroupStyle}>
+        <h4 style={filterHeaderStyle}>Min. Inventory</h4>
+        <input
+          type="range"
+          min={0} max={200} step={10}
+          value={localMinStock}
+          onChange={e => setLocalMinStock(Number(e.target.value))}
+          style={{ width: "100%", accentColor: "#1C3557" }}
+        />
+        <div style={{ fontSize: "12px", color: "#6B6B6B", marginTop: "6px", fontFamily: "'DM Sans', sans-serif" }}>
+          ≥ {localMinStock} units per product
         </div>
       </div>
 
       {/* Product Code */}
-      <div style={{ marginBottom: "24px" }}>
-        <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "11px", letterSpacing: ".14em", color: "#7A7880", marginBottom: "12px", textTransform: "uppercase" }}>
-          Product Code
-        </h4>
+      <div style={filterGroupStyle}>
+        <h4 style={filterHeaderStyle}>Product Code</h4>
         <div style={{ display: "flex", gap: "6px" }}>
           <input
             type="text"
@@ -441,11 +423,11 @@ export function ProductListClient({
             value={localCode}
             onChange={e => setLocalCode(e.target.value)}
             onKeyDown={e => e.key === "Enter" && applyCodeFilter()}
-            style={{ flex: 1, padding: "7px 10px", border: "1.5px solid #E2E0DA", borderRadius: "5px", fontSize: "12px", color: "#2A2830", outline: "none" }}
+            style={{ flex: 1, padding: "7px 10px", border: "1px solid #E2E2DE", fontSize: "12px", fontFamily: "'IBM Plex Mono', monospace", color: "#1A1A1A", outline: "none" }}
           />
           <button
             onClick={applyCodeFilter}
-            style={{ padding: "7px 10px", background: "#1A5CFF", color: "#fff", border: "none", borderRadius: "5px", fontSize: "12px", fontWeight: 700, cursor: "pointer" }}
+            style={{ padding: "7px 14px", background: "#1C3557", color: "#fff", border: "none", fontSize: "12px", fontFamily: "'DM Sans', sans-serif", cursor: "pointer" }}
           >
             Go
           </button>
@@ -453,7 +435,7 @@ export function ProductListClient({
         {currentProductCode && (
           <button
             onClick={() => { setLocalCode(""); router.push(buildFilterUrl({ product_code: null })); }}
-            style={{ marginTop: "6px", fontSize: "11px", color: "#7A7880", background: "none", border: "none", cursor: "pointer", padding: 0 }}
+            style={{ marginTop: "6px", fontSize: "11px", color: "#6B6B6B", background: "none", border: "none", cursor: "pointer", padding: 0, fontFamily: "'DM Sans', sans-serif" }}
           >
             ✕ Clear code
           </button>
@@ -463,9 +445,9 @@ export function ProductListClient({
       {hasFilters && (
         <button
           onClick={handleClearAll}
-          style={{ fontSize: "12px", color: "#E8242A", fontWeight: 700, cursor: "pointer", padding: "5px 0", background: "none", border: "none" }}
+          style={{ fontSize: "12px", color: "#1C3557", fontWeight: 500, cursor: "pointer", padding: "5px 0", background: "none", border: "none", fontFamily: "'DM Sans', sans-serif", textDecoration: "underline" }}
         >
-          ✕ Clear All Filters
+          Clear All Filters
         </button>
       )}
     </div>
@@ -500,37 +482,32 @@ export function ProductListClient({
       {/* ── Desktop sidebar ── */}
       <aside
         className="hidden lg:block"
-        style={{ width: "220px", flexShrink: 0, borderRight: "1px solid #E2E2DE", padding: "28px 20px 28px 0", position: "sticky", top: "72px", maxHeight: "calc(100vh - 72px)", overflowY: "auto", background: "#F8F8F6" }}
+        style={{ width: "300px", flexShrink: 0, borderRight: "1px solid #E2E2DE", padding: "28px 20px 28px 0", position: "sticky", top: "72px", maxHeight: "calc(100vh - 72px)", overflowY: "auto", background: "#ffffff" }}
       >
         {sidebarContent}
       </aside>
 
       {/* ── Mobile filter drawer overlay ── */}
       {filterOpen && (
-        <div
-          style={{ position: "fixed", inset: 0, zIndex: 50, display: "flex" }}
-          className="lg:hidden"
-        >
+        <>
           {/* Backdrop */}
           <div
-            style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.5)" }}
+            style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 499 }}
             onClick={() => setFilterOpen(false)}
           />
           {/* Drawer */}
-          <div style={{ position: "relative", width: "280px", background: "#fff", height: "100%", padding: "24px 20px", overflowY: "auto", boxShadow: "4px 0 24px rgba(0,0,0,.15)", zIndex: 51 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
-              <span style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".08em", color: "#2A2830" }}>FILTERS</span>
-              <button
-                onClick={() => setFilterOpen(false)}
-                style={{ background: "none", border: "none", cursor: "pointer", fontSize: "20px", color: "#7A7880", padding: "4px", lineHeight: 1 }}
-                aria-label="Close filters"
-              >
-                ✕
-              </button>
-            </div>
+          <div style={{ position: "fixed", left: 0, top: 0, height: "100vh", width: "300px", background: "#fff", zIndex: 500, overflowY: "auto", padding: "24px" }}>
+            <button
+              onClick={() => setFilterOpen(false)}
+              style={{ position: "absolute", top: "16px", right: "16px", fontSize: "24px", background: "none", border: "none", cursor: "pointer", color: "#1A1A1A", lineHeight: 1, padding: "4px" }}
+              aria-label="Close filters"
+            >
+              ×
+            </button>
+            <h4 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 600, color: "#1A1A1A", marginBottom: "24px", marginTop: "4px" }}>Filters</h4>
             {sidebarContent}
           </div>
-        </div>
+        </>
       )}
 
       {/* ── Main content ── */}
@@ -593,8 +570,62 @@ export function ProductListClient({
         </div>
 
         {bulkMessage && (
-          <div style={{ marginBottom: "16px", background: "rgba(26,92,255,.06)", border: "1px solid rgba(26,92,255,.2)", borderRadius: "6px", padding: "12px 16px", fontSize: "13px", color: "#1A5CFF" }}>
+          <div style={{ marginBottom: "16px", background: "rgba(28,53,87,.06)", border: "1px solid rgba(28,53,87,.2)", padding: "12px 16px", fontSize: "13px", color: "#1C3557", fontFamily: "'DM Sans', sans-serif" }}>
             {bulkMessage}
+          </div>
+        )}
+
+        {/* Active filter pills */}
+        {hasFilters && (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", alignItems: "center", marginBottom: "16px" }}>
+            {currentCategory && (
+              <span style={{ background: "#e8edf3", border: "1px solid #c5d0dc", fontSize: "12px", padding: "4px 10px", display: "flex", alignItems: "center", gap: "6px", fontFamily: "'DM Sans', sans-serif", color: "#1C3557" }}>
+                {categories.find(c => c.slug === currentCategory)?.name ?? currentCategory}
+                <button onClick={() => router.push(buildFilterUrl({ category: null }))} style={{ background: "none", border: "none", cursor: "pointer", fontSize: "14px", color: "#1C3557", lineHeight: 1, padding: 0 }}>×</button>
+              </span>
+            )}
+            {currentColor && (
+              <span style={{ background: "#e8edf3", border: "1px solid #c5d0dc", fontSize: "12px", padding: "4px 10px", display: "flex", alignItems: "center", gap: "6px", fontFamily: "'DM Sans', sans-serif", color: "#1C3557" }}>
+                {currentColor}
+                <button onClick={() => router.push(buildFilterUrl({ color: null }))} style={{ background: "none", border: "none", cursor: "pointer", fontSize: "14px", color: "#1C3557", lineHeight: 1, padding: 0 }}>×</button>
+              </span>
+            )}
+            {currentSize && (
+              <span style={{ background: "#e8edf3", border: "1px solid #c5d0dc", fontSize: "12px", padding: "4px 10px", display: "flex", alignItems: "center", gap: "6px", fontFamily: "'DM Sans', sans-serif", color: "#1C3557" }}>
+                Size: {currentSize}
+                <button onClick={() => router.push(buildFilterUrl({ size: null }))} style={{ background: "none", border: "none", cursor: "pointer", fontSize: "14px", color: "#1C3557", lineHeight: 1, padding: 0 }}>×</button>
+              </span>
+            )}
+            {currentGender && (
+              <span style={{ background: "#e8edf3", border: "1px solid #c5d0dc", fontSize: "12px", padding: "4px 10px", display: "flex", alignItems: "center", gap: "6px", fontFamily: "'DM Sans', sans-serif", color: "#1C3557" }}>
+                {currentGender}
+                <button onClick={() => router.push(buildFilterUrl({ gender: null }))} style={{ background: "none", border: "none", cursor: "pointer", fontSize: "14px", color: "#1C3557", lineHeight: 1, padding: 0 }}>×</button>
+              </span>
+            )}
+            {currentInStock === "true" && (
+              <span style={{ background: "#e8edf3", border: "1px solid #c5d0dc", fontSize: "12px", padding: "4px 10px", display: "flex", alignItems: "center", gap: "6px", fontFamily: "'DM Sans', sans-serif", color: "#1C3557" }}>
+                In Stock
+                <button onClick={() => router.push(buildFilterUrl({ in_stock: null }))} style={{ background: "none", border: "none", cursor: "pointer", fontSize: "14px", color: "#1C3557", lineHeight: 1, padding: 0 }}>×</button>
+              </span>
+            )}
+            {(currentPriceMin || currentPriceMax) && (
+              <span style={{ background: "#e8edf3", border: "1px solid #c5d0dc", fontSize: "12px", padding: "4px 10px", display: "flex", alignItems: "center", gap: "6px", fontFamily: "'DM Sans', sans-serif", color: "#1C3557" }}>
+                ${currentPriceMin || 0}–${currentPriceMax || 500}
+                <button onClick={() => router.push(buildFilterUrl({ price_min: null, price_max: null }))} style={{ background: "none", border: "none", cursor: "pointer", fontSize: "14px", color: "#1C3557", lineHeight: 1, padding: 0 }}>×</button>
+              </span>
+            )}
+            {currentProductCode && (
+              <span style={{ background: "#e8edf3", border: "1px solid #c5d0dc", fontSize: "12px", padding: "4px 10px", display: "flex", alignItems: "center", gap: "6px", fontFamily: "'DM Sans', sans-serif", color: "#1C3557" }}>
+                Code: {currentProductCode}
+                <button onClick={() => { setLocalCode(""); router.push(buildFilterUrl({ product_code: null })); }} style={{ background: "none", border: "none", cursor: "pointer", fontSize: "14px", color: "#1C3557", lineHeight: 1, padding: 0 }}>×</button>
+              </span>
+            )}
+            <button
+              onClick={handleClearAll}
+              style={{ fontSize: "12px", color: "#1C3557", textDecoration: "underline", background: "none", border: "none", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}
+            >
+              Clear All
+            </button>
           </div>
         )}
 
@@ -638,7 +669,7 @@ export function ProductListClient({
                     onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "#E2E2DE"; }}
                   >
                     {/* Image area */}
-                    <div style={{ background: "#F8F8F6", height: "220px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "#6B6B6B", fontSize: "12px", position: "relative" }}>
+                    <div style={{ background: "#ffffff", height: "220px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "#6B6B6B", fontSize: "12px", position: "relative" }}>
                       {primaryImage ? (
                         <Image
                           src={primaryImage.url_medium_webp ?? primaryImage.url_medium}
