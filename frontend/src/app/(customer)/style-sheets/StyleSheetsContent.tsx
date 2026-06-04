@@ -26,10 +26,10 @@ export default function StyleSheetsPage() {
   return (
     <div style={{ background: "#F4F3EF", minHeight: "100vh" }}>
       {/* Announce */}
-      <div style={{ background: "#2A2830", color: "#fff", textAlign: "center", padding: "10px 20px", fontSize: "12px", fontWeight: 600, letterSpacing: ".05em" }}>
+      {/* <div style={{ background: "#2A2830", color: "#fff", textAlign: "center", padding: "10px 20px", fontSize: "12px", fontWeight: 600, letterSpacing: ".05em" }}>
         <Grid size={13} style={{ display: "inline", marginRight: "6px", verticalAlign: "middle" }} />
         T-Shirt Collection Style Sheets — Downloadable PDFs for Every AF Blank
-      </div>
+      </div> */}
 
       {/* Hero */}
       <div style={{ background: "#fff", borderBottom: "1px solid #E2E0DA", padding: "48px 32px", textAlign: "center" }}>

@@ -53,7 +53,7 @@ export default function AboutPage() {
 
       {/* OUR STORY */}
       <div style={{ background: "#F8F8F6", padding: "72px 24px" }}>
-        <div style={{ maxWidth: "760px", margin: "0 auto" }}>
+        <div style={{ margin: "0 auto" }}>
           <div className="about-story-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "48px", alignItems: "flex-start" }}>
             <div>
               <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.12em", color: "#6B6B6B", marginBottom: "8px" }}>Our Story</p>

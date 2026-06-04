@@ -13,7 +13,7 @@ export default function CtaSection() {
         <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: "38px", fontWeight: 600, color: "#FFFFFF", marginBottom: "16px", lineHeight: 1.2 }}>
           Better Prices. One Application.
         </h2>
-        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "16px", color: "rgba(255,255,255,0.8)", marginBottom: "32px", maxWidth: "480px", marginLeft: "auto", marginRight: "auto", lineHeight: 1.6 }}>
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "16px", color: "rgba(255,255,255,0.8)", marginBottom: "32px", marginLeft: "auto", marginRight: "auto", lineHeight: 1.6 }}>
           Apply for a wholesale account and get lower prices on everything we carry.
         </p>
         <Link
