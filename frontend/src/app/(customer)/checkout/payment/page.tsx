@@ -39,12 +39,20 @@ function brandDisplayName(brand: string): string {
   if (b === "discover") return "Discover";
   return brand.charAt(0).toUpperCase() + brand.slice(1);
 }
-const sectionCard: React.CSSProperties = {
-  background: "#fff", border: "1.5px solid #E2E0DA", borderRadius: "12px", padding: "22px 24px", marginBottom: "16px",
+
+const inp: React.CSSProperties = {
+  width: "100%", padding: "11px 14px", border: "1px solid #E2E2DE",
+  fontSize: "14px", fontFamily: "'DM Sans', sans-serif",
+  outline: "none", boxSizing: "border-box", color: "#1A1A1A", background: "#fff",
 };
-const sectionTitle: React.CSSProperties = {
-  fontFamily: "var(--font-bebas)", fontSize: "17px", letterSpacing: ".06em",
-  color: "#2A2830", marginBottom: "18px", display: "block",
+const lbl: React.CSSProperties = {
+  display: "block", fontSize: "12px", fontWeight: 600, color: "#1A1A1A",
+  textTransform: "uppercase", letterSpacing: ".07em", marginBottom: "7px",
+};
+const sectionLabelStyle: React.CSSProperties = {
+  fontFamily: "'DM Sans', sans-serif", fontSize: "11px", letterSpacing: "0.1em",
+  textTransform: "uppercase", fontWeight: 700, color: "#1A1A1A",
+  marginBottom: "14px", paddingBottom: "10px", borderBottom: "1px solid #E2E2DE",
 };
 
 export default function CheckoutPaymentPage() {
@@ -172,7 +180,7 @@ export default function CheckoutPaymentPage() {
 
   if (loadingCards) {
     return (
-      <div style={{ textAlign: "center", padding: "60px 0", color: "#7A7880", fontSize: "14px" }}>
+      <div style={{ textAlign: "center", padding: "60px 0", color: "#6B6B6B", fontSize: "14px" }}>
         Loading payment methods…
       </div>
     );
@@ -189,361 +197,392 @@ export default function CheckoutPaymentPage() {
     will_call: "Will Call Pickup",
   };
 
-  const inp: React.CSSProperties = { width: "100%", padding: "10px 12px", border: "1.5px solid #E2E0DA", borderRadius: "7px", fontSize: "13px", fontFamily: "var(--font-jakarta)", outline: "none", boxSizing: "border-box", color: "#2A2830", background: "#fff" };
-  const lbl: React.CSSProperties = { display: "block", fontSize: "11px", fontWeight: 700, color: "#7A7880", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: "5px" };
-
   return (
-    <div>
-      {/* ── Payment Method type selector ── */}
-      <div style={sectionCard}>
-        <span style={sectionTitle}>Payment Method</span>
-        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-          {(["card", "ach"] as const).map(type => {
-            const isSelected = paymentType === type;
-            return (
-              <label key={type} onClick={() => setPaymentType(type)} style={{ flex: 1, display: "flex", alignItems: "center", gap: "12px", padding: "14px 18px", borderRadius: "10px", border: `1.5px solid ${isSelected ? "#1A5CFF" : "#E2E0DA"}`, background: isSelected ? "rgba(26,92,255,.04)" : "#FAFAF8", cursor: "pointer", transition: "all .15s" }}>
-                <div style={{ width: "18px", height: "18px", borderRadius: "50%", flexShrink: 0, border: `2px solid ${isSelected ? "#1A5CFF" : "#E2E0DA"}`, background: isSelected ? "#1A5CFF" : "#fff", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  {isSelected && <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#fff" }} />}
-                </div>
-                <div>
-                  <div style={{ fontSize: "13px", fontWeight: 700, color: "#2A2830" }}>{type === "card" ? "Credit / Debit Card" : "ACH / Bank Transfer"}</div>
-                  <div style={{ fontSize: "11px", color: "#7A7880", marginTop: "2px" }}>{type === "card" ? "Visa, Mastercard, Amex, Discover" : "Checking or savings account"}</div>
-                </div>
-              </label>
-            );
-          })}
-          {!isGuest && isWholesale && (() => {
-            const isSelected = paymentType === "net_30";
-            return (
-              <label onClick={() => setPaymentType("net_30")} style={{ flex: 1, display: "flex", alignItems: "center", gap: "12px", padding: "14px 18px", borderRadius: "10px", border: `1.5px solid ${isSelected ? "#1A5CFF" : "#E2E0DA"}`, background: isSelected ? "rgba(26,92,255,.04)" : "#FAFAF8", cursor: "pointer", transition: "all .15s" }}>
-                <div style={{ width: "18px", height: "18px", borderRadius: "50%", flexShrink: 0, border: `2px solid ${isSelected ? "#1A5CFF" : "#E2E0DA"}`, background: isSelected ? "#1A5CFF" : "#fff", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  {isSelected && <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#fff" }} />}
-                </div>
-                <div>
-                  <div style={{ fontSize: "13px", fontWeight: 700, color: "#2A2830" }}>Net 30 — Pay by Invoice</div>
-                  <div style={{ fontSize: "11px", color: "#7A7880", marginTop: "2px" }}>Invoice sent to your account; payment due within 30 days</div>
-                </div>
-              </label>
-            );
-          })()}
-        </div>
-      </div>
+    <div style={{ padding: "40px 24px 64px", background: "#F8F8F6" }}>
+      <div style={{ maxWidth: "1500px", margin: "0 auto" }}>
+        <div className="checkout-cols" style={{ display: "grid", gridTemplateColumns: "1fr 380px", gap: "48px", alignItems: "start" }}>
 
-      {/* ── ACH section ── */}
-      {paymentType === "ach" && (
-        <div style={sectionCard}>
-          <span style={sectionTitle}>Bank Account Details</span>
-
-          {/* Saved ACH — shown for authenticated users who have one saved */}
-          {!isGuest && savedAch && (
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: useNewAch ? "16px" : "0" }}>
-              {/* Saved ACH option */}
-              <label
-                onClick={() => setUseNewAch(false)}
-                style={{
-                  display: "flex", alignItems: "center", gap: "14px",
-                  padding: "14px 18px", borderRadius: "10px",
-                  border: `1.5px solid ${!useNewAch ? "#1A5CFF" : "#E2E0DA"}`,
-                  background: !useNewAch ? "rgba(26,92,255,.04)" : "#FAFAF8",
-                  cursor: "pointer", transition: "all .15s",
-                }}
-              >
-                <div style={{
-                  width: "18px", height: "18px", borderRadius: "50%", flexShrink: 0,
-                  border: `2px solid ${!useNewAch ? "#1A5CFF" : "#E2E0DA"}`,
-                  background: !useNewAch ? "#1A5CFF" : "#fff",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                }}>
-                  {!useNewAch && <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#fff" }} />}
-                </div>
-                {/* Bank icon */}
-                <svg width="32" height="22" viewBox="0 0 32 22" fill="none" style={{ flexShrink: 0 }}>
-                  <rect width="32" height="22" rx="3" fill="#F4F3EF" stroke="#E2E0DA" />
-                  <rect x="4" y="5" width="24" height="3" rx="1" fill="#E2E0DA" />
-                  <rect x="6" y="10" width="3" height="6" rx="0.5" fill="#E2E0DA" />
-                  <rect x="14" y="10" width="3" height="6" rx="0.5" fill="#E2E0DA" />
-                  <rect x="22" y="10" width="3" height="6" rx="0.5" fill="#E2E0DA" />
-                </svg>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: "13px", fontWeight: 700, color: "#2A2830" }}>
-                    {savedAch.bank_name} •••• {savedAch.account_last4}
-                  </div>
-                  <div style={{ fontSize: "11px", color: "#7A7880", marginTop: "2px" }}>
-                    {savedAch.account_holder} · {savedAch.account_type.charAt(0).toUpperCase() + savedAch.account_type.slice(1)}
-                  </div>
-                </div>
-              </label>
-
-              {/* Use different account option */}
-              <label
-                onClick={() => setUseNewAch(true)}
-                style={{
-                  display: "flex", alignItems: "center", gap: "14px",
-                  padding: "12px 18px", borderRadius: "10px",
-                  border: `1.5px solid ${useNewAch ? "#1A5CFF" : "#E2E0DA"}`,
-                  background: useNewAch ? "rgba(26,92,255,.04)" : "#FAFAF8",
-                  cursor: "pointer", fontSize: "13px", fontWeight: 600, color: "#2A2830",
-                  transition: "all .15s",
-                }}
-              >
-                <div style={{
-                  width: "18px", height: "18px", borderRadius: "50%", flexShrink: 0,
-                  border: `2px solid ${useNewAch ? "#1A5CFF" : "#E2E0DA"}`,
-                  background: useNewAch ? "#1A5CFF" : "#fff",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                }}>
-                  {useNewAch && <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#fff" }} />}
-                </div>
-                + Use a different account
-              </label>
+          {/* LEFT COLUMN — Payment */}
+          <div>
+            {/* ── Payment Method type selector ── */}
+            <div style={{ marginBottom: "32px" }}>
+              <div style={{ ...sectionLabelStyle, marginTop: 0 }}>Payment Method</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                {(["card", "ach"] as const).map(type => {
+                  const isSelected = paymentType === type;
+                  return (
+                    <label key={type} onClick={() => setPaymentType(type)} style={{ flex: 1, display: "flex", alignItems: "center", gap: "12px", padding: "14px 18px", border: `1px solid ${isSelected ? "#1C3557" : "#E2E2DE"}`, background: isSelected ? "rgba(28,53,87,.04)" : "#FAFAF8", cursor: "pointer", transition: "all .15s" }}>
+                      <div style={{ width: "18px", height: "18px", borderRadius: "50%", flexShrink: 0, border: `2px solid ${isSelected ? "#1C3557" : "#E2E2DE"}`, background: isSelected ? "#1C3557" : "#fff", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        {isSelected && <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#fff" }} />}
+                      </div>
+                      <div>
+                        <div style={{ fontSize: "13px", fontWeight: 700, color: "#1A1A1A" }}>{type === "card" ? "Credit / Debit Card" : "ACH / Bank Transfer"}</div>
+                        <div style={{ fontSize: "11px", color: "#6B6B6B", marginTop: "2px" }}>{type === "card" ? "Visa, Mastercard, Amex, Discover" : "Checking or savings account"}</div>
+                      </div>
+                    </label>
+                  );
+                })}
+                {!isGuest && isWholesale && (() => {
+                  const isSelected = paymentType === "net_30";
+                  return (
+                    <label onClick={() => setPaymentType("net_30")} style={{ flex: 1, display: "flex", alignItems: "center", gap: "12px", padding: "14px 18px", border: `1px solid ${isSelected ? "#1C3557" : "#E2E2DE"}`, background: isSelected ? "rgba(28,53,87,.04)" : "#FAFAF8", cursor: "pointer", transition: "all .15s" }}>
+                      <div style={{ width: "18px", height: "18px", borderRadius: "50%", flexShrink: 0, border: `2px solid ${isSelected ? "#1C3557" : "#E2E2DE"}`, background: isSelected ? "#1C3557" : "#fff", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        {isSelected && <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#fff" }} />}
+                      </div>
+                      <div>
+                        <div style={{ fontSize: "13px", fontWeight: 700, color: "#1A1A1A" }}>Net 30 — Pay by Invoice</div>
+                        <div style={{ fontSize: "11px", color: "#6B6B6B", marginTop: "2px" }}>Invoice sent to your account; payment due within 30 days</div>
+                      </div>
+                    </label>
+                  );
+                })()}
+              </div>
             </div>
-          )}
 
-          {/* Manual ACH form — shown when no saved ACH, or user chose "use different account" */}
-          {(isGuest || !savedAch || useNewAch) && (
-            <div style={{ borderTop: savedAch && useNewAch ? "1px solid #F0EEE9" : "none", paddingTop: savedAch && useNewAch ? "16px" : "0" }}>
-              <div className="checkout-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
-                <div>
-                  <label style={lbl}>Bank Name <span style={{ color: "#E8242A" }}>*</span></label>
-                  <input style={{ ...inp, borderColor: achErrors.bankName ? "#E8242A" : "#E2E0DA" }} value={achForm.bankName} onChange={e => { setAchForm(p => ({ ...p, bankName: e.target.value })); setAchErrors(p => ({ ...p, bankName: undefined })); }} placeholder="Chase, Wells Fargo, etc." />
-                  {achErrors.bankName && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "3px" }}>{achErrors.bankName}</p>}
-                </div>
-                <div>
-                  <label style={lbl}>Account Holder Name <span style={{ color: "#E8242A" }}>*</span></label>
-                  <input style={{ ...inp, borderColor: achErrors.accountHolder ? "#E8242A" : "#E2E0DA" }} value={achForm.accountHolder} onChange={e => { setAchForm(p => ({ ...p, accountHolder: e.target.value })); setAchErrors(p => ({ ...p, accountHolder: undefined })); }} placeholder="Full name on account" />
-                  {achErrors.accountHolder && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "3px" }}>{achErrors.accountHolder}</p>}
-                </div>
-                <div>
-                  <label style={lbl}>Routing Number <span style={{ color: "#E8242A" }}>*</span></label>
-                  <input style={{ ...inp, borderColor: achErrors.routingNumber ? "#E8242A" : "#E2E0DA" }} value={achForm.routingNumber} onChange={e => { setAchForm(p => ({ ...p, routingNumber: e.target.value.replace(/\D/g, "").slice(0, 9) })); setAchErrors(p => ({ ...p, routingNumber: undefined })); }} placeholder="9-digit routing number" maxLength={9} />
-                  {achErrors.routingNumber && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "3px" }}>{achErrors.routingNumber}</p>}
-                </div>
-                <div>
-                  <label style={lbl}>Account Number <span style={{ color: "#E8242A" }}>*</span></label>
-                  <input style={{ ...inp, borderColor: achErrors.accountNumber ? "#E8242A" : "#E2E0DA" }} value={achForm.accountNumber} onChange={e => { setAchForm(p => ({ ...p, accountNumber: e.target.value.replace(/\D/g, "") })); setAchErrors(p => ({ ...p, accountNumber: undefined })); }} placeholder="Account number" type="text" />
-                  {achErrors.accountNumber && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "3px" }}>{achErrors.accountNumber}</p>}
-                </div>
-                <div style={{ gridColumn: "1 / -1" }}>
-                  <label style={lbl}>Account Type <span style={{ color: "#E8242A" }}>*</span></label>
-                  <div style={{ display: "flex", gap: "10px" }}>
-                    {(["checking", "savings"] as const).map(t => (
-                      <label key={t} onClick={() => setAchForm(p => ({ ...p, accountType: t }))} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 16px", borderRadius: "8px", border: `1.5px solid ${achForm.accountType === t ? "#1A5CFF" : "#E2E0DA"}`, cursor: "pointer", fontSize: "13px", fontWeight: 600, color: "#2A2830", background: achForm.accountType === t ? "rgba(26,92,255,.04)" : "#FAFAF8" }}>
-                        <div style={{ width: "16px", height: "16px", borderRadius: "50%", border: `2px solid ${achForm.accountType === t ? "#1A5CFF" : "#E2E0DA"}`, background: achForm.accountType === t ? "#1A5CFF" : "#fff", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          {achForm.accountType === t && <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#fff" }} />}
+            {/* ── ACH section ── */}
+            {paymentType === "ach" && (
+              <div style={{ marginBottom: "32px" }}>
+                <div style={sectionLabelStyle}>Bank Account Details</div>
+
+                {/* Saved ACH — shown for authenticated users who have one saved */}
+                {!isGuest && savedAch && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: useNewAch ? "16px" : "0" }}>
+                    {/* Saved ACH option */}
+                    <label
+                      onClick={() => setUseNewAch(false)}
+                      style={{
+                        display: "flex", alignItems: "center", gap: "14px",
+                        padding: "14px 18px",
+                        border: `1px solid ${!useNewAch ? "#1C3557" : "#E2E2DE"}`,
+                        background: !useNewAch ? "rgba(28,53,87,.04)" : "#FAFAF8",
+                        cursor: "pointer", transition: "all .15s",
+                      }}
+                    >
+                      <div style={{
+                        width: "18px", height: "18px", borderRadius: "50%", flexShrink: 0,
+                        border: `2px solid ${!useNewAch ? "#1C3557" : "#E2E2DE"}`,
+                        background: !useNewAch ? "#1C3557" : "#fff",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                      }}>
+                        {!useNewAch && <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#fff" }} />}
+                      </div>
+                      {/* Bank icon */}
+                      <svg width="32" height="22" viewBox="0 0 32 22" fill="none" style={{ flexShrink: 0 }}>
+                        <rect width="32" height="22" rx="3" fill="#F4F3EF" stroke="#E2E2DE" />
+                        <rect x="4" y="5" width="24" height="3" rx="1" fill="#E2E2DE" />
+                        <rect x="6" y="10" width="3" height="6" rx="0.5" fill="#E2E2DE" />
+                        <rect x="14" y="10" width="3" height="6" rx="0.5" fill="#E2E2DE" />
+                        <rect x="22" y="10" width="3" height="6" rx="0.5" fill="#E2E2DE" />
+                      </svg>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: "13px", fontWeight: 700, color: "#1A1A1A" }}>
+                          {savedAch.bank_name} •••• {savedAch.account_last4}
                         </div>
-                        {t.charAt(0).toUpperCase() + t.slice(1)}
-                      </label>
-                    ))}
+                        <div style={{ fontSize: "11px", color: "#6B6B6B", marginTop: "2px" }}>
+                          {savedAch.account_holder} · {savedAch.account_type.charAt(0).toUpperCase() + savedAch.account_type.slice(1)}
+                        </div>
+                      </div>
+                    </label>
+
+                    {/* Use different account option */}
+                    <label
+                      onClick={() => setUseNewAch(true)}
+                      style={{
+                        display: "flex", alignItems: "center", gap: "14px",
+                        padding: "12px 18px",
+                        border: `1px solid ${useNewAch ? "#1C3557" : "#E2E2DE"}`,
+                        background: useNewAch ? "rgba(28,53,87,.04)" : "#FAFAF8",
+                        cursor: "pointer", fontSize: "13px", fontWeight: 600, color: "#1A1A1A",
+                        transition: "all .15s",
+                      }}
+                    >
+                      <div style={{
+                        width: "18px", height: "18px", borderRadius: "50%", flexShrink: 0,
+                        border: `2px solid ${useNewAch ? "#1C3557" : "#E2E2DE"}`,
+                        background: useNewAch ? "#1C3557" : "#fff",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                      }}>
+                        {useNewAch && <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#fff" }} />}
+                      </div>
+                      + Use a different account
+                    </label>
                   </div>
+                )}
+
+                {/* Manual ACH form — shown when no saved ACH, or user chose "use different account" */}
+                {(isGuest || !savedAch || useNewAch) && (
+                  <div style={{ borderTop: savedAch && useNewAch ? "1px solid #E2E2DE" : "none", paddingTop: savedAch && useNewAch ? "16px" : "0" }}>
+                    <div className="checkout-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+                      <div>
+                        <label style={lbl}>Bank Name <span style={{ color: "#E8242A" }}>*</span></label>
+                        <input style={{ ...inp, borderColor: achErrors.bankName ? "#E8242A" : "#E2E2DE" }} value={achForm.bankName} onChange={e => { setAchForm(p => ({ ...p, bankName: e.target.value })); setAchErrors(p => ({ ...p, bankName: undefined })); }} placeholder="Chase, Wells Fargo, etc." />
+                        {achErrors.bankName && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "3px" }}>{achErrors.bankName}</p>}
+                      </div>
+                      <div>
+                        <label style={lbl}>Account Holder Name <span style={{ color: "#E8242A" }}>*</span></label>
+                        <input style={{ ...inp, borderColor: achErrors.accountHolder ? "#E8242A" : "#E2E2DE" }} value={achForm.accountHolder} onChange={e => { setAchForm(p => ({ ...p, accountHolder: e.target.value })); setAchErrors(p => ({ ...p, accountHolder: undefined })); }} placeholder="Full name on account" />
+                        {achErrors.accountHolder && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "3px" }}>{achErrors.accountHolder}</p>}
+                      </div>
+                      <div>
+                        <label style={lbl}>Routing Number <span style={{ color: "#E8242A" }}>*</span></label>
+                        <input style={{ ...inp, borderColor: achErrors.routingNumber ? "#E8242A" : "#E2E2DE" }} value={achForm.routingNumber} onChange={e => { setAchForm(p => ({ ...p, routingNumber: e.target.value.replace(/\D/g, "").slice(0, 9) })); setAchErrors(p => ({ ...p, routingNumber: undefined })); }} placeholder="9-digit routing number" maxLength={9} />
+                        {achErrors.routingNumber && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "3px" }}>{achErrors.routingNumber}</p>}
+                      </div>
+                      <div>
+                        <label style={lbl}>Account Number <span style={{ color: "#E8242A" }}>*</span></label>
+                        <input style={{ ...inp, borderColor: achErrors.accountNumber ? "#E8242A" : "#E2E2DE" }} value={achForm.accountNumber} onChange={e => { setAchForm(p => ({ ...p, accountNumber: e.target.value.replace(/\D/g, "") })); setAchErrors(p => ({ ...p, accountNumber: undefined })); }} placeholder="Account number" type="text" />
+                        {achErrors.accountNumber && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "3px" }}>{achErrors.accountNumber}</p>}
+                      </div>
+                      <div style={{ gridColumn: "1 / -1" }}>
+                        <label style={lbl}>Account Type <span style={{ color: "#E8242A" }}>*</span></label>
+                        <div style={{ display: "flex", gap: "10px" }}>
+                          {(["checking", "savings"] as const).map(t => (
+                            <label key={t} onClick={() => setAchForm(p => ({ ...p, accountType: t }))} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 16px", border: `1px solid ${achForm.accountType === t ? "#1C3557" : "#E2E2DE"}`, cursor: "pointer", fontSize: "13px", fontWeight: 600, color: "#1A1A1A", background: achForm.accountType === t ? "rgba(28,53,87,.04)" : "#FAFAF8" }}>
+                              <div style={{ width: "16px", height: "16px", borderRadius: "50%", border: `2px solid ${achForm.accountType === t ? "#1C3557" : "#E2E2DE"}`, background: achForm.accountType === t ? "#1C3557" : "#fff", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                {achForm.accountType === t && <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#fff" }} />}
+                              </div>
+                              {t.charAt(0).toUpperCase() + t.slice(1)}
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div style={{ marginTop: "14px", padding: "12px 14px", background: "#F4F3EF", fontSize: "12px", color: "#6B6B6B", lineHeight: 1.6 }}>
+                  ACH payments are verified manually. Your order will be processed within 1–2 business days after payment is confirmed.
+                </div>
+                <div style={{ display: "flex", gap: "10px", marginTop: "16px" }}>
+                  <a
+                    href="/checkout/address"
+                    style={{ display: "inline-block", fontSize: "13px", color: "#6B6B6B", textDecoration: "none", fontFamily: "'DM Sans', sans-serif", padding: "14px 0" }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#1C3557"; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#6B6B6B"; }}
+                  >
+                    ← Back to Shipping
+                  </a>
+                  <button type="button" onClick={handleAchContinue} style={{ flex: 1, padding: "14px", background: "#1C3557", color: "#fff", border: "none", fontFamily: "'DM Sans', sans-serif", fontSize: "15px", fontWeight: 500, cursor: "pointer", transition: "opacity .15s" }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "0.88"; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}
+                  >
+                    Continue to Review →
+                  </button>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          <div style={{ marginTop: "14px", padding: "12px 14px", background: "#F4F3EF", borderRadius: "8px", fontSize: "12px", color: "#7A7880", lineHeight: 1.6 }}>
-            ACH payments are verified manually. Your order will be processed within 1–2 business days after payment is confirmed.
-          </div>
-          <div style={{ display: "flex", gap: "10px", marginTop: "16px" }}>
-            <button type="button" onClick={() => router.push("/checkout/address")} style={{ flex: 1, padding: "14px", border: "1.5px solid #E2E0DA", borderRadius: "8px", background: "#fff", fontSize: "13px", fontWeight: 600, cursor: "pointer", color: "#7A7880" }}>
-              &#8592; Back
-            </button>
-            <button type="button" onClick={handleAchContinue} style={{ flex: 2, padding: "14px", background: "#E8242A", color: "#fff", border: "none", borderRadius: "8px", fontFamily: "var(--font-bebas)", fontSize: "17px", letterSpacing: ".08em", cursor: "pointer" }}>
-              Continue to Review &#8594;
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* ── Net 30 section ── */}
-      {paymentType === "net_30" && (
-        <div style={sectionCard}>
-          <span style={sectionTitle}>Net 30 — Pay by Invoice</span>
-          <div style={{ fontSize: "13px", color: "#2A2830", lineHeight: 1.7, marginBottom: "14px" }}>
-            Your order will be processed immediately. An invoice will be emailed to your account within 1 business day. Payment is due within 30 days of the invoice date.
-          </div>
-          <div style={{ padding: "12px 14px", background: "rgba(217,119,6,.08)", borderRadius: "8px", fontSize: "12px", color: "#D97706", fontWeight: 600, marginBottom: "16px" }}>
-            Net 30 terms are subject to your approved credit limit. Overdue balances may affect future orders.
-          </div>
-          <div style={{ display: "flex", gap: "10px" }}>
-            <button type="button" onClick={() => router.push("/checkout/address")} style={{ flex: 1, padding: "14px", border: "1.5px solid #E2E0DA", borderRadius: "8px", background: "#fff", fontSize: "13px", fontWeight: 600, cursor: "pointer", color: "#7A7880" }}>
-              &#8592; Back
-            </button>
-            <button type="button" onClick={handleNet30Continue} style={{ flex: 2, padding: "14px", background: "#E8242A", color: "#fff", border: "none", borderRadius: "8px", fontFamily: "var(--font-bebas)", fontSize: "17px", letterSpacing: ".08em", cursor: "pointer" }}>
-              Continue to Review &#8594;
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* ── Card payment section (when card type selected) ── */}
-      {paymentType === "card" && (
-      <div style={sectionCard}>
-        {!isGuest && <span style={sectionTitle}>Card Details</span>}
-
-        {savedCards.length > 0 && !isGuest && (
-          <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: showNewCardForm ? "16px" : "0" }}>
-            {savedCards.map(card => {
-              const isSelected = selectedCardId === card.id && !showNewCardForm;
-              return (
-                <label
-                  key={card.id}
-                  onClick={() => { setSelectedCardId(card.id); setShowNewCardForm(false); }}
-                  style={{
-                    display: "flex", alignItems: "center", gap: "14px",
-                    padding: "14px 18px", borderRadius: "10px",
-                    border: `1.5px solid ${isSelected ? "#1A5CFF" : "#E2E0DA"}`,
-                    background: isSelected ? "rgba(26,92,255,.04)" : "#FAFAF8",
-                    cursor: "pointer", transition: "all .15s",
-                  }}
-                >
-                  {/* Radio */}
-                  <div style={{
-                    width: "18px", height: "18px", borderRadius: "50%", flexShrink: 0,
-                    border: `2px solid ${isSelected ? "#1A5CFF" : "#E2E0DA"}`,
-                    background: isSelected ? "#1A5CFF" : "#fff",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                  }}>
-                    {isSelected && <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#fff" }} />}
-                  </div>
-                  {/* Card icon */}
-                  <svg width="32" height="22" viewBox="0 0 32 22" fill="none" style={{ flexShrink: 0 }}>
-                    <rect width="32" height="22" rx="3" fill="#F4F3EF" stroke="#E2E0DA" />
-                    <rect x="4" y="8" width="10" height="6" rx="1.5" fill="#E2E0DA" />
-                    <rect x="4" y="16" width="5" height="2" rx="0.5" fill="#E2E0DA" />
-                    <rect x="11" y="16" width="5" height="2" rx="0.5" fill="#E2E0DA" />
-                  </svg>
-                  {/* Card info */}
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: "13px", fontWeight: 700, color: "#2A2830" }}>
-                      {brandDisplayName(card.brand)} •••• {card.last4}
-                      {card.is_default && (
-                        <span style={{ marginLeft: "8px", fontSize: "10px", background: "rgba(26,92,255,.1)", color: "#1A5CFF", padding: "2px 7px", borderRadius: "3px", fontWeight: 700 }}>
-                          Default
-                        </span>
-                      )}
-                    </div>
-                    <div style={{ fontSize: "11px", color: "#7A7880", marginTop: "2px" }}>
-                      Expires {card.exp_month}/{card.exp_year}
-                    </div>
-                  </div>
-                </label>
-              );
-            })}
-
-            {/* Use new card option */}
-            <label
-              onClick={() => { setShowNewCardForm(true); setSelectedCardId(null); }}
-              style={{
-                display: "flex", alignItems: "center", gap: "14px",
-                padding: "12px 18px", borderRadius: "10px",
-                border: `1.5px solid ${showNewCardForm ? "#1A5CFF" : "#E2E0DA"}`,
-                background: showNewCardForm ? "rgba(26,92,255,.04)" : "#FAFAF8",
-                cursor: "pointer", fontSize: "13px", fontWeight: 600, color: "#2A2830",
-                transition: "all .15s",
-              }}
-            >
-              <div style={{
-                width: "18px", height: "18px", borderRadius: "50%", flexShrink: 0,
-                border: `2px solid ${showNewCardForm ? "#1A5CFF" : "#E2E0DA"}`,
-                background: showNewCardForm ? "#1A5CFF" : "#fff",
-                display: "flex", alignItems: "center", justifyContent: "center",
-              }}>
-                {showNewCardForm && <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#fff" }} />}
+            {/* ── Net 30 section ── */}
+            {paymentType === "net_30" && (
+              <div style={{ marginBottom: "32px" }}>
+                <div style={sectionLabelStyle}>Net 30 — Pay by Invoice</div>
+                <div style={{ fontSize: "13px", color: "#1A1A1A", lineHeight: 1.7, marginBottom: "14px" }}>
+                  Your order will be processed immediately. An invoice will be emailed to your account within 1 business day. Payment is due within 30 days of the invoice date.
+                </div>
+                <div style={{ padding: "12px 14px", background: "rgba(217,119,6,.08)", fontSize: "12px", color: "#D97706", fontWeight: 600, marginBottom: "16px" }}>
+                  Net 30 terms are subject to your approved credit limit. Overdue balances may affect future orders.
+                </div>
+                <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                  <a
+                    href="/checkout/address"
+                    style={{ display: "inline-block", fontSize: "13px", color: "#6B6B6B", textDecoration: "none", fontFamily: "'DM Sans', sans-serif", padding: "14px 0" }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#1C3557"; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#6B6B6B"; }}
+                  >
+                    ← Back to Shipping
+                  </a>
+                  <button type="button" onClick={handleNet30Continue} style={{ flex: 1, padding: "14px", background: "#1C3557", color: "#fff", border: "none", fontFamily: "'DM Sans', sans-serif", fontSize: "15px", fontWeight: 500, cursor: "pointer", transition: "opacity .15s" }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "0.88"; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}
+                  >
+                    Continue to Review →
+                  </button>
+                </div>
               </div>
-              + Use a new card
-            </label>
-          </div>
-        )}
+            )}
 
-        {/* New card form */}
-        {showNewCardForm && (
-          <div style={{ borderTop: savedCards.length > 0 ? "1px solid #F0EEE9" : "none", paddingTop: savedCards.length > 0 ? "16px" : "0" }}>
-            <QBPaymentForm
-              onToken={handleNewCardToken}
-              onBack={
-                savedCards.length > 0
-                  ? () => { setShowNewCardForm(false); setSelectedCardId(savedCards.find(c => c.is_default)?.id ?? savedCards[0]?.id ?? null); }
-                  : () => router.push("/checkout/address")
-              }
-            />
+            {/* ── Card payment section (when card type selected) ── */}
+            {paymentType === "card" && (
+              <div style={{ marginBottom: "32px" }}>
+                {!isGuest && <div style={sectionLabelStyle}>Card Details</div>}
+
+                {savedCards.length > 0 && !isGuest && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: showNewCardForm ? "16px" : "0" }}>
+                    {savedCards.map(card => {
+                      const isSelected = selectedCardId === card.id && !showNewCardForm;
+                      return (
+                        <label
+                          key={card.id}
+                          onClick={() => { setSelectedCardId(card.id); setShowNewCardForm(false); }}
+                          style={{
+                            display: "flex", alignItems: "center", gap: "14px",
+                            padding: "14px 18px",
+                            border: `1px solid ${isSelected ? "#1C3557" : "#E2E2DE"}`,
+                            background: isSelected ? "rgba(28,53,87,.04)" : "#FAFAF8",
+                            cursor: "pointer", transition: "all .15s",
+                          }}
+                        >
+                          {/* Radio */}
+                          <div style={{
+                            width: "18px", height: "18px", borderRadius: "50%", flexShrink: 0,
+                            border: `2px solid ${isSelected ? "#1C3557" : "#E2E2DE"}`,
+                            background: isSelected ? "#1C3557" : "#fff",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                          }}>
+                            {isSelected && <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#fff" }} />}
+                          </div>
+                          {/* Card icon */}
+                          <svg width="32" height="22" viewBox="0 0 32 22" fill="none" style={{ flexShrink: 0 }}>
+                            <rect width="32" height="22" rx="3" fill="#F4F3EF" stroke="#E2E2DE" />
+                            <rect x="4" y="8" width="10" height="6" rx="1.5" fill="#E2E2DE" />
+                            <rect x="4" y="16" width="5" height="2" rx="0.5" fill="#E2E2DE" />
+                            <rect x="11" y="16" width="5" height="2" rx="0.5" fill="#E2E2DE" />
+                          </svg>
+                          {/* Card info */}
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: "13px", fontWeight: 700, color: "#1A1A1A" }}>
+                              {brandDisplayName(card.brand)} •••• {card.last4}
+                              {card.is_default && (
+                                <span style={{ marginLeft: "8px", fontSize: "10px", background: "rgba(28,53,87,.1)", color: "#1C3557", padding: "2px 7px", fontWeight: 700 }}>
+                                  Default
+                                </span>
+                              )}
+                            </div>
+                            <div style={{ fontSize: "11px", color: "#6B6B6B", marginTop: "2px" }}>
+                              Expires {card.exp_month}/{card.exp_year}
+                            </div>
+                          </div>
+                        </label>
+                      );
+                    })}
+
+                    {/* Use new card option */}
+                    <label
+                      onClick={() => { setShowNewCardForm(true); setSelectedCardId(null); }}
+                      style={{
+                        display: "flex", alignItems: "center", gap: "14px",
+                        padding: "12px 18px",
+                        border: `1px solid ${showNewCardForm ? "#1C3557" : "#E2E2DE"}`,
+                        background: showNewCardForm ? "rgba(28,53,87,.04)" : "#FAFAF8",
+                        cursor: "pointer", fontSize: "13px", fontWeight: 600, color: "#1A1A1A",
+                        transition: "all .15s",
+                      }}
+                    >
+                      <div style={{
+                        width: "18px", height: "18px", borderRadius: "50%", flexShrink: 0,
+                        border: `2px solid ${showNewCardForm ? "#1C3557" : "#E2E2DE"}`,
+                        background: showNewCardForm ? "#1C3557" : "#fff",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                      }}>
+                        {showNewCardForm && <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#fff" }} />}
+                      </div>
+                      + Use a new card
+                    </label>
+                  </div>
+                )}
+
+                {/* New card form */}
+                {showNewCardForm && (
+                  <div style={{ borderTop: savedCards.length > 0 ? "1px solid #E2E2DE" : "none", paddingTop: savedCards.length > 0 ? "16px" : "0" }}>
+                    <QBPaymentForm
+                      onToken={handleNewCardToken}
+                      onBack={
+                        savedCards.length > 0
+                          ? () => { setShowNewCardForm(false); setSelectedCardId(savedCards.find(c => c.is_default)?.id ?? savedCards[0]?.id ?? null); }
+                          : () => router.push("/checkout/address")
+                      }
+                    />
+                  </div>
+                )}
+
+                {/* Continue to Review (saved card) */}
+                {!showNewCardForm && selectedCardId && (
+                  <div style={{ display: "flex", gap: "16px", alignItems: "center", marginTop: "16px" }}>
+                    <a
+                      href="/checkout/address"
+                      style={{ display: "inline-block", fontSize: "13px", color: "#6B6B6B", textDecoration: "none", fontFamily: "'DM Sans', sans-serif" }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#1C3557"; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#6B6B6B"; }}
+                    >
+                      ← Back to Shipping
+                    </a>
+                    <button
+                      type="button"
+                      onClick={handleContinueWithSavedCard}
+                      style={{
+                        flex: 1, padding: "14px", background: "#1C3557",
+                        color: "#fff", border: "none",
+                        fontFamily: "'DM Sans', sans-serif", fontSize: "15px", fontWeight: 500,
+                        cursor: "pointer", transition: "opacity .15s",
+                      }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "0.88"; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}
+                    >
+                      Continue to Review →
+                    </button>
+                  </div>
+                )}
+
+                {/* Back button when new card form shown and no saved cards */}
+                {showNewCardForm && savedCards.length === 0 && (
+                  <a
+                    href="/checkout/address"
+                    style={{ display: "inline-block", marginTop: "10px", fontSize: "13px", color: "#6B6B6B", textDecoration: "none", fontFamily: "'DM Sans', sans-serif" }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#1C3557"; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#6B6B6B"; }}
+                  >
+                    ← Back to Shipping
+                  </a>
+                )}
+              </div>
+            )}
           </div>
-        )}
+
+          {/* RIGHT COLUMN — Order Summary */}
+          <div style={{ alignSelf: "start", position: "sticky", top: "24px" }}>
+            <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, color: "#1A1A1A", marginBottom: "18px" }}>
+              Order Summary
+            </div>
+            {(cart || isGuest) && (
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#6B6B6B", padding: "8px 0", borderBottom: "1px solid #E2E2DE" }}>
+                  <span>Subtotal{cart ? ` (${cart.total_units} units)` : ""}</span>
+                  <span style={{ fontWeight: 600, color: "#1A1A1A" }}>{formatCurrency(subtotal)}</span>
+                </div>
+                {cart && Number(cart.discount_percent) > 0 && (
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#059669", padding: "8px 0", borderBottom: "1px solid #E2E2DE" }}>
+                    <span style={{ fontWeight: 600 }}>Tier Discount ({cart.discount_percent}% applied)</span>
+                    <span style={{ fontWeight: 700 }}>&#10003; Included</span>
+                  </div>
+                )}
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#6B6B6B", padding: "8px 0", borderBottom: "1px solid #E2E2DE" }}>
+                  <span>Shipping ({SHIPPING_LABELS[shippingMethod] ?? "Standard"})</span>
+                  <span style={{ color: shipping === 0 ? "#059669" : "#1A1A1A", fontWeight: 600 }}>
+                    {shipping === 0 ? "FREE" : formatCurrency(shipping)}
+                  </span>
+                </div>
+                {couponDiscount > 0 && (
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#059669", padding: "8px 0", borderBottom: "1px solid #E2E2DE" }}>
+                    <span style={{ fontWeight: 600 }}>Coupon Applied</span>
+                    <span style={{ fontWeight: 700 }}>-{formatCurrency(couponDiscount)}</span>
+                  </div>
+                )}
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#6B6B6B", padding: "8px 0", borderBottom: "1px solid #E2E2DE" }}>
+                  <span>{storedTaxRegion && storedTaxRate > 0 ? `Tax (${storedTaxRegion} ${storedTaxRate}%)` : "Tax"}</span>
+                  <span style={{ fontWeight: 600, color: "#1A1A1A" }}>{formatCurrency(taxAmountDisplay)}</span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "15px", fontWeight: 600, color: "#1A1A1A", padding: "14px 0 0" }}>
+                  <span>Total</span>
+                  <span>{formatCurrency(total)}</span>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
-      )}
-
-      {/* ── Order total summary ── */}
-      {cart && paymentType === "card" && (
-        <div style={{ background: "#fff", border: "1.5px solid #E2E0DA", borderRadius: "12px", padding: "18px 24px", marginBottom: "16px" }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#7A7880" }}>
-              <span>Subtotal ({cart.total_units} units)</span>
-              <span style={{ fontWeight: 600, color: "#2A2830" }}>{formatCurrency(subtotal)}</span>
-            </div>
-            {Number(cart.discount_percent) > 0 && (
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#059669" }}>
-                <span style={{ fontWeight: 600 }}>Tier Discount ({cart.discount_percent}% applied)</span>
-                <span style={{ fontWeight: 700 }}>&#10003; Included</span>
-              </div>
-            )}
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#7A7880" }}>
-              <span>Shipping ({SHIPPING_LABELS[shippingMethod] ?? "Standard"})</span>
-              <span style={{ color: shipping === 0 ? "#059669" : "#2A2830", fontWeight: 600 }}>
-                {shipping === 0 ? "FREE" : formatCurrency(shipping)}
-              </span>
-            </div>
-            {couponDiscount > 0 && (
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#059669" }}>
-                <span style={{ fontWeight: 600 }}>Coupon Applied</span>
-                <span style={{ fontWeight: 700 }}>-{formatCurrency(couponDiscount)}</span>
-              </div>
-            )}
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#7A7880" }}>
-              <span>{storedTaxRegion && storedTaxRate > 0 ? `Tax (${storedTaxRegion} ${storedTaxRate}%)` : "Tax"}</span>
-              <span style={{ fontWeight: 600, color: "#2A2830" }}>{formatCurrency(taxAmountDisplay)}</span>
-            </div>
-            <div style={{ borderTop: "1px solid #F0EEE9", paddingTop: "8px", display: "flex", justifyContent: "space-between", fontSize: "15px", fontWeight: 800, color: "#2A2830" }}>
-              <span>Total</span>
-              <span style={{ fontFamily: "var(--font-bebas)", fontSize: "20px", letterSpacing: ".02em" }}>{formatCurrency(total)}</span>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── Continue to Review (saved card) ── */}
-      {paymentType === "card" && !showNewCardForm && selectedCardId && (
-        <div style={{ display: "flex", gap: "10px" }}>
-          <button
-            type="button"
-            onClick={() => router.push("/checkout/address")}
-            style={{ flex: 1, padding: "14px", border: "1.5px solid #E2E0DA", borderRadius: "8px", background: "#fff", fontSize: "13px", fontWeight: 600, cursor: "pointer", color: "#7A7880" }}
-          >
-            &#8592; Back
-          </button>
-          <button
-            type="button"
-            onClick={handleContinueWithSavedCard}
-            style={{
-              flex: 2, padding: "14px", background: "#E8242A",
-              color: "#fff", border: "none", borderRadius: "8px",
-              fontFamily: "var(--font-bebas)", fontSize: "17px", letterSpacing: ".08em",
-              cursor: "pointer", transition: "background .2s",
-            }}
-          >
-            Continue to Review &#8594;
-          </button>
-        </div>
-      )}
-
-      {/* Back button when new card form shown and no saved cards */}
-      {paymentType === "card" && showNewCardForm && savedCards.length === 0 && (
-        <button
-          type="button"
-          onClick={() => router.push("/checkout/address")}
-          style={{ marginTop: "10px", padding: "12px 20px", border: "1.5px solid #E2E0DA", borderRadius: "8px", background: "#fff", fontSize: "13px", fontWeight: 600, cursor: "pointer", color: "#7A7880" }}
-        >
-          &#8592; Back to Shipping
-        </button>
-      )}
+      <style>{`
+        @media (max-width: 900px) { .checkout-cols { display: block !important; } }
+      `}</style>
     </div>
   );
 }

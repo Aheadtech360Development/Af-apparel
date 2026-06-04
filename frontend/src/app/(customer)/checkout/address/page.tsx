@@ -46,20 +46,18 @@ interface SavedAddress {
 }
 
 const inp: React.CSSProperties = {
-  width: "100%", padding: "10px 12px", border: "1.5px solid #E2E0DA",
-  borderRadius: "7px", fontSize: "13px", fontFamily: "var(--font-jakarta)",
-  outline: "none", boxSizing: "border-box", color: "#2A2830", background: "#fff",
+  width: "100%", padding: "11px 14px", border: "1px solid #E2E2DE",
+  fontSize: "14px", fontFamily: "'DM Sans', sans-serif",
+  outline: "none", boxSizing: "border-box", color: "#1A1A1A", background: "#fff",
 };
 const lbl: React.CSSProperties = {
-  display: "block", fontSize: "11px", fontWeight: 700, color: "#7A7880",
-  textTransform: "uppercase", letterSpacing: ".06em", marginBottom: "5px",
+  display: "block", fontSize: "12px", fontWeight: 600, color: "#1A1A1A",
+  textTransform: "uppercase", letterSpacing: ".07em", marginBottom: "7px",
 };
-const sectionCard: React.CSSProperties = {
-  background: "#fff", border: "1.5px solid #E2E0DA", borderRadius: "12px", padding: "22px 24px", marginBottom: "16px",
-};
-const sectionTitle: React.CSSProperties = {
-  fontFamily: "var(--font-bebas)", fontSize: "17px", letterSpacing: ".06em",
-  color: "#2A2830", marginBottom: "18px", display: "block",
+const sectionLabelStyle: React.CSSProperties = {
+  fontFamily: "'DM Sans', sans-serif", fontSize: "11px", letterSpacing: "0.1em",
+  textTransform: "uppercase", fontWeight: 700, color: "#1A1A1A",
+  marginBottom: "14px", paddingBottom: "10px", borderBottom: "1px solid #E2E2DE",
 };
 
 const EXPEDITED_SURCHARGE = 45;
@@ -432,369 +430,383 @@ export default function CheckoutAddressPage() {
   ];
 
   return (
-    <div>
-      {/* ── Shipping Address ── */}
-      <div style={sectionCard}>
-        <span style={sectionTitle}>Shipping Address</span>
+    <div style={{ padding: "40px 24px 64px", background: "#F8F8F6" }}>
+      <div style={{ maxWidth: "1500px", margin: "0 auto" }}>
+        <div className="checkout-cols" style={{ display: "grid", gridTemplateColumns: "1fr 380px", gap: "48px", alignItems: "start" }}>
 
-        {savedAddresses.length > 0 && (
-          <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "10px" }}>
-            {savedAddresses.map(addr => {
-              const isSelected = selectedAddressId === addr.id && !showNewForm;
-              return (
-                <label
-                  key={addr.id}
-                  onClick={() => { setSelectedAddressId(addr.id); setShowNewForm(false); }}
-                  style={{
-                    display: "flex", alignItems: "flex-start", gap: "14px",
-                    padding: "14px 18px", borderRadius: "10px",
-                    border: `1.5px solid ${isSelected ? "#E8242A" : "#E2E0DA"}`,
-                    background: isSelected ? "rgba(232,36,42,.03)" : "#FAFAF8",
-                    cursor: "pointer", transition: "all .15s",
-                  }}
-                >
-                  <div style={{
-                    width: "18px", height: "18px", borderRadius: "50%", flexShrink: 0, marginTop: "2px",
-                    border: `2px solid ${isSelected ? "#E8242A" : "#E2E0DA"}`,
-                    background: isSelected ? "#E8242A" : "#fff",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                  }}>
-                    {isSelected && <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#fff" }} />}
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "2px" }}>
-                      <span style={{ fontSize: "13px", fontWeight: 700, color: "#2A2830" }}>
-                        {addr.label || "Address"}
-                      </span>
-                      {addr.is_default && (
-                        <span style={{ fontSize: "10px", fontWeight: 700, padding: "1px 6px", borderRadius: "3px", background: "rgba(232,36,42,.1)", color: "#E8242A" }}>
-                          Default
-                        </span>
-                      )}
-                    </div>
-                    {addr.full_name && <div style={{ fontSize: "12px", color: "#7A7880" }}>{addr.full_name}</div>}
-                    <div style={{ fontSize: "12px", color: "#7A7880" }}>
-                      {addr.line1}{addr.line2 ? `, ${addr.line2}` : ""}, {addr.city}, {addr.state} {addr.postal_code}
-                    </div>
-                    {addr.phone && <div style={{ fontSize: "11px", color: "#7A7880", marginTop: "2px" }}>{addr.phone}</div>}
-                  </div>
-                </label>
-              );
-            })}
+          {/* LEFT COLUMN — Form */}
+          <div>
+            {/* ── Shipping Address ── */}
+            <div style={{ marginBottom: "32px" }}>
+              <div style={{ ...sectionLabelStyle, marginTop: 0 }}>Shipping Address</div>
 
-            <label
-              onClick={() => { setShowNewForm(true); setSelectedAddressId(null); }}
-              style={{
-                display: "flex", alignItems: "center", gap: "14px",
-                padding: "12px 18px", borderRadius: "10px",
-                border: `1.5px solid ${showNewForm ? "#E8242A" : "#E2E0DA"}`,
-                background: showNewForm ? "rgba(232,36,42,.03)" : "#FAFAF8",
-                cursor: "pointer", fontSize: "13px", fontWeight: 600, color: "#2A2830",
-                transition: "all .15s",
-              }}
+              {savedAddresses.length > 0 && (
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "10px" }}>
+                  {savedAddresses.map(addr => {
+                    const isSelected = selectedAddressId === addr.id && !showNewForm;
+                    return (
+                      <label
+                        key={addr.id}
+                        onClick={() => { setSelectedAddressId(addr.id); setShowNewForm(false); }}
+                        style={{
+                          display: "flex", alignItems: "flex-start", gap: "14px",
+                          padding: "14px 18px",
+                          border: `1px solid ${isSelected ? "#1C3557" : "#E2E2DE"}`,
+                          background: isSelected ? "rgba(28,53,87,.03)" : "#FAFAF8",
+                          cursor: "pointer", transition: "all .15s",
+                        }}
+                      >
+                        <div style={{
+                          width: "18px", height: "18px", borderRadius: "50%", flexShrink: 0, marginTop: "2px",
+                          border: `2px solid ${isSelected ? "#1C3557" : "#E2E2DE"}`,
+                          background: isSelected ? "#1C3557" : "#fff",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                        }}>
+                          {isSelected && <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#fff" }} />}
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "2px" }}>
+                            <span style={{ fontSize: "13px", fontWeight: 700, color: "#1A1A1A" }}>
+                              {addr.label || "Address"}
+                            </span>
+                            {addr.is_default && (
+                              <span style={{ fontSize: "10px", fontWeight: 700, padding: "1px 6px", background: "rgba(28,53,87,.1)", color: "#1C3557" }}>
+                                Default
+                              </span>
+                            )}
+                          </div>
+                          {addr.full_name && <div style={{ fontSize: "12px", color: "#6B6B6B" }}>{addr.full_name}</div>}
+                          <div style={{ fontSize: "12px", color: "#6B6B6B" }}>
+                            {addr.line1}{addr.line2 ? `, ${addr.line2}` : ""}, {addr.city}, {addr.state} {addr.postal_code}
+                          </div>
+                          {addr.phone && <div style={{ fontSize: "11px", color: "#6B6B6B", marginTop: "2px" }}>{addr.phone}</div>}
+                        </div>
+                      </label>
+                    );
+                  })}
+
+                  <label
+                    onClick={() => { setShowNewForm(true); setSelectedAddressId(null); }}
+                    style={{
+                      display: "flex", alignItems: "center", gap: "14px",
+                      padding: "12px 18px",
+                      border: `1px solid ${showNewForm ? "#1C3557" : "#E2E2DE"}`,
+                      background: showNewForm ? "rgba(28,53,87,.03)" : "#FAFAF8",
+                      cursor: "pointer", fontSize: "13px", fontWeight: 600, color: "#1A1A1A",
+                      transition: "all .15s",
+                    }}
+                  >
+                    <div style={{
+                      width: "18px", height: "18px", borderRadius: "50%", flexShrink: 0,
+                      border: `2px solid ${showNewForm ? "#1C3557" : "#E2E2DE"}`,
+                      background: showNewForm ? "#1C3557" : "#fff",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                    }}>
+                      {showNewForm && <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#fff" }} />}
+                    </div>
+                    + Use a different address
+                  </label>
+                </div>
+              )}
+
+              {/* Company name — wholesale only */}
+              {!isGuest && (
+                <div style={{ marginBottom: "14px" }}>
+                  <label style={lbl}>Company Name <span style={{ color: "#E8242A" }}>*</span></label>
+                  <input
+                    style={{ ...inp, borderColor: errors.company ? "#E8242A" : "#E2E2DE" }}
+                    value={form.company}
+                    onChange={e => setForm(p => ({ ...p, company: e.target.value }))}
+                    placeholder="AF Apparels Inc."
+                  />
+                  {errors.company && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "3px" }}>{errors.company}</p>}
+                </div>
+              )}
+
+              {showNewForm && (
+                <div className="checkout-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+                  <div style={{ gridColumn: "1 / -1" }}>
+                    <label style={lbl}>{isGuest ? "Full Name" : "Contact Name"} <span style={{ color: "#E8242A" }}>*</span></label>
+                    <input
+                      style={{ ...inp, borderColor: errors.contact ? "#E8242A" : "#E2E2DE" }}
+                      value={form.contact}
+                      onChange={e => setForm(p => ({ ...p, contact: e.target.value }))}
+                      placeholder={isGuest ? "Jane Smith" : "John Smith"}
+                    />
+                    {errors.contact && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "3px" }}>{errors.contact}</p>}
+                  </div>
+
+                  {/* Guest email field */}
+                  {isGuest && (
+                    <div style={{ gridColumn: "1 / -1" }}>
+                      <label style={lbl}>Email Address <span style={{ color: "#E8242A" }}>*</span></label>
+                      <input
+                        type="email"
+                        style={{ ...inp, borderColor: errors.email ? "#E8242A" : "#E2E2DE" }}
+                        value={form.email}
+                        onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
+                        placeholder="you@example.com"
+                      />
+                      {errors.email && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "3px" }}>{errors.email}</p>}
+                      <p style={{ fontSize: "11px", color: "#6B6B6B", marginTop: "3px" }}>Order confirmation will be sent to this email.</p>
+                    </div>
+                  )}
+
+                  <div style={{ gridColumn: "1 / -1" }}>
+                    <label style={lbl}>Street Address <span style={{ color: "#E8242A" }}>*</span></label>
+                    <input
+                      style={{ ...inp, borderColor: errors.street ? "#E8242A" : "#E2E2DE" }}
+                      value={form.street}
+                      onChange={e => setForm(p => ({ ...p, street: e.target.value }))}
+                      placeholder="123 Commerce Blvd, Suite 400"
+                    />
+                    {errors.street && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "3px" }}>{errors.street}</p>}
+                  </div>
+
+                  <div>
+                    <label style={lbl}>City <span style={{ color: "#E8242A" }}>*</span></label>
+                    <input
+                      style={{ ...inp, borderColor: errors.city ? "#E8242A" : "#E2E2DE" }}
+                      value={form.city}
+                      onChange={e => setForm(p => ({ ...p, city: e.target.value }))}
+                      placeholder="Dallas"
+                    />
+                    {errors.city && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "3px" }}>{errors.city}</p>}
+                  </div>
+
+                  <div>
+                    <label style={lbl}>State <span style={{ color: "#E8242A" }}>*</span></label>
+                    <select
+                      style={{ ...inp, cursor: "pointer", borderColor: errors.state ? "#E8242A" : "#E2E2DE" }}
+                      value={form.state}
+                      onChange={e => setForm(p => ({ ...p, state: e.target.value }))}
+                    >
+                      <option value="">Select state</option>
+                      {US_STATES.map(s => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                    {errors.state && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "3px" }}>{errors.state}</p>}
+                  </div>
+
+                  <div>
+                    <label style={lbl}>ZIP Code <span style={{ color: "#E8242A" }}>*</span></label>
+                    <input
+                      style={{ ...inp, borderColor: errors.zip ? "#E8242A" : "#E2E2DE" }}
+                      value={form.zip}
+                      onChange={e => setForm(p => ({ ...p, zip: e.target.value }))}
+                      placeholder="75001"
+                      maxLength={10}
+                    />
+                    {errors.zip && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "3px" }}>{errors.zip}</p>}
+                  </div>
+
+                  <div>
+                    <label style={lbl}>Phone <span style={{ fontSize: "10px", color: "#6B6B6B", textTransform: "none", letterSpacing: 0 }}>(for shipping updates)</span></label>
+                    <input
+                      style={inp}
+                      type="tel"
+                      value={form.phone}
+                      onChange={e => setForm(p => ({ ...p, phone: e.target.value }))}
+                      placeholder="(214) 555-0100"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* ── Shipping Method ── */}
+            <div style={{ marginBottom: "32px" }}>
+              <div style={sectionLabelStyle}>Shipping Method</div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                {SHIPPING_OPTIONS.map(opt => {
+                  const isSelected = shippingMethod === opt.id;
+                  const { price: priceDisplay, note } = shippingOptionLabel(opt.id);
+                  const isFree = priceDisplay === "FREE";
+
+                  return (
+                    <label
+                      key={opt.id}
+                      onClick={() => setShippingMethod(opt.id)}
+                      style={{
+                        display: "flex", alignItems: "flex-start", gap: "14px",
+                        padding: "16px 18px",
+                        border: `1px solid ${isSelected ? "#1C3557" : "#E2E2DE"}`,
+                        background: isSelected ? "rgba(28,53,87,.03)" : "#FAFAF8",
+                        cursor: "pointer", transition: "border-color .15s, background .15s",
+                      }}
+                    >
+                      <div style={{
+                        width: "18px", height: "18px", borderRadius: "50%", flexShrink: 0, marginTop: "1px",
+                        border: `2px solid ${isSelected ? "#1C3557" : "#E2E2DE"}`,
+                        background: isSelected ? "#1C3557" : "#fff",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                      }}>
+                        {isSelected && <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#fff" }} />}
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
+                          <span style={{ fontSize: "14px", fontWeight: 700, color: "#1A1A1A" }}>{opt.label}</span>
+                          <span style={{ fontSize: "14px", fontWeight: 800, color: isFree ? "#059669" : "#1A1A1A" }}>
+                            {priceDisplay}
+                          </span>
+                        </div>
+                        {opt.id === "will_call" ? (
+                          <div style={{ marginTop: "6px" }}>
+                            <div style={{ display: "flex", alignItems: "flex-start", gap: "5px", marginBottom: "5px" }}>
+                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1C3557" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: "1px" }}>
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
+                              </svg>
+                              <span style={{ fontSize: "12px", fontWeight: 600, color: "#1A1A1A" }}>10719 Turbeville Rd, Dallas, TX 75243</span>
+                            </div>
+                            <div style={{ fontSize: "11px", color: "#6B6B6B", lineHeight: 1.6, paddingLeft: "18px" }}>
+                              <div>Mon–Fri, before 12 PM → same-day pickup by 4 PM</div>
+                              <div>Mon–Fri, after 12 PM → next business day by 12 PM</div>
+                              <div>Sat / Sun: Closed</div>
+                            </div>
+                          </div>
+                        ) : shippingTypeForUser === "live_shippo" && opt.id === "standard" && isSelected ? (
+                          <div style={{ marginTop: "8px" }}>
+                            <div style={{ fontSize: "12px", color: "#6B6B6B", marginBottom: "8px" }}>{opt.sub}</div>
+                            {liveRatesLoading && (
+                              <div style={{ fontSize: "12px", color: "#6B6B6B", padding: "8px 0" }}>Fetching live carrier rates…</div>
+                            )}
+                            {!liveRatesLoading && liveRates.length > 0 && (
+                              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                                {liveRates.map(rate => {
+                                  const isRateSelected = selectedLiveRateId === rate.rate_id;
+                                  return (
+                                    <label
+                                      key={rate.rate_id}
+                                      onClick={() => {
+                                        setSelectedLiveRateId(rate.rate_id);
+                                        setTierShipping(rate.cost);
+                                      }}
+                                      style={{
+                                        display: "flex", alignItems: "center", justifyContent: "space-between",
+                                        padding: "10px 14px", cursor: "pointer",
+                                        border: `1px solid ${isRateSelected ? "#1C3557" : "#E2E2DE"}`,
+                                        background: isRateSelected ? "rgba(28,53,87,.03)" : "#fff",
+                                      }}
+                                    >
+                                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                        <div style={{
+                                          width: "14px", height: "14px", borderRadius: "50%", flexShrink: 0,
+                                          border: `2px solid ${isRateSelected ? "#1C3557" : "#E2E2DE"}`,
+                                          background: isRateSelected ? "#1C3557" : "#fff",
+                                          display: "flex", alignItems: "center", justifyContent: "center",
+                                        }}>
+                                          {isRateSelected && <div style={{ width: "4px", height: "4px", borderRadius: "50%", background: "#fff" }} />}
+                                        </div>
+                                        {CARRIER_LOGOS[rate.carrier] && (
+                                          // eslint-disable-next-line @next/next/no-img-element
+                                          <img
+                                            src={CARRIER_LOGOS[rate.carrier]}
+                                            alt={rate.carrier}
+                                            style={{ height: "22px", width: "auto", objectFit: "contain", flexShrink: 0 }}
+                                          />
+                                        )}
+                                        <div>
+                                          <div style={{ fontSize: "12px", fontWeight: 700, color: "#1A1A1A" }}>{rate.service}</div>
+                                          {rate.days != null && <div style={{ fontSize: "11px", color: "#6B6B6B", marginTop: "1px" }}>{rate.days} business day{rate.days !== 1 ? "s" : ""}</div>}
+                                        </div>
+                                      </div>
+                                      <span style={{ fontSize: "13px", fontWeight: 800, color: "#1A1A1A" }}>{formatCurrency(rate.cost)}</span>
+                                    </label>
+                                  );
+                                })}
+                              </div>
+                            )}
+                            {!liveRatesLoading && liveRates.length === 0 && activeZip.length >= 5 && (
+                              <div style={{ fontSize: "12px", color: "#6B6B6B", padding: "6px 0" }}>
+                                No rates available for this address. Please verify your ZIP and state.
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div style={{ fontSize: "12px", color: "#6B6B6B", marginTop: "3px" }}>{opt.sub}</div>
+                        )}
+                        {note && (
+                          <div style={{ fontSize: "11px", color: isFree ? "#059669" : "#6B6B6B", marginTop: "4px", fontWeight: isFree ? 600 : 400 }}>
+                            {note}
+                          </div>
+                        )}
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Continue button */}
+            <button
+              onClick={handleContinue}
+              style={{ width: "100%", padding: "14px", background: "#1C3557", color: "#fff", border: "none", fontFamily: "'DM Sans', sans-serif", fontSize: "15px", fontWeight: 500, cursor: "pointer", transition: "opacity .15s" }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "0.88"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}
             >
-              <div style={{
-                width: "18px", height: "18px", borderRadius: "50%", flexShrink: 0,
-                border: `2px solid ${showNewForm ? "#E8242A" : "#E2E0DA"}`,
-                background: showNewForm ? "#E8242A" : "#fff",
-                display: "flex", alignItems: "center", justifyContent: "center",
-              }}>
-                {showNewForm && <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#fff" }} />}
+              Continue to Payment →
+            </button>
+            <a
+              href="/cart"
+              style={{ display: "inline-block", fontSize: "13px", color: "#6B6B6B", textDecoration: "none", marginTop: "14px", fontFamily: "'DM Sans', sans-serif" }}
+              onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#1C3557"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#6B6B6B"; }}
+            >
+              ← Return to Cart
+            </a>
+          </div>
+
+          {/* RIGHT COLUMN — Order Summary */}
+          <div style={{ alignSelf: "start", position: "sticky", top: "24px" }}>
+            <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, color: "#1A1A1A", marginBottom: "18px" }}>
+              Order Summary
+            </div>
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#6B6B6B", padding: "8px 0", borderBottom: "1px solid #E2E2DE" }}>
+                <span>Subtotal</span>
+                <span style={{ fontWeight: 600, color: "#1A1A1A" }}>{formatCurrency(subtotal)}</span>
               </div>
-              + Use a different address
-            </label>
-          </div>
-        )}
-
-        {/* Company name — wholesale only */}
-        {!isGuest && (
-          <div style={{ marginBottom: "14px" }}>
-            <label style={lbl}>Company Name <span style={{ color: "#E8242A" }}>*</span></label>
-            <input
-              style={{ ...inp, borderColor: errors.company ? "#E8242A" : "#E2E0DA" }}
-              value={form.company}
-              onChange={e => setForm(p => ({ ...p, company: e.target.value }))}
-              placeholder="AF Apparels Inc."
-            />
-            {errors.company && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "3px" }}>{errors.company}</p>}
-          </div>
-        )}
-
-        {showNewForm && (
-          <div className="checkout-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
-            <div style={{ gridColumn: "1 / -1" }}>
-              <label style={lbl}>{isGuest ? "Full Name" : "Contact Name"} <span style={{ color: "#E8242A" }}>*</span></label>
-              <input
-                style={{ ...inp, borderColor: errors.contact ? "#E8242A" : "#E2E0DA" }}
-                value={form.contact}
-                onChange={e => setForm(p => ({ ...p, contact: e.target.value }))}
-                placeholder={isGuest ? "Jane Smith" : "John Smith"}
-              />
-              {errors.contact && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "3px" }}>{errors.contact}</p>}
-            </div>
-
-            {/* Guest email field */}
-            {isGuest && (
-              <div style={{ gridColumn: "1 / -1" }}>
-                <label style={lbl}>Email Address <span style={{ color: "#E8242A" }}>*</span></label>
-                <input
-                  type="email"
-                  style={{ ...inp, borderColor: errors.email ? "#E8242A" : "#E2E0DA" }}
-                  value={form.email}
-                  onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
-                  placeholder="you@example.com"
-                />
-                {errors.email && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "3px" }}>{errors.email}</p>}
-                <p style={{ fontSize: "11px", color: "#7A7880", marginTop: "3px" }}>Order confirmation will be sent to this email.</p>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#6B6B6B", padding: "8px 0", borderBottom: "1px solid #E2E2DE" }}>
+                <span>Shipping ({shippingTypeForUser === "live_shippo" && shippingMethod === "standard" && selectedLiveRate ? `${selectedLiveRate.carrier} ${selectedLiveRate.service}` : SHIPPING_OPTIONS.find(o => o.id === shippingMethod)?.label})</span>
+                <span style={{ fontWeight: 600, color: (shippingMethod === "will_call" || (tierShipping !== null && selectedCost === 0)) ? "#059669" : "#1A1A1A" }}>
+                  {shippingMethod === "will_call"
+                    ? "FREE"
+                    : shippingTypeForUser === "live_shippo" && shippingMethod === "standard"
+                      ? selectedLiveRate
+                        ? formatCurrency(selectedLiveRate.cost)
+                        : <span style={{ color: "#6B6B6B", fontWeight: 400 }}>Select a carrier above</span>
+                      : tierShipping === null
+                        ? <span style={{ color: "#6B6B6B", fontWeight: 400 }}>Calculated at checkout</span>
+                        : selectedCost === 0
+                          ? "FREE"
+                          : formatCurrency(selectedCost)}
+                </span>
               </div>
-            )}
-
-            <div style={{ gridColumn: "1 / -1" }}>
-              <label style={lbl}>Street Address <span style={{ color: "#E8242A" }}>*</span></label>
-              <input
-                style={{ ...inp, borderColor: errors.street ? "#E8242A" : "#E2E0DA" }}
-                value={form.street}
-                onChange={e => setForm(p => ({ ...p, street: e.target.value }))}
-                placeholder="123 Commerce Blvd, Suite 400"
-              />
-              {errors.street && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "3px" }}>{errors.street}</p>}
-            </div>
-
-            <div>
-              <label style={lbl}>City <span style={{ color: "#E8242A" }}>*</span></label>
-              <input
-                style={{ ...inp, borderColor: errors.city ? "#E8242A" : "#E2E0DA" }}
-                value={form.city}
-                onChange={e => setForm(p => ({ ...p, city: e.target.value }))}
-                placeholder="Dallas"
-              />
-              {errors.city && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "3px" }}>{errors.city}</p>}
-            </div>
-
-            <div>
-              <label style={lbl}>State <span style={{ color: "#E8242A" }}>*</span></label>
-              <select
-                style={{ ...inp, cursor: "pointer", borderColor: errors.state ? "#E8242A" : "#E2E0DA" }}
-                value={form.state}
-                onChange={e => setForm(p => ({ ...p, state: e.target.value }))}
-              >
-                <option value="">Select state</option>
-                {US_STATES.map(s => <option key={s} value={s}>{s}</option>)}
-              </select>
-              {errors.state && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "3px" }}>{errors.state}</p>}
-            </div>
-
-            <div>
-              <label style={lbl}>ZIP Code <span style={{ color: "#E8242A" }}>*</span></label>
-              <input
-                style={{ ...inp, borderColor: errors.zip ? "#E8242A" : "#E2E0DA" }}
-                value={form.zip}
-                onChange={e => setForm(p => ({ ...p, zip: e.target.value }))}
-                placeholder="75001"
-                maxLength={10}
-              />
-              {errors.zip && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "3px" }}>{errors.zip}</p>}
-            </div>
-
-            <div>
-              <label style={lbl}>Phone <span style={{ fontSize: "10px", color: "#7A7880", textTransform: "none", letterSpacing: 0 }}>(for shipping updates)</span></label>
-              <input
-                style={inp}
-                type="tel"
-                value={form.phone}
-                onChange={e => setForm(p => ({ ...p, phone: e.target.value }))}
-                placeholder="(214) 555-0100"
-              />
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* ── Shipping Method ── */}
-      <div style={sectionCard}>
-        <span style={sectionTitle}>Shipping Method</span>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-          {SHIPPING_OPTIONS.map(opt => {
-            const isSelected = shippingMethod === opt.id;
-            const { price: priceDisplay, note } = shippingOptionLabel(opt.id);
-            const isFree = priceDisplay === "FREE";
-
-            return (
-              <label
-                key={opt.id}
-                onClick={() => setShippingMethod(opt.id)}
-                style={{
-                  display: "flex", alignItems: "flex-start", gap: "14px",
-                  padding: "16px 18px", borderRadius: "10px",
-                  border: `1.5px solid ${isSelected ? "#E8242A" : "#E2E0DA"}`,
-                  background: isSelected ? "rgba(232,36,42,.03)" : "#FAFAF8",
-                  cursor: "pointer", transition: "border-color .15s, background .15s",
-                }}
-              >
-                <div style={{
-                  width: "18px", height: "18px", borderRadius: "50%", flexShrink: 0, marginTop: "1px",
-                  border: `2px solid ${isSelected ? "#E8242A" : "#E2E0DA"}`,
-                  background: isSelected ? "#E8242A" : "#fff",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                }}>
-                  {isSelected && <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#fff" }} />}
+              {couponDiscount > 0 && (
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#059669", padding: "8px 0", borderBottom: "1px solid #E2E2DE" }}>
+                  <span style={{ fontWeight: 600 }}>Coupon Applied</span>
+                  <span style={{ fontWeight: 700 }}>-{formatCurrency(couponDiscount)}</span>
                 </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
-                    <span style={{ fontSize: "14px", fontWeight: 700, color: "#2A2830" }}>{opt.label}</span>
-                    <span style={{ fontSize: "14px", fontWeight: 800, color: isFree ? "#059669" : "#2A2830" }}>
-                      {priceDisplay}
-                    </span>
-                  </div>
-                  {opt.id === "will_call" ? (
-                    <div style={{ marginTop: "6px" }}>
-                      <div style={{ display: "flex", alignItems: "flex-start", gap: "5px", marginBottom: "5px" }}>
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#E8242A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: "1px" }}>
-                          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
-                        </svg>
-                        <span style={{ fontSize: "12px", fontWeight: 600, color: "#2A2830" }}>10719 Turbeville Rd, Dallas, TX 75243</span>
-                      </div>
-                      <div style={{ fontSize: "11px", color: "#7A7880", lineHeight: 1.6, paddingLeft: "18px" }}>
-                        <div>Mon–Fri, before 12 PM → same-day pickup by 4 PM</div>
-                        <div>Mon–Fri, after 12 PM → next business day by 12 PM</div>
-                        <div>Sat / Sun: Closed</div>
-                      </div>
-                    </div>
-                  ) : shippingTypeForUser === "live_shippo" && opt.id === "standard" && isSelected ? (
-                    <div style={{ marginTop: "8px" }}>
-                      <div style={{ fontSize: "12px", color: "#7A7880", marginBottom: "8px" }}>{opt.sub}</div>
-                      {liveRatesLoading && (
-                        <div style={{ fontSize: "12px", color: "#7A7880", padding: "8px 0" }}>Fetching live carrier rates…</div>
-                      )}
-                      {!liveRatesLoading && liveRates.length > 0 && (
-                        <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                          {liveRates.map(rate => {
-                            const isRateSelected = selectedLiveRateId === rate.rate_id;
-                            return (
-                              <label
-                                key={rate.rate_id}
-                                onClick={() => {
-                                  setSelectedLiveRateId(rate.rate_id);
-                                  setTierShipping(rate.cost);
-                                }}
-                                style={{
-                                  display: "flex", alignItems: "center", justifyContent: "space-between",
-                                  padding: "10px 14px", borderRadius: "8px", cursor: "pointer",
-                                  border: `1.5px solid ${isRateSelected ? "#E8242A" : "#E2E0DA"}`,
-                                  background: isRateSelected ? "rgba(232,36,42,.03)" : "#fff",
-                                }}
-                              >
-                                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                                  <div style={{
-                                    width: "14px", height: "14px", borderRadius: "50%", flexShrink: 0,
-                                    border: `2px solid ${isRateSelected ? "#E8242A" : "#E2E0DA"}`,
-                                    background: isRateSelected ? "#E8242A" : "#fff",
-                                    display: "flex", alignItems: "center", justifyContent: "center",
-                                  }}>
-                                    {isRateSelected && <div style={{ width: "4px", height: "4px", borderRadius: "50%", background: "#fff" }} />}
-                                  </div>
-                                  {CARRIER_LOGOS[rate.carrier] && (
-                                    // eslint-disable-next-line @next/next/no-img-element
-                                    <img
-                                      src={CARRIER_LOGOS[rate.carrier]}
-                                      alt={rate.carrier}
-                                      style={{ height: "22px", width: "auto", objectFit: "contain", flexShrink: 0 }}
-                                    />
-                                  )}
-                                  <div>
-                                    <div style={{ fontSize: "12px", fontWeight: 700, color: "#2A2830" }}>{rate.service}</div>
-                                    {rate.days != null && <div style={{ fontSize: "11px", color: "#7A7880", marginTop: "1px" }}>{rate.days} business day{rate.days !== 1 ? "s" : ""}</div>}
-                                  </div>
-                                </div>
-                                <span style={{ fontSize: "13px", fontWeight: 800, color: "#2A2830" }}>{formatCurrency(rate.cost)}</span>
-                              </label>
-                            );
-                          })}
-                        </div>
-                      )}
-                      {!liveRatesLoading && liveRates.length === 0 && activeZip.length >= 5 && (
-                        <div style={{ fontSize: "12px", color: "#7A7880", padding: "6px 0" }}>
-                          No rates available for this address. Please verify your ZIP and state.
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div style={{ fontSize: "12px", color: "#7A7880", marginTop: "3px" }}>{opt.sub}</div>
-                  )}
-                  {note && (
-                    <div style={{ fontSize: "11px", color: isFree ? "#059669" : "#7A7880", marginTop: "4px", fontWeight: isFree ? 600 : 400 }}>
-                      {note}
-                    </div>
-                  )}
-                </div>
-              </label>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* ── Order Summary ── */}
-      <div style={{ background: "#fff", border: "1.5px solid #E2E0DA", borderRadius: "12px", padding: "18px 24px", marginBottom: "16px" }}>
-        <div style={{ fontFamily: "var(--font-bebas)", fontSize: "15px", letterSpacing: ".06em", color: "#2A2830", marginBottom: "12px" }}>
-          Order Summary
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#7A7880" }}>
-            <span>Subtotal</span>
-            <span style={{ fontWeight: 600, color: "#2A2830" }}>{formatCurrency(subtotal)}</span>
-          </div>
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#7A7880" }}>
-            <span>Shipping ({shippingTypeForUser === "live_shippo" && shippingMethod === "standard" && selectedLiveRate ? `${selectedLiveRate.carrier} ${selectedLiveRate.service}` : SHIPPING_OPTIONS.find(o => o.id === shippingMethod)?.label})</span>
-            <span style={{ fontWeight: 600, color: (shippingMethod === "will_call" || (tierShipping !== null && selectedCost === 0)) ? "#059669" : "#2A2830" }}>
-              {shippingMethod === "will_call"
-                ? "FREE"
-                : shippingTypeForUser === "live_shippo" && shippingMethod === "standard"
-                  ? selectedLiveRate
-                    ? formatCurrency(selectedLiveRate.cost)
-                    : <span style={{ color: "#7A7880", fontWeight: 400 }}>Select a carrier above</span>
-                  : tierShipping === null
-                    ? <span style={{ color: "#7A7880", fontWeight: 400 }}>Calculated at checkout</span>
-                    : selectedCost === 0
-                      ? "FREE"
-                      : formatCurrency(selectedCost)}
-            </span>
-          </div>
-          {couponDiscount > 0 && (
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#059669" }}>
-              <span style={{ fontWeight: 600 }}>Coupon Applied</span>
-              <span style={{ fontWeight: 700 }}>-{formatCurrency(couponDiscount)}</span>
+              )}
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#6B6B6B", padding: "8px 0", borderBottom: "1px solid #E2E2DE" }}>
+                <span>{taxRate ? `Tax (${taxRate.region} ${taxRate.rate}%)` : "Tax"}</span>
+                <span style={{ fontWeight: 600, color: "#1A1A1A" }}>
+                  {activeState ? formatCurrency(taxAmount) : <span style={{ fontWeight: 400 }}>Calculated at checkout</span>}
+                </span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "15px", fontWeight: 600, color: "#1A1A1A", padding: "14px 0 0" }}>
+                <span>Total</span>
+                <span>
+                  {(tierShipping !== null || shippingMethod === "will_call" || (shippingTypeForUser === "live_shippo" && selectedLiveRate)) ? formatCurrency(orderTotal) : `${formatCurrency(subtotal)}+`}
+                </span>
+              </div>
             </div>
-          )}
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#7A7880" }}>
-            <span>{taxRate ? `Tax (${taxRate.region} ${taxRate.rate}%)` : "Tax"}</span>
-            <span style={{ fontWeight: 600, color: "#2A2830" }}>
-              {activeState ? formatCurrency(taxAmount) : <span style={{ fontWeight: 400 }}>Calculated at checkout</span>}
-            </span>
-          </div>
-          <div style={{ borderTop: "1px solid #F0EEE9", paddingTop: "8px", display: "flex", justifyContent: "space-between" }}>
-            <span style={{ fontSize: "14px", fontWeight: 800, color: "#2A2830" }}>Total</span>
-            <span style={{ fontFamily: "var(--font-bebas)", fontSize: "20px", color: "#E8242A", letterSpacing: ".02em" }}>
-              {(tierShipping !== null || shippingMethod === "will_call" || (shippingTypeForUser === "live_shippo" && selectedLiveRate)) ? formatCurrency(orderTotal) : `${formatCurrency(subtotal)}+`}
-            </span>
           </div>
         </div>
       </div>
-
-      {/* Continue button */}
-      <button
-        onClick={handleContinue}
-        style={{
-          width: "100%", padding: "15px", background: "#E8242A", color: "#fff",
-          border: "none", borderRadius: "8px", fontFamily: "var(--font-bebas)",
-          fontSize: "17px", letterSpacing: ".08em", cursor: "pointer",
-          transition: "background .2s",
-        }}
-        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = "#c91e23"; }}
-        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = "#E8242A"; }}
-      >
-        Continue to Payment
-      </button>
+      <style>{`
+        @media (max-width: 900px) { .checkout-cols { display: block !important; } }
+      `}</style>
     </div>
   );
 }

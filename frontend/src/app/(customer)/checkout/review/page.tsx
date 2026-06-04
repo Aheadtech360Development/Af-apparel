@@ -1,4 +1,4 @@
-// frontend/src/app/(customer)/checkout/review/page.tsx 
+// frontend/src/app/(customer)/checkout/review/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -38,8 +38,20 @@ const SHIPPING_LABELS: Record<string, string> = {
   will_call: "Will Call Pickup",
 };
 
-const row: React.CSSProperties = {
-  display: "flex", justifyContent: "space-between", gap: "12px", fontSize: "13px",
+const sectionLabelStyle: React.CSSProperties = {
+  fontFamily: "'DM Sans', sans-serif", fontSize: "11px", letterSpacing: "0.1em",
+  textTransform: "uppercase", fontWeight: 700, color: "#1A1A1A",
+  marginBottom: "14px", paddingBottom: "10px", borderBottom: "1px solid #E2E2DE",
+};
+
+const inp: React.CSSProperties = {
+  width: "100%", padding: "11px 14px", border: "1px solid #E2E2DE",
+  fontSize: "14px", fontFamily: "'DM Sans', sans-serif",
+  outline: "none", boxSizing: "border-box", color: "#1A1A1A", background: "#fff",
+};
+const lbl: React.CSSProperties = {
+  display: "block", fontSize: "12px", fontWeight: 600, color: "#1A1A1A",
+  textTransform: "uppercase", letterSpacing: ".07em", marginBottom: "7px",
 };
 
 export default function CheckoutReviewPage() {
@@ -330,11 +342,11 @@ export default function CheckoutReviewPage() {
 
   const selectedCard = savedCards.find(c => c.id === savedCardId);
   const paymentLabel = paymentMethod === "ach"
-    ? `ACH / Bank Transfer${achAccountLast4 ? ` \u2014 ****${achAccountLast4}` : ""}`
+    ? `ACH / Bank Transfer${achAccountLast4 ? ` — ****${achAccountLast4}` : ""}`
     : paymentMethod === "net_30"
-    ? "Net 30 \u2014 Pay by Invoice"
+    ? "Net 30 — Pay by Invoice"
     : selectedCard
-    ? `${brandDisplayName(selectedCard.brand)} \u2022\u2022\u2022\u2022 ${selectedCard.last4}`
+    ? `${brandDisplayName(selectedCard.brand)} •••• ${selectedCard.last4}`
     : qbToken
     ? "New Card (tokenized)"
     : "Credit Card";
@@ -348,260 +360,258 @@ export default function CheckoutReviewPage() {
   const total = subtotal + shipping + taxAmount - (isGuest ? 0 : couponDiscount);
   const shippingLabel = SHIPPING_LABELS[shippingMethod] ?? "Standard Ground";
 
-  const sectionCard: React.CSSProperties = {
-    background: "#fff", border: "1.5px solid #E2E0DA", borderRadius: "12px",
-    padding: "20px 24px", marginBottom: "14px",
-  };
-  const sectionLabel: React.CSSProperties = {
-    fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em",
-    color: "#7A7880", marginBottom: "14px",
-  };
-
   return (
-    <div>
-      {/* ── Heading ── */}
-      <div style={{ marginBottom: "20px" }}>
-        <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(22px,4vw,32px)", color: "#2A2830", letterSpacing: ".03em", lineHeight: 1, marginBottom: "6px" }}>
-          Review Your Order
-        </h1>
-        <p style={{ fontSize: "13px", color: "#7A7880" }}>
-          Please confirm all details before placing your order.
-        </p>
-      </div>
+    <div style={{ padding: "40px 24px 64px", background: "#F8F8F6" }}>
+      <div style={{ maxWidth: "1500px", margin: "0 auto" }}>
+        <div className="checkout-cols" style={{ display: "grid", gridTemplateColumns: "1fr 380px", gap: "48px", alignItems: "start" }}>
 
-      {/* ── Shipping ── */}
-      <div style={sectionCard}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
-          <div style={sectionLabel as React.CSSProperties}>Shipping Address</div>
-          <button onClick={() => router.push("/checkout/address")} style={{ fontSize: "11px", color: "#1A5CFF", background: "none", border: "none", cursor: "pointer", fontWeight: 700 }}>Edit</button>
-        </div>
-        <div style={{ fontSize: "13px", color: "#2A2830", lineHeight: 1.7 }}>
-          {companyName && <div style={{ fontWeight: 700 }}>{companyName}</div>}
-          {contactName && <div>{contactName}</div>}
-          {shippingAddress && (
-            <>
-              <div>{shippingAddress.line1}</div>
-              {shippingAddress.line2 && <div>{shippingAddress.line2}</div>}
-              <div>{shippingAddress.city}, {shippingAddress.state} {shippingAddress.postal_code}</div>
-            </>
-          )}
-          {shippingPhone && <div style={{ color: "#7A7880" }}>{shippingPhone}</div>}
-        </div>
-        <div style={{ borderTop: "1px solid #F0EEE9", margin: "12px 0" }} />
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
-          <span style={{ color: "#7A7880" }}>Shipping Method</span>
-          <span style={{ fontWeight: 700, color: "#2A2830" }}>
-            {shippingLabel} — {shipping === 0 ? "FREE" : formatCurrency(shipping)}
-          </span>
-        </div>
-      </div>
-
-      {/* ── Payment ── */}
-      <div style={sectionCard}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
-          <div style={sectionLabel as React.CSSProperties}>Payment</div>
-          <button onClick={() => router.push("/checkout/payment")} style={{ fontSize: "11px", color: "#1A5CFF", background: "none", border: "none", cursor: "pointer", fontWeight: 700 }}>Change</button>
-        </div>
-        {paymentMethod === "ach" ? (
-          <div style={{ fontSize: "13px", color: "#2A2830", lineHeight: 1.8 }}>
-            <div style={{ fontWeight: 700, marginBottom: "6px" }}>ACH / Bank Transfer</div>
-            {achBankName && <div style={{ color: "#7A7880" }}>Bank: <span style={{ color: "#2A2830", fontWeight: 600 }}>{achBankName}</span></div>}
-            {achAccountHolder && <div style={{ color: "#7A7880" }}>Account Holder: <span style={{ color: "#2A2830", fontWeight: 600 }}>{achAccountHolder}</span></div>}
-            {achAccountLast4 && <div style={{ color: "#7A7880" }}>Account: <span style={{ color: "#2A2830", fontWeight: 600 }}>****{achAccountLast4}</span></div>}
-            {achAccountType && <div style={{ color: "#7A7880" }}>Type: <span style={{ color: "#2A2830", fontWeight: 600 }}>{achAccountType.charAt(0).toUpperCase() + achAccountType.slice(1)}</span></div>}
-            <div style={{ marginTop: "8px", padding: "8px 12px", background: "rgba(217,119,6,.08)", borderRadius: "6px", fontSize: "12px", color: "#D97706", fontWeight: 600 }}>
-              Order pending — payment verified within 1–2 business days
-            </div>
-          </div>
-        ) : paymentMethod === "net_30" ? (
-          <div style={{ fontSize: "13px", color: "#2A2830", lineHeight: 1.8 }}>
-            <div style={{ fontWeight: 700, marginBottom: "6px" }}>Net 30 — Pay by Invoice</div>
-            <div style={{ marginTop: "8px", padding: "8px 12px", background: "rgba(217,119,6,.08)", borderRadius: "6px", fontSize: "12px", color: "#D97706", fontWeight: 600 }}>
-              An invoice will be sent to your account. Payment due within 30 days.
-            </div>
-          </div>
-        ) : (
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <svg width="32" height="22" viewBox="0 0 32 22" fill="none">
-              <rect width="32" height="22" rx="3" fill="#F4F3EF" stroke="#E2E0DA" />
-              <rect x="4" y="8" width="10" height="6" rx="1.5" fill="#E2E0DA" />
-              <rect x="4" y="16" width="5" height="2" rx="0.5" fill="#E2E0DA" />
-              <rect x="11" y="16" width="5" height="2" rx="0.5" fill="#E2E0DA" />
-            </svg>
-            <span style={{ fontSize: "13px", fontWeight: 700, color: "#2A2830" }}>{paymentLabel}</span>
-          </div>
-        )}
-      </div>
-
-      {/* ── Order Items ── */}
-      {(isGuest ? guestEntries.length > 0 : cart ? cart.items.length > 0 : false) && (
-        <div style={sectionCard}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
-            <div style={sectionLabel as React.CSSProperties}>Items in Your Order</div>
-            <span style={{ fontSize: "11px", color: "#7A7880" }}>
-              {isGuest
-                ? `${guestEntries.reduce((s, e) => s + e.quantity, 0)} units`
-                : `${cart!.total_units} units`}
-            </span>
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            {isGuest
-              ? guestEntries.map((item, idx) => (
-                  <div key={idx} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                    <div style={{ width: "38px", height: "38px", flexShrink: 0, borderRadius: "6px", background: "#F4F3EF", border: "1px solid #E2E0DA", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px" }}>
-                      {item.image_url
-                        // eslint-disable-next-line @next/next/no-img-element
-                        ? <img src={item.image_url} alt={item.product_name} style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
-                        : <span>👕</span>
-                      }
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: "13px", fontWeight: 600, color: "#2A2830" }}>{item.product_name}</div>
-                      <div style={{ fontSize: "11px", color: "#7A7880", marginTop: "1px" }}>
-                        {[item.color, item.size].filter(Boolean).join(" / ")}
-                        {" · "}qty {item.quantity}
-                      </div>
-                    </div>
-                    <span style={{ fontSize: "13px", fontWeight: 600, color: "#2A2830", whiteSpace: "nowrap" }}>{formatCurrency(item.unit_price * item.quantity)}</span>
-                  </div>
-                ))
-              : cart!.items.map(item => (
-                  <div key={item.id} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                    <div style={{ width: "38px", height: "38px", flexShrink: 0, borderRadius: "6px", background: "#F4F3EF", border: "1px solid #E2E0DA", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      {item.product_image_url
-                        ? <img src={item.product_image_url} alt={item.product_name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                        : <span style={{ fontSize: "16px" }}>👕</span>
-                      }
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: "13px", fontWeight: 600, color: "#2A2830" }}>{item.product_name}</div>
-                      <div style={{ fontSize: "11px", color: "#7A7880", marginTop: "1px" }}>
-                        {[item.color, item.size].filter(Boolean).join(" / ")}
-                        {" · "}SKU {item.sku}
-                        {" · "}qty {item.quantity}
-                      </div>
-                    </div>
-                    <span style={{ fontSize: "13px", fontWeight: 600, color: "#2A2830", whiteSpace: "nowrap" }}>{formatCurrency(Number(item.line_total))}</span>
-                  </div>
-                ))
-            }
-          </div>
-        </div>
-      )}
-      {/* Loading state for wholesale cart */}
-      {!isGuest && !cart && (
-        <div style={{ ...sectionCard, textAlign: "center", color: "#7A7880", fontSize: "13px" }}>
-          Loading order items…
-        </div>
-      )}
-
-      {/* ── PO Number & Notes ── */}
-      <div style={sectionCard}>
-        <div style={sectionLabel as React.CSSProperties}>Order Details (Optional)</div>
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+          {/* LEFT COLUMN */}
           <div>
-            <label style={{ display: "block", fontSize: "11px", fontWeight: 700, color: "#7A7880", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: "5px" }}>
-              PO Number
-            </label>
-            <input
-              type="text"
-              value={poNumber}
-              onChange={e => setPoNumber(e.target.value)}
-              placeholder="Optional purchase order reference"
-              style={{ width: "100%", padding: "9px 12px", border: "1.5px solid #E2E0DA", borderRadius: "7px", fontSize: "13px", outline: "none", boxSizing: "border-box", color: "#2A2830" }}
-            />
-          </div>
-          <div>
-            <label style={{ display: "block", fontSize: "11px", fontWeight: 700, color: "#7A7880", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: "5px" }}>
-              Order Notes
-            </label>
-            <textarea
-              value={orderNotes}
-              onChange={e => setOrderNotes(e.target.value)}
-              placeholder="Special instructions or notes for this order"
-              rows={3}
-              style={{ width: "100%", padding: "9px 12px", border: "1.5px solid #E2E0DA", borderRadius: "7px", fontSize: "13px", outline: "none", resize: "vertical", boxSizing: "border-box", color: "#2A2830", fontFamily: "var(--font-jakarta)" }}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* ── Order Total ── */}
-      <div style={{ background: "#fff", border: "1.5px solid #E2E0DA", borderRadius: "12px", padding: "18px 24px", marginBottom: "16px" }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-          <div style={row}>
-            <span style={{ color: "#7A7880" }}>Subtotal ({isGuest ? guestEntries.reduce((s, e) => s + e.quantity, 0) : (cart?.total_units ?? 0)} units)</span>
-            <span style={{ fontWeight: 600, color: "#2A2830" }}>{formatCurrency(subtotal)}</span>
-          </div>
-          {Number(cart?.discount_percent ?? 0) > 0 && (
-            <div style={{ ...row, color: "#059669" }}>
-              <span style={{ fontWeight: 600 }}>Tier Discount ({cart?.discount_percent}% applied)</span>
-              <span style={{ fontWeight: 700 }}>&#10003; Included</span>
+            {/* ── Shipping Address ── */}
+            <div style={{ marginBottom: "32px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", ...sectionLabelStyle }}>
+                <span>Shipping Address</span>
+                <button onClick={() => router.push("/checkout/address")} style={{ fontSize: "12px", color: "#1C3557", background: "none", border: "none", cursor: "pointer", fontWeight: 600, fontFamily: "'DM Sans', sans-serif", textTransform: "none", letterSpacing: 0 }}>Edit</button>
+              </div>
+              <div style={{ fontSize: "13px", color: "#1A1A1A", lineHeight: 1.7 }}>
+                {companyName && <div style={{ fontWeight: 700 }}>{companyName}</div>}
+                {contactName && <div>{contactName}</div>}
+                {shippingAddress && (
+                  <>
+                    <div>{shippingAddress.line1}</div>
+                    {shippingAddress.line2 && <div>{shippingAddress.line2}</div>}
+                    <div>{shippingAddress.city}, {shippingAddress.state} {shippingAddress.postal_code}</div>
+                  </>
+                )}
+                {shippingPhone && <div style={{ color: "#6B6B6B" }}>{shippingPhone}</div>}
+              </div>
+              <div style={{ borderTop: "1px solid #E2E2DE", margin: "12px 0" }} />
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
+                <span style={{ color: "#6B6B6B" }}>Shipping Method</span>
+                <span style={{ fontWeight: 600, color: "#1A1A1A" }}>
+                  {shippingLabel} — {shipping === 0 ? "FREE" : formatCurrency(shipping)}
+                </span>
+              </div>
             </div>
-          )}
-          {appliedCoupon && (
-            <div style={{ ...row, color: "#059669" }}>
-              <span style={{ fontWeight: 600 }}>Coupon ({appliedCoupon.code})</span>
-              <span style={{ fontWeight: 700 }}>-{formatCurrency(couponDiscount)}</span>
+
+            {/* ── Payment ── */}
+            <div style={{ marginBottom: "32px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", ...sectionLabelStyle }}>
+                <span>Payment</span>
+                <button onClick={() => router.push("/checkout/payment")} style={{ fontSize: "12px", color: "#1C3557", background: "none", border: "none", cursor: "pointer", fontWeight: 600, fontFamily: "'DM Sans', sans-serif", textTransform: "none", letterSpacing: 0 }}>Change</button>
+              </div>
+              {paymentMethod === "ach" ? (
+                <div style={{ fontSize: "13px", color: "#1A1A1A", lineHeight: 1.8 }}>
+                  <div style={{ fontWeight: 700, marginBottom: "6px" }}>ACH / Bank Transfer</div>
+                  {achBankName && <div style={{ color: "#6B6B6B" }}>Bank: <span style={{ color: "#1A1A1A", fontWeight: 600 }}>{achBankName}</span></div>}
+                  {achAccountHolder && <div style={{ color: "#6B6B6B" }}>Account Holder: <span style={{ color: "#1A1A1A", fontWeight: 600 }}>{achAccountHolder}</span></div>}
+                  {achAccountLast4 && <div style={{ color: "#6B6B6B" }}>Account: <span style={{ color: "#1A1A1A", fontWeight: 600 }}>****{achAccountLast4}</span></div>}
+                  {achAccountType && <div style={{ color: "#6B6B6B" }}>Type: <span style={{ color: "#1A1A1A", fontWeight: 600 }}>{achAccountType.charAt(0).toUpperCase() + achAccountType.slice(1)}</span></div>}
+                  <div style={{ marginTop: "8px", padding: "8px 12px", background: "rgba(217,119,6,.08)", fontSize: "12px", color: "#D97706", fontWeight: 600 }}>
+                    Order pending — payment verified within 1–2 business days
+                  </div>
+                </div>
+              ) : paymentMethod === "net_30" ? (
+                <div style={{ fontSize: "13px", color: "#1A1A1A", lineHeight: 1.8 }}>
+                  <div style={{ fontWeight: 700, marginBottom: "6px" }}>Net 30 — Pay by Invoice</div>
+                  <div style={{ marginTop: "8px", padding: "8px 12px", background: "rgba(217,119,6,.08)", fontSize: "12px", color: "#D97706", fontWeight: 600 }}>
+                    An invoice will be sent to your account. Payment due within 30 days.
+                  </div>
+                </div>
+              ) : (
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <svg width="32" height="22" viewBox="0 0 32 22" fill="none">
+                    <rect width="32" height="22" rx="3" fill="#F4F3EF" stroke="#E2E2DE" />
+                    <rect x="4" y="8" width="10" height="6" rx="1.5" fill="#E2E2DE" />
+                    <rect x="4" y="16" width="5" height="2" rx="0.5" fill="#E2E2DE" />
+                    <rect x="11" y="16" width="5" height="2" rx="0.5" fill="#E2E2DE" />
+                  </svg>
+                  <span style={{ fontSize: "13px", fontWeight: 700, color: "#1A1A1A" }}>{paymentLabel}</span>
+                </div>
+              )}
             </div>
-          )}
-          <div style={row}>
-            <span style={{ color: "#7A7880" }}>Shipping ({shippingLabel})</span>
-            <span style={{ color: shipping === 0 ? "#059669" : "#2A2830", fontWeight: 600 }}>
-              {shipping === 0 ? "FREE" : formatCurrency(shipping)}
-            </span>
+
+            {/* ── Order Items ── */}
+            {(isGuest ? guestEntries.length > 0 : cart ? cart.items.length > 0 : false) && (
+              <div style={{ marginBottom: "32px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", ...sectionLabelStyle }}>
+                  <span>Items in Your Order</span>
+                  <span style={{ fontSize: "11px", color: "#6B6B6B", textTransform: "none", letterSpacing: 0, fontWeight: 400 }}>
+                    {isGuest
+                      ? `${guestEntries.reduce((s, e) => s + e.quantity, 0)} units`
+                      : `${cart!.total_units} units`}
+                  </span>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  {isGuest
+                    ? guestEntries.map((item, idx) => (
+                        <div key={idx} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                          <div style={{ width: "38px", height: "38px", flexShrink: 0, background: "#F4F3EF", border: "1px solid #E2E2DE", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px" }}>
+                            {item.image_url
+                              // eslint-disable-next-line @next/next/no-img-element
+                              ? <img src={item.image_url} alt={item.product_name} style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
+                              : <span>👕</span>
+                            }
+                          </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: "13px", fontWeight: 600, color: "#1A1A1A" }}>{item.product_name}</div>
+                            <div style={{ fontSize: "11px", color: "#6B6B6B", marginTop: "1px" }}>
+                              {[item.color, item.size].filter(Boolean).join(" / ")}
+                              {" · "}qty {item.quantity}
+                            </div>
+                          </div>
+                          <span style={{ fontSize: "13px", fontWeight: 600, color: "#1A1A1A", whiteSpace: "nowrap" }}>{formatCurrency(item.unit_price * item.quantity)}</span>
+                        </div>
+                      ))
+                    : cart!.items.map(item => (
+                        <div key={item.id} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                          <div style={{ width: "38px", height: "38px", flexShrink: 0, background: "#F4F3EF", border: "1px solid #E2E2DE", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            {item.product_image_url
+                              ? <img src={item.product_image_url} alt={item.product_name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                              : <span style={{ fontSize: "16px" }}>👕</span>
+                            }
+                          </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: "13px", fontWeight: 600, color: "#1A1A1A" }}>{item.product_name}</div>
+                            <div style={{ fontSize: "11px", color: "#6B6B6B", marginTop: "1px" }}>
+                              {[item.color, item.size].filter(Boolean).join(" / ")}
+                              {" · "}SKU {item.sku}
+                              {" · "}qty {item.quantity}
+                            </div>
+                          </div>
+                          <span style={{ fontSize: "13px", fontWeight: 600, color: "#1A1A1A", whiteSpace: "nowrap" }}>{formatCurrency(Number(item.line_total))}</span>
+                        </div>
+                      ))
+                  }
+                </div>
+              </div>
+            )}
+            {/* Loading state for wholesale cart */}
+            {!isGuest && !cart && (
+              <div style={{ textAlign: "center", color: "#6B6B6B", fontSize: "13px", marginBottom: "32px" }}>
+                Loading order items…
+              </div>
+            )}
+
+            {/* ── PO Number & Notes ── */}
+            <div style={{ marginBottom: "32px" }}>
+              <div style={sectionLabelStyle}>Order Details (Optional)</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                <div>
+                  <label style={lbl}>
+                    PO Number
+                  </label>
+                  <input
+                    type="text"
+                    value={poNumber}
+                    onChange={e => setPoNumber(e.target.value)}
+                    placeholder="Optional purchase order reference"
+                    style={inp}
+                  />
+                </div>
+                <div>
+                  <label style={lbl}>
+                    Order Notes
+                  </label>
+                  <textarea
+                    value={orderNotes}
+                    onChange={e => setOrderNotes(e.target.value)}
+                    placeholder="Special instructions or notes for this order"
+                    rows={3}
+                    style={{ ...inp, resize: "vertical" }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* ── Error ── */}
+            {error && (
+              <div style={{ padding: "12px 16px", background: "rgba(232,36,42,.07)", border: "1px solid rgba(232,36,42,.25)", color: "#E8242A", fontSize: "13px", fontWeight: 600, marginBottom: "14px" }}>
+                {error}
+              </div>
+            )}
+
+            {/* ── Place Order ── */}
+            <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+              <a
+                href="/checkout/payment"
+                style={{ display: "inline-block", fontSize: "13px", color: "#6B6B6B", textDecoration: "none", fontFamily: "'DM Sans', sans-serif" }}
+                onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#1C3557"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#6B6B6B"; }}
+              >
+                ← Back to Payment
+              </a>
+              <button
+                type="button"
+                onClick={handlePlaceOrder}
+                disabled={isPlacing}
+                style={{
+                  flex: 1, padding: "14px",
+                  background: isPlacing ? "#E2E2DE" : "#1C3557",
+                  color: isPlacing ? "#aaa" : "#fff",
+                  border: "none",
+                  fontFamily: "'DM Sans', sans-serif", fontSize: "15px", fontWeight: 500,
+                  cursor: isPlacing ? "not-allowed" : "pointer", transition: "opacity .15s",
+                }}
+                onMouseEnter={e => { if (!isPlacing) (e.currentTarget as HTMLButtonElement).style.opacity = "0.88"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}
+              >
+                {isPlacing ? "Placing Order…" : "Place Order"}
+              </button>
+            </div>
+
+            <p style={{ textAlign: "center", fontSize: "12px", color: "#6B6B6B", marginTop: "12px", fontFamily: "'DM Sans', sans-serif" }}>
+              By placing your order you agree to our Terms of Service and wholesale pricing agreement.
+            </p>
           </div>
-          <div style={row}>
-            <span style={{ color: "#7A7880" }}>
-              {taxRate ? `Tax (${taxRate.region} ${taxRate.rate}%)` : "Tax"}
-            </span>
-            <span style={{ color: "#2A2830", fontWeight: 600 }}>
-              {formatCurrency(taxAmount)}
-            </span>
-          </div>
-          <div style={{ borderTop: "1.5px solid #E2E0DA", paddingTop: "10px", display: "flex", justifyContent: "space-between" }}>
-            <span style={{ fontSize: "15px", fontWeight: 800, color: "#2A2830" }}>Total</span>
-            <span style={{ fontFamily: "var(--font-bebas)", fontSize: "22px", color: "#E8242A", letterSpacing: ".02em" }}>{formatCurrency(total)}</span>
+
+          {/* RIGHT COLUMN — Order Summary */}
+          <div style={{ alignSelf: "start", position: "sticky", top: "24px" }}>
+            <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, color: "#1A1A1A", marginBottom: "18px" }}>
+              Order Summary
+            </div>
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#6B6B6B", padding: "8px 0", borderBottom: "1px solid #E2E2DE" }}>
+                <span>Subtotal ({isGuest ? guestEntries.reduce((s, e) => s + e.quantity, 0) : (cart?.total_units ?? 0)} units)</span>
+                <span style={{ fontWeight: 600, color: "#1A1A1A" }}>{formatCurrency(subtotal)}</span>
+              </div>
+              {Number(cart?.discount_percent ?? 0) > 0 && (
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#059669", padding: "8px 0", borderBottom: "1px solid #E2E2DE" }}>
+                  <span style={{ fontWeight: 600 }}>Tier Discount ({cart?.discount_percent}% applied)</span>
+                  <span style={{ fontWeight: 700 }}>&#10003; Included</span>
+                </div>
+              )}
+              {appliedCoupon && (
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#059669", padding: "8px 0", borderBottom: "1px solid #E2E2DE" }}>
+                  <span style={{ fontWeight: 600 }}>Coupon ({appliedCoupon.code})</span>
+                  <span style={{ fontWeight: 700 }}>-{formatCurrency(couponDiscount)}</span>
+                </div>
+              )}
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#6B6B6B", padding: "8px 0", borderBottom: "1px solid #E2E2DE" }}>
+                <span>Shipping ({shippingLabel})</span>
+                <span style={{ color: shipping === 0 ? "#059669" : "#1A1A1A", fontWeight: 600 }}>
+                  {shipping === 0 ? "FREE" : formatCurrency(shipping)}
+                </span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#6B6B6B", padding: "8px 0", borderBottom: "1px solid #E2E2DE" }}>
+                <span>
+                  {taxRate ? `Tax (${taxRate.region} ${taxRate.rate}%)` : "Tax"}
+                </span>
+                <span style={{ color: "#1A1A1A", fontWeight: 600 }}>
+                  {formatCurrency(taxAmount)}
+                </span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "15px", fontWeight: 600, color: "#1A1A1A", padding: "14px 0 0" }}>
+                <span>Total</span>
+                <span>{formatCurrency(total)}</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-
-      {/* ── Error ── */}
-      {error && (
-        <div style={{ padding: "12px 16px", borderRadius: "8px", background: "rgba(232,36,42,.07)", border: "1.5px solid rgba(232,36,42,.25)", color: "#E8242A", fontSize: "13px", fontWeight: 600, marginBottom: "14px" }}>
-          {error}
-        </div>
-      )}
-
-      {/* ── Place Order ── */}
-      <div style={{ display: "flex", gap: "10px" }}>
-        <button
-          type="button"
-          onClick={() => router.push("/checkout/payment")}
-          style={{ flex: 1, padding: "14px", border: "1.5px solid #E2E0DA", borderRadius: "8px", background: "#fff", fontSize: "13px", fontWeight: 600, cursor: "pointer", color: "#7A7880" }}
-        >
-          &#8592; Back
-        </button>
-        <button
-          type="button"
-          onClick={handlePlaceOrder}
-          disabled={isPlacing}
-          style={{
-            flex: 3, padding: "14px",
-            background: isPlacing ? "#E2E0DA" : "#E8242A",
-            color: isPlacing ? "#aaa" : "#fff",
-            border: "none", borderRadius: "8px",
-            fontFamily: "var(--font-bebas)", fontSize: "18px", letterSpacing: ".08em",
-            cursor: isPlacing ? "not-allowed" : "pointer", transition: "background .2s",
-          }}
-        >
-          {isPlacing ? "Placing Order\u2026" : "Place Order"}
-        </button>
-      </div>
-
-      <p style={{ textAlign: "center", fontSize: "11px", color: "#7A7880", marginTop: "12px" }}>
-        By placing your order you agree to our Terms of Service and wholesale pricing agreement.
-      </p>
+      <style>{`
+        @media (max-width: 900px) { .checkout-cols { display: block !important; } }
+      `}</style>
     </div>
   );
 }

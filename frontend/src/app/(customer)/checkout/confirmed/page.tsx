@@ -61,7 +61,7 @@ export default function CheckoutConfirmedPage() {
 
   if (!ready || !confirmedOrderNumber) {
     return (
-      <div style={{ textAlign: "center", padding: "60px 0", color: "#7A7880", fontSize: "14px" }}>
+      <div style={{ textAlign: "center", padding: "60px 0", color: "#6B6B6B", fontSize: "14px" }}>
         Loading&hellip;
       </div>
     );
@@ -74,96 +74,64 @@ export default function CheckoutConfirmedPage() {
   const shippingLabel = SHIPPING_LABELS[confirmedShippingMethod] ?? "Standard Ground";
 
   return (
-    <div style={{ textAlign: "center", fontFamily: "'DM Sans', sans-serif" }}>
+    <div style={{ background: "#F8F8F6", padding: "64px 24px", display: "flex", flexDirection: "column", alignItems: "center", minHeight: "60vh", fontFamily: "'DM Sans', sans-serif" }}>
+      <div style={{ maxWidth: "600px", width: "100%" }}>
 
-      {/* Success */}
-      <div style={{ marginBottom: "24px" }}>
-        <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: "44px", fontWeight: 600, color: "#1A1A1A", lineHeight: 1.15, marginBottom: "12px" }}>
+        {/* Success checkmark */}
+        <div style={{ marginBottom: "20px", textAlign: "center" }}>
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+            <circle cx="24" cy="24" r="24" fill="#1C3557" opacity="0.1"/>
+            <path d="M14 24l7 7 13-13" stroke="#1C3557" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+
+        <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: "44px", fontWeight: 600, color: "#1A1A1A", marginBottom: "12px", lineHeight: 1.1, textAlign: "left" }}>
           Order Confirmed
         </h1>
-
-        <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: "14px", color: "#6B6B6B", marginBottom: "12px" }}>
+        <p style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: "14px", color: "#6B6B6B", marginBottom: "8px" }}>
           {orderNum}
-        </div>
-
-        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "15px", color: "#6B6B6B", lineHeight: 1.7, maxWidth: "480px", margin: "0 auto" }}>
+        </p>
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "16px", color: "#6B6B6B", marginBottom: "36px", lineHeight: 1.6 }}>
           Your order has been placed. You will receive a confirmation email shortly.
         </p>
-      </div>
 
-      {/* Order detail box */}
-      <div style={{
-        background: "#FFFFFF", border: "1px solid #E2E2DE",
-        padding: "24px", textAlign: "left", margin: "28px 0",
-      }}>
-        <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".1em", color: "#6B6B6B", marginBottom: "16px" }}>
-          Order Details
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", alignItems: "flex-start", fontSize: "13px" }}>
-            <span style={{ color: "#7A7880", flexShrink: 0 }}>Product</span>
-            <span style={{ fontWeight: 700, color: "#2A2830", textAlign: "right" }}>{confirmedProductName}</span>
-          </div>
-
-          {confirmedColorSummary && (
-            <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", alignItems: "flex-start", fontSize: "13px" }}>
-              <span style={{ color: "#7A7880", flexShrink: 0 }}>Colors</span>
-              <span style={{ fontWeight: 600, color: "#2A2830", textAlign: "right" }}>{confirmedColorSummary}</span>
+        {/* Details box */}
+        <div style={{ border: "1px solid #E2E2DE", background: "#FFFFFF", padding: "24px", marginBottom: "28px" }}>
+          {[
+            { label: "Order Number", value: orderNum, mono: true },
+            { label: "Items", value: `${confirmedUnits} unit${confirmedUnits !== 1 ? "s" : ""}` },
+            ...(confirmedProductName ? [{ label: "Product", value: confirmedProductName }] : []),
+            ...(confirmedColorSummary ? [{ label: "Colors", value: confirmedColorSummary }] : []),
+            { label: "Shipping", value: shippingLabel },
+            ...(confirmedShippingCost > 0 ? [{ label: "Shipping Cost", value: formatCurrency(confirmedShippingCost) }] : []),
+            { label: "Total", value: formatCurrency(confirmedOrderTotal) },
+            ...(confirmedPaymentMethod ? [{ label: "Payment", value: confirmedPaymentMethod === "net_30" ? "Net 30 — Invoice" : confirmedPaymentMethod === "ach" ? "ACH / Bank Transfer" : "Credit Card" }] : []),
+          ].map((row, i, arr) => (
+            <div key={row.label} style={{ display: "flex", gap: "12px", padding: "10px 0", borderBottom: i < arr.length - 1 ? "1px solid #E2E2DE" : "none" }}>
+              <dt style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", color: "#6B6B6B", minWidth: "200px", margin: 0 }}>{row.label}</dt>
+              <dd style={{ fontFamily: (row as { mono?: boolean }).mono ? "'IBM Plex Mono', monospace" : "'DM Sans', sans-serif", fontSize: (row as { mono?: boolean }).mono ? "13px" : "14px", color: "#1A1A1A", margin: 0, fontWeight: 500 }}>{row.value}</dd>
             </div>
-          )}
-
-          <div style={{ borderTop: "1px solid #F0EEE9" }} />
-
-          <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", fontSize: "13px" }}>
-            <span style={{ color: "#7A7880" }}>Shipping</span>
-            <span style={{ fontWeight: 600, color: "#2A2830" }}>
-              {shippingLabel}{confirmedShippingCost > 0 ? ` — ${formatCurrency(confirmedShippingCost)}` : " — FREE"}
-            </span>
-          </div>
-
-          <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", fontSize: "13px" }}>
-            <span style={{ color: "#7A7880" }}>Payment</span>
-            <span style={{ fontWeight: 600, color: "#2A2830" }}>
-              {confirmedPaymentMethod === "ach" ? "ACH / Bank Transfer" : "Credit Card"}
-            </span>
-          </div>
-
-          <div style={{ borderTop: "1px solid #E2E2DE" }} />
-
-          <div style={{ display: "flex", justifyContent: "space-between", gap: "12px" }}>
-            <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "15px", fontWeight: 600, color: "#1A1A1A" }}>Total Charged</span>
-            <span style={{ fontFamily: "'Fraunces', serif", fontSize: "20px", color: "#1C3557", fontWeight: 600 }}>
-              {formatCurrency(confirmedOrderTotal)}
-            </span>
-          </div>
+          ))}
         </div>
-      </div>
 
-      {/* Actions */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-        <Link
-          href={(() => {
-            try { const d = JSON.parse(sessionStorage.getItem("af_confirmed_order") || "{}"); return d.isGuest ? "/track-order" : "/account/orders"; } catch { return "/account/orders"; }
-          })()}
-          style={{
-            display: "block", padding: "14px", background: "#1C3557", color: "#fff",
-            textDecoration: "none", fontFamily: "'DM Sans', sans-serif",
-            fontSize: "14px", fontWeight: 500, transition: "background .2s",
-          }}
-        >
-          {(() => { try { const d = JSON.parse(sessionStorage.getItem("af_confirmed_order") || "{}"); return d.isGuest ? "Track Your Order →" : "Track Your Order →"; } catch { return "Track Your Order →"; } })()}
-        </Link>
-        <a
-          href="/products"
-          style={{
-            display: "block", padding: "14px", background: "#FFFFFF", color: "#1C3557",
-            border: "1px solid #1C3557", textDecoration: "none",
-            fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 500,
-          }}
-        >
-          Continue Shopping
-        </a>
+        {/* Action buttons */}
+        <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
+          <Link
+            href={(() => {
+              try { const d = JSON.parse(sessionStorage.getItem("af_confirmed_order") || "{}"); return d.isGuest ? "/track-order" : "/account/orders"; } catch { return "/account/orders"; }
+            })()}
+            style={{ display: "inline-block", padding: "12px 24px", border: "1px solid #1C3557", color: "#1C3557", fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 500, textDecoration: "none", transition: "all .15s" }}
+          >
+            Track Your Order →
+          </Link>
+          <Link
+            href="/products"
+            style={{ display: "inline-block", padding: "12px 24px", background: "#1C3557", color: "#fff", fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 500, textDecoration: "none", transition: "opacity .15s" }}
+          >
+            Continue Shopping →
+          </Link>
+        </div>
+
       </div>
     </div>
   );
