@@ -75,10 +75,7 @@ export default async function BlogListingPage() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "28px" }} className="blog-grid">
             {posts.map(post => (
               <Link key={post.id} href={`/blog/${post.slug}`} style={{ textDecoration: "none", color: "inherit" }}>
-                <article style={{ background: "#FFFFFF", border: "1px solid #E2E2DE", cursor: "pointer", transition: "box-shadow .2s" }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow = "0 4px 16px rgba(0,0,0,.08)"; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = "none"; }}
-                >
+                <article className="blog-card" style={{ background: "#FFFFFF", border: "1px solid #E2E2DE", cursor: "pointer", transition: "box-shadow .2s" }}>
                   {/* Cover */}
                   <div style={{ height: "200px", background: "#F8F8F6", overflow: "hidden" }}>
                     {post.cover_image_url ? (
@@ -117,6 +114,11 @@ export default async function BlogListingPage() {
           </div>
         )}
       </div>
+      <style>{`
+        .blog-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.08); }
+        @media (max-width: 900px) { .blog-grid { grid-template-columns: 1fr 1fr !important; } }
+        @media (max-width: 580px) { .blog-grid { grid-template-columns: 1fr !important; } }
+      `}</style>
     </div>
   );
 }

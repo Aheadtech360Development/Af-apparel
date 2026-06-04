@@ -1,13 +1,13 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import type ReCAPTCHAType from "react-google-recaptcha";
 import { authService } from "@/services/auth.service";
 import { ApiClientError } from "@/lib/api-client";
-import { FactoryIcon, PackageIcon, ZapIcon, PaletteIcon, CreditCardIcon, UsersIcon } from "@/components/ui/icons";
+import { useAuthStore } from "@/stores/auth.store";
 
 const ReCAPTCHA = dynamic(() => import("react-google-recaptcha"), {
   ssr: false,
@@ -99,7 +99,14 @@ const req = <span style={{ color: "#E8242A" }}>*</span>;
 
 export default function WholesaleRegisterPage() {
   const router = useRouter();
+  const { isAuthenticated, isLoading: authIsLoading } = useAuthStore();
   const recaptchaRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (!authIsLoading && isAuthenticated()) {
+      router.replace("/account");
+    }
+  }, [authIsLoading, isAuthenticated, router]);
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -222,10 +229,10 @@ export default function WholesaleRegisterPage() {
       </div>
 
       {/* Content */}
-      <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "32px 24px 64px", display: "grid", gridTemplateColumns: "1fr 320px", gap: "28px", alignItems: "flex-start" }} className="register-grid-responsive">
+      <div style={{ maxWidth: "760px", margin: "0 auto", padding: "32px 24px 64px" }}>
 
         {/* Form card */}
-        <div className="register-form-card" style={{ background: "#fff", border: "1px solid #E2E2DE", padding: "40px" }}>
+        <div style={{ background: "#fff", border: "1px solid #E2E2DE", padding: "40px" }}>
           <form onSubmit={handleSubmit}>
             {error && (
               <div style={{ background: "#FFF0F0", border: "1px solid #fcc", borderRadius: "6px", padding: "12px 16px", fontSize: "13px", color: "#c0392b", marginBottom: "24px" }}>
@@ -483,37 +490,12 @@ export default function WholesaleRegisterPage() {
             </p>
           </form>
         </div>
-
-        {/* Benefits sidebar */}
-        <div style={{ background: "#FFFFFF", border: "1px solid #E2E2DE", padding: "32px", position: "sticky", top: "20px" }}>
-          <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", fontWeight: 600, letterSpacing: ".1em", textTransform: "uppercase", color: "#1C3557", marginBottom: "20px" }}>
-            Why Apply?
-          </h3>
-          {[
-            { icon: <FactoryIcon size={18} color="#1C3557" />, h: "Factory-Direct Pricing", p: "No distributors. Pay factory price — better margins on every order." },
-            { icon: <PackageIcon size={18} color="#1C3557" />, h: "No Minimums", p: "Order 1 unit or 10,000. In-stock items ship same day from Dallas." },
-            { icon: <ZapIcon size={18} color="#1C3557" />, h: "Same-Day Shipping", p: "Orders before 12 PM CT ship the same day. Dallas, TX warehouse." },
-            { icon: <PaletteIcon size={18} color="#1C3557" />, h: "Print-Optimized Blanks", p: "Every fabric tested for DTF, screen printing, and embroidery." },
-            { icon: <CreditCardIcon size={18} color="#1C3557" />, h: "NET 30 Terms Available", p: "Qualifying accounts can access NET 30 payment terms." },
-            { icon: <UsersIcon size={18} color="#1C3557" />, h: "Dedicated Support", p: "Real account manager — not a ticket queue. Phone + email." },
-          ].map(item => (
-            <div key={item.h} style={{ display: "flex", gap: "12px", marginBottom: "18px", alignItems: "flex-start" }}>
-              <div style={{ minWidth: "24px", display: "flex", paddingTop: "2px" }}>{item.icon}</div>
-              <div>
-                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", fontWeight: 600, color: "#1A1A1A", marginBottom: "3px" }}>{item.h}</div>
-                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#6B6B6B", lineHeight: 1.55 }}>{item.p}</div>
-              </div>
-            </div>
-          ))}
-
-          <div style={{ marginTop: "20px", paddingTop: "16px", borderTop: "1px solid #E2E2DE" }}>
-            <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#6B6B6B", lineHeight: 1.6 }}>
-              Questions? <strong style={{ color: "#1A1A1A" }}>+1 (469) 367-9753</strong><br />
-              info@afblanks.com
-            </div>
-          </div>
-        </div>
       </div>
+      <style>{`
+        @media (max-width: 600px) {
+          .register-form-row { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </div>
   );
 }

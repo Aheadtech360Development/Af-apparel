@@ -102,11 +102,11 @@ export function Header() {
 
       {/* Main header */}
       <header style={{ background: "#FFFFFF", borderBottom: "1px solid #E2E2DE", position: "sticky", top: 0, zIndex: 1 }}>
-        <div className="header-inner" style={{ maxWidth: "1500px", margin: "0 auto", padding: "0 32px", display: "flex", alignItems: "center", justifyContent: "space-between", height: "72px", gap: "24px" }}>
+        <div className="header-inner" style={{ maxWidth: "1500px", margin: "0 auto", padding: "0 32px", display: "flex", alignItems: "center", justifyContent: "space-between", height: "64px", gap: "24px" }}>
 
           {/* Logo */}
           <Link href="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
-            <Image src="/Af-apparel logo.png" alt="AF Blanks" height={48} width={160} style={{ objectFit: "contain" }} />
+            <Image src="/Af-apparel logo.png" alt="AF Blanks" height={52} width={172} className="af-logo" style={{ objectFit: "contain", display: "block" }} />
           </Link>
 
           {/* Desktop Nav */}
@@ -321,6 +321,12 @@ export function Header() {
           </div>
         </div>
       )}
+      <style>{`
+        @media (max-width: 768px) {
+          .af-logo { height: 40px !important; width: auto !important; }
+          .header-inner { padding: 0 16px !important; }
+        }
+      `}</style>
     </>
   );
 }

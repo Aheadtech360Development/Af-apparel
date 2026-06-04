@@ -1,7 +1,7 @@
 // frontend/src/app/(auth)/login/page.tsx
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import dynamic from "next/dynamic";
@@ -30,8 +30,14 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { setAuth } = useAuthStore();
+  const { setAuth, isAuthenticated, isLoading: authIsLoading } = useAuthStore();
   const recaptchaRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (!authIsLoading && isAuthenticated()) {
+      router.replace("/account");
+    }
+  }, [authIsLoading, isAuthenticated, router]);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

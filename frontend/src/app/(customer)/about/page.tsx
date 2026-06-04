@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 
 const _API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -54,27 +53,18 @@ export default function AboutPage() {
 
       {/* OUR STORY */}
       <div style={{ background: "#F8F8F6", padding: "72px 24px" }}>
-        <div style={{ maxWidth: "1500px", margin: "0 auto" }}>
-          <div className="why-grid-responsive" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "64px", alignItems: "flex-start" }}>
+        <div style={{ maxWidth: "760px", margin: "0 auto" }}>
+          <div className="about-story-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "48px", alignItems: "flex-start" }}>
             <div>
               <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.12em", color: "#6B6B6B", marginBottom: "8px" }}>Our Story</p>
-              <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: "36px", fontWeight: 600, color: "#1A1A1A", lineHeight: 1.2, marginBottom: "24px" }}>
+              <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: "36px", fontWeight: 600, color: "#1A1A1A", lineHeight: 1.2, marginBottom: 0 }}>
                 Lower prices, direct from us.
               </h2>
+            </div>
+            <div>
               <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "15px", color: "#6B6B6B", lineHeight: 1.75 }}>
                 American Fashion was founded with a single purpose: remove the middlemen that drive up blank apparel costs for print shops and decorators across the US. For too long, businesses were paying markups of 20–35% on every blank they ordered. We built direct relationships with manufacturers and opened our own Dallas warehouse to fix that. Today, 2,000+ businesses across the US order with AF — getting lower prices and same-day shipping every time.
               </p>
-            </div>
-            <div>
-              <div style={{ border: "1px solid #E2E2DE", height: "360px", overflow: "hidden", position: "relative" }}>
-                <Image
-                  src="/Our Store.png"
-                  alt="AF Apparels Dallas Warehouse"
-                  fill
-                  sizes="(max-width: 900px) 100vw, 50vw"
-                  style={{ objectFit: "cover" }}
-                />
-              </div>
             </div>
           </div>
         </div>
@@ -139,6 +129,13 @@ export default function AboutPage() {
         </div>
       </div>
 
+      <style>{`
+        @media (max-width: 600px) {
+          .about-story-grid { grid-template-columns: 1fr !important; gap: 24px !important; }
+          .about-stats-grid { grid-template-columns: 1fr 1fr !important; }
+          .about-cert-grid  { grid-template-columns: 1fr 1fr !important; }
+        }
+      `}</style>
     </div>
   );
 }
