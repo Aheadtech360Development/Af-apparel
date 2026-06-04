@@ -11,7 +11,7 @@ import { cartService } from "@/services/cart.service";
 import { formatCurrency } from "@/lib/utils";
 import type { Cart } from "@/types/order.types";
 
-type GuestCartEntry = { unit_price: number; quantity: number; product_name?: string; color?: string | null; size?: string | null };
+type GuestCartEntry = { unit_price: number; quantity: number; product_name?: string; color?: string | null; size?: string | null; image_url?: string | null };
 
 interface SavedCard {
   id: string;
@@ -74,6 +74,7 @@ export default function CheckoutPaymentPage() {
   const [loadingCards, setLoadingCards] = useState(true);
   const [cart, setCart] = useState<Cart | null>(null);
   const [guestSubtotal, setGuestSubtotal] = useState(0);
+  const [cartDisplayItems, setCartDisplayItems] = useState<Array<{ name: string; color: string | null; size: string | null; qty: number; lineTotal: number; imageUrl?: string | null }>>([]);
 
   const [savedAch, setSavedAch] = useState<SavedAch | null>(null);
   const [useNewAch, setUseNewAch] = useState(false);
@@ -98,6 +99,14 @@ export default function CheckoutPaymentPage() {
       try {
         const entries: GuestCartEntry[] = JSON.parse(localStorage.getItem("af_guest_cart") || "[]");
         setGuestSubtotal(entries.reduce((s, i) => s + i.unit_price * i.quantity, 0));
+        setCartDisplayItems(entries.map(i => ({
+          name: i.product_name ?? "",
+          color: i.color ?? null,
+          size: i.size ?? null,
+          qty: i.quantity,
+          lineTotal: i.unit_price * i.quantity,
+          imageUrl: i.image_url,
+        })));
       } catch { /* ignore */ }
       return;
     }
@@ -131,7 +140,17 @@ export default function CheckoutPaymentPage() {
   // Load cart for total display (wholesale only)
   useEffect(() => {
     if (!isGuest) {
-      cartService.getCart().then(setCart).catch(() => { });
+      cartService.getCart().then(c => {
+        setCart(c);
+        setCartDisplayItems(c.items.map(i => ({
+          name: i.product_name,
+          color: i.color ?? null,
+          size: i.size ?? null,
+          qty: i.quantity,
+          lineTotal: Number(i.line_total),
+          imageUrl: i.product_image_url,
+        })));
+      }).catch(() => { });
     }
     const saved = localStorage.getItem("af_coupon");
     if (saved) {
@@ -543,6 +562,31 @@ export default function CheckoutPaymentPage() {
             <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, color: "#1A1A1A", marginBottom: "18px" }}>
               Order Summary
             </div>
+            {/* Cart items */}
+            {cartDisplayItems.length > 0 && (
+              <div>
+                {cartDisplayItems.map((item, i) => (
+                  <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "12px", marginBottom: "16px", paddingBottom: "16px", borderBottom: "1px solid #E2E2DE" }}>
+                    <div style={{ width: "52px", height: "52px", border: "1px solid #E2E2DE", flexShrink: 0, background: "#FFFFFF", overflow: "hidden" }}>
+                      {item.imageUrl
+                        // eslint-disable-next-line @next/next/no-img-element
+                        ? <img src={item.imageUrl} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                        : <div style={{ width: "100%", height: "100%", background: "#F8F8F6" }} />
+                      }
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", fontWeight: 500, color: "#1A1A1A", lineHeight: 1.3 }}>{item.name}</div>
+                      <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", color: "#6B6B6B", marginTop: "2px" }}>
+                        {[item.color, item.size].filter(Boolean).join(" / ")}{item.qty > 0 ? ` × ${item.qty}` : ""}
+                      </div>
+                    </div>
+                    <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", fontWeight: 500, color: "#1A1A1A", whiteSpace: "nowrap", flexShrink: 0 }}>
+                      {formatCurrency(item.lineTotal)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
             {(cart || isGuest) && (
               <div style={{ display: "flex", flexDirection: "column" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#6B6B6B", padding: "8px 0", borderBottom: "1px solid #E2E2DE" }}>
