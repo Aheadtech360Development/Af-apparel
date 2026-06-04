@@ -106,7 +106,7 @@ export function Header() {
 
           {/* Logo */}
           <Link href="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
-            <Image src="/Af-apparel logo.png" alt="AF Blanks" height={52} width={172} className="af-logo" style={{ objectFit: "contain", display: "block" }} />
+            <Image src="/Af-apparel logo.png" alt="AF Blanks" height={52} width={60} className="af-logo" style={{ objectFit: "contain", display: "block" }} />
           </Link>
 
           {/* Desktop Nav */}
