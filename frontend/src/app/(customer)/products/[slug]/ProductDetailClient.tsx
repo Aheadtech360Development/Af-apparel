@@ -722,7 +722,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
           {/* ── LEFT: Image Gallery ─────────────────────────────────────── */}
           <div>
             {/* Main image */}
-            <div className="pdp-main-img" style={{ height: "480px", border: "1px solid #E2E2DE", display: "flex", alignItems: "center", justifyContent: "center", background: "#FFFFFF", overflow: "hidden" }}>
+            <div className="pdp-main-img" style={{ width: "100%", height: "480px", border: "1px solid #E2E2DE", display: "flex", alignItems: "center", justifyContent: "center", background: "#FFFFFF", overflow: "hidden" }}>
               {displayImages[activeImageIdx] ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
