@@ -428,10 +428,21 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
         setExpandedColors(
           groupVariantsByColor(p.variants ?? []).slice(0, 3).map(g => g.color)
         );
+        // Auto-select first color that has images, so gallery shows that color on load
+        const groups = groupVariantsByColor(p.variants ?? []);
+        if (groups.length > 0) {
+          const imgs = p.images ?? [];
+          const firstColorWithImages = groups.find(g =>
+            imgs.some(img => img.alt_text?.toLowerCase().includes(g.color.toLowerCase()))
+          );
+          if (firstColorWithImages) {
+            setSelectedColor(firstColorWithImages.color);
+          }
+        }
       })
       .catch(() => { })
       .finally(() => setProductLoading(false));
-  }, [slug, isAuthenticated, authIsLoading]);
+  }, [slug, isAuthenticated, authIsLoading]); // eslint-disable-line
 
   const colorGroups = useMemo(() => groupVariantsByColor(product?.variants ?? []), [product?.variants]);
   const uniqueColors = colorGroups.map(g => g.color);
@@ -589,18 +600,32 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
 
   async function handleDownload(imageUrl: string, filename: string) {
     try {
-      const response = await fetch(imageUrl);
+      const response = await fetch(imageUrl, { mode: "cors" });
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = filename;
+      a.download = filename || "image.jpg";
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch {
-      window.open(imageUrl, "_blank");
+      // fallback: force download via anchor with download attribute
+      const a = document.createElement("a");
+      a.href = imageUrl;
+      a.download = filename || "image.jpg";
+      a.target = "_blank";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+  }
+
+  async function handleDownloadAll(imgs: Array<{ url: string; filename: string }>) {
+    for (let i = 0; i < imgs.length; i++) {
+      await new Promise<void>(resolve => setTimeout(resolve, 150));
+      await handleDownload(imgs[i]!.url, imgs[i]!.filename);
     }
   }
 
@@ -673,7 +698,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
 
       {/* Breadcrumb */}
       <div style={{ background: "#FFFFFF", borderBottom: "1px solid #E2E2DE", padding: "12px 24px" }}>
-        <div style={{ maxWidth: "1500px", margin: "0 auto", display: "flex", alignItems: "center", gap: "6px", fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#6B6B6B", flexWrap: "wrap" }}>
+        <div className="pdp-breadcrumb-inner" style={{ maxWidth: "1500px", margin: "0 auto", display: "flex", alignItems: "center", gap: "6px", fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#6B6B6B", flexWrap: "wrap" }}>
           <Link href="/" style={{ color: "#6B6B6B", textDecoration: "none" }}>Home</Link>
           <span>›</span>
           <Link href="/products" style={{ color: "#6B6B6B", textDecoration: "none" }}>Collections</Link>
@@ -697,7 +722,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
           {/* ── LEFT: Image Gallery ─────────────────────────────────────── */}
           <div>
             {/* Main image */}
-            <div style={{ height: "480px", border: "1px solid #E2E2DE", display: "flex", alignItems: "center", justifyContent: "center", background: "#FFFFFF", overflow: "hidden" }}>
+            <div className="pdp-main-img" style={{ height: "480px", border: "1px solid #E2E2DE", display: "flex", alignItems: "center", justifyContent: "center", background: "#FFFFFF", overflow: "hidden" }}>
               {displayImages[activeImageIdx] ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -717,6 +742,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                   <button
                     key={img.id}
                     onClick={() => setActiveImageIdx(i)}
+                    className="pdp-thumb"
                     style={{ width: "80px", height: "80px", flexShrink: 0, border: activeImageIdx === i ? "1px solid #1C3557" : "1px solid #E2E2DE", cursor: "pointer", background: "#F8F8F6", padding: 0, outline: activeImageIdx === i ? "1px solid #1C3557" : "none", outlineOffset: "2px", overflow: "hidden" }}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -727,7 +753,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
             )}
 
             {/* Gallery links */}
-            <div style={{ marginTop: "14px", display: "flex", flexDirection: "column", gap: "6px" }}>
+            <div className="pdp-gallery-links" style={{ marginTop: "14px", display: "flex", flexDirection: "column", gap: "6px" }}>
               <a
                 href="#"
                 onClick={e => { e.preventDefault(); handleDownloadStyleSheet(); }}
@@ -758,7 +784,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
             )}
 
             {/* Title */}
-            <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: "36px", fontWeight: 600, color: "#1A1A1A", lineHeight: 1.15, marginBottom: "10px" }}>
+            <h1 className="pdp-title" style={{ fontFamily: "'Fraunces', serif", fontSize: "36px", fontWeight: 600, color: "#1A1A1A", lineHeight: 1.15, marginBottom: "10px" }}>
               {product.name}
             </h1>
 
@@ -828,6 +854,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                         const isLight = ["#FFFFFF", "#fffff0", "#fef3c7", "#f5f0e8"].includes(hex);
                         const rowQty = group.variants.reduce((s, v) => s + (quantities[v.id] ?? 0), 0);
                         const rowTotal = group.variants.reduce((s, v) => s + (quantities[v.id] ?? 0) * Number(v.effective_price ?? v.retail_price ?? 0), 0);
+                        const allRowOOS = group.variants.every(v => isOutOfStock(v.stock_quantity));
                         return (
                           <tr key={group.color}>
                             <td style={{ padding: "10px 8px", borderBottom: "1px solid #E2E2DE", verticalAlign: "top" }}>
@@ -847,9 +874,9 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                               const stockLabel = isOOS ? "Out of Stock" : stockNum >= 9999 ? "In Stock" : `${stockNum} in stock`;
                               const price = Number(variant.effective_price ?? variant.retail_price ?? 0);
                               return (
-                                <td key={size} style={{ padding: "10px 8px", borderBottom: "1px solid #E2E2DE", textAlign: "center", verticalAlign: "top" }}>
-                                  <span style={{ display: "block", fontSize: "11px", color: "#6B6B6B", fontFamily: "'DM Sans', sans-serif", marginBottom: "2px" }}>{stockLabel}</span>
-                                  <span style={{ display: "block", fontSize: "11px", color: "#6B6B6B", fontFamily: "'DM Sans', sans-serif", marginBottom: "4px" }}>${price.toFixed(2)}</span>
+                                <td key={size} style={{ padding: "10px 8px", borderBottom: "1px solid #E2E2DE", textAlign: "center", verticalAlign: "top", background: isOOS ? "#fafafa" : "transparent" }}>
+                                  <span style={{ display: "block", fontSize: "11px", color: isOOS ? "#cc0000" : "#6B6B6B", fontWeight: isOOS ? 500 : 400, fontFamily: "'DM Sans', sans-serif", marginBottom: "2px" }}>{stockLabel}</span>
+                                  <span style={{ display: "block", fontSize: "11px", color: isOOS ? "#aaaaaa" : "#6B6B6B", fontFamily: "'DM Sans', sans-serif", marginBottom: "4px" }}>${price.toFixed(2)}</span>
                                   <input
                                     type="number"
                                     min={0}
@@ -866,7 +893,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                                         return { ...prev, [variant.id]: val };
                                       });
                                     }}
-                                    style={{ width: "52px", border: `1px solid ${qty > 0 ? "#1C3557" : "#E2E2DE"}`, padding: "5px 6px", textAlign: "center", fontFamily: "'DM Sans', sans-serif", fontSize: "13px", outline: "none", opacity: isOOS ? 0.4 : 1, cursor: isOOS ? "not-allowed" : "text", background: isOOS ? "#f5f5f5" : "#FFFFFF" }}
+                                    style={{ width: "52px", border: `1px solid ${isOOS ? "#e0e0e0" : qty > 0 ? "#1C3557" : "#E2E2DE"}`, padding: "5px 6px", textAlign: "center", fontFamily: "'DM Sans', sans-serif", fontSize: "13px", outline: "none", cursor: isOOS ? "not-allowed" : "text", background: isOOS ? "#f0f0f0" : "#FFFFFF", color: isOOS ? "#aaaaaa" : "#1A1A1A" }}
                                   />
                                 </td>
                               );
@@ -878,8 +905,8 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                             <td style={{ padding: "10px 8px", borderBottom: "1px solid #E2E2DE", textAlign: "center", verticalAlign: "middle" }}>
                               <button
                                 onClick={() => handleRowAddToCart(group)}
-                                disabled={rowQty === 0}
-                                style={{ background: "transparent", color: rowQty > 0 ? "#1C3557" : "#ccc", border: `1px solid ${rowQty > 0 ? "#1C3557" : "#E2E2DE"}`, padding: "5px 10px", fontSize: "11px", fontFamily: "'DM Sans', sans-serif", cursor: rowQty > 0 ? "pointer" : "not-allowed", whiteSpace: "nowrap" }}
+                                disabled={rowQty === 0 || allRowOOS}
+                                style={{ background: "transparent", color: (rowQty > 0 && !allRowOOS) ? "#1C3557" : "#ccc", border: `1px solid ${(rowQty > 0 && !allRowOOS) ? "#1C3557" : "#E2E2DE"}`, padding: "5px 10px", fontSize: "11px", fontFamily: "'DM Sans', sans-serif", cursor: (rowQty > 0 && !allRowOOS) ? "pointer" : "not-allowed", whiteSpace: "nowrap" }}
                               >
                                 Add to Cart
                               </button>
@@ -892,7 +919,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                 </div>
 
                 {/* Grand total row */}
-                <div style={{ display: "flex", alignItems: "center", gap: "24px", padding: "16px 0 12px", borderTop: "1px solid #E2E2DE", marginTop: "8px" }}>
+                <div className="pdp-grand-total" style={{ display: "flex", alignItems: "center", gap: "24px", padding: "16px 0 12px", borderTop: "1px solid #E2E2DE", marginTop: "8px" }}>
                   <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", color: "#6B6B6B" }}>
                     Grand Total Qty: <strong style={{ color: "#1A1A1A" }}>{totalUnits}</strong>
                   </span>
@@ -1064,9 +1091,49 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
 
       <style>{`
         @media (max-width: 900px) {
-          .pdp-main-grid { grid-template-columns: 1fr !important; gap: 24px !important; }
-          .pdp-main-grid h1 { font-size: 28px !important; }
-          .pdp-main-grid button[style*="width: 80px"] { width: 60px !important; height: 60px !important; }
+          .pdp-main-grid {
+            grid-template-columns: 1fr !important;
+            gap: 24px !important;
+          }
+          .pdp-main-img {
+            height: 320px !important;
+          }
+          .pdp-thumb {
+            width: 60px !important;
+            height: 60px !important;
+          }
+          .pdp-title {
+            font-size: 28px !important;
+          }
+          .pdp-gallery-links {
+            flex-direction: row !important;
+            flex-wrap: wrap !important;
+            gap: 16px !important;
+          }
+          .pdp-grand-total {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 8px !important;
+          }
+          .pdp-breadcrumb-inner {
+            font-size: 11px !important;
+          }
+        }
+        @media (max-width: 600px) {
+          .pdp-title {
+            font-size: 24px !important;
+          }
+          .pdp-main-img {
+            height: 260px !important;
+          }
+          .pdp-thumb {
+            width: 50px !important;
+            height: 50px !important;
+          }
+          .pdp-main-grid {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+          }
         }
       `}</style>
 
@@ -1125,13 +1192,12 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                       {group.images.length} image{group.images.length !== 1 ? "s" : ""}
                     </div>
                     <button
-                      onClick={async () => {
-                        for (let idx = 0; idx < group.images.length; idx++) {
-                          const img = group.images[idx]!;
-                          await handleDownload(imgSrc(img), `${product.slug}-${group.color ?? "image"}-${idx + 1}.jpg`);
-                          if (idx < group.images.length - 1) await new Promise(r => setTimeout(r, 100));
-                        }
-                      }}
+                      onClick={() => handleDownloadAll(
+                        group.images.map((img, idx) => ({
+                          url: imgSrc(img),
+                          filename: `${product.slug}-${group.color ?? "image"}-${idx + 1}.jpg`,
+                        }))
+                      )}
                       style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", color: "#1C3557", background: "none", border: "none", cursor: "pointer", padding: 0, display: "block" }}
                     >
                       Download All
