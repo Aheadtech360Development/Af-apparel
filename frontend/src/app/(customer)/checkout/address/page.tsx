@@ -92,6 +92,7 @@ export default function CheckoutAddressPage() {
   const [liveRatesLoading, setLiveRatesLoading] = useState(false);
   const [selectedLiveRateId, setSelectedLiveRateId] = useState<string | null>(null);
   const [cartItemsForShipping, setCartItemsForShipping] = useState<Array<{ variant_id: string; quantity: number }>>([]);
+  const [cartDisplayItems, setCartDisplayItems] = useState<Array<{ name: string; color: string | null; size: string | null; qty: number; lineTotal: number; imageUrl?: string | null }>>([]);
   const ratesDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [form, setForm] = useState({
@@ -129,13 +130,21 @@ export default function CheckoutAddressPage() {
       let guestSubtotal = 0;
       let guestUnits = 0;
       try {
-        const guestCart = JSON.parse(localStorage.getItem("af_guest_cart") || "[]") as Array<{ variant_id?: string; unit_price: number; quantity: number }>;
+        const guestCart = JSON.parse(localStorage.getItem("af_guest_cart") || "[]") as Array<{ variant_id?: string; unit_price: number; quantity: number; product_name?: string; color?: string | null; size?: string | null; image_url?: string | null }>;
         guestSubtotal = guestCart.reduce((s, i) => s + i.unit_price * i.quantity, 0);
         guestUnits = guestCart.reduce((s, i) => s + i.quantity, 0);
         setSubtotal(guestSubtotal);
         setCartItemsForShipping(
           guestCart.filter(i => i.variant_id).map(i => ({ variant_id: i.variant_id!, quantity: i.quantity }))
         );
+        setCartDisplayItems(guestCart.map(i => ({
+          name: i.product_name ?? "",
+          color: i.color ?? null,
+          size: i.size ?? null,
+          qty: i.quantity,
+          lineTotal: i.unit_price * i.quantity,
+          imageUrl: i.image_url,
+        })));
       } catch { /* ignore */ }
       setShowNewForm(true);
       if (shippingTypeForUser !== "live_shippo") {
@@ -166,6 +175,14 @@ export default function CheckoutAddressPage() {
       cartService.getCart().then(c => {
         setSubtotal(Number(c.subtotal));
         setCartItemsForShipping(c.items.map(i => ({ variant_id: i.variant_id, quantity: i.quantity })));
+        setCartDisplayItems(c.items.map(i => ({
+          name: i.product_name,
+          color: i.color ?? null,
+          size: i.size ?? null,
+          qty: i.quantity,
+          lineTotal: Number(i.line_total),
+          imageUrl: i.product_image_url,
+        })));
         const hasTier = (c.validation as (typeof c.validation & { has_shipping_tier?: boolean }))?.has_shipping_tier ?? false;
         setTierShipping(hasTier ? Number(c.validation?.estimated_shipping ?? 0) : null);
       }).catch(() => {
@@ -702,7 +719,7 @@ export default function CheckoutAddressPage() {
                                           <img
                                             src={CARRIER_LOGOS[rate.carrier]}
                                             alt={rate.carrier}
-                                            style={{ height: "22px", width: "auto", objectFit: "contain", flexShrink: 0 }}
+                                            style={{ maxHeight: "20px", width: "auto", objectFit: "contain", flexShrink: 0 }}
                                           />
                                         )}
                                         <div>
@@ -761,6 +778,33 @@ export default function CheckoutAddressPage() {
             <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, color: "#1A1A1A", marginBottom: "18px" }}>
               Order Summary
             </div>
+
+            {/* Cart items */}
+            {cartDisplayItems.length > 0 && (
+              <div>
+                {cartDisplayItems.map((item, i) => (
+                  <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "12px", marginBottom: "16px", paddingBottom: "16px", borderBottom: "1px solid #E2E2DE" }}>
+                    <div style={{ width: "52px", height: "52px", border: "1px solid #E2E2DE", flexShrink: 0, background: "#FFFFFF", overflow: "hidden" }}>
+                      {item.imageUrl
+                        // eslint-disable-next-line @next/next/no-img-element
+                        ? <img src={item.imageUrl} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                        : <div style={{ width: "100%", height: "100%", background: "#F8F8F6" }} />
+                      }
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", fontWeight: 500, color: "#1A1A1A", lineHeight: 1.3 }}>{item.name}</div>
+                      <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", color: "#6B6B6B", marginTop: "2px" }}>
+                        {[item.color, item.size].filter(Boolean).join(" / ")}{item.qty > 0 ? ` × ${item.qty}` : ""}
+                      </div>
+                    </div>
+                    <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", fontWeight: 500, color: "#1A1A1A", whiteSpace: "nowrap", flexShrink: 0 }}>
+                      {formatCurrency(item.lineTotal)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
             <div style={{ display: "flex", flexDirection: "column" }}>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#6B6B6B", padding: "8px 0", borderBottom: "1px solid #E2E2DE" }}>
                 <span>Subtotal</span>

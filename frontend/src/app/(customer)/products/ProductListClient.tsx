@@ -482,7 +482,7 @@ export function ProductListClient({
       {/* ── Desktop sidebar ── */}
       <aside
         className="hidden lg:block"
-        style={{ width: "300px", flexShrink: 0, borderRight: "1px solid #E2E2DE", padding: "28px 20px 28px 0", position: "sticky", top: "72px", maxHeight: "calc(100vh - 72px)", overflowY: "auto", background: "#ffffff" }}
+        style={{ width: "300px", flexShrink: 0, borderRight: "1px solid #E2E2DE", padding: "28px 20px 28px 0", position: "sticky", top: "72px", maxHeight: "calc(100vh - 72px)", overflowY: "auto", background: "#f8f8f6" }}
       >
         {sidebarContent}
       </aside>
