@@ -47,15 +47,15 @@ export default async function HomePage() {
         <HeroSection />
         <TrustStrip />
         <CategoryGrid categories={categories} />
-        <BestSellers />
-        <HowItWorks />
-        <WhoWeServe />
+        {/* <BestSellers /> */}
+        {/* <HowItWorks /> */}
+        {/* <WhoWeServe /> */}
         {/* S10: Why Choose AF */}
-        <WhyChooseUs />
+        {/* <WhyChooseUs /> */}
         {/* S11: Client Logos */}
         {/* <BrandLogos /> */}
         <Certifications />
-        <FaqSection />
+        {/* <FaqSection /> */}
         {/* S13: CTA */}
         <CtaSection />
       </main>
