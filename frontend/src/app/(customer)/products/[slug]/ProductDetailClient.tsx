@@ -836,8 +836,8 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                 <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", fontWeight: 600, color: "#1A1A1A", marginBottom: "14px" }}>
                   Select Sizes &amp; Quantities
                 </div>
-                <div style={{ overflowX: "auto" }}>
-                  <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "'DM Sans', sans-serif", fontSize: "13px" }}>
+                <div className="bulk-table-wrapper" style={{ overflowX: "auto", WebkitOverflowScrolling: "touch", marginLeft: "-16px", marginRight: "-16px", paddingLeft: "16px", paddingRight: "16px" }}>
+                  <table style={{ minWidth: "650px", width: "100%", borderCollapse: "collapse", fontFamily: "'DM Sans', sans-serif", fontSize: "13px" }}>
                     <thead>
                       <tr>
                         <th style={{ fontSize: "11px", color: "#6B6B6B", fontWeight: 500, padding: "6px 8px", textAlign: "left", borderBottom: "1px solid #E2E2DE" }}>Color</th>
@@ -1090,10 +1090,22 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
       </div>
 
       <style>{`
+        /* ── PDP table: always scrollable, never overflows ── */
+        .bulk-table-wrapper {
+          overflow-x: auto !important;
+          -webkit-overflow-scrolling: touch !important;
+        }
+        .bulk-table-wrapper table {
+          min-width: 650px !important;
+        }
+
         @media (max-width: 900px) {
           .pdp-main-grid {
-            grid-template-columns: 1fr !important;
-            gap: 24px !important;
+            display: block !important;
+          }
+          .pdp-main-grid > div {
+            width: 100% !important;
+            max-width: 100% !important;
           }
           .pdp-main-img {
             height: 320px !important;
@@ -1118,6 +1130,12 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
           .pdp-breadcrumb-inner {
             font-size: 11px !important;
           }
+          .bulk-table-wrapper {
+            margin-left: -16px !important;
+            margin-right: -16px !important;
+            padding-left: 16px !important;
+            padding-right: 16px !important;
+          }
         }
         @media (max-width: 600px) {
           .pdp-title {
@@ -1129,10 +1147,6 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
           .pdp-thumb {
             width: 50px !important;
             height: 50px !important;
-          }
-          .pdp-main-grid {
-            padding-left: 0 !important;
-            padding-right: 0 !important;
           }
         }
       `}</style>
