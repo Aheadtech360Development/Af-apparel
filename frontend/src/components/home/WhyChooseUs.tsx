@@ -10,26 +10,24 @@ export default function WhyChooseUs() {
   ];
 
   return (
-    <section style={{ padding: "60px 0", background: "#F4F6F9" }}>
-      <div style={{ maxWidth: "1500px", margin: "0 auto", padding: "0 24px" }}>
-        <div style={{ display: "flex", gap: "48px", alignItems: "center", flexWrap: "wrap" }}>
-          <div style={{ flex: "1.2", minWidth: "260px" }}>
-            <div style={{ marginBottom: "36px" }}>
-              <h2 style={{ fontFamily: "'Barlow Semi Condensed', sans-serif", fontSize: "28px", fontWeight: 800, color: "#0F172A", marginBottom: "8px" }}>Why 2,000+ Businesses Choose AF Apparels</h2>
-              <p style={{ fontSize: "14px", color: "#64748B", maxWidth: "560px", lineHeight: 1.6 }}>Factory-direct isn&apos;t just a price story. It&apos;s a reliability story.</p>
-            </div>
+    <section style={{ padding: "72px 24px", background: "#FFFFFF", borderTop: "1px solid #E2E2DE" }}>
+      <div style={{ maxWidth: "1500px", margin: "0 auto" }}>
+        <div className="why-grid-responsive" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "64px", alignItems: "center" }}>
+          <div>
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.12em", color: "#6B6B6B", marginBottom: "8px" }}>Why AF</p>
+            <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: "36px", fontWeight: 600, color: "#1A1A1A", marginBottom: "32px", lineHeight: 1.2 }}>Why 2,000+ Businesses Choose AF Apparels</h2>
             {rows.map(({ num, h, p }) => (
-              <div key={num} style={{ display: "flex", gap: "14px", marginBottom: "18px", alignItems: "flex-start" }}>
-                <div style={{ fontFamily: "'Barlow Semi Condensed', sans-serif", fontSize: "22px", fontWeight: 800, color: "#E8242A", minWidth: "28px", lineHeight: 1, marginTop: "1px" }}>{num}</div>
+              <div key={num} style={{ display: "flex", gap: "16px", marginBottom: "20px", alignItems: "flex-start" }}>
+                <div style={{ fontFamily: "'Fraunces', serif", fontSize: "20px", fontWeight: 300, color: "#1C3557", minWidth: "28px", lineHeight: 1, marginTop: "2px" }}>{num}</div>
                 <div>
-                  <h4 style={{ fontFamily: "'Barlow Semi Condensed', sans-serif", fontSize: "15px", fontWeight: 700, marginBottom: "3px", color: "#0F172A" }}>{h}</h4>
-                  <p style={{ fontSize: "12px", color: "#64748B", lineHeight: 1.55 }}>{p}</p>
+                  <h4 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 600, marginBottom: "4px", color: "#1A1A1A" }}>{h}</h4>
+                  <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#6B6B6B", lineHeight: 1.6 }}>{p}</p>
                 </div>
               </div>
             ))}
           </div>
-          <div className="hidden lg:flex" style={{ flex: 1, minWidth: "240px" }}>
-            <div style={{ height: "360px", width: "100%", overflow: "hidden", borderRadius: "15px", border: "1px solid #E2E8F0", position: "relative" }}>
+          <div className="hidden lg:flex">
+            <div style={{ height: "440px", width: "100%", overflow: "hidden", border: "1px solid #E2E2DE", position: "relative" }}>
               <Image
                 src="/Home page Hero.png"
                 alt="Warehouse / Fulfillment Center"

@@ -55,35 +55,38 @@ const SALES_REP_OPTIONS = [
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
-  border: "1px solid #E2E0DA",
-  borderRadius: "6px",
-  padding: "10px 14px",
+  border: "1px solid #E2E2DE",
+  padding: "11px 14px",
   fontSize: "14px",
-  color: "#2A2830",
+  color: "#1A1A1A",
   background: "#fff",
   outline: "none",
   transition: "border-color .2s",
   boxSizing: "border-box",
+  fontFamily: "'DM Sans', sans-serif",
 };
 
 const labelStyle: React.CSSProperties = {
   display: "block",
-  fontSize: "11px",
-  fontWeight: 700,
+  fontSize: "12px",
+  fontWeight: 500,
   textTransform: "uppercase",
-  letterSpacing: ".07em",
-  color: "#7A7880",
+  letterSpacing: ".05em",
+  color: "#1A1A1A",
   marginBottom: "6px",
+  fontFamily: "'DM Sans', sans-serif",
 };
 
 const sectionHeadStyle: React.CSSProperties = {
-  fontFamily: "var(--font-bebas)",
-  fontSize: "16px",
-  letterSpacing: ".06em",
-  color: "#2A2830",
-  marginBottom: "20px",
+  fontFamily: "'DM Sans', sans-serif",
+  fontSize: "11px",
+  fontWeight: 600,
+  letterSpacing: ".1em",
+  textTransform: "uppercase",
+  color: "#1C3557",
+  marginBottom: "16px",
   paddingBottom: "10px",
-  borderBottom: "1px solid #E2E0DA",
+  borderBottom: "1px solid #1C3557",
 };
 
 const gridStyle: React.CSSProperties = {
@@ -207,25 +210,22 @@ export default function WholesaleRegisterPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F4F3EF", fontFamily: "var(--font-jakarta)" }}>
+    <div style={{ minHeight: "100vh", background: "#F8F8F6", fontFamily: "'DM Sans', sans-serif" }}>
       {/* Page header */}
-      <div style={{ background: "#1B3A5C", padding: "32px", textAlign: "center", borderBottom: "3px solid #E8242A" }}>
-        {/* <Link href="/" style={{ display: "inline-flex", alignItems: "center", textDecoration: "none", marginBottom: "16px" }}>
-          <img src="/Af-apparel logo.png" alt="AF Apparels Logo" style={{ height: "55px", width: "auto", objectFit: "contain" }} />
-        </Link> */}
-        <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(28px,3vw,42px)", color: "#fff", letterSpacing: ".02em", lineHeight: 1, marginBottom: "8px" }}>
-          Apply for Wholesale Access
+      <div style={{ maxWidth: "760px", margin: "0 auto", padding: "56px 24px 0", textAlign: "center" }}>
+        <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: "38px", fontWeight: 600, color: "#1A1A1A", lineHeight: 1.2, marginBottom: "12px" }}>
+          Apply for a Wholesale Account
         </h1>
-        <p style={{ fontSize: "14px", color: "#d3d0d0", maxWidth: "460px", margin: "0 auto" }}>
-          Free to apply. Approved within 24 hours. No commitment required.
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "15px", color: "#6B6B6B", maxWidth: "460px", margin: "0 auto 40px" }}>
+          Apply once. Get lower prices, better terms, and faster fulfillment.
         </p>
       </div>
 
       {/* Content */}
-      <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "48px 32px", display: "grid", gridTemplateColumns: "1fr 340px", gap: "28px", alignItems: "flex-start" }} className="register-grid-responsive">
+      <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "32px 24px 64px", display: "grid", gridTemplateColumns: "1fr 320px", gap: "28px", alignItems: "flex-start" }} className="register-grid-responsive">
 
         {/* Form card */}
-        <div className="register-form-card" style={{ background: "#fff", border: "1px solid #E2E0DA", borderRadius: "12px", padding: "40px" }}>
+        <div className="register-form-card" style={{ background: "#fff", border: "1px solid #E2E2DE", padding: "40px" }}>
           <form onSubmit={handleSubmit}>
             {error && (
               <div style={{ background: "#FFF0F0", border: "1px solid #fcc", borderRadius: "6px", padding: "12px 16px", fontSize: "13px", color: "#c0392b", marginBottom: "24px" }}>
@@ -425,7 +425,7 @@ export default function WholesaleRegisterPage() {
               <p style={{ fontSize: "13px", color: "#4A4850", lineHeight: 1.65, marginBottom: "14px" }}>
                 By proceeding I acknowledge that I have read and agree to the following terms and conditions:
               </p>
-              <div style={{ background: "#F9F8F5", border: "1px solid #E2E0DA", borderRadius: "8px", padding: "14px 16px", fontSize: "12px", color: "#7A7880", lineHeight: 1.7, marginBottom: "18px", maxHeight: "110px", overflowY: "auto" }}>
+              <div style={{ background: "#F8F8F6", border: "1px solid #E2E2DE", padding: "14px 16px", fontSize: "12px", color: "#6B6B6B", lineHeight: 1.7, marginBottom: "18px", maxHeight: "100px", overflowY: "auto", fontFamily: "'DM Sans', sans-serif" }}>
                 AF Apparels wholesale accounts are strictly for business-to-business transactions. By submitting this application you confirm that your business holds a valid resale certificate or equivalent tax exemption document. All pricing, product availability, and terms are subject to change. Accounts may be suspended for misuse. We reserve the right to approve or deny any application at our sole discretion.
               </div>
 
@@ -461,64 +461,54 @@ export default function WholesaleRegisterPage() {
               disabled={isSubmitting || !recaptchaToken}
               style={{
                 width: "100%",
-                background: (isSubmitting || !recaptchaToken) ? "#ccc" : "#E8242A",
+                background: (isSubmitting || !recaptchaToken) ? "#9ca3af" : "#1C3557",
                 color: "#fff",
-                padding: "14px",
-                fontSize: "14px",
-                fontWeight: 700,
-                borderRadius: "6px",
+                padding: "16px",
+                fontSize: "15px",
+                fontWeight: 500,
                 border: "none",
                 cursor: (isSubmitting || !recaptchaToken) ? "not-allowed" : "pointer",
                 transition: "all .2s",
-                letterSpacing: ".04em",
-                textTransform: "uppercase",
+                fontFamily: "'DM Sans', sans-serif",
               }}
             >
-              {isSubmitting ? "Submitting Application…" : "Submit Wholesale Application →"}
+              {isSubmitting ? "Submitting Application…" : "Submit Application →"}
             </button>
 
-            <p style={{ textAlign: "center", fontSize: "13px", color: "#7A7880", marginTop: "16px" }}>
+            <p style={{ textAlign: "center", fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#6B6B6B", marginTop: "16px" }}>
               Already have an account?{" "}
-              <Link href="/login" style={{ color: "#1A5CFF", fontWeight: 600, textDecoration: "none" }}>
-                Sign in
+              <Link href="/login" style={{ color: "#1C3557", fontWeight: 500, textDecoration: "none" }}>
+                Sign in →
               </Link>
             </p>
           </form>
         </div>
 
         {/* Benefits sidebar */}
-        <div style={{ background: "#0F2340", border: "1px solid rgba(255,255,255,.1)", borderRadius: "12px", padding: "32px", position: "sticky", top: "20px" }}>
-          <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "18px", letterSpacing: ".06em", color: "#fff", marginBottom: "20px" }}>
+        <div style={{ background: "#FFFFFF", border: "1px solid #E2E2DE", padding: "32px", position: "sticky", top: "20px" }}>
+          <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", fontWeight: 600, letterSpacing: ".1em", textTransform: "uppercase", color: "#1C3557", marginBottom: "20px" }}>
             Why Apply?
           </h3>
           {[
-            { icon: <FactoryIcon size={20} color="#aaa" />, h: "Factory-Direct Pricing", p: "No distributors. Pay factory price — better margins on every order." },
-            { icon: <PackageIcon size={20} color="#aaa" />, h: "No Minimums", p: "Order 1 unit or 10,000. In-stock items ship same day from Dallas." },
-            { icon: <ZapIcon size={20} color="#aaa" />, h: "Same-Day Shipping", p: "Orders before 12 PM CT ship the same day. Dallas, TX warehouse." },
-            { icon: <PaletteIcon size={20} color="#aaa" />, h: "Print-Optimized Blanks", p: "Every fabric tested for DTF, screen printing, and embroidery." },
-            { icon: <CreditCardIcon size={20} color="#aaa" />, h: "NET 30 Terms Available", p: "Qualifying accounts can access NET 30 payment terms." },
-            { icon: <UsersIcon size={20} color="#aaa" />, h: "Dedicated Support", p: "Real account manager — not a ticket queue. Phone + email." },
+            { icon: <FactoryIcon size={18} color="#1C3557" />, h: "Factory-Direct Pricing", p: "No distributors. Pay factory price — better margins on every order." },
+            { icon: <PackageIcon size={18} color="#1C3557" />, h: "No Minimums", p: "Order 1 unit or 10,000. In-stock items ship same day from Dallas." },
+            { icon: <ZapIcon size={18} color="#1C3557" />, h: "Same-Day Shipping", p: "Orders before 12 PM CT ship the same day. Dallas, TX warehouse." },
+            { icon: <PaletteIcon size={18} color="#1C3557" />, h: "Print-Optimized Blanks", p: "Every fabric tested for DTF, screen printing, and embroidery." },
+            { icon: <CreditCardIcon size={18} color="#1C3557" />, h: "NET 30 Terms Available", p: "Qualifying accounts can access NET 30 payment terms." },
+            { icon: <UsersIcon size={18} color="#1C3557" />, h: "Dedicated Support", p: "Real account manager — not a ticket queue. Phone + email." },
           ].map(item => (
             <div key={item.h} style={{ display: "flex", gap: "12px", marginBottom: "18px", alignItems: "flex-start" }}>
-              <div style={{ minWidth: "28px", display: "flex", paddingTop: "1px" }}>{item.icon}</div>
+              <div style={{ minWidth: "24px", display: "flex", paddingTop: "2px" }}>{item.icon}</div>
               <div>
-                <div style={{ fontFamily: "var(--font-bebas)", fontSize: "13px", letterSpacing: ".04em", color: "#ccc", marginBottom: "3px" }}>{item.h}</div>
-                <div style={{ fontSize: "12px", color: "#aaa", lineHeight: 1.55 }}>{item.p}</div>
+                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", fontWeight: 600, color: "#1A1A1A", marginBottom: "3px" }}>{item.h}</div>
+                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#6B6B6B", lineHeight: 1.55 }}>{item.p}</div>
               </div>
             </div>
           ))}
 
-          <div style={{ marginTop: "24px", paddingTop: "20px", borderTop: "1px solid rgba(255,255,255,.06)" }}>
-            <div style={{ fontSize: "11px", color: "#aaa", textTransform: "uppercase", letterSpacing: ".08em", fontWeight: 700, marginBottom: "10px" }}>Trusted by 2,000+ Businesses</div>
-            <div style={{ fontSize: "12px", color: "#aaa", lineHeight: 1.6 }}>
-              Printing companies, retailers, corporate buyers, and apparel brands across the US source direct from AF Apparels.
-            </div>
-          </div>
-
-          <div style={{ marginTop: "20px", background: "rgba(26,92,255,.08)", border: "1px solid rgba(26,92,255,.15)", borderRadius: "8px", padding: "14px" }}>
-            <div style={{ fontSize: "12px", color: "#6B9FFF", fontWeight: 600, marginBottom: "4px" }}>Questions?</div>
-            <div style={{ fontSize: "12px", color: "#aaa" }}>
-              +1 (469) 367-9753<br />
+          <div style={{ marginTop: "20px", paddingTop: "16px", borderTop: "1px solid #E2E2DE" }}>
+            <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#6B6B6B", lineHeight: 1.6 }}>
+              Questions? <strong style={{ color: "#1A1A1A" }}>+1 (469) 367-9753</strong><br />
               info@afblanks.com
             </div>
           </div>

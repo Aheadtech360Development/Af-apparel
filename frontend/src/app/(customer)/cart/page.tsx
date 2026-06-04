@@ -334,34 +334,24 @@ export default function CartPage() {
   const estimatedShipping = Number(cart?.validation?.estimated_shipping ?? (isGuest ? 9.99 : 0));
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F4F3EF", fontFamily: "var(--font-jakarta)", paddingBottom: "60px" }}>
+    <div style={{ minHeight: "100vh", background: "#F8F8F6", fontFamily: "'DM Sans', sans-serif", paddingBottom: "60px" }}>
 
-      {/* Header bar */}
-      <div style={{ display: "none", background: "#1B3A5C", borderBottom: "3px solid #E8242A", padding: "20px 32px 18px" }}>
-        <div style={{ maxWidth: "1500px", margin: "0 auto" }}>
-          <div style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".14em", color: "rgba(255,255,255,.5)", marginBottom: "4px" }}>Wholesale</div>
-          <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(24px,4vw,40px)", color: "#fff", letterSpacing: ".03em", lineHeight: 1 }}>
-            Shopping Cart
-          </h1>
-        </div>
-      </div>
-
-      <div style={{ maxWidth: "1500px", margin: "0 auto", padding: "28px 24px 0" }}>
+      <div style={{ maxWidth: "1500px", margin: "0 auto", padding: "40px 24px 0" }}>
+        <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: "36px", fontWeight: 600, color: "#1A1A1A", marginBottom: "32px", lineHeight: 1.15 }}>Your Cart</h1>
         {isEmpty ? (
           /* ── Empty state ── */
-          <div style={{ textAlign: "center", padding: "80px 24px", background: "#fff", borderRadius: "12px", border: "1.5px dashed #E2E0DA" }}>
+          <div style={{ textAlign: "center", padding: "80px 24px", background: "#FFFFFF", border: "1px solid #E2E2DE" }}>
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ddd" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" style={{ margin: "0 auto 16px" }}>
               <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
               <path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.66a2 2 0 001.99-1.78L23 6H6" />
             </svg>
-            <p style={{ fontSize: "15px", fontWeight: 700, color: "#2A2830", marginBottom: "8px" }}>Your cart is empty</p>
-            <p style={{ fontSize: "13px", color: "#7A7880", marginBottom: "24px" }}>Browse our wholesale catalog to add products.</p>
-            <Link href="/products" style={{ background: "#E8242A", color: "#fff", padding: "12px 28px", borderRadius: "7px", fontSize: "13px", fontWeight: 700, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".06em" }}>
-              Browse Products
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "15px", color: "#1A1A1A", marginBottom: "8px" }}>Your cart is empty.</p>
+            <Link href="/products" style={{ fontFamily: "'DM Sans', sans-serif", color: "#1C3557", fontSize: "14px", textDecoration: "none", fontWeight: 500 }}>
+              Shop All →
             </Link>
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 360px", gap: "24px", alignItems: "flex-start" }} className="cart-grid-responsive">
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 360px", gap: "48px", alignItems: "flex-start" }} className="cart-grid-responsive">
 
             {/* ── Items column ── */}
             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>

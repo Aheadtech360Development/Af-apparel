@@ -8,26 +8,23 @@ export default function CtaSection() {
   const loggedIn = isAuthenticated();
 
   return (
-    <div style={{ background: "#f4f3ef", padding: "52px 0", textAlign: "center" }}>
-      <div style={{ maxWidth: "1500px", margin: "0 auto", padding: "0 24px" }}>
-        <h2 style={{ fontFamily: "'Barlow Semi Condensed', sans-serif", fontSize: "32px", fontWeight: 800, color: "#1b3a5c", marginBottom: "10px" }}>
-          Ready to Order at Factory-Direct Prices?
+    <div style={{ background: "#1C3557", padding: "64px 24px", textAlign: "center" }}>
+      <div style={{ maxWidth: "1500px", margin: "0 auto" }}>
+        <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: "38px", fontWeight: 600, color: "#FFFFFF", marginBottom: "16px", lineHeight: 1.2 }}>
+          Better Prices. One Application.
         </h2>
-        <p style={{ fontSize: "14px", color: "#7A7880", marginBottom: "24px", maxWidth: "480px", marginLeft: "auto", marginRight: "auto", lineHeight: 1.6 }}>
-          Join 2,000+ print shops and brands already stocking with AF Apparels. Apply takes 2 minutes. Approval within 1 business day.
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "16px", color: "rgba(255,255,255,0.8)", marginBottom: "32px", maxWidth: "480px", marginLeft: "auto", marginRight: "auto", lineHeight: 1.6 }}>
+          Apply for a wholesale account and get lower prices on everything we carry.
         </p>
-        <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
-          <Link
-            href={loggedIn ? "/account" : "/wholesale/register"}
-            style={{ background: "#E8242A", color: "#fff", padding: "13px 30px", fontSize: "16px", borderRadius: "3px", fontWeight: 700, textDecoration: "none", fontFamily: "'Barlow Semi Condensed', sans-serif", letterSpacing: ".04em" }}
-          >
-            {loggedIn ? "Go to Dashboard" : "Apply for Wholesale Account"}
-          </Link>
-          <Link
-            href="/products"
-            style={{ background: "none", color: "#1b3a5c", padding: "12px 24px", fontSize: "14px", borderRadius: "3px", fontWeight: 700, textDecoration: "none", border: "1.5px solid #1b3a5c" }}
-          >
-            Browse Products First
+        <Link
+          href={loggedIn ? "/account" : "/wholesale/register"}
+          style={{ background: "#FFFFFF", color: "#1C3557", padding: "13px 30px", fontSize: "14px", fontWeight: 600, textDecoration: "none", fontFamily: "'DM Sans', sans-serif", display: "inline-block" }}
+        >
+          Apply for Wholesale Account →
+        </Link>
+        <div style={{ marginTop: "16px" }}>
+          <Link href="/login" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "rgba(255,255,255,0.6)", textDecoration: "none" }}>
+            Already have an account? Sign in →
           </Link>
         </div>
       </div>

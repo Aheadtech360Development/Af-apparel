@@ -62,19 +62,18 @@ export default async function ProductsPage({ searchParams }: PageProps) {
     )
   ).sort() as string[];
 
+  const collectionName = filters.category
+    ? (categories.find(c => c.slug === filters.category)?.name ?? "All Products")
+    : "All Products";
+
   return (
-    <div style={{ minHeight: "100vh", background: "#fff", fontFamily: "var(--font-jakarta)"}}>
-      {/* Banner */}
-      <div style={{ display: "none", background: "#1B3A5C", padding: "28px 32px", borderBottom: "3px solid #E8242A" }}>
+    <div style={{ minHeight: "100vh", background: "#F8F8F6", fontFamily: "'DM Sans', sans-serif" }}>
+      {/* Collection header */}
+      <div style={{ background: "#FFFFFF", padding: "40px 24px 24px", borderBottom: "1px solid #E2E2DE" }}>
         <div style={{ maxWidth: "1500px", margin: "0 auto" }}>
-          <h2 style={{ fontFamily: "'Barlow Semi Condensed', sans-serif", fontSize: "28px", fontWeight: 800, color: "#fff", marginBottom: "4px" }}>
-            {filters.category
-              ? (categories.find(c => c.slug === filters.category)?.name ?? "All Products")
-              : "All Products"}
-          </h2>
-          <p style={{ fontSize: "13px", color: "rgba(255,255,255,.55)", marginTop: "4px" }}>
-            Factory-direct blank apparel · Same-day shipping on all in-stock
-          </p>
+          <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: "36px", fontWeight: 600, color: "#1A1A1A", lineHeight: 1.15 }}>
+            {collectionName}
+          </h1>
         </div>
       </div>
 

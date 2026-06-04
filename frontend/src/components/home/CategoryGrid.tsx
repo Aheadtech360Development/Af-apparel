@@ -1,22 +1,11 @@
 import Link from "next/link";
 import { ShirtIcon } from "@/components/ui/icons";
 
-const categoryDescriptions: Record<string, string> = {
-  "t-shirts":     "Ring-spun & CVC blends. DTF and screen print optimized.",
-  "hoodies":      "80/20 cotton-poly fleece. Pullover and zip-up styles.",
-  "sweatshirts":  "Classic crewneck fleece. Heavy-weight, print-friendly.",
-  "polo-shirts":  "CVC performance fabric. Corporate and retail ready.",
-  "dress-shirts": "Easy-care blends. Slim-fit for uniform programs.",
-  "jackets":      "Denim and outerwear. Great for promotional programs.",
-};
-
 const fallbackCategories = [
   { slug: "t-shirts",     name: "T-Shirts" },
-  { slug: "hoodies",      name: "Hoodies" },
   { slug: "sweatshirts",  name: "Sweatshirts" },
-  { slug: "polo-shirts",  name: "Polos" },
-  { slug: "dress-shirts", name: "Dress Shirts" },
-  { slug: "jackets",      name: "Jackets" },
+  { slug: "hoodies",      name: "Hoodies" },
+  { slug: "polo-shirts",  name: "New Arrivals" },
 ];
 
 interface Category {
@@ -31,36 +20,35 @@ interface CategoryGridProps {
 }
 
 export default function CategoryGrid({ categories }: CategoryGridProps) {
-  const items = categories.length > 0 ? categories : fallbackCategories.map(c => ({ ...c, id: c.slug }));
+  const items = categories.length > 0 ? categories.slice(0, 4) : fallbackCategories.map(c => ({ ...c, id: c.slug }));
 
   return (
-    <section style={{ padding: "80px 0", background: "#F4F3EF" }}>
-      <div style={{ maxWidth: "1500px", margin: "0 auto", padding: "0 32px" }}>
-        <div style={{ marginBottom: "44px" }}>
-          <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(32px,3.5vw,48px)", color: "#2A2830", letterSpacing: ".01em", lineHeight: 1, marginBottom: "10px" }}>Shop by Category</h2>
-          <p style={{ fontSize: "15px", color: "#7A7880", fontWeight: 500 }}>Browse our full range of print-ready blank apparel</p>
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "16px" }} className="cat-grid-responsive">
+    <section style={{ padding: "72px 24px", background: "#F8F8F6" }}>
+      <div style={{ maxWidth: "1500px", margin: "0 auto" }}>
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.12em", color: "#6B6B6B", marginBottom: "20px" }}>
+          Shop by Category
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "16px" }} className="cat-grid-responsive">
           {items.map((cat) => (
             <Link key={cat.id} href={`/products?category=${cat.slug}`}
-              style={{ background: "#fff", border: "1px solid #E2E0DA", borderRadius: "10px", overflow: "hidden", cursor: "pointer", transition: "all .25s", textDecoration: "none", display: "block" }}
-              className="cat-card-hover">
-              <div style={{ height: "360px", display: "flex", alignItems: "center", justifyContent: "center", background: "#fff", position: "relative" }}>
-                {(cat as any).image_url ? (
+              style={{ display: "block", textDecoration: "none", borderBottom: "2px solid transparent", transition: "border-color .2s", background: "#FFFFFF", border: "1px solid #E2E2DE" }}
+              onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "#1C3557"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "#E2E2DE"; }}
+            >
+              <div style={{ height: "240px", display: "flex", alignItems: "center", justifyContent: "center", background: "#F8F8F6", position: "relative", overflow: "hidden" }}>
+                {(cat as { image_url?: string | null }).image_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
-                    src={(cat as any).image_url}
+                    src={(cat as { image_url?: string | null }).image_url as string}
                     alt={cat.name}
                     style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", inset: 0 }}
                   />
                 ) : (
-                  <ShirtIcon size={52} color="#2A2830" style={{ opacity: 0.2 }} />
+                  <ShirtIcon size={48} color="#1A1A1A" style={{ opacity: 0.15 }} />
                 )}
               </div>
-              <div style={{ padding: "20px 22px" }}>
-                <h4 style={{ fontFamily: "var(--font-bebas)", fontSize: "18px", letterSpacing: ".03em", marginBottom: "5px", color: "#2A2830" }}>{cat.name}</h4>
-                <p style={{ fontSize: "15px", color: "#7A7880", marginBottom: "12px", lineHeight: 1.5, fontWeight: 500 }}>{categoryDescriptions[cat.slug] ?? "Premium print-ready blanks."}</p>
-                <div style={{ fontSize: "15px", fontWeight: 700, color: "#1A5CFF", display: "flex", alignItems: "center", gap: "6px" }}>Shop {cat.name} →</div>
+              <div style={{ padding: "14px 16px" }}>
+                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 500, color: "#1A1A1A" }}>{cat.name}</span>
               </div>
             </Link>
           ))}

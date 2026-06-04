@@ -27,47 +27,23 @@ export default function CheckoutLayout({ children }: CheckoutLayoutProps) {
   const activeStep = getActiveStep(pathname);
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F4F3EF", fontFamily: "var(--font-jakarta)" }}>
-      {/* Page header */}
-      <div style={{ display: "none", background: "#1B3A5C", borderBottom: "3px solid #E8242A", padding: "18px 32px 16px" }}>
-        <div style={{ maxWidth: "680px", margin: "0 auto" }}>
-          <div style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".14em", color: "rgba(255,255,255,.5)", marginBottom: "4px" }}>AF Apparels</div>
-          <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(22px,3vw,34px)", color: "#fff", letterSpacing: ".03em", lineHeight: 1 }}>
-            Checkout
-          </h1>
-        </div>
-      </div>
-
-      {/* Step indicator — hidden on invoice payment page */}
-      <div style={{ background: "#fff", borderBottom: "1px solid #E2E0DA", padding: "0 32px", display: pathname.includes('/checkout/invoice') ? 'none' : undefined }}>
+    <div style={{ minHeight: "100vh", background: "#F8F8F6", fontFamily: "'DM Sans', sans-serif" }}>
+      {/* Progress bar — hidden on invoice payment page */}
+      <div style={{ background: "#FFFFFF", borderBottom: "1px solid #E2E2DE", padding: "20px 24px", display: pathname.includes('/checkout/invoice') ? 'none' : undefined }}>
         <div style={{ maxWidth: "680px", margin: "0 auto", display: "flex", alignItems: "center" }}>
           {STEPS.map((step, i) => {
             const isActive = activeStep === step.step;
             const isDone = activeStep > step.step;
             return (
               <div key={step.href} style={{ display: "flex", alignItems: "center", flex: i < STEPS.length - 1 ? 1 : undefined }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", padding: "14px 0", whiteSpace: "nowrap" }}>
-                  {/* Bubble */}
-                  <div style={{
-                    width: "24px", height: "24px", borderRadius: "50%", flexShrink: 0,
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    background: isDone ? "#059669" : isActive ? "#E8242A" : "#E2E0DA",
-                    color: (isDone || isActive) ? "#fff" : "#aaa",
-                    fontSize: "11px", fontWeight: 800,
-                  }}>
-                    {isDone ? (
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="20 6 9 17 4 12" />
-                      </svg>
-                    ) : step.step}
-                  </div>
-                  <span style={{ fontSize: "12px", fontWeight: isActive ? 700 : 500, color: isActive ? "#2A2830" : isDone ? "#7A7880" : "#aaa" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", whiteSpace: "nowrap" }}>
+                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", fontWeight: isActive ? 600 : 400, color: isActive ? "#1C3557" : isDone ? "#6B6B6B" : "#9B9B9B", textDecoration: isActive ? "underline" : "none" }}>
                     {step.label}
                   </span>
                 </div>
                 {/* Connector */}
                 {i < STEPS.length - 1 && (
-                  <div style={{ flex: 1, height: "1.5px", background: isDone ? "#059669" : "#E2E0DA", margin: "0 6px" }} />
+                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#E2E2DE", margin: "0 8px" }}>—</span>
                 )}
               </div>
             );

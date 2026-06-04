@@ -500,7 +500,7 @@ export function ProductListClient({
       {/* ── Desktop sidebar ── */}
       <aside
         className="hidden lg:block"
-        style={{ width: "240px", flexShrink: 0, borderRight: "1px solid #E2E0DA", padding: "28px 22px", position: "sticky", top: "80px", maxHeight: "calc(100vh - 80px)", overflowY: "auto", background: "#fff" }}
+        style={{ width: "220px", flexShrink: 0, borderRight: "1px solid #E2E2DE", padding: "28px 20px 28px 0", position: "sticky", top: "72px", maxHeight: "calc(100vh - 72px)", overflowY: "auto", background: "#F8F8F6" }}
       >
         {sidebarContent}
       </aside>
@@ -611,7 +611,7 @@ export function ProductListClient({
             )}
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "14px" }} className="prod-grid-responsive">
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }} className="prod-grid-responsive">
             {displayedProducts.map((product) => {
               const primaryImage = product.primary_image;
               const primaryVariant = product.variants?.[0];
@@ -632,11 +632,13 @@ export function ProductListClient({
 
                   <Link
                     href={`/products/${product.slug}`}
-                    style={{ display: "block", background: "#fff", border: "1px solid #E2E0DA", borderRadius: "10px", overflow: "hidden", textDecoration: "none", transition: "all .25s" }}
+                    style={{ display: "block", background: "#FFFFFF", border: "1px solid #E2E2DE", overflow: "hidden", textDecoration: "none", transition: "border-color .2s" }}
                     className="prod-card-hover"
+                    onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "#1C3557"; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "#E2E2DE"; }}
                   >
                     {/* Image area */}
-                    <div style={{ background: "#fff", height: "200px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "#7A7880", fontSize: "12px", fontWeight: 600, position: "relative" }}>
+                    <div style={{ background: "#F8F8F6", height: "220px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "#6B6B6B", fontSize: "12px", position: "relative" }}>
                       {primaryImage ? (
                         <Image
                           src={primaryImage.url_medium_webp ?? primaryImage.url_medium}
@@ -647,64 +649,21 @@ export function ProductListClient({
                         />
                       ) : (
                         <>
-                          <ShirtIcon size={44} color="#bbb" style={{ opacity: 0.4, marginBottom: "6px" }} />
-                          <span style={{ fontSize: "10px", letterSpacing: ".06em", textTransform: "uppercase" }}>No Image</span>
+                          <ShirtIcon size={44} color="#bbb" style={{ opacity: 0.3, marginBottom: "6px" }} />
                         </>
                       )}
-                      {/* In-stock badge */}
-                      <div style={{ position: "absolute", top: "12px", right: "12px", display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "10px", fontWeight: 700, color: "#059669" }}>
-                        <svg width="7" height="7" viewBox="0 0 7 7"><circle cx="3.5" cy="3.5" r="3.5" fill="#059669" /></svg> In Stock
-                      </div>
                     </div>
 
                     {/* Body */}
-                    <div style={{ padding: "14px 16px" }}>
-                      <div style={{ fontSize: "10px", color: "#7A7880", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: "3px", fontWeight: 600 }}>
-                        {[
-                          (product as any).fabric,
-                          (product as any).product_code,
-                          (product as any).weight,
-                        ].filter(Boolean).join(" · ") || product.categories?.[0]?.name || "Apparel"}
-
-                      </div>
-                      <div style={{ fontFamily: "var(--font-bebas)", fontSize: "16px", letterSpacing: ".02em", marginBottom: "10px", color: "#2A2830", lineHeight: 1.2 }}>
+                    <div style={{ padding: "10px 12px" }}>
+                      <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 500, color: "#1A1A1A", marginBottom: "4px", lineHeight: 1.3 }}>
                         {product.name}
                       </div>
-
-                      {/* Color swatches */}
-                      {variantColors.length > 0 && (
-                        <div style={{ display: "flex", gap: "4px", alignItems: "center", marginBottom: "10px", flexWrap: "wrap" }}>
-                          {variantColors.slice(0, 5).map((c) => (
-                            <div
-                              key={c}
-                              title={c}
-                              style={{
-                                width: "14px", height: "14px", borderRadius: "50%",
-                                background: swatchColor(c),
-                                border: "1.5px solid rgba(0,0,0,.12)",
-                                flexShrink: 0,
-                              }}
-                            />
-                          ))}
-                          {extraColors > 0 && (
-                            <span style={{ fontSize: "10px", color: "#7A7880", fontWeight: 600 }}>+{extraColors}</span>
-                          )}
+                      {((product as any).product_code || (product as any).code) && (
+                        <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: "11px", color: "#6B6B6B", marginTop: "3px" }}>
+                          {(product as any).product_code || (product as any).code}
                         </div>
                       )}
-
-                      {/* Price */}
-                      {price ? (
-                        <div style={{ lineHeight: 1 }}>
-                          {primaryVariant?.effective_price != null && primaryVariant?.retail_price != null && Number(primaryVariant.effective_price) < Number(primaryVariant.retail_price) && (
-                            <span style={{ fontSize: "11px", color: "#9CA3AF", textDecoration: "line-through", marginRight: "5px" }}>
-                              ${Number(primaryVariant.retail_price).toFixed(2)}
-                            </span>
-                          )}
-                          <span style={{ fontSize: "13px", color: "#2A2830", fontWeight: 700 }}>
-                            From ${Number(price).toFixed(2)}
-                          </span>
-                        </div>
-                      ) : null}
                     </div>
                   </Link>
                 </div>

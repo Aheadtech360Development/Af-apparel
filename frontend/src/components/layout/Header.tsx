@@ -8,20 +8,16 @@ import { authService } from "@/services/auth.service";
 import { apiClient } from "@/lib/api-client";
 import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { ShoppingCartIcon } from "@/components/ui/icons";
-import { Building2, Star, Printer, Tag, FileText, Ruler, PenLine, Mail, Lock } from "lucide-react";
 
-const BROWSE_LINKS = [
-  { href: "/products?category=t-shirts", label: "T-Shirts" },
-  { href: "/products?category=short-sleeve", label: "Short Sleeves" },
-  { href: "/products?category=long-sleeve", label: "Long Sleeves" },
-  { href: "/products?category=hoodies", label: "Hoodies" },
-  { href: "/products?category=sweatshirts", label: "Sweatshirts" },
-  { href: "/products?category=crop-tops", label: "Crop Tops" },
-  { href: "/products?category=v-neck", label: "V-Neck" },
-  { href: "/products?category=polo-shirts", label: "Polos" },
-  { href: "/products?category=youth", label: "Youth" },
-  { href: "/products", label: "New Arrivals" },
-  { href: "/products", label: "All Products" },
+const RESOURCES_LINKS = [
+  { href: "/about", label: "About Us" },
+  { href: "/style-sheets", label: "Style Sheets" },
+  { href: "/product-specs", label: "Product Specs" },
+  { href: "/print-guide", label: "Print Guide" },
+  { href: "/reviews", label: "Customer Reviews" },
+  { href: "/private-label", label: "Private Label" },
+  { href: "/blog", label: "Blog" },
+  { href: "/contact", label: "Contact Us" },
 ];
 
 export function Header() {
@@ -88,34 +84,41 @@ export function Header() {
     router.push("/login");
   }
 
+  const navLinkStyle: React.CSSProperties = {
+    color: "#1C3557",
+    fontSize: "13px",
+    fontWeight: 500,
+    textDecoration: "none",
+    letterSpacing: ".01em",
+    padding: "6px 12px",
+    transition: "color .15s",
+    fontFamily: "'DM Sans', sans-serif",
+  };
+
   return (
     <>
       <AnnouncementBar />
 
       {/* Main header */}
-      <header style={{ background: "#f4f3ef", borderBottom: "3px solid #E8242A" }} className="sticky top-0 z-40">
-        <div className="header-inner" style={{ maxWidth: "1500px", margin: "0 auto", padding: "0 32px", display: "flex", alignItems: "center", justifyContent: "space-between", height: "100px", gap: "24px" }}>
+      <header style={{ background: "#FFFFFF", borderBottom: "1px solid #E2E2DE", position: "sticky", top: 0, zIndex: 100 }}>
+        <div className="header-inner" style={{ maxWidth: "1500px", margin: "0 auto", padding: "0 32px", display: "flex", alignItems: "center", justifyContent: "space-between", height: "72px", gap: "24px" }}>
 
           {/* Logo */}
-          <Link href="/" className="header-logo" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
-            <img
-              src="/Af-apparel logo.png"
-              alt="AF Apparels Logo"
-              style={{ height: "70px", width: "auto", objectFit: "contain" }}
-            />
+          <Link href="/" style={{ display: "flex", alignItems: "center", textDecoration: "none", gap: "10px" }}>
+            <span style={{ fontFamily: "'Fraunces', serif", fontSize: "22px", fontWeight: 600, color: "#1C3557", letterSpacing: "-0.01em" }}>AF Blanks</span>
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex" style={{ gap: "4px", alignItems: "center" }}>
+          <nav className="hidden md:flex" style={{ gap: "0px", alignItems: "center" }}>
             {([
               { href: "/products", label: "Shop All" },
               { href: "/products?category=t-shirts", label: "T-Shirts" },
               { href: "/products?category=hoodies", label: "Hoodies" },
-              { href: "/products?category=sweatshirts", label: "Sweatshirts" },
+              { href: "/products", label: "New" },
             ] as { href: string; label: string }[]).map(({ href, label }) => (
-              <Link key={href} href={href} style={{ color: "#1B3A5C", fontSize: "13px", fontWeight: 600, textDecoration: "none", letterSpacing: ".04em", padding: "8px 14px", borderRadius: "4px", transition: "all .2s", textTransform: "uppercase" }}
-                onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#E8242A"; (e.currentTarget as HTMLAnchorElement).style.background = "rgba(27,58,92,.07)"; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#1B3A5C"; (e.currentTarget as HTMLAnchorElement).style.background = "transparent"; }}>
+              <Link key={label} href={href} style={navLinkStyle}
+                onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#E8242A"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#1C3557"; }}>
                 {label}
               </Link>
             ))}
@@ -124,9 +127,9 @@ export function Header() {
             <div ref={resourcesRef} style={{ position: "relative" }}>
               <button
                 onClick={() => setResourcesOpen(o => !o)}
-                style={{ color: "#1B3A5C", fontSize: "13px", fontWeight: 600, background: resourcesOpen ? "rgba(27,58,92,.07)" : "transparent", border: "none", letterSpacing: ".04em", padding: "8px 14px", borderRadius: "4px", transition: "all .2s", textTransform: "uppercase", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px" }}
-                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = "#E8242A"; (e.currentTarget as HTMLButtonElement).style.background = "rgba(27,58,92,.07)"; }}
-                onMouseLeave={e => { if (!resourcesOpen) { (e.currentTarget as HTMLButtonElement).style.color = "#1B3A5C"; (e.currentTarget as HTMLButtonElement).style.background = "transparent"; } }}
+                style={{ ...navLinkStyle, background: "transparent", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px" } as React.CSSProperties}
+                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = "#E8242A"; }}
+                onMouseLeave={e => { if (!resourcesOpen) { (e.currentTarget as HTMLButtonElement).style.color = "#1C3557"; } }}
               >
                 Resources
                 <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style={{ marginTop: "1px", opacity: 0.6, transform: resourcesOpen ? "rotate(180deg)" : "none", transition: "transform .2s" }}>
@@ -134,27 +137,16 @@ export function Header() {
                 </svg>
               </button>
               {resourcesOpen && (
-                <div style={{ position: "absolute", top: "100%", left: 0, marginTop: "6px", background: "#fff", border: "1px solid #E2E0DA", borderRadius: "8px", padding: "6px", minWidth: "200px", boxShadow: "0 8px 24px rgba(0,0,0,.1)", zIndex: 100 }}>
-                  {([
-                    { href: "/about", label: "About Us", icon: <Building2 size={15} /> },
-                    { href: "/reviews", label: "Customer Reviews", icon: <Star size={15} /> },
-                    { href: "/print-guide", label: "Print Guide", icon: <Printer size={15} /> },
-                    { href: "/private-label", label: "Private Label", icon: <Tag size={15} /> },
-                    { href: "/style-sheets", label: "Style Sheets", icon: <FileText size={15} /> },
-                    { href: "/product-specs", label: "Product Specs", icon: <Ruler size={15} /> },
-                    { href: "/blog", label: "Blog", icon: <PenLine size={15} /> },
-                    { href: "/contact", label: "Contact Us", icon: <Mail size={15} /> },
-                    { href: "/privacy-policy", label: "Privacy Policy", icon: <Lock size={15} /> },
-                  ] as { href: string; label: string; icon: React.ReactNode }[]).map(({ href, label, icon }) => (
+                <div style={{ position: "absolute", top: "100%", left: 0, marginTop: "4px", background: "#fff", border: "1px solid #E2E2DE", padding: "6px", minWidth: "200px", boxShadow: "0 8px 24px rgba(0,0,0,.08)", zIndex: 100 }}>
+                  {RESOURCES_LINKS.map(({ href, label }) => (
                     <Link
                       key={href}
                       href={href}
                       onClick={() => setResourcesOpen(false)}
-                      style={{ display: "flex", alignItems: "center", gap: "10px", padding: "9px 12px", color: "#1B3A5C", fontSize: "13px", fontWeight: 600, textDecoration: "none", borderRadius: "5px", transition: "background .15s" }}
-                      onMouseEnter={e => (e.currentTarget.style.background = "rgba(27,58,92,.06)")}
+                      style={{ display: "block", padding: "9px 12px", color: "#1C3557", fontSize: "13px", fontWeight: 500, textDecoration: "none", fontFamily: "'DM Sans', sans-serif", transition: "background .15s" }}
+                      onMouseEnter={e => (e.currentTarget.style.background = "#F8F8F6")}
                       onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                     >
-                      <span style={{ flexShrink: 0, color: "#64748B", display: "flex" }}>{icon}</span>
                       {label}
                     </Link>
                   ))}
@@ -164,9 +156,9 @@ export function Header() {
 
             {/* Admin link */}
             {isAdmin() && (
-              <Link href="/admin/dashboard" style={{ color: "#1B3A5C", fontSize: "13px", fontWeight: 600, textDecoration: "none", letterSpacing: ".04em", padding: "8px 14px", borderRadius: "4px", transition: "all .2s", textTransform: "uppercase" }}
-                onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#E8242A"; (e.currentTarget as HTMLAnchorElement).style.background = "rgba(27,58,92,.07)"; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#1B3A5C"; (e.currentTarget as HTMLAnchorElement).style.background = "transparent"; }}>
+              <Link href="/admin/dashboard" style={navLinkStyle}
+                onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#E8242A"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#1C3557"; }}>
                 Admin Panel
               </Link>
             )}
@@ -174,14 +166,14 @@ export function Header() {
             {/* Authenticated non-admin links */}
             {isAuthenticated() && !isAdmin() && (
               <>
-                <Link href="/quick-order" style={{ color: "#1B3A5C", fontSize: "13px", fontWeight: 600, textDecoration: "none", letterSpacing: ".04em", padding: "8px 14px", borderRadius: "4px", transition: "all .2s", textTransform: "uppercase" }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#E8242A"; (e.currentTarget as HTMLAnchorElement).style.background = "rgba(27,58,92,.07)"; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#1B3A5C"; (e.currentTarget as HTMLAnchorElement).style.background = "transparent"; }}>
+                <Link href="/quick-order" style={navLinkStyle}
+                  onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#E8242A"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#1C3557"; }}>
                   Quick Order
                 </Link>
-                <Link href="/account" style={{ color: "#1B3A5C", fontSize: "13px", fontWeight: 600, textDecoration: "none", letterSpacing: ".04em", padding: "8px 14px", borderRadius: "4px", transition: "all .2s", textTransform: "uppercase" }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#E8242A"; (e.currentTarget as HTMLAnchorElement).style.background = "rgba(27,58,92,.07)"; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#1B3A5C"; (e.currentTarget as HTMLAnchorElement).style.background = "transparent"; }}>
+                <Link href="/account" style={navLinkStyle}
+                  onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#E8242A"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#1C3557"; }}>
                   My Account
                 </Link>
               </>
@@ -189,39 +181,39 @@ export function Header() {
           </nav>
 
           {/* Right Actions */}
-          <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
             {/* Cart */}
             {!isAdmin() && (
-              <Link href="/cart" style={{ position: "relative", background: "transparent", border: "1.5px solid #CBD5E1", color: "#1B3A5C", padding: "9px 14px", borderRadius: "5px", cursor: "pointer", fontSize: "18px", transition: "all .2s", display: "flex", alignItems: "center" }}>
-                <ShoppingCartIcon size={18} color="#1B3A5C" />
+              <Link href="/cart" style={{ position: "relative", background: "transparent", border: "1px solid #E2E2DE", color: "#1C3557", padding: "8px 12px", cursor: "pointer", fontSize: "18px", transition: "all .2s", display: "flex", alignItems: "center" }}>
+                <ShoppingCartIcon size={18} color="#1C3557" />
                 {cartCount > 0 && (
-                  <span style={{ position: "absolute", top: "-6px", right: "-6px", background: "#E8242A", color: "#fff", fontSize: "9px", fontWeight: 800, width: "18px", height: "18px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <span style={{ position: "absolute", top: "-6px", right: "-6px", background: "#1C3557", color: "#fff", fontSize: "9px", fontWeight: 700, width: "18px", height: "18px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
                     {cartCount}
                   </span>
                 )}
               </Link>
             )}
 
-            <div className="hidden md:flex" style={{ gap: "10px", alignItems: "center" }}>
+            <div className="hidden md:flex" style={{ gap: "8px", alignItems: "center" }}>
               {isAuthenticated() ? (
                 <>
-                  <span style={{ fontSize: "13px", color: "#1B3A5C" }}>
+                  <span style={{ fontSize: "13px", color: "#1C3557", fontFamily: "'DM Sans', sans-serif" }}>
                     {user?.first_name}
-                    {isAdmin() && <span style={{ marginLeft: "6px", fontSize: "10px", background: "rgba(27,58,92,.1)", color: "#1B3A5C", padding: "2px 8px", borderRadius: "4px", fontWeight: 700 }}>Admin</span>}
+                    {isAdmin() && <span style={{ marginLeft: "6px", fontSize: "10px", background: "rgba(28,53,87,.1)", color: "#1C3557", padding: "2px 8px", fontWeight: 600 }}>Admin</span>}
                   </span>
                   <button
                     onClick={handleLogout}
-                    style={{ background: "transparent", color: "#e8242a", padding: "10px 18px", fontSize: "13px", border: "1.5px solid #e8242a", borderRadius: "5px", cursor: "pointer", fontWeight: 700, transition: "all .2s" }}
+                    style={{ background: "transparent", color: "#1C3557", padding: "8px 16px", fontSize: "13px", border: "1px solid #1C3557", cursor: "pointer", fontWeight: 500, transition: "all .2s", fontFamily: "'DM Sans', sans-serif" }}
                   >
                     Sign out
                   </button>
                 </>
               ) : (
                 <>
-                  <Link href="/login" style={{ background: "transparent", color: "#1B3A5C", padding: "10px 18px", fontSize: "13px", border: "1.5px solid #1B3A5C", borderRadius: "5px", fontWeight: 700, textDecoration: "none", transition: "all .2s" }}>
-                    Sign In
+                  <Link href="/login" style={{ background: "transparent", color: "#1C3557", padding: "8px 16px", fontSize: "13px", border: "1px solid #1C3557", fontWeight: 500, textDecoration: "none", transition: "all .2s", fontFamily: "'DM Sans', sans-serif" }}>
+                    Log In
                   </Link>
-                  <Link href="/wholesale/register" style={{ background: "#E8242A", color: "#fff", padding: "10px 22px", fontSize: "13px", borderRadius: "5px", fontWeight: 700, textDecoration: "none", transition: "all .2s", border: "none" }}>
+                  <Link href="/wholesale/register" style={{ background: "#1C3557", color: "#fff", padding: "8px 18px", fontSize: "13px", fontWeight: 500, textDecoration: "none", transition: "all .2s", fontFamily: "'DM Sans', sans-serif" }}>
                     Apply Now
                   </Link>
                 </>
@@ -232,7 +224,7 @@ export function Header() {
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               className="md:hidden"
-              style={{ padding: "6px", color: "#1B3A5C", background: "transparent", border: "1.5px solid #CBD5E1", borderRadius: "5px", cursor: "pointer" }}
+              style={{ padding: "8px", color: "#1C3557", background: "transparent", border: "1px solid #E2E2DE", cursor: "pointer" }}
               aria-label="Toggle menu"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -245,100 +237,82 @@ export function Header() {
             </button>
           </div>
         </div>
-
-        {/* Browse Bar */}
-        {/* <div style={{ background: "#1B3A5C" }} className="hidden md:block">
-          <div style={{ maxWidth: "1500px", margin: "0 auto", padding: "0 32px", display: "flex", alignItems: "center", overflowX: "auto" }}>
-            <span style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".08em", color: "rgba(255,255,255,.45)", whiteSpace: "nowrap", padding: "8px 14px 8px 0", flexShrink: 0 }}>Browse:</span>
-            {BROWSE_LINKS.map(({ href, label }) => (
-              <Link key={label} href={href}
-                style={{ color: "rgba(255,255,255,.75)", fontSize: "12px", fontWeight: 600, textDecoration: "none", whiteSpace: "nowrap", padding: "8px 12px", display: "block", transition: "color .15s", letterSpacing: ".02em" }}
-                onMouseEnter={e => (e.currentTarget.style.color = "#fff")}
-                onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,.75)")}
-              >
-                {label}
-              </Link>
-            ))}
-          </div>
-        </div> */}
-
       </header>
 
-      {/* Mobile side drawer */}
+      {/* Mobile overlay nav */}
       {menuOpen && (
         <div className="md:hidden" style={{ position: "fixed", inset: 0, zIndex: 200 }}>
           {/* Backdrop */}
           <div
-            style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.5)" }}
+            style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.4)" }}
             onClick={() => setMenuOpen(false)}
           />
           {/* Drawer */}
           <div style={{
-            position: "fixed", left: 0, top: 0, bottom: 0, width: "280px",
-            background: "#1B3A5C", overflowY: "auto", zIndex: 201,
+            position: "fixed", left: 0, top: 0, bottom: 0, width: "300px",
+            background: "#fff", overflowY: "auto", zIndex: 201,
             padding: "0 0 32px",
-            boxShadow: "4px 0 24px rgba(0,0,0,.25)",
+            boxShadow: "4px 0 24px rgba(0,0,0,.12)",
           }}>
             {/* Drawer header */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,.1)" }}>
-              <img src="/Af-apparel logo.png" alt="AF Apparels" style={{ height: "40px", width: "auto", objectFit: "contain", filter: "brightness(0) invert(1)" }} />
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 24px", borderBottom: "1px solid #E2E2DE" }}>
+              <span style={{ fontFamily: "'Fraunces', serif", fontSize: "20px", fontWeight: 600, color: "#1C3557" }}>AF Blanks</span>
               <button
                 onClick={() => setMenuOpen(false)}
-                style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,.7)", fontSize: "22px", lineHeight: 1, padding: "4px" }}
+                style={{ background: "none", border: "none", cursor: "pointer", color: "#6B6B6B", fontSize: "20px", lineHeight: 1, padding: "4px" }}
               >
                 ✕
               </button>
             </div>
             {/* Links */}
-            <div style={{ padding: "12px 20px" }}>
+            <div style={{ padding: "16px 24px" }}>
               {[
                 { href: "/products", label: "Shop All" },
                 { href: "/products?category=t-shirts", label: "T-Shirts" },
                 { href: "/products?category=hoodies", label: "Hoodies" },
-                { href: "/products?category=sweatshirts", label: "Sweatshirts" },
                 { href: "/about", label: "About Us" },
                 { href: "/contact", label: "Contact" },
                 { href: "/blog", label: "Blog" },
               ].map(({ href, label }) => (
-                <Link key={href} href={href} onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "11px 0", color: "#d3d0d0", fontSize: "14px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+                <Link key={href} href={href} onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "12px 0", color: "#1C3557", fontSize: "14px", fontWeight: 500, textDecoration: "none", borderBottom: "1px solid #E2E2DE", fontFamily: "'DM Sans', sans-serif" }}>
                   {label}
                 </Link>
               ))}
               {isAdmin() && (
-                <Link href="/admin/dashboard" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "11px 0", color: "#7bb3ff", fontSize: "14px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+                <Link href="/admin/dashboard" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "12px 0", color: "#1C3557", fontSize: "14px", fontWeight: 500, textDecoration: "none", borderBottom: "1px solid #E2E2DE", fontFamily: "'DM Sans', sans-serif" }}>
                   Admin Panel
                 </Link>
               )}
               {isAuthenticated() && !isAdmin() && (
                 <>
-                  <Link href="/quick-order" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "11px 0", color: "#d3d0d0", fontSize: "14px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+                  <Link href="/quick-order" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "12px 0", color: "#1C3557", fontSize: "14px", fontWeight: 500, textDecoration: "none", borderBottom: "1px solid #E2E2DE", fontFamily: "'DM Sans', sans-serif" }}>
                     Quick Order
                   </Link>
-                  <Link href="/account" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "11px 0", color: "#d3d0d0", fontSize: "14px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+                  <Link href="/account" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "12px 0", color: "#1C3557", fontSize: "14px", fontWeight: 500, textDecoration: "none", borderBottom: "1px solid #E2E2DE", fontFamily: "'DM Sans', sans-serif" }}>
                     My Account
                   </Link>
-                  <Link href="/cart" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "11px 0", color: "#d3d0d0", fontSize: "14px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+                  <Link href="/cart" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "12px 0", color: "#1C3557", fontSize: "14px", fontWeight: 500, textDecoration: "none", borderBottom: "1px solid #E2E2DE", fontFamily: "'DM Sans', sans-serif" }}>
                     Cart {cartCount > 0 && `(${cartCount})`}
                   </Link>
                 </>
               )}
               {!isAuthenticated() && (
                 <>
-                  <Link href="/cart" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "11px 0", color: "#d3d0d0", fontSize: "14px", fontWeight: 600, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".04em", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+                  <Link href="/cart" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "12px 0", color: "#1C3557", fontSize: "14px", fontWeight: 500, textDecoration: "none", borderBottom: "1px solid #E2E2DE", fontFamily: "'DM Sans', sans-serif" }}>
                     Cart {cartCount > 0 && `(${cartCount})`}
                   </Link>
                   <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "10px" }}>
-                    <Link href="/wholesale/register" onClick={() => setMenuOpen(false)} style={{ display: "block", background: "#E8242A", color: "#fff", padding: "12px 20px", borderRadius: "5px", fontWeight: 700, fontSize: "13px", textDecoration: "none", textAlign: "center", textTransform: "uppercase", letterSpacing: ".04em" }}>
-                      Apply for Wholesale
+                    <Link href="/wholesale/register" onClick={() => setMenuOpen(false)} style={{ display: "block", background: "#1C3557", color: "#fff", padding: "12px 20px", fontWeight: 500, fontSize: "13px", textDecoration: "none", textAlign: "center", fontFamily: "'DM Sans', sans-serif" }}>
+                      Apply for Wholesale Account
                     </Link>
-                    <Link href="/login" onClick={() => setMenuOpen(false)} style={{ display: "block", background: "rgba(255,255,255,.1)", color: "#fff", padding: "12px 20px", borderRadius: "5px", fontWeight: 700, fontSize: "13px", textDecoration: "none", textAlign: "center", textTransform: "uppercase", letterSpacing: ".04em" }}>
+                    <Link href="/login" onClick={() => setMenuOpen(false)} style={{ display: "block", background: "transparent", color: "#1C3557", border: "1px solid #1C3557", padding: "12px 20px", fontWeight: 500, fontSize: "13px", textDecoration: "none", textAlign: "center", fontFamily: "'DM Sans', sans-serif" }}>
                       Log In
                     </Link>
                   </div>
                 </>
               )}
               {isAuthenticated() && (
-                <button onClick={handleLogout} style={{ marginTop: "20px", display: "block", width: "100%", textAlign: "center", padding: "12px", color: "#fff", fontSize: "13px", fontWeight: 600, background: "rgba(232,36,42,.3)", border: "1px solid rgba(232,36,42,.5)", borderRadius: "5px", cursor: "pointer", textTransform: "uppercase", letterSpacing: ".04em" }}>
+                <button onClick={handleLogout} style={{ marginTop: "20px", display: "block", width: "100%", textAlign: "center", padding: "12px", color: "#1C3557", fontSize: "13px", fontWeight: 500, background: "transparent", border: "1px solid #E2E2DE", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>
                   Sign Out
                 </button>
               )}

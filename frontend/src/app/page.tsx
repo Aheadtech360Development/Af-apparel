@@ -42,7 +42,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <main style={{ fontFamily: "var(--font-jakarta)" }}>
+      <main style={{ fontFamily: "'DM Sans', sans-serif" }}>
         {/* S4: Hero */}
         <HeroSection />
         <TrustStrip />

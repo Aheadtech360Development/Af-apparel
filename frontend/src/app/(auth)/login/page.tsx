@@ -110,32 +110,21 @@ export default function LoginPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#1B3A5C", fontFamily: "var(--font-jakarta)", display: "flex", flexDirection: "column" }}>
-      {/* Top bar */}
-      {/* <div style={{ padding: "24px 32px", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
-        <Link href="/" style={{ display: "inline-flex", alignItems: "center", textDecoration: "none" }}>
-          <img src="/Af-apparel logo.jpeg" alt="AF Apparels Logo" style={{ height: "50px", width: "auto", objectFit: "contain" }} />
-        </Link>
-      </div> */}
-
+    <div style={{ minHeight: "70vh", background: "#F8F8F6", fontFamily: "'DM Sans', sans-serif", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "48px 24px" }}>
       {/* Main */}
-      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 16px" }}>
-        <div style={{ width: "100%", maxWidth: "420px" }}>
+      <div style={{ width: "100%", maxWidth: "400px" }}>
           {/* Heading */}
-          <div style={{ textAlign: "center", marginBottom: "32px" }}>
-            <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(28px,4vw,40px)", color: "#fff", letterSpacing: ".02em", lineHeight: 1, marginBottom: "8px" }}>
-              Sign In
+          <div style={{ marginBottom: "28px" }}>
+            <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: "34px", fontWeight: 600, color: "#1A1A1A", lineHeight: 1.15, marginBottom: "0" }}>
+              Log In
             </h1>
-            <p style={{ fontSize: "15px", color: "#d3d0d0", fontWeight: 500 }}>
-              Access your wholesale account
-            </p>
           </div>
 
           {/* Card */}
-          <div style={{ background: "#0F2340", border: "1px solid rgba(255,255,255,.12)", borderRadius: "12px", padding: "36px" }}>
+          <div style={{ background: "#FFFFFF", border: "1px solid #E2E2DE", padding: "36px" }}>
             <form onSubmit={handleSubmit}>
               {error && (
-                <div style={{ background: "rgba(232,36,42,.12)", border: "1px solid rgba(232,36,42,.3)", borderRadius: "6px", padding: "12px 14px", fontSize: "13px", color: "#f87171", marginBottom: "12px" }}>
+                <div style={{ background: "#fff0f0", border: "1px solid #fcc", padding: "12px 14px", fontSize: "13px", color: "#cc0000", marginBottom: "12px", fontFamily: "'DM Sans', sans-serif" }}>
                   {error}
                 </div>
               )}
@@ -177,12 +166,12 @@ export default function LoginPage() {
                 </div>
               )}
 
-              <div style={{ marginBottom: "18px" }}>
+              <div style={{ marginBottom: "16px" }}>
                 <label
                   htmlFor="email"
-                  style={{ display: "block", fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".07em", color: "#7A7880", marginBottom: "6px" }}
+                  style={{ display: "block", fontFamily: "'DM Sans', sans-serif", fontSize: "12px", fontWeight: 500, textTransform: "uppercase", letterSpacing: ".05em", color: "#1A1A1A", marginBottom: "6px" }}
                 >
-                  Email Address
+                  Email *
                 </label>
                 <input
                   id="email"
@@ -194,34 +183,26 @@ export default function LoginPage() {
                   placeholder="you@company.com"
                   style={{
                     width: "100%",
-                    background: "#1E1D24",
-                    border: "1px solid rgba(255,255,255,.1)",
-                    borderRadius: "6px",
-                    padding: "10px 14px",
+                    background: "#fff",
+                    border: "1px solid #E2E2DE",
+                    padding: "11px 14px",
                     fontSize: "14px",
-                    color: "#fff",
+                    color: "#1A1A1A",
                     outline: "none",
                     boxSizing: "border-box",
                     transition: "border-color .2s",
+                    fontFamily: "'DM Sans', sans-serif",
                   }}
                 />
               </div>
 
-              <div style={{ marginBottom: "24px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
-                  <label
-                    htmlFor="password"
-                    style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".07em", color: "#7A7880" }}
-                  >
-                    Password
-                  </label>
-                  <Link
-                    href="/forgot-password"
-                    style={{ fontSize: "12px", color: "#1A5CFF", textDecoration: "none", fontWeight: 600 }}
-                  >
-                    Forgot password?
-                  </Link>
-                </div>
+              <div style={{ marginBottom: "8px" }}>
+                <label
+                  htmlFor="password"
+                  style={{ display: "block", fontFamily: "'DM Sans', sans-serif", fontSize: "12px", fontWeight: 500, textTransform: "uppercase", letterSpacing: ".05em", color: "#1A1A1A", marginBottom: "6px" }}
+                >
+                  Password *
+                </label>
                 <input
                   id="password"
                   type="password"
@@ -229,21 +210,29 @@ export default function LoginPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder="Your password"
                   style={{
                     width: "100%",
-                    background: "#1E1D24",
-                    border: "1px solid rgba(255,255,255,.1)",
-                    borderRadius: "6px",
-                    padding: "10px 14px",
+                    background: "#fff",
+                    border: "1px solid #E2E2DE",
+                    padding: "11px 14px",
                     fontSize: "14px",
-                    color: "#fff",
+                    color: "#1A1A1A",
                     outline: "none",
                     boxSizing: "border-box",
                     transition: "border-color .2s",
+                    fontFamily: "'DM Sans', sans-serif",
                   }}
                 />
+                <Link
+                  href="/forgot-password"
+                  style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#1C3557", textDecoration: "none", display: "inline-block", marginTop: "6px" }}
+                >
+                  Forgot your password?
+                </Link>
               </div>
+
+              <div style={{ marginBottom: "16px" }}></div>
 
               {/* reCAPTCHA */}
               <div className="recaptcha-wrap" style={{ marginBottom: "20px" }}>
@@ -264,55 +253,39 @@ export default function LoginPage() {
                 disabled={isSubmitting || !recaptchaToken}
                 style={{
                   width: "100%",
-                  background: (isSubmitting || !recaptchaToken) ? "#555" : "#E8242A",
+                  background: (isSubmitting || !recaptchaToken) ? "#9ca3af" : "#1C3557",
                   color: "#fff",
-                  padding: "13px",
+                  padding: "14px",
                   fontSize: "14px",
-                  fontWeight: 700,
-                  borderRadius: "6px",
+                  fontWeight: 500,
                   border: "none",
                   cursor: (isSubmitting || !recaptchaToken) ? "not-allowed" : "pointer",
-                  textTransform: "uppercase",
-                  letterSpacing: ".06em",
                   transition: "background .2s",
+                  fontFamily: "'DM Sans', sans-serif",
+                  marginTop: "8px",
                 }}
               >
-                {isSubmitting ? "Signing in…" : "Sign In →"}
+                {isSubmitting ? "Signing in…" : "Log In →"}
               </button>
             </form>
 
-            <div style={{ marginTop: "20px", paddingTop: "20px", borderTop: "1px solid rgba(255,255,255,.06)", textAlign: "center", fontSize: "13px", color: "#aaa" }}>
-              {"Don't have an account? "}
+            <div style={{ marginTop: "20px", paddingTop: "16px", borderTop: "1px solid #E2E2DE" }}>
+              <div style={{ position: "relative", textAlign: "center", marginBottom: "16px" }}>
+                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#6B6B6B", background: "#FFFFFF", padding: "0 12px", position: "relative", zIndex: 1 }}>or</span>
+                <div style={{ position: "absolute", top: "50%", left: 0, right: 0, height: "1px", background: "#E2E2DE", zIndex: 0 }} />
+              </div>
               <Link
                 href="/wholesale/register"
-                style={{ color: "#1A5CFF", fontWeight: 700, textDecoration: "none" }}
+                style={{ display: "block", textAlign: "center", fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 500, color: "#1C3557", border: "1px solid #1C3557", padding: "14px", textDecoration: "none", transition: "all .15s" }}
               >
-                Apply for Wholesale Access
+                Create a Wholesale Account →
               </Link>
+              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#6B6B6B", textAlign: "center", marginTop: "16px" }}>
+                No account needed to place an order. Guests pay standard pricing.
+              </p>
             </div>
           </div>
-
-          {/* Benefits */}
-          <div style={{ marginTop: "28px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px" }}>
-            {[
-              { icon: <FactoryIcon size={20} color="#aaa" />, text: "Factory-Direct" },
-              { icon: <ZapIcon size={20} color="#aaa" />, text: "Same-Day Ship" },
-              { icon: <CreditCardIcon size={20} color="#aaa" />, text: "NET 30 Terms" },
-            ].map((item) => (
-              <div key={item.text} style={{ textAlign: "center", padding: "12px 8px", background: "#0F2340", border: "1px solid rgba(255,255,255,.1)", borderRadius: "8px" }}>
-                <div style={{ marginBottom: "4px", display: "flex", justifyContent: "center" }}>{item.icon}</div>
-                <div style={{ fontSize: "11px", fontWeight: 700, color: "#aaa", textTransform: "uppercase", letterSpacing: ".06em" }}>{item.text}</div>
-              </div>
-            ))}
-          </div>
         </div>
-      </div>
-
-      {/* Footer */}
-      <div style={{ padding: "20px 32px", borderTop: "1px solid rgba(255,255,255,.06)", textAlign: "center", fontSize: "12px", color: "#888" }}>
-        © {new Date().getFullYear()} AF Apparels · Dallas, TX ·{" "}
-        <a href="tel:+14693679753" style={{ color: "#aaa", textDecoration: "none" }}>+1 (469) 367-9753</a>
-      </div>
     </div>
   );
 }

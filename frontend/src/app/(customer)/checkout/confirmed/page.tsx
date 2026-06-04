@@ -74,40 +74,29 @@ export default function CheckoutConfirmedPage() {
   const shippingLabel = SHIPPING_LABELS[confirmedShippingMethod] ?? "Standard Ground";
 
   return (
-    <div style={{ textAlign: "center" }}>
+    <div style={{ textAlign: "center", fontFamily: "'DM Sans', sans-serif" }}>
 
-      {/* Success icon */}
-      <div style={{ marginBottom: "20px" }}>
-        <div style={{
-          width: "72px", height: "72px", borderRadius: "50%",
-          background: "rgba(5,150,105,.1)", border: "2px solid rgba(5,150,105,.3)",
-          display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px",
-        }}>
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
-        </div>
-
-        <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(28px,5vw,44px)", color: "#2A2830", letterSpacing: ".03em", lineHeight: 1, marginBottom: "10px" }}>
-          Order Confirmed!
+      {/* Success */}
+      <div style={{ marginBottom: "24px" }}>
+        <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: "44px", fontWeight: 600, color: "#1A1A1A", lineHeight: 1.15, marginBottom: "12px" }}>
+          Order Confirmed
         </h1>
 
-        <div style={{ fontFamily: "var(--font-bebas)", fontSize: "20px", color: "#7A7880", letterSpacing: ".06em", marginBottom: "14px" }}>
-          Order {orderNum}
+        <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: "14px", color: "#6B6B6B", marginBottom: "12px" }}>
+          {orderNum}
         </div>
 
-        <p style={{ fontSize: "14px", color: "#7A7880", lineHeight: 1.7, maxWidth: "480px", margin: "0 auto" }}>
-          Your order of <strong style={{ color: "#2A2830" }}>{confirmedUnits.toLocaleString()} units</strong> is confirmed and will be processed for same-day shipping from our Dallas, TX warehouse.
-          A confirmation email has been sent to your account address.
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "15px", color: "#6B6B6B", lineHeight: 1.7, maxWidth: "480px", margin: "0 auto" }}>
+          Your order has been placed. You will receive a confirmation email shortly.
         </p>
       </div>
 
       {/* Order detail box */}
       <div style={{
-        background: "#fff", border: "1.5px solid #E2E0DA", borderRadius: "12px",
-        padding: "22px 24px", textAlign: "left", margin: "28px 0",
+        background: "#FFFFFF", border: "1px solid #E2E2DE",
+        padding: "24px", textAlign: "left", margin: "28px 0",
       }}>
-        <div style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em", color: "#7A7880", marginBottom: "14px" }}>
+        <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".1em", color: "#6B6B6B", marginBottom: "16px" }}>
           Order Details
         </div>
 
@@ -140,11 +129,11 @@ export default function CheckoutConfirmedPage() {
             </span>
           </div>
 
-          <div style={{ borderTop: "1.5px solid #E2E0DA" }} />
+          <div style={{ borderTop: "1px solid #E2E2DE" }} />
 
           <div style={{ display: "flex", justifyContent: "space-between", gap: "12px" }}>
-            <span style={{ fontSize: "14px", fontWeight: 700, color: "#2A2830" }}>Total Charged</span>
-            <span style={{ fontFamily: "var(--font-bebas)", fontSize: "20px", color: "#E8242A", letterSpacing: ".02em" }}>
+            <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "15px", fontWeight: 600, color: "#1A1A1A" }}>Total Charged</span>
+            <span style={{ fontFamily: "'Fraunces', serif", fontSize: "20px", color: "#1C3557", fontWeight: 600 }}>
               {formatCurrency(confirmedOrderTotal)}
             </span>
           </div>
@@ -158,19 +147,19 @@ export default function CheckoutConfirmedPage() {
             try { const d = JSON.parse(sessionStorage.getItem("af_confirmed_order") || "{}"); return d.isGuest ? "/track-order" : "/account/orders"; } catch { return "/account/orders"; }
           })()}
           style={{
-            display: "block", padding: "14px", background: "#E8242A", color: "#fff",
-            borderRadius: "8px", textDecoration: "none", fontFamily: "var(--font-bebas)",
-            fontSize: "17px", letterSpacing: ".08em", transition: "background .2s",
+            display: "block", padding: "14px", background: "#1C3557", color: "#fff",
+            textDecoration: "none", fontFamily: "'DM Sans', sans-serif",
+            fontSize: "14px", fontWeight: 500, transition: "background .2s",
           }}
         >
-          {(() => { try { const d = JSON.parse(sessionStorage.getItem("af_confirmed_order") || "{}"); return d.isGuest ? "Track Your Order" : "View My Orders"; } catch { return "View My Orders"; } })()}
+          {(() => { try { const d = JSON.parse(sessionStorage.getItem("af_confirmed_order") || "{}"); return d.isGuest ? "Track Your Order →" : "Track Your Order →"; } catch { return "Track Your Order →"; } })()}
         </Link>
         <a
           href="/products"
           style={{
-            display: "block", padding: "14px", background: "#fff", color: "#2A2830",
-            border: "1.5px solid #E2E0DA", borderRadius: "8px", textDecoration: "none",
-            fontFamily: "var(--font-bebas)", fontSize: "17px", letterSpacing: ".08em",
+            display: "block", padding: "14px", background: "#FFFFFF", color: "#1C3557",
+            border: "1px solid #1C3557", textDecoration: "none",
+            fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 500,
           }}
         >
           Continue Shopping

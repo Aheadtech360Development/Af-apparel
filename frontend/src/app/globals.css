@@ -1,35 +1,44 @@
 /* Tailwind CSS v4 */
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,300&family=DM+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
 /* Load existing JS-based config (theme.extend, plugins) for backward compat */
 @config "../../tailwind.config.ts";
 
 @layer base {
   :root {
-    --font-jakarta: "Barlow Semi Condensed", system-ui, sans-serif;
-    --font-bebas: "Bebas Neue", sans-serif;
+    --font-jakarta: "DM Sans", system-ui, sans-serif;
+    --font-bebas: "Fraunces", serif;
     --af-black: #080808;
     --af-dark: #111016;
     --af-mid: #1E1D24;
     --af-red: #E8242A;
     --af-blue: #1A5CFF;
     --af-gold: #C9A84C;
-    --af-offwhite: #F4F3EF;
-    --af-border: #E2E0DA;
-    --af-text: #2A2830;
-    --af-muted: #7A7880;
+    --af-offwhite: #F8F8F6;
+    --af-border: #E2E2DE;
+    --af-text: #1A1A1A;
+    --af-muted: #6B6B6B;
+    /* New design tokens */
+    --bg: #F8F8F6;
+    --white: #FFFFFF;
+    --text: #1A1A1A;
+    --text-sec: #6B6B6B;
+    --accent: #1C3557;
+    --divider: #E2E2DE;
+    --max: 1500px;
   }
 
   html { scroll-behavior: smooth; }
 
-  h1, h2, h3, h4, h5, h6 { font-weight: 800; }
+  h1, h2, h3, h4, h5, h6 { font-weight: 700; }
 
   body {
-    font-family: var(--font-jakarta);
-    background: #FAFAFA;
-    color: var(--af-text);
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background: #F8F8F6;
+    color: var(--text);
     -webkit-font-smoothing: antialiased;
-    font-weight: 500;
+    font-weight: 400;
     font-size: 15px;
   }
 
@@ -62,6 +71,9 @@
   /* AF Design System */
   .font-bebas { font-family: var(--font-bebas); }
   .font-jakarta { font-family: var(--font-jakarta); }
+  .font-fraunces { font-family: 'Fraunces', serif; }
+  .font-dm { font-family: 'DM Sans', sans-serif; }
+  .font-mono-ibm { font-family: 'IBM Plex Mono', monospace; }
 
   .af-btn-red {
     @apply inline-flex items-center justify-center font-bold cursor-pointer border-none rounded-[5px] transition-all duration-200 tracking-wide no-underline whitespace-nowrap bg-[#E8242A] text-white px-[22px] py-[10px] text-[13px];
