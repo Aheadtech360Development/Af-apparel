@@ -4,12 +4,11 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { formatCurrency, SIZE_ORDER } from "@/lib/utils";
+import { SIZE_ORDER } from "@/lib/utils";
 import type { ProductDetail, ProductVariant } from "@/types/product.types";
 import { useAuthStore } from "@/stores/auth.store";
 import { apiClient } from "@/lib/api-client";
 import { cartService } from "@/services/cart.service";
-import { FactoryIcon, ZapIcon, PackageIcon, PaletteIcon } from "@/components/ui/icons";
 import { productsService } from "@/services/products.service";
 
 function formatWeightGrams(raw: string | null | undefined): string | null {
@@ -416,6 +415,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
   const [activeTab, setActiveTab] = useState<Tab>("Description");
   const [copiedUrl, setCopiedUrl] = useState(false);
   const [showImageLibrary, setShowImageLibrary] = useState(false);
+  const [expandedLibraryColor, setExpandedLibraryColor] = useState<string | null>(null);
 
   useEffect(() => {
     if (authIsLoading) return; // wait for auth to resolve before fetching
@@ -469,13 +469,34 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
   const orderTotal = totalUnits * pricePerUnit;
   const anyInStock = (product.variants ?? []).some(v => !isOutOfStock(v.stock_quantity));
 
-  const lastExpandedColor = expandedColors.length > 0 ? expandedColors[expandedColors.length - 1] : null;
-  const orderedImages = lastExpandedColor
-    ? [
-      ...images.filter(img => img.alt_text?.toLowerCase().includes(lastExpandedColor.toLowerCase())),
-      ...images.filter(img => !img.alt_text?.toLowerCase().includes(lastExpandedColor.toLowerCase())),
-    ]
+  // Color-filtered images for gallery: when a swatch is selected, show only that color's images
+  const displayImages = selectedColor
+    ? (() => {
+        const colorImgs = images.filter(img =>
+          img.alt_text?.toLowerCase().includes(selectedColor.toLowerCase())
+        );
+        return colorImgs.length > 0 ? colorImgs : images;
+      })()
     : images;
+
+  // Group images by color for the image library modal
+  type ImageGroupEntry = { color: string | null; hex: string; images: typeof images };
+  const imageGroups: ImageGroupEntry[] = [];
+  if (images.length > 0) {
+    const assigned = new Set<string>();
+    for (const cg of colorGroups) {
+      const colorImgs = images.filter(img =>
+        img.alt_text?.toLowerCase().includes(cg.color.toLowerCase())
+      );
+      if (colorImgs.length > 0) {
+        imageGroups.push({ color: cg.color, hex: COLOR_MAP[cg.color] ?? "#E2E2DE", images: colorImgs });
+        colorImgs.forEach(img => assigned.add(img.id));
+      }
+    }
+    const unassigned = images.filter(img => !assigned.has(img.id));
+    if (unassigned.length > 0) imageGroups.push({ color: null, hex: "#E2E2DE", images: unassigned });
+    if (imageGroups.length === 0) imageGroups.push({ color: null, hex: "#E2E2DE", images });
+  }
 
   function toggleColor(color: string) {
     const isCurrentlyExpanded = expandedColors.includes(color);
@@ -560,6 +581,77 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
     }
   }
 
+  function handleDownloadStyleSheet() {
+    const styleSheet = product?.assets?.find((a: any) => a.asset_type === "style_sheet");
+    if (styleSheet?.url) window.open(styleSheet.url, "_blank");
+    else setAssetMsg("No style sheet available for this product.");
+  }
+
+  async function handleDownload(imageUrl: string, filename: string) {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch {
+      window.open(imageUrl, "_blank");
+    }
+  }
+
+  async function handleRowAddToCart(group: { color: string; variants: ProductVariant[] }) {
+    const rowItems = group.variants
+      .filter(v => (quantities[v.id] ?? 0) > 0)
+      .map(v => ({ variant_id: v.id, quantity: quantities[v.id]! }));
+    if (rowItems.length === 0) return;
+    for (const { variant_id } of rowItems) {
+      const v = group.variants.find(x => x.id === variant_id);
+      if (v && isOutOfStock(v.stock_quantity)) {
+        setCartMsg({ type: "error", text: `${v.size ?? ""} is out of stock` });
+        return;
+      }
+    }
+    if (!isAuthenticated) {
+      const guestCart = getGuestCart();
+      for (const { variant_id, quantity } of rowItems) {
+        const v = group.variants.find(x => x.id === variant_id);
+        if (!v) continue;
+        const colorImg = product?.images?.find(i => i.alt_text?.toLowerCase() === v.color?.toLowerCase())
+          ?? product?.images?.find((i: any) => i.is_primary) ?? product?.images?.[0];
+        const entry = { variant_id, quantity, product_id: product!.id, product_name: product!.name, slug: product!.slug, color: v.color, size: v.size, unit_price: Number(v.effective_price ?? v.retail_price), image_url: colorImg?.url_thumbnail ?? null };
+        const idx = guestCart.findIndex(i => i.variant_id === variant_id);
+        if (idx >= 0) guestCart[idx]!.quantity += quantity;
+        else guestCart.push(entry);
+      }
+      localStorage.setItem("af_guest_cart", JSON.stringify(guestCart));
+      window.dispatchEvent(new Event("af_guest_cart_updated"));
+      const added = rowItems.reduce((s, i) => s + i.quantity, 0);
+      setQuantities(prev => { const next = { ...prev }; rowItems.forEach(i => delete next[i.variant_id]); return next; });
+      setCartMsg({ type: "success", text: `${added} unit${added !== 1 ? "s" : ""} added to cart!` });
+      setTimeout(() => setCartMsg(null), 4000);
+      return;
+    }
+    setIsSubmitting(true);
+    setCartMsg(null);
+    try {
+      await cartService.addMatrix(product!.id, rowItems);
+      window.dispatchEvent(new Event("cart_updated"));
+      const added = rowItems.reduce((s, i) => s + i.quantity, 0);
+      setQuantities(prev => { const next = { ...prev }; rowItems.forEach(i => delete next[i.variant_id]); return next; });
+      setCartMsg({ type: "success", text: `${added} unit${added !== 1 ? "s" : ""} added to cart!` });
+      setTimeout(() => setCartMsg(null), 4000);
+    } catch (err) {
+      setCartMsg({ type: "error", text: err instanceof Error ? err.message : "Failed to add to cart" });
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
   async function handleDownloadImages() {
     window.open(`/api/v1/products/${product?.id}/download-images`, "_blank");
   }
@@ -580,8 +672,8 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
     <div style={{ minHeight: "100vh", background: "#F8F8F6", fontFamily: "'DM Sans', sans-serif" }}>
 
       {/* Breadcrumb */}
-      <div className="pd-breadcrumb" style={{ background: "#FFFFFF", borderBottom: "1px solid #E2E2DE", padding: "12px 24px" }}>
-        <div style={{ maxWidth: "1500px", margin: "0 auto", display: "flex", alignItems: "center", gap: "6px", fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#6B6B6B", flexWrap: "wrap" }}>
+      <div style={{ background: "#FFFFFF", borderBottom: "1px solid #E2E2DE", padding: "12px 24px" }}>
+        <div style={{ maxWidth: "1160px", margin: "0 auto", display: "flex", alignItems: "center", gap: "6px", fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#6B6B6B", flexWrap: "wrap" }}>
           <Link href="/" style={{ color: "#6B6B6B", textDecoration: "none" }}>Home</Link>
           <span>›</span>
           <Link href="/products" style={{ color: "#6B6B6B", textDecoration: "none" }}>Collections</Link>
@@ -599,119 +691,65 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
       </div>
 
       {/* Main content */}
-      <div className="pd-main-pad" style={{ maxWidth: "1500px", margin: "0 auto", padding: "0 24px 64px" }}>
-        <div className="product-detail-grid" style={{}}>
+      <div style={{ maxWidth: "1160px", margin: "0 auto", padding: "0 24px 64px" }}>
+        <div className="pdp-main-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "56px", paddingTop: "32px" }}>
 
           {/* ── LEFT: Image Gallery ─────────────────────────────────────── */}
-          <div className="pd-image-col" style={{ width: "100%", minWidth: 0, paddingTop: "32px" }}>
+          <div>
             {/* Main image */}
-            <div style={{ height: "480px", overflow: "hidden", background: "#F8F8F6", marginBottom: "12px", border: "1px solid #E2E2DE", position: "relative" }}>
-              {orderedImages[activeImageIdx] ? (
+            <div style={{ height: "480px", border: "1px solid #E2E2DE", display: "flex", alignItems: "center", justifyContent: "center", background: "#FFFFFF", overflow: "hidden" }}>
+              {displayImages[activeImageIdx] ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
-                  src={imgSrc(orderedImages[activeImageIdx]!)}
-                  alt={orderedImages[activeImageIdx]!.alt_text ?? product.name}
+                  src={imgSrc(displayImages[activeImageIdx]!)}
+                  alt={displayImages[activeImageIdx]!.alt_text ?? product.name}
                   style={{ width: "100%", height: "100%", objectFit: "contain" }}
                 />
               ) : (
-                <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <span style={{ fontSize: "80px", opacity: 0.15 }}>👕</span>
-                </div>
+                <span style={{ fontSize: "80px", opacity: 0.1 }}>👕</span>
               )}
             </div>
 
-            {/* Thumbnail slider */}
-            {orderedImages.length > 1 && (
-              <div style={{ position: "relative" }}>
-                <div
-                  id="thumb-slider"
-                  style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "4px", scrollbarWidth: "thin", scrollbarColor: "#E2E2DE transparent", scrollBehavior: "smooth" }}
-                >
-                  {orderedImages.map((img, i) => (
-                    <button
-                      key={img.id}
-                      onClick={() => setActiveImageIdx(i)}
-                      style={{ width: "80px", height: "80px", overflow: "hidden", cursor: "pointer", flexShrink: 0, border: activeImageIdx === i ? "1px solid #1C3557" : "1px solid #E2E2DE", background: "#F8F8F6", transition: "border .15s", padding: 0, outline: activeImageIdx === i ? "1px solid #1C3557" : "none", outlineOffset: "2px" }}
-                    >
-                      {thumbSrc(img) ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={thumbSrc(img)} alt={img.alt_text ?? ""} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                      ) : (
-                        <span style={{ fontSize: "20px", opacity: 0.3 }}>👕</span>
-                      )}
-                    </button>
-                  ))}
-                </div>
-                {orderedImages.length > 5 && (
-                  <>
-                    <button
-                      onClick={() => { const el = document.getElementById("thumb-slider"); if (el) el.scrollLeft -= 200; }}
-                      style={{ position: "absolute", left: "-12px", top: "50%", transform: "translateY(-50%)", width: "28px", height: "28px", background: "#fff", border: "1px solid #E2E2DE", cursor: "pointer", fontSize: "14px", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1 }}
-                    >‹</button>
-                    <button
-                      onClick={() => { const el = document.getElementById("thumb-slider"); if (el) el.scrollLeft += 200; }}
-                      style={{ position: "absolute", right: "-12px", top: "50%", transform: "translateY(-50%)", width: "28px", height: "28px", background: "#fff", border: "1px solid #E2E2DE", cursor: "pointer", fontSize: "14px", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1 }}
-                    >›</button>
-                  </>
-                )}
+            {/* Thumbnails */}
+            {displayImages.length > 1 && (
+              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginTop: "12px" }}>
+                {displayImages.map((img, i) => (
+                  <button
+                    key={img.id}
+                    onClick={() => setActiveImageIdx(i)}
+                    style={{ width: "80px", height: "80px", flexShrink: 0, border: activeImageIdx === i ? "1px solid #1C3557" : "1px solid #E2E2DE", cursor: "pointer", background: "#F8F8F6", padding: 0, outline: activeImageIdx === i ? "1px solid #1C3557" : "none", outlineOffset: "2px", overflow: "hidden" }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={thumbSrc(img)} alt={img.alt_text ?? ""} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  </button>
+                ))}
               </div>
             )}
 
-            {/* Image Library + Email Flyer */}
-            <div style={{ display: "flex", gap: "8px", marginTop: "12px" }}>
-              {product.images && product.images.length > 0 && (
-                <button
-                  onClick={() => setShowImageLibrary(true)}
-                  style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", padding: "10px", border: "1px solid #E2E0DA", borderRadius: "8px", fontSize: "12px", fontWeight: 600, color: "#2A2830", background: "#fff", cursor: "pointer" }}
-                >
-                  <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>
-                  Image Library
-                </button>
-              )}
-              <button
-                onClick={hasFlyer ? handleEmailFlyer : () => setAssetMsg("No flyer available for this product.")}
-                style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", padding: "10px", border: "1px solid #E2E0DA", borderRadius: "8px", fontSize: "12px", fontWeight: 600, color: hasFlyer ? "#2A2830" : "#aaa", background: "#fff", cursor: "pointer" }}
+            {/* Gallery links */}
+            <div style={{ marginTop: "14px", display: "flex", flexDirection: "column", gap: "6px" }}>
+              <a
+                href="#"
+                onClick={e => { e.preventDefault(); handleDownloadStyleSheet(); }}
+                style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#1C3557", textDecoration: "none", cursor: "pointer" }}
               >
-                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                Email Flyer
-              </button>
+                ↓ Download Style Sheet
+              </a>
+              {product.images && product.images.length > 0 && (
+                <a
+                  href="#"
+                  onClick={e => { e.preventDefault(); setShowImageLibrary(true); setExpandedLibraryColor(null); }}
+                  style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#1C3557", textDecoration: "none", cursor: "pointer" }}
+                >
+                  View Image Library →
+                </a>
+              )}
             </div>
-            {assetMsg && (
-              <p style={{ marginTop: "6px", fontSize: "12px", color: assetMsg.startsWith("No flyer") ? "#aaa" : "#1A5CFF", textAlign: "center" }}>{assetMsg}</p>
-            )}
+            {assetMsg && <p style={{ marginTop: "6px", fontSize: "12px", color: "#6B6B6B" }}>{assetMsg}</p>}
           </div>
 
           {/* ── RIGHT: Product Info ─────────────────────────────────────── */}
           <div>
-            {/* Category */}
-            {/* Tags + Copy URL + Category */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
-              <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
-                {(product.tags?.some(t => t.toLowerCase().includes("best seller") || t.toLowerCase().includes("bestseller"))) && (
-                  <span style={{ background: "#E8242A", color: "#fff", fontSize: "10px", fontWeight: 700, padding: "3px 8px", borderRadius: "4px", textTransform: "uppercase", letterSpacing: ".06em" }}>Best Seller</span>
-                )}
-                <span style={{ background: anyInStock ? "rgba(5,150,105,.1)" : "rgba(232,36,42,.1)", color: anyInStock ? "#059669" : "#E8242A", fontSize: "10px", fontWeight: 700, padding: "3px 8px", borderRadius: "4px", display: "flex", alignItems: "center", gap: "4px" }}>
-                  <svg width="7" height="7" viewBox="0 0 7 7"><circle cx="3.5" cy="3.5" r="3.5" fill={anyInStock ? "#059669" : "#E8242A"} /></svg> {anyInStock ? "In Stock" : "Out of Stock"}
-                </span>
-                {(product.tags ?? []).filter(t => !t.toLowerCase().includes("best seller") && !t.toLowerCase().includes("bestseller")).map(tag => (
-                  <span key={tag} style={{ background: "#F4F3EF", color: "#7A7880", fontSize: "10px", fontWeight: 700, padding: "3px 8px", borderRadius: "4px", textTransform: "uppercase", letterSpacing: ".06em", border: "1px solid #E2E0DA" }}>
-                    {tag}
-                  </span>
-                ))}
-              </div>
-              <button
-                onClick={() => {
-                  if (typeof window !== "undefined") {
-                    navigator.clipboard.writeText(window.location.href);
-                    setCopiedUrl(true);
-                    setTimeout(() => setCopiedUrl(false), 2000);
-                  }
-                }}
-                style={{ background: copiedUrl ? "rgba(5,150,105,.08)" : "none", border: `1px solid ${copiedUrl ? "rgba(5,150,105,.3)" : "#E2E0DA"}`, borderRadius: "6px", padding: "5px 12px", fontSize: "11px", fontWeight: 600, color: copiedUrl ? "#059669" : "#7A7880", cursor: "pointer", transition: "all .2s" }}
-              >
-                {copiedUrl ? "✓ Copied!" : "Copy URL"}
-              </button>
-            </div>
             {/* Product code */}
             {((product as any).product_code || (product as any).code) && (
               <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: "12px", color: "#6B6B6B", marginBottom: "8px" }}>
@@ -720,378 +758,175 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
             )}
 
             {/* Title */}
-            <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: "36px", fontWeight: 600, color: "#1A1A1A", lineHeight: 1.15, marginBottom: "12px" }}>
+            <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: "36px", fontWeight: 600, color: "#1A1A1A", lineHeight: 1.15, marginBottom: "10px" }}>
               {product.name}
             </h1>
 
-            <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", color: "#6B6B6B", marginBottom: "14px", display: "flex", flexWrap: "wrap", gap: "6px", alignItems: "center" }}>
-              {(product as any).fabric && <span>{(product as any).fabric}</span>}
-              {(product as any).weight && <><span style={{ color: "#ccc" }}>·</span><span>{(product as any).weight}</span></>}
-              {uniqueColors.length > 0 && <><span style={{ color: "#ccc" }}>·</span><span>{uniqueColors.length} Colors</span></>}
+            {/* Meta line */}
+            <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", color: "#6B6B6B", marginBottom: "20px" }}>
+              {[(product as any).fabric, (product as any).weight, uniqueColors.length > 0 ? `${uniqueColors.length} Colors` : null].filter(Boolean).join(" · ")}
             </div>
 
-            {/* Stars */}
-            {((product as any).review_count ?? 0) > 0 ? (
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "20px" }}>
-                <div style={{ display: "flex", gap: "2px" }}>
-                  {[1, 2, 3, 4, 5].map(s => (
-                    <svg key={s} width="14" height="14" viewBox="0 0 24 24" fill={s <= Math.round((product as any).avg_rating ?? 0) ? "#C9A84C" : "#E2E0DA"}>
-                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                    </svg>
-                  ))}
-                </div>
-                <span style={{ fontSize: "12px", color: "#7A7880" }}>
-                  {(product as any).avg_rating ?? 0} ({(product as any).review_count ?? 0} review{(product as any).review_count !== 1 ? "s" : ""})
-                </span>
-              </div>
-            ) : (
-              <div style={{ fontSize: "12px", color: "#B0ADBA", marginBottom: "20px" }}>No reviews yet</div>
+            {/* Guest state — plain inline text, no card/box */}
+            {!isAuthenticated && (
+              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#6B6B6B", marginBottom: "22px" }}>
+                Create a wholesale account to get lower prices.{" "}
+                <Link href="/wholesale/register" style={{ color: "#1C3557", fontWeight: 500, textDecoration: "none" }}>Create Account</Link>
+                {" · "}
+                <Link href="/login" style={{ color: "#1C3557", fontWeight: 500, textDecoration: "none" }}>Log In</Link>
+              </p>
             )}
 
-            {/* Highlight box — editable from admin; hidden when empty */}
-            {(product as any).highlight_text ? (
-              <div style={{ background: "rgba(26,92,255,.05)", border: "1px solid rgba(26,92,255,.15)", borderRadius: "8px", padding: "12px 16px", marginBottom: "20px", fontSize: "13px", color: "#2A2830", lineHeight: 1.6 }}>
+            {/* Highlight text */}
+            {(product as any).highlight_text && (
+              <div style={{ background: "rgba(28,53,87,.05)", border: "1px solid rgba(28,53,87,.15)", padding: "12px 16px", marginBottom: "20px", fontSize: "13px", color: "#1A1A1A", lineHeight: 1.6 }}>
                 ✅ {(product as any).highlight_text}
               </div>
-            ) : null}
-
-            {/* Pricing */}
-            {/* {isAuthenticated ? (
-              <div style={{ background: "#F4F3EF", border: "1px solid #E2E0DA", borderRadius: "10px", padding: "20px", marginBottom: "20px" }}>
-                <div style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".08em", color: "#7A7880", marginBottom: "8px" }}>
-                  Wholesale Price
-                </div>
-                {primaryVariant?.effective_price ? (
-                  <div style={{ display: "flex", alignItems: "baseline", gap: "10px" }}>
-                    <span style={{ fontFamily: "var(--font-bebas)", fontSize: "36px", color: "#E8242A", letterSpacing: ".02em" }}>
-                      {formatCurrency(Number(primaryVariant.effective_price))}
-                    </span>
-                    {primaryVariant.effective_price !== primaryVariant.retail_price && primaryVariant.retail_price && (
-                      <span style={{ fontSize: "16px", color: "#7A7880", textDecoration: "line-through" }}>
-                        {formatCurrency(Number(primaryVariant.retail_price))}
-                      </span>
-                    )}
-                    <span style={{ fontSize: "12px", color: "#7A7880" }}>/ unit</span>
-                  </div>
-                ) : (
-                  <span style={{ fontFamily: "var(--font-bebas)", fontSize: "28px", color: "#7A7880" }}>Price on request</span>
-                )}
-              </div>
-            ) : (
-              <div style={{ background: "#1B3A5C", border: "1px solid rgba(255,255,255,.12)", borderRadius: "10px", padding: "24px", marginBottom: "20px", textAlign: "center" }}>
-                <div style={{ fontSize: "24px", marginBottom: "8px" }}>🔒</div>
-                <div style={{ fontFamily: "var(--font-bebas)", fontSize: "18px", color: "#fff", letterSpacing: ".04em", marginBottom: "6px" }}>
-                  Wholesale Pricing Locked
-                </div>
-                <p style={{ fontSize: "13px", color: "#7A7880", marginBottom: "16px", lineHeight: 1.5 }}>
-                  Log in to your approved wholesale account to see factory-direct pricing and place orders.
-                </p>
-                <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
-                  <Link href="/login" style={{ background: "#E8242A", color: "#fff", padding: "10px 20px", borderRadius: "6px", fontSize: "13px", fontWeight: 700, textDecoration: "none", textTransform: "uppercase", letterSpacing: ".06em" }}>
-                    Log In
-                  </Link>
-                  <Link href="/wholesale/register" style={{ background: "transparent", color: "#fff", padding: "10px 20px", borderRadius: "6px", fontSize: "13px", fontWeight: 600, textDecoration: "none", border: "1px solid rgba(255,255,255,.15)" }}>
-                    Apply for Access
-                  </Link>
-                </div>
-              </div>
-            )} */}
-
-            {/* Pricing block — shown to authenticated users only */}
-            {isAuthenticated && (
-              <div style={{ background: "#F8F8F6", border: "1px solid #E2E2DE", padding: "16px 20px", marginBottom: "16px" }}>
-                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".08em", color: "#6B6B6B", marginBottom: "8px" }}>
-                  {!isRetailUser ? "Wholesale Price" : "Retail Price"}
-                </div>
-                {primaryVariant?.effective_price ? (
-                  <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-                    {Number(primaryVariant.retail_price) > Number(primaryVariant.effective_price) && (
-                      <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", color: "#6B6B6B", textDecoration: "line-through" }}>
-                        {formatCurrency(Number(primaryVariant.retail_price))}
-                      </div>
-                    )}
-                    <div style={{ display: "flex", alignItems: "baseline", gap: "10px" }}>
-                      <span style={{ fontFamily: "'Fraunces', serif", fontSize: "32px", color: "#1C3557", fontWeight: 600 }}>
-                        {formatCurrency(Number(primaryVariant.effective_price))}
-                      </span>
-                      <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#6B6B6B" }}>/ unit</span>
-                    </div>
-                  </div>
-                ) : (
-                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "16px", color: "#6B6B6B" }}>Price on request</span>
-                )}
-              </div>
             )}
 
-            {/* Wholesale gate — guests only */}
-            {!isAuthenticated && (
-              <div style={{ background: "#F8F8F6", border: "1px solid #E2E2DE", padding: "16px 20px", marginBottom: "16px" }}>
-                <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#6B6B6B", margin: "0 0 12px", lineHeight: 1.5 }}>
-                  Create a wholesale account to get lower prices.
-                </p>
-                <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-                  <Link href="/wholesale/register" style={{ fontFamily: "'DM Sans', sans-serif", background: "#1C3557", color: "#fff", padding: "8px 16px", fontSize: "13px", fontWeight: 500, textDecoration: "none" }}>Create Account</Link>
-                  <Link href="/login" style={{ fontFamily: "'DM Sans', sans-serif", background: "none", color: "#1C3557", padding: "8px 16px", fontSize: "13px", fontWeight: 500, textDecoration: "none", border: "1px solid #1C3557" }}>Log In</Link>
-                </div>
-              </div>
-            )}
-
-            {/* ── Color + Order section ──────────────────────────────── */}
+            {/* COLOR label + swatches */}
             {colorGroups.length > 0 && (
-              <div style={{ marginBottom: "20px" }}>
-                {/* Color selector swatches */}
-                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", fontWeight: 600, color: "#1A1A1A", marginBottom: "12px" }}>
-                  Available Colors ({colorGroups.length})
+              <>
+                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", letterSpacing: "0.1em", textTransform: "uppercase", color: "#6B6B6B", fontWeight: 600, marginBottom: "10px" }}>
+                  Color
                 </div>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "16px" }}>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "28px" }}>
                   {colorGroups.map(group => {
                     const hex = COLOR_MAP[group.color] ?? "#E2E2DE";
                     const isLight = ["#FFFFFF", "#fffff0", "#fef3c7", "#f5f0e8"].includes(hex);
-                    const isSelected = expandedColors.includes(group.color);
+                    const isSel = selectedColor === group.color;
                     return (
                       <button
                         key={group.color}
-                        onClick={() => toggleColor(group.color)}
+                        onClick={() => { setSelectedColor(selectedColor === group.color ? null : group.color); setActiveImageIdx(0); }}
                         title={group.color}
-                        style={{ width: "24px", height: "24px", borderRadius: "50%", cursor: "pointer", border: isLight ? "1px solid #E2E2DE" : "none", background: hex, outline: isSelected ? "2px solid #1C3557" : "none", outlineOffset: "2px", transition: "all .15s", flexShrink: 0 }}
+                        style={{ width: "24px", height: "24px", borderRadius: "50%", background: hex, border: isLight ? "1px solid #E2E2DE" : "1px solid rgba(0,0,0,.08)", cursor: "pointer", outline: isSel ? "2px solid #1C3557" : "none", outlineOffset: "2px", flexShrink: 0, padding: 0, display: "block" }}
                       />
                     );
                   })}
                 </div>
 
-                {/* Order quantities accordion */}
-                <div style={{ fontSize: "13px", fontWeight: 700, color: "#2A2830", marginBottom: "12px" }}>
-                  Order Quantities
+                {/* Bulk order table */}
+                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", fontWeight: 600, color: "#1A1A1A", marginBottom: "14px" }}>
+                  Select Sizes &amp; Quantities
                 </div>
-
-                {filteredGroups.map((group, idx) => {
-                  const expanded = isExpanded(group);
-                  const hex = COLOR_MAP[group.color] ?? "#E2E0DA";
-                  const isLight = ["#FFFFFF", "#fffff0", "#fef3c7", "#f5f0e8"].includes(hex);
-                  return (
-                    <div key={group.color} style={{ border: "1px solid #E2E0DA", borderRadius: "10px", marginBottom: "10px", overflow: "hidden" }}>
-                      {/* Accordion header */}
-                      <div
-                        onClick={() => toggleColor(group.color)}
-                        style={{ display: "flex", alignItems: "center", gap: "10px", padding: "12px 16px", cursor: "pointer", background: "#F4F3EF", userSelect: "none" }}
-                      >
-                        <div style={{ width: "18px", height: "18px", borderRadius: "50%", background: hex, border: isLight ? "1px solid #E2E0DA" : "none", flexShrink: 0 }} />
-                        <span style={{ fontWeight: 700, fontSize: "14px", color: "#2A2830" }}>{group.color}</span>
-                        <span style={{ fontSize: "12px", color: "#7A7880", marginLeft: "auto" }}>{group.variants.length} sizes</span>
-                        <span style={{ fontSize: "11px", color: "#7A7880", transition: "transform .2s", transform: expanded ? "rotate(180deg)" : "rotate(0deg)", display: "inline-block" }}>▼</span>
-                      </div>
-
-                      {/* Size inputs */}
-                      {expanded && (
-                        <div style={{ padding: "16px", display: "flex", flexWrap: "wrap", gap: "10px" }}>
-                          {group.variants.map(variant => {
-                            const qty = quantities[variant.id] ?? 0;
-                            const isOOS = isOutOfStock(variant.stock_quantity);
-                            return (
-                              <div key={variant.id} style={{ textAlign: "center", minWidth: "64px" }}>
-                                <div style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", color: "#7A7880", marginBottom: "4px" }}>{variant.size}</div>
-                                <div style={{ fontSize: "11px", color: "#7A7880", marginBottom: "4px" }}>
-                                  ${Number(variant.effective_price ?? variant.retail_price).toFixed(2)}
-                                </div>
-                                {variant.weight_grams != null && variant.weight_grams > 0 && (
-                                  <div style={{ fontSize: "10px", color: "#9ca3af", marginBottom: "4px" }}>
-                                    {variant.weight_grams}g
-                                  </div>
-                                )}
-                                <input
-                                  type="number"
-                                  min="0"
-                                  max={variant.stock_quantity ?? undefined}
-                                  value={qty === 0 ? "" : qty}
-                                  disabled={isOOS}
-                                  onChange={e => {
-                                    if (isOOS) return;
-                                    const raw = parseInt(e.target.value, 10) || 0;
-                                    const maxStock = variant.stock_quantity ?? 9999;
-                                    const val = Math.min(raw, maxStock);
-                                    setQuantities(prev => {
-                                      if (val <= 0) {
-                                        const next = { ...prev };
-                                        delete next[variant.id];
-                                        return next;
-                                      }
-                                      return { ...prev, [variant.id]: val };
-                                    });
-                                  }}
-                                  style={{ width: "64px", height: "44px", textAlign: "center", border: qty > 0 ? "2px solid #1A5CFF" : "1.5px solid #E2E0DA", borderRadius: "8px", fontSize: "15px", fontWeight: 700, outline: "none", fontFamily: "var(--font-jakarta)", opacity: isOOS ? 0.4 : 1, cursor: isOOS ? "not-allowed" : "text", background: isOOS ? "#f5f5f5" : "white" }}
-                                />
-                                <div style={{ fontSize: "10px", fontWeight: 700, marginTop: "4px", textAlign: "center", color: getStockColor(variant.stock_quantity) }}>
-                                  {getStockLabel(variant.stock_quantity)}
-                                </div>
+                <div style={{ overflowX: "auto" }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "'DM Sans', sans-serif", fontSize: "13px" }}>
+                    <thead>
+                      <tr>
+                        <th style={{ fontSize: "11px", color: "#6B6B6B", fontWeight: 500, padding: "6px 8px", textAlign: "left", borderBottom: "1px solid #E2E2DE" }}>Color</th>
+                        {uniqueSizes.map(size => (
+                          <th key={size} style={{ fontSize: "11px", color: "#6B6B6B", fontWeight: 500, padding: "6px 8px", textAlign: "center", borderBottom: "1px solid #E2E2DE" }}>{size}</th>
+                        ))}
+                        <th style={{ fontSize: "11px", color: "#6B6B6B", fontWeight: 500, padding: "6px 8px", textAlign: "center", borderBottom: "1px solid #E2E2DE" }}>Total</th>
+                        <th style={{ fontSize: "11px", color: "#6B6B6B", fontWeight: 500, padding: "6px 8px", borderBottom: "1px solid #E2E2DE" }}></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {colorGroups.map(group => {
+                        const hex = COLOR_MAP[group.color] ?? "#E2E2DE";
+                        const isLight = ["#FFFFFF", "#fffff0", "#fef3c7", "#f5f0e8"].includes(hex);
+                        const rowQty = group.variants.reduce((s, v) => s + (quantities[v.id] ?? 0), 0);
+                        const rowTotal = group.variants.reduce((s, v) => s + (quantities[v.id] ?? 0) * Number(v.effective_price ?? v.retail_price ?? 0), 0);
+                        return (
+                          <tr key={group.color}>
+                            <td style={{ padding: "10px 8px", borderBottom: "1px solid #E2E2DE", verticalAlign: "top" }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                <div style={{ width: "14px", height: "14px", borderRadius: "50%", background: hex, border: isLight ? "1px solid #E2E2DE" : "1px solid rgba(0,0,0,.08)", flexShrink: 0 }} />
+                                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#1A1A1A", whiteSpace: "nowrap" }}>{group.color}</span>
                               </div>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-
-                {/* Show more / fewer */}
-                {!selectedColor && colorGroups.length > 4 && (
-                  <button
-                    onClick={() => setShowAllColors(!showAllColors)}
-                    style={{ width: "100%", padding: "10px", border: "1.5px dashed #E2E0DA", borderRadius: "8px", background: "transparent", cursor: "pointer", fontSize: "13px", fontWeight: 600, color: "#7A7880", marginBottom: "12px" }}
-                  >
-                    {showAllColors ? `▲ Show fewer colors` : `▼ Show ${colorGroups.length - 4} more colors`}
-                  </button>
-                )}
-
-                {/* Order summary box */}
-                <div style={{ background: "#F4F3EF", borderRadius: "10px", padding: "18px 20px", marginBottom: "16px", border: "1px solid #E2E0DA" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
-                    <span style={{ fontSize: "13px", color: "#7A7880", fontWeight: 500 }}>Total Units</span>
-                    <span style={{ fontFamily: "var(--font-bebas)", fontSize: "20px", color: "#2A2830" }}>{totalUnits} units</span>
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
-                    <span style={{ fontSize: "13px", color: "#7A7880", fontWeight: 500 }}>Price Per Unit</span>
-                    <span style={{ fontWeight: 700, fontSize: "15px", color: "#2A2830" }}>${pricePerUnit.toFixed(2)}</span>
-                  </div>
-                  <div style={{ fontSize: "11px", color: "#7A7880", marginBottom: "12px", fontStyle: "italic" }}>
-                    {isAuthenticated ? "Tier pricing applies at checkout" : "Retail pricing — log in for wholesale rates"}
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", borderTop: "1px solid #E2E0DA", paddingTop: "12px" }}>
-                    <span style={{ fontSize: "14px", fontWeight: 700, color: "#2A2830" }}>Order Total</span>
-                    <span style={{ fontFamily: "var(--font-bebas)", fontSize: "24px", color: "#1A5CFF" }}>${orderTotal.toFixed(2)}</span>
-                  </div>
+                            </td>
+                            {uniqueSizes.map(size => {
+                              const variant = group.variants.find(v => v.size === size);
+                              if (!variant) {
+                                return <td key={size} style={{ padding: "10px 8px", borderBottom: "1px solid #E2E2DE", textAlign: "center", color: "#ccc", verticalAlign: "top" }}>—</td>;
+                              }
+                              const qty = quantities[variant.id] ?? 0;
+                              const isOOS = isOutOfStock(variant.stock_quantity);
+                              const stockNum = variant.stock_quantity as number;
+                              const stockLabel = isOOS ? "Out of Stock" : stockNum >= 9999 ? "In Stock" : `${stockNum} in stock`;
+                              const price = Number(variant.effective_price ?? variant.retail_price ?? 0);
+                              return (
+                                <td key={size} style={{ padding: "10px 8px", borderBottom: "1px solid #E2E2DE", textAlign: "center", verticalAlign: "top" }}>
+                                  <span style={{ display: "block", fontSize: "11px", color: "#6B6B6B", fontFamily: "'DM Sans', sans-serif", marginBottom: "2px" }}>{stockLabel}</span>
+                                  <span style={{ display: "block", fontSize: "11px", color: "#6B6B6B", fontFamily: "'DM Sans', sans-serif", marginBottom: "4px" }}>${price.toFixed(2)}</span>
+                                  <input
+                                    type="number"
+                                    min={0}
+                                    max={variant.stock_quantity ?? undefined}
+                                    value={qty === 0 ? "" : qty}
+                                    disabled={isOOS}
+                                    onChange={e => {
+                                      if (isOOS) return;
+                                      const raw = parseInt(e.target.value, 10) || 0;
+                                      const maxStock = variant.stock_quantity ?? 9999;
+                                      const val = Math.min(raw, maxStock);
+                                      setQuantities(prev => {
+                                        if (val <= 0) { const next = { ...prev }; delete next[variant.id]; return next; }
+                                        return { ...prev, [variant.id]: val };
+                                      });
+                                    }}
+                                    style={{ width: "52px", border: `1px solid ${qty > 0 ? "#1C3557" : "#E2E2DE"}`, padding: "5px 6px", textAlign: "center", fontFamily: "'DM Sans', sans-serif", fontSize: "13px", outline: "none", opacity: isOOS ? 0.4 : 1, cursor: isOOS ? "not-allowed" : "text", background: isOOS ? "#f5f5f5" : "#FFFFFF" }}
+                                  />
+                                </td>
+                              );
+                            })}
+                            <td style={{ padding: "10px 8px", borderBottom: "1px solid #E2E2DE", textAlign: "center", verticalAlign: "middle" }}>
+                              <span style={{ display: "block", fontSize: "12px", color: "#6B6B6B", whiteSpace: "nowrap" }}>Qty: {rowQty}</span>
+                              <span style={{ display: "block", fontSize: "12px", color: "#6B6B6B", whiteSpace: "nowrap" }}>${rowTotal.toFixed(2)}</span>
+                            </td>
+                            <td style={{ padding: "10px 8px", borderBottom: "1px solid #E2E2DE", textAlign: "center", verticalAlign: "middle" }}>
+                              <button
+                                onClick={() => handleRowAddToCart(group)}
+                                disabled={rowQty === 0}
+                                style={{ background: "transparent", color: rowQty > 0 ? "#1C3557" : "#ccc", border: `1px solid ${rowQty > 0 ? "#1C3557" : "#E2E2DE"}`, padding: "5px 10px", fontSize: "11px", fontFamily: "'DM Sans', sans-serif", cursor: rowQty > 0 ? "pointer" : "not-allowed", whiteSpace: "nowrap" }}
+                              >
+                                Add to Cart
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
                 </div>
 
-                {/* {totalUnits > 0 && (
-                  <div style={{ background: "#F4F3EF", borderRadius: "10px", padding: "18px 20px", marginBottom: "16px", border: "1px solid #E2E0DA" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
-                      <span style={{ fontSize: "13px", color: "#7A7880", fontWeight: 500 }}>Total Units</span>
-                      <span style={{ fontFamily: "var(--font-bebas)", fontSize: "20px", color: "#2A2830" }}>{totalUnits} units</span>
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
-                      <span style={{ fontSize: "13px", color: "#7A7880", fontWeight: 500 }}>Price Per Unit</span>
-                      <span style={{ fontWeight: 700, fontSize: "15px", color: "#2A2830" }}>${pricePerUnit.toFixed(2)}</span>
-                    </div>
-                    <div style={{ fontSize: "11px", color: "#7A7880", marginBottom: "12px", fontStyle: "italic" }}>
-                      Tier pricing applies at checkout
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "space-between", borderTop: "1px solid #E2E0DA", paddingTop: "12px" }}>
-                      <span style={{ fontSize: "14px", fontWeight: 700, color: "#2A2830" }}>Order Total</span>
-                      <span style={{ fontFamily: "var(--font-bebas)", fontSize: "24px", color: "#1A5CFF" }}>${orderTotal.toFixed(2)}</span>
-                    </div>
-                  </div>
-                )} */}
+                {/* Grand total row */}
+                <div style={{ display: "flex", alignItems: "center", gap: "24px", padding: "16px 0 12px", borderTop: "1px solid #E2E2DE", marginTop: "8px" }}>
+                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", color: "#6B6B6B" }}>
+                    Grand Total Qty: <strong style={{ color: "#1A1A1A" }}>{totalUnits}</strong>
+                  </span>
+                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#6B6B6B" }}>
+                    Grand Total Price: <strong style={{ color: "#1A1A1A" }}>${orderTotal.toFixed(2)}</strong>
+                  </span>
+                </div>
 
                 {/* Cart message */}
                 {cartMsg && (
-                  <div style={{ padding: "10px 14px", borderRadius: "8px", fontSize: "13px", fontWeight: 600, marginBottom: "12px", background: cartMsg.type === "success" ? "rgba(5,150,105,.08)" : "rgba(232,36,42,.08)", color: cartMsg.type === "success" ? "#059669" : "#E8242A", border: `1px solid ${cartMsg.type === "success" ? "rgba(5,150,105,.2)" : "rgba(232,36,42,.2)"}` }}>
+                  <div style={{ padding: "10px 14px", fontSize: "13px", fontWeight: 600, marginBottom: "12px", background: cartMsg.type === "success" ? "rgba(5,150,105,.08)" : "rgba(232,36,42,.08)", color: cartMsg.type === "success" ? "#059669" : "#E8242A", border: `1px solid ${cartMsg.type === "success" ? "rgba(5,150,105,.2)" : "rgba(232,36,42,.2)"}` }}>
                     {cartMsg.text}
                   </div>
                 )}
 
-                {/* Add to cart button */}
+                {/* Main CTA button */}
                 <button
                   onClick={handleAddToCart}
                   disabled={totalUnits === 0 || isSubmitting}
-                  style={{ width: "100%", padding: "16px", background: totalUnits > 0 ? "#E8242A" : "#E2E0DA", color: totalUnits > 0 ? "#fff" : "#aaa", border: "none", borderRadius: "8px", cursor: totalUnits > 0 ? "pointer" : "not-allowed", fontFamily: "var(--font-bebas)", fontSize: "18px", letterSpacing: ".08em", transition: "all .2s", marginBottom: "12px" }}
+                  style={{ width: "100%", padding: "14px", background: totalUnits > 0 ? "#1C3557" : "#E2E2DE", color: totalUnits > 0 ? "#fff" : "#aaa", border: "none", cursor: totalUnits > 0 ? "pointer" : "not-allowed", fontFamily: "'DM Sans', sans-serif", fontSize: "15px", fontWeight: 500, transition: "all .2s", marginTop: "12px" }}
                 >
-                  {isSubmitting ? "ADDING TO CART…" : totalUnits > 0 ? `ADD TO CART — ${totalUnits} UNITS` : "SELECT QUANTITIES TO ORDER"}
+                  {isSubmitting ? "Adding to Cart…" : "Add to Cart — All Selections"}
                 </button>
-                {!isAuthenticated && totalUnits > 0 && (
-                  <p style={{ textAlign: "center", fontSize: "12px", color: "#7A7880", marginBottom: "8px" }}>
-                    <Link href="/login" style={{ color: "#1A5CFF", fontWeight: 600, textDecoration: "none" }}>Log in</Link> or <Link href="/register" style={{ color: "#1A5CFF", fontWeight: 600, textDecoration: "none" }}>create an account</Link> to complete your purchase
-                  </p>
-                )}
-
-                {/* Request quote */}
-                <div style={{ textAlign: "center" }}>
-                  <a
-                    href="/contact"
-                    style={{ fontSize: "13px", color: "#7A7880", textDecoration: "none", borderBottom: "1px solid #E2E0DA", paddingBottom: "1px", transition: "color .2s" }}
-                    onMouseEnter={e => (e.currentTarget.style.color = "#1A5CFF")}
-                    onMouseLeave={e => (e.currentTarget.style.color = "#7A7880")}
-                  >
-                    Request a Quote for large or custom orders →
-                  </a>
-                </div>
-              </div>
+                <p style={{ textAlign: "center", marginTop: "10px", fontSize: "12px", color: "#6B6B6B", fontFamily: "'DM Sans', sans-serif" }}>
+                  No minimum order quantity
+                </p>
+              </>
             )}
-
-            {/* Fallback color swatches when product has no variants */}
-            {colorGroups.length === 0 && uniqueColors.length > 0 && (
-              <div style={{ marginBottom: "16px" }}>
-                <div style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".08em", color: "#7A7880", marginBottom: "8px" }}>
-                  Available Colors ({uniqueColors.length})
-                </div>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "16px" }}>
-                  {uniqueColors.map(color => {
-                    const hex = COLOR_MAP[color] ?? "#E2E0DA";
-                    return (
-                      <button
-                        key={color}
-                        title={color}
-                        onClick={() => {
-                          const colorLower = color.toLowerCase();
-                          const matchIdx = images.findIndex(img => img.alt_text?.toLowerCase().includes(colorLower));
-                          if (matchIdx >= 0) setActiveImageIdx(matchIdx);
-                        }}
-                        style={{ width: "24px", height: "24px", borderRadius: "50%", background: hex, border: ["#FFFFFF", "#fffff0", "#fef3c7", "#f5f0e8"].includes(hex) ? "1px solid #E2E0DA" : "1px solid transparent", cursor: "pointer", padding: 0 }}
-                      />
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Trust badges */}
-            <div className="pd-trust-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "20px" }}>
-              {[
-                { icon: <FactoryIcon size={16} color="#2A2830" />, text: "Factory-Direct Pricing" },
-                { icon: <ZapIcon size={16} color="#2A2830" />, text: "Same-Day Shipping" },
-                { icon: <PackageIcon size={16} color="#2A2830" />, text: "No Order Minimums" },
-                { icon: <PaletteIcon size={16} color="#2A2830" />, text: "Print-Optimized Blanks" },
-              ].map(item => (
-                <div key={item.text} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 12px", background: "#F4F3EF", borderRadius: "6px", border: "1px solid #E2E0DA" }}>
-                  {item.icon}
-                  <span style={{ fontSize: "11px", fontWeight: 600, color: "#2A2830" }}>{item.text}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Asset Downloads */}
-            {/* {isAuthenticated && (
-              <div style={{ borderTop: "1px solid #E2E0DA", paddingTop: "16px" }}>
-                <div style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".08em", color: "#7A7880", marginBottom: "10px" }}>
-                  Downloads & Assets
-                </div>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-                  {product.images && product.images.length > 0 && (
-                    <button onClick={handleDownloadImages} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "8px 14px", border: "1px solid #E2E0DA", borderRadius: "6px", fontSize: "12px", fontWeight: 600, color: "#2A2830", background: "#fff", cursor: "pointer" }}>
-                      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                      Download Images
-                    </button>
-                  )}
-                  {hasFlyer && (
-                    <>
-                      <button onClick={handleDownloadFlyer} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "8px 14px", border: "1px solid #E2E0DA", borderRadius: "6px", fontSize: "12px", fontWeight: 600, color: "#2A2830", background: "#fff", cursor: "pointer" }}>
-                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
-                        Download Flyer
-                      </button>
-                      <button onClick={handleEmailFlyer} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "8px 14px", border: "1px solid #E2E0DA", borderRadius: "6px", fontSize: "12px", fontWeight: 600, color: "#2A2830", background: "#fff", cursor: "pointer" }}>
-                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                        Email Flyer
-                      </button>
-                    </>
-                  )}
-                </div>
-                {assetMsg && <p style={{ marginTop: "8px", fontSize: "12px", color: "#1A5CFF" }}>{assetMsg}</p>}
-              </div>
-            )} */}
           </div>
         </div>
 
         {/* ── Product Tabs ───────────────────────────────────────────────── */}
         <div style={{ marginTop: "40px", borderTop: "1px solid #E2E2DE" }}>
-          <div className="pd-tab-bar" style={{ gap: "0", borderBottom: "1px solid #E2E2DE" }}>
+          <div style={{ display: "flex", borderBottom: "1px solid #E2E2DE" }}>
             {TABS.map(tab => (
               <button
                 key={tab}
@@ -1105,14 +940,14 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
 
           <div style={{ padding: "32px 0" }}>
             {activeTab === "Description" && (
-              <div style={{ maxWidth: "720px" }}>
+              <div style={{ maxWidth: "660px" }}>
                 {product.description ? (
                   <div
-                    style={{ fontSize: "15px", color: "#2A2830", lineHeight: 1.7 }}
+                    style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "15px", color: "#6B6B6B", lineHeight: 1.75 }}
                     dangerouslySetInnerHTML={{ __html: product.description }}
                   />
                 ) : (
-                  <p style={{ fontSize: "15px", color: "#2A2830", lineHeight: 1.7 }}>
+                  <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "15px", color: "#6B6B6B", lineHeight: 1.75 }}>
                     No description available for this product.
                   </p>
                 )}
@@ -1228,83 +1063,105 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
       </div>
 
       <style>{`
-        @media (max-width: 768px) {
-          .product-detail-grid {
-            grid-template-columns: 1fr !important;
-            gap: 24px !important;
-          }
+        @media (max-width: 900px) {
+          .pdp-main-grid { grid-template-columns: 1fr !important; gap: 24px !important; }
+          .pdp-main-grid h1 { font-size: 28px !important; }
+          .pdp-main-grid button[style*="width: 80px"] { width: 60px !important; height: 60px !important; }
         }
       `}</style>
 
-      {/* ── Image Library Modal ───────────────────────────────────────────── */}
+      {/* ── Image Library Modal — grouped by color ────────────────────────── */}
       {showImageLibrary && (
         <div
           style={{ position: "fixed", inset: 0, zIndex: 1000, background: "rgba(0,0,0,.75)", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}
           onClick={() => setShowImageLibrary(false)}
         >
           <div
-            style={{ background: "#fff", borderRadius: "12px", maxWidth: "960px", width: "100%", maxHeight: "90vh", overflow: "auto", padding: "28px" }}
+            style={{ background: "#fff", maxWidth: "960px", width: "100%", maxHeight: "90vh", overflow: "auto", padding: "28px" }}
             onClick={e => e.stopPropagation()}
           >
             {/* Modal header */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px" }}>
               <div>
-                <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "22px", letterSpacing: ".04em", color: "#2A2830", margin: 0 }}>
-                  Image Library
+                <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "18px", fontWeight: 600, color: "#1A1A1A", margin: "0 0 4px" }}>
+                  Image Library — {product.name}
                 </h3>
-                <p style={{ fontSize: "12px", color: "#7A7880", margin: "4px 0 0" }}>
-                  {product.images!.length} image{product.images!.length !== 1 ? "s" : ""} — click any image to open full size
+                <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#6B6B6B", margin: 0 }}>
+                  All colorway images available for download.
                 </p>
               </div>
               <button
                 onClick={() => setShowImageLibrary(false)}
-                style={{ width: "32px", height: "32px", borderRadius: "50%", border: "1px solid #E2E0DA", background: "#fff", cursor: "pointer", fontSize: "16px", display: "flex", alignItems: "center", justifyContent: "center", color: "#7A7880" }}
-              >
-                ✕
-              </button>
+                style={{ background: "none", border: "none", cursor: "pointer", fontSize: "20px", color: "#6B6B6B", lineHeight: 1, padding: "4px" }}
+              >✕</button>
             </div>
 
-            {/* Image grid */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "12px" }}>
-              {product.images!.map((img, i) => (
-                <div key={img.id} style={{ border: "1px solid #E2E0DA", borderRadius: "10px", overflow: "hidden", background: "#F4F3EF" }}>
-                  <button
-                    onClick={() => { setActiveImageIdx(images.indexOf(img)); setShowImageLibrary(false); }}
-                    style={{ display: "block", width: "100%", border: "none", padding: 0, cursor: "pointer", background: "none" }}
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={imgSrc(img)}
-                      alt={img.alt_text ?? `${product.name} — Image ${i + 1}`}
-                      style={{ width: "100%", aspectRatio: "1", objectFit: "cover", display: "block" }}
-                    />
-                  </button>
-                  <div style={{ padding: "8px 10px", display: "flex", gap: "6px" }}>
+            {/* Color cards grid */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "12px" }}>
+              {imageGroups.map((group, gi) => {
+                const groupKey = group.color ?? `__unassigned_${gi}`;
+                const isExpanded = expandedLibraryColor === groupKey;
+                const firstImg = group.images[0];
+                return (
+                  <div key={groupKey} style={{ border: "1px solid #E2E2DE", padding: "8px" }}>
+                    {/* Thumbnail — click to expand */}
+                    <div
+                      onClick={() => setExpandedLibraryColor(isExpanded ? null : groupKey)}
+                      style={{ cursor: "pointer", marginBottom: "6px" }}
+                    >
+                      {firstImg ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={imgSrc(firstImg)} alt={firstImg.alt_text ?? group.color ?? ""} style={{ width: "100%", height: "120px", objectFit: "contain", display: "block" }} />
+                      ) : (
+                        <div style={{ height: "120px", background: "#F8F8F6", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <span style={{ fontSize: "32px", opacity: 0.2 }}>👕</span>
+                        </div>
+                      )}
+                    </div>
+                    {group.color && (
+                      <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", color: "#6B6B6B", marginBottom: "2px" }}>{group.color}</div>
+                    )}
+                    <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "10px", color: "#6B6B6B", marginBottom: "6px" }}>
+                      {group.images.length} image{group.images.length !== 1 ? "s" : ""}
+                    </div>
                     <button
                       onClick={async () => {
-                        try {
-                          const resp = await fetch(imgSrc(img));
-                          const blob = await resp.blob();
-                          const url = URL.createObjectURL(blob);
-                          const a = document.createElement("a");
-                          a.href = url;
-                          a.download = `${product.slug}-image-${i + 1}.jpg`;
-                          document.body.appendChild(a);
-                          a.click();
-                          document.body.removeChild(a);
-                          URL.revokeObjectURL(url);
-                        } catch {
-                          window.open(imgSrc(img), "_blank");
+                        for (let idx = 0; idx < group.images.length; idx++) {
+                          const img = group.images[idx]!;
+                          await handleDownload(imgSrc(img), `${product.slug}-${group.color ?? "image"}-${idx + 1}.jpg`);
+                          if (idx < group.images.length - 1) await new Promise(r => setTimeout(r, 100));
                         }
                       }}
-                      style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: "5px", padding: "6px 10px", background: "#1A5CFF", color: "#fff", borderRadius: "6px", fontSize: "11px", fontWeight: 700, border: "none", cursor: "pointer" }}
+                      style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", color: "#1C3557", background: "none", border: "none", cursor: "pointer", padding: 0, display: "block" }}
                     >
-                      <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                      Download
+                      Download All
                     </button>
+
+                    {/* Expanded: individual images */}
+                    {isExpanded && (
+                      <div style={{ marginTop: "8px", borderTop: "1px solid #E2E2DE", paddingTop: "8px", display: "flex", flexDirection: "column", gap: "8px" }}>
+                        {group.images.map((img, idx) => (
+                          <div key={img.id} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={thumbSrc(img)} alt={img.alt_text ?? ""} style={{ width: "48px", height: "48px", objectFit: "cover", flexShrink: 0, border: "1px solid #E2E2DE" }} />
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ fontSize: "10px", color: "#6B6B6B", fontFamily: "'DM Sans', sans-serif", marginBottom: "2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                {img.alt_text ?? `Image ${idx + 1}`}
+                              </div>
+                              <button
+                                onClick={() => handleDownload(imgSrc(img), `${product.slug}-${group.color ?? "image"}-${idx + 1}.jpg`)}
+                                style={{ fontSize: "10px", color: "#1C3557", background: "none", border: "none", cursor: "pointer", padding: 0, fontFamily: "'DM Sans', sans-serif" }}
+                              >
+                                Download
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
