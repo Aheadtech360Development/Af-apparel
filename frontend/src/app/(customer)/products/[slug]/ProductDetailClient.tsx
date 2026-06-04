@@ -833,19 +833,22 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                 </div>
 
                 {/* Bulk order table */}
-                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", fontWeight: 600, color: "#1A1A1A", marginBottom: "14px" }}>
+                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", fontWeight: 600, color: "#1A1A1A", marginBottom: "8px" }}>
                   Select Sizes &amp; Quantities
                 </div>
+                <p className="block md:hidden" style={{ fontSize: "11px", color: "#6B6B6B", fontFamily: "'DM Sans', sans-serif", marginBottom: "8px", textAlign: "center" }}>
+                  ← Scroll to see all sizes →
+                </p>
                 <div className="bulk-table-wrapper" style={{ overflowX: "auto", WebkitOverflowScrolling: "touch", marginLeft: "-16px", marginRight: "-16px", paddingLeft: "16px", paddingRight: "16px" }}>
-                  <table style={{ minWidth: "650px", width: "100%", borderCollapse: "collapse", fontFamily: "'DM Sans', sans-serif", fontSize: "13px" }}>
+                  <table style={{ minWidth: "700px", width: "100%", borderCollapse: "collapse", fontFamily: "'DM Sans', sans-serif", fontSize: "13px" }}>
                     <thead>
                       <tr>
-                        <th style={{ fontSize: "11px", color: "#6B6B6B", fontWeight: 500, padding: "6px 8px", textAlign: "left", borderBottom: "1px solid #E2E2DE" }}>Color</th>
+                        <th style={{ fontSize: "11px", color: "#6B6B6B", fontWeight: 500, padding: "6px 8px", textAlign: "left", borderBottom: "1px solid #E2E2DE", minWidth: "120px", width: "120px" }}>Color</th>
                         {uniqueSizes.map(size => (
-                          <th key={size} style={{ fontSize: "11px", color: "#6B6B6B", fontWeight: 500, padding: "6px 8px", textAlign: "center", borderBottom: "1px solid #E2E2DE" }}>{size}</th>
+                          <th key={size} style={{ fontSize: "11px", color: "#6B6B6B", fontWeight: 500, padding: "6px 8px", textAlign: "center", borderBottom: "1px solid #E2E2DE", minWidth: "80px", width: "80px" }}>{size}</th>
                         ))}
-                        <th style={{ fontSize: "11px", color: "#6B6B6B", fontWeight: 500, padding: "6px 8px", textAlign: "center", borderBottom: "1px solid #E2E2DE" }}>Total</th>
-                        <th style={{ fontSize: "11px", color: "#6B6B6B", fontWeight: 500, padding: "6px 8px", borderBottom: "1px solid #E2E2DE" }}></th>
+                        <th style={{ fontSize: "11px", color: "#6B6B6B", fontWeight: 500, padding: "6px 8px", textAlign: "center", borderBottom: "1px solid #E2E2DE", minWidth: "80px", width: "80px" }}>Total</th>
+                        <th style={{ fontSize: "11px", color: "#6B6B6B", fontWeight: 500, padding: "6px 8px", borderBottom: "1px solid #E2E2DE", minWidth: "90px", width: "90px" }}></th>
                       </tr>
                     </thead>
                     <tbody>
@@ -857,16 +860,16 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                         const allRowOOS = group.variants.every(v => isOutOfStock(v.stock_quantity));
                         return (
                           <tr key={group.color}>
-                            <td style={{ padding: "10px 8px", borderBottom: "1px solid #E2E2DE", verticalAlign: "top" }}>
-                              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                            <td style={{ padding: "10px 8px", borderBottom: "1px solid #E2E2DE", verticalAlign: "top", minWidth: "120px", width: "120px" }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: "6px", whiteSpace: "nowrap" }}>
                                 <div style={{ width: "14px", height: "14px", borderRadius: "50%", background: hex, border: isLight ? "1px solid #E2E2DE" : "1px solid rgba(0,0,0,.08)", flexShrink: 0 }} />
-                                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#1A1A1A", whiteSpace: "nowrap" }}>{group.color}</span>
+                                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#1A1A1A" }}>{group.color}</span>
                               </div>
                             </td>
                             {uniqueSizes.map(size => {
                               const variant = group.variants.find(v => v.size === size);
                               if (!variant) {
-                                return <td key={size} style={{ padding: "10px 8px", borderBottom: "1px solid #E2E2DE", textAlign: "center", color: "#ccc", verticalAlign: "top" }}>—</td>;
+                                return <td key={size} style={{ padding: "10px 8px", borderBottom: "1px solid #E2E2DE", textAlign: "center", color: "#ccc", verticalAlign: "top", minWidth: "80px", width: "80px" }}>—</td>;
                               }
                               const qty = quantities[variant.id] ?? 0;
                               const isOOS = isOutOfStock(variant.stock_quantity);
@@ -874,9 +877,9 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                               const stockLabel = isOOS ? "Out of Stock" : stockNum >= 9999 ? "In Stock" : `${stockNum} in stock`;
                               const price = Number(variant.effective_price ?? variant.retail_price ?? 0);
                               return (
-                                <td key={size} style={{ padding: "10px 8px", borderBottom: "1px solid #E2E2DE", textAlign: "center", verticalAlign: "top", background: isOOS ? "#fafafa" : "transparent" }}>
-                                  <span style={{ display: "block", fontSize: "11px", color: isOOS ? "#cc0000" : "#6B6B6B", fontWeight: isOOS ? 500 : 400, fontFamily: "'DM Sans', sans-serif", marginBottom: "2px" }}>{stockLabel}</span>
-                                  <span style={{ display: "block", fontSize: "11px", color: isOOS ? "#aaaaaa" : "#6B6B6B", fontFamily: "'DM Sans', sans-serif", marginBottom: "4px" }}>${price.toFixed(2)}</span>
+                                <td key={size} style={{ padding: "10px 8px", borderBottom: "1px solid #E2E2DE", textAlign: "center", verticalAlign: "top", background: isOOS ? "#fafafa" : "transparent", minWidth: "80px", width: "80px" }}>
+                                  <span style={{ display: "block", fontSize: "11px", color: isOOS ? "#cc0000" : "#6B6B6B", fontWeight: isOOS ? 500 : 400, fontFamily: "'DM Sans', sans-serif", marginBottom: "2px", whiteSpace: "nowrap" }}>{stockLabel}</span>
+                                  <span style={{ display: "block", fontSize: "11px", color: isOOS ? "#aaaaaa" : "#6B6B6B", fontFamily: "'DM Sans', sans-serif", marginBottom: "4px", whiteSpace: "nowrap" }}>${price.toFixed(2)}</span>
                                   <input
                                     type="number"
                                     min={0}
@@ -898,11 +901,11 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                                 </td>
                               );
                             })}
-                            <td style={{ padding: "10px 8px", borderBottom: "1px solid #E2E2DE", textAlign: "center", verticalAlign: "middle" }}>
+                            <td style={{ padding: "10px 8px", borderBottom: "1px solid #E2E2DE", textAlign: "center", verticalAlign: "middle", minWidth: "80px", width: "80px" }}>
                               <span style={{ display: "block", fontSize: "12px", color: "#6B6B6B", whiteSpace: "nowrap" }}>Qty: {rowQty}</span>
                               <span style={{ display: "block", fontSize: "12px", color: "#6B6B6B", whiteSpace: "nowrap" }}>${rowTotal.toFixed(2)}</span>
                             </td>
-                            <td style={{ padding: "10px 8px", borderBottom: "1px solid #E2E2DE", textAlign: "center", verticalAlign: "middle" }}>
+                            <td style={{ padding: "10px 8px", borderBottom: "1px solid #E2E2DE", textAlign: "center", verticalAlign: "middle", minWidth: "90px", width: "90px" }}>
                               <button
                                 onClick={() => handleRowAddToCart(group)}
                                 disabled={rowQty === 0 || allRowOOS}
@@ -953,12 +956,12 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
 
         {/* ── Product Tabs ───────────────────────────────────────────────── */}
         <div style={{ marginTop: "40px", borderTop: "1px solid #E2E2DE" }}>
-          <div style={{ display: "flex", borderBottom: "1px solid #E2E2DE" }}>
+          <div style={{ display: "flex", borderBottom: "1px solid #E2E2DE", overflowX: "auto", WebkitOverflowScrolling: "touch", scrollbarWidth: "none" }}>
             {TABS.map(tab => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                style={{ padding: "14px 20px", fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 500, color: activeTab === tab ? "#1C3557" : "#6B6B6B", background: "none", border: "none", borderBottom: activeTab === tab ? "2px solid #1C3557" : "2px solid transparent", marginBottom: "-1px", cursor: "pointer", whiteSpace: "nowrap", transition: "color .15s" }}
+                style={{ padding: "14px 20px", fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 500, color: activeTab === tab ? "#1C3557" : "#6B6B6B", background: "none", border: "none", borderBottom: activeTab === tab ? "2px solid #1C3557" : "2px solid transparent", marginBottom: "-1px", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, transition: "color .15s" }}
               >
                 {tab}
               </button>
