@@ -41,7 +41,7 @@ interface CheckoutState {
   taxAmount: number;
 
   // Payment method selection
-  paymentMethod: "card" | "ach";
+  paymentMethod: "card" | "ach" | "net_30";
   achBankName: string;
   achAccountHolder: string;
   achRoutingNumber: string;
@@ -77,7 +77,7 @@ interface CheckoutState {
   setShippingType: (t: string) => void;
   setSelectedRate: (r: SelectedLiveRate | null) => void;
   setTaxInfo: (region: string | null, rate: number, amount?: number) => void;
-  setPaymentMethod: (m: "card" | "ach") => void;
+  setPaymentMethod: (m: "card" | "ach" | "net_30") => void;
   setAchInfo: (bankName: string, accountHolder: string, routingNumber: string, accountLast4: string, accountType: string) => void;
   setPoNumber: (po: string) => void;
   setOrderNotes: (notes: string) => void;
@@ -112,7 +112,7 @@ const initialState = {
   taxRegion: null,
   taxRate: 0,
   taxAmount: 0,
-  paymentMethod: "card" as "card" | "ach",
+  paymentMethod: "card" as "card" | "ach" | "net_30",
   achBankName: "",
   achAccountHolder: "",
   achRoutingNumber: "",

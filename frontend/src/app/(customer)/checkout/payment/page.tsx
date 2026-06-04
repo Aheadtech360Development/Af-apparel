@@ -54,10 +54,11 @@ export default function CheckoutPaymentPage() {
     taxAmount: storedTaxAmount, taxRate: storedTaxRate, taxRegion: storedTaxRegion,
     setPaymentMethod, setAchInfo,
   } = useCheckoutStore();
-  const { isAuthenticated, isLoading } = useAuthStore();
+  const { isAuthenticated, isLoading, user } = useAuthStore();
   const isGuest = !isLoading && !isAuthenticated();
+  const isWholesale = user?.account_type === "wholesale";
   const [couponDiscount, setCouponDiscount] = useState(0);
-  const [paymentType, setPaymentType] = useState<"card" | "ach">("card");
+  const [paymentType, setPaymentType] = useState<"card" | "ach" | "net_30">("card");
 
   const [savedCards, setSavedCards] = useState<SavedCard[]>([]);
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
@@ -164,6 +165,11 @@ export default function CheckoutPaymentPage() {
     router.push("/checkout/review");
   }
 
+  function handleNet30Continue() {
+    setPaymentMethod("net_30");
+    router.push("/checkout/review");
+  }
+
   if (loadingCards) {
     return (
       <div style={{ textAlign: "center", padding: "60px 0", color: "#7A7880", fontSize: "14px" }}>
@@ -191,7 +197,7 @@ export default function CheckoutPaymentPage() {
       {/* ── Payment Method type selector ── */}
       <div style={sectionCard}>
         <span style={sectionTitle}>Payment Method</span>
-        <div style={{ display: "flex", gap: "10px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           {(["card", "ach"] as const).map(type => {
             const isSelected = paymentType === type;
             return (
@@ -206,6 +212,20 @@ export default function CheckoutPaymentPage() {
               </label>
             );
           })}
+          {!isGuest && isWholesale && (() => {
+            const isSelected = paymentType === "net_30";
+            return (
+              <label onClick={() => setPaymentType("net_30")} style={{ flex: 1, display: "flex", alignItems: "center", gap: "12px", padding: "14px 18px", borderRadius: "10px", border: `1.5px solid ${isSelected ? "#1A5CFF" : "#E2E0DA"}`, background: isSelected ? "rgba(26,92,255,.04)" : "#FAFAF8", cursor: "pointer", transition: "all .15s" }}>
+                <div style={{ width: "18px", height: "18px", borderRadius: "50%", flexShrink: 0, border: `2px solid ${isSelected ? "#1A5CFF" : "#E2E0DA"}`, background: isSelected ? "#1A5CFF" : "#fff", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  {isSelected && <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#fff" }} />}
+                </div>
+                <div>
+                  <div style={{ fontSize: "13px", fontWeight: 700, color: "#2A2830" }}>Net 30 — Pay by Invoice</div>
+                  <div style={{ fontSize: "11px", color: "#7A7880", marginTop: "2px" }}>Invoice sent to your account; payment due within 30 days</div>
+                </div>
+              </label>
+            );
+          })()}
         </div>
       </div>
 
@@ -328,6 +348,27 @@ export default function CheckoutPaymentPage() {
               &#8592; Back
             </button>
             <button type="button" onClick={handleAchContinue} style={{ flex: 2, padding: "14px", background: "#E8242A", color: "#fff", border: "none", borderRadius: "8px", fontFamily: "var(--font-bebas)", fontSize: "17px", letterSpacing: ".08em", cursor: "pointer" }}>
+              Continue to Review &#8594;
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Net 30 section ── */}
+      {paymentType === "net_30" && (
+        <div style={sectionCard}>
+          <span style={sectionTitle}>Net 30 — Pay by Invoice</span>
+          <div style={{ fontSize: "13px", color: "#2A2830", lineHeight: 1.7, marginBottom: "14px" }}>
+            Your order will be processed immediately. An invoice will be emailed to your account within 1 business day. Payment is due within 30 days of the invoice date.
+          </div>
+          <div style={{ padding: "12px 14px", background: "rgba(217,119,6,.08)", borderRadius: "8px", fontSize: "12px", color: "#D97706", fontWeight: 600, marginBottom: "16px" }}>
+            Net 30 terms are subject to your approved credit limit. Overdue balances may affect future orders.
+          </div>
+          <div style={{ display: "flex", gap: "10px" }}>
+            <button type="button" onClick={() => router.push("/checkout/address")} style={{ flex: 1, padding: "14px", border: "1.5px solid #E2E0DA", borderRadius: "8px", background: "#fff", fontSize: "13px", fontWeight: 600, cursor: "pointer", color: "#7A7880" }}>
+              &#8592; Back
+            </button>
+            <button type="button" onClick={handleNet30Continue} style={{ flex: 2, padding: "14px", background: "#E8242A", color: "#fff", border: "none", borderRadius: "8px", fontFamily: "var(--font-bebas)", fontSize: "17px", letterSpacing: ".08em", cursor: "pointer" }}>
               Continue to Review &#8594;
             </button>
           </div>

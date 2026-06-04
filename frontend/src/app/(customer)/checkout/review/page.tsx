@@ -92,7 +92,7 @@ export default function CheckoutReviewPage() {
   useEffect(() => {
     if (!shippingAddress) {
       router.replace("/checkout/address");
-    } else if (!savedCardId && !qbToken && paymentMethod !== "ach") {
+    } else if (!savedCardId && !qbToken && paymentMethod !== "ach" && paymentMethod !== "net_30") {
       router.replace("/checkout/payment");
     }
   }, [shippingAddress, savedCardId, qbToken, paymentMethod, router]);
@@ -288,6 +288,11 @@ export default function CheckoutReviewPage() {
               ach_account_last4: achAccountLast4 || undefined,
               ach_account_type: achAccountType || undefined,
             }
+          : paymentMethod === "net_30"
+          ? {
+              ...basePayload,
+              payment_method: "net_30",
+            }
           : {
               ...basePayload,
               qb_token: qbToken ?? undefined,
@@ -326,6 +331,8 @@ export default function CheckoutReviewPage() {
   const selectedCard = savedCards.find(c => c.id === savedCardId);
   const paymentLabel = paymentMethod === "ach"
     ? `ACH / Bank Transfer${achAccountLast4 ? ` \u2014 ****${achAccountLast4}` : ""}`
+    : paymentMethod === "net_30"
+    ? "Net 30 \u2014 Pay by Invoice"
     : selectedCard
     ? `${brandDisplayName(selectedCard.brand)} \u2022\u2022\u2022\u2022 ${selectedCard.last4}`
     : qbToken
@@ -404,6 +411,13 @@ export default function CheckoutReviewPage() {
             {achAccountType && <div style={{ color: "#7A7880" }}>Type: <span style={{ color: "#2A2830", fontWeight: 600 }}>{achAccountType.charAt(0).toUpperCase() + achAccountType.slice(1)}</span></div>}
             <div style={{ marginTop: "8px", padding: "8px 12px", background: "rgba(217,119,6,.08)", borderRadius: "6px", fontSize: "12px", color: "#D97706", fontWeight: 600 }}>
               Order pending — payment verified within 1–2 business days
+            </div>
+          </div>
+        ) : paymentMethod === "net_30" ? (
+          <div style={{ fontSize: "13px", color: "#2A2830", lineHeight: 1.8 }}>
+            <div style={{ fontWeight: 700, marginBottom: "6px" }}>Net 30 — Pay by Invoice</div>
+            <div style={{ marginTop: "8px", padding: "8px 12px", background: "rgba(217,119,6,.08)", borderRadius: "6px", fontSize: "12px", color: "#D97706", fontWeight: 600 }}>
+              An invoice will be sent to your account. Payment due within 30 days.
             </div>
           </div>
         ) : (
