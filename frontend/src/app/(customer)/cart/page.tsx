@@ -1,7 +1,7 @@
 // frontend/src/app/(customer)/cart/page.tsx
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { formatCurrency, sortSizes } from "@/lib/utils";
@@ -9,7 +9,6 @@ import { cartService } from "@/services/cart.service";
 import { apiClient } from "@/lib/api-client";
 import { useAuthStore } from "@/stores/auth.store";
 import type { Cart, CartItem } from "@/types/order.types";
-import { TruckIcon, LockIcon, PhoneIcon, MailIcon } from "@/components/ui/icons";
 
 // ── Color map (same as quick-order) ──────────────────────────────────────────
 const COLOR_MAP: Record<string, string> = {
@@ -103,9 +102,6 @@ function groupByProduct(items: CartItem[]): ProductGroup[] {
     };
   });
 }
-
-// ── Shared styles ─────────────────────────────────────────────────────────────
-const divider = <div style={{ borderTop: "1px solid #F0EEE9", margin: "14px 0" }} />;
 
 // ── Component ─────────────────────────────────────────────────────────────────
 interface AppliedCoupon {
@@ -316,6 +312,41 @@ export default function CartPage() {
     return undefined;
   }
 
+  async function handleRemoveItem(item: CartItem) {
+    try {
+      if (isGuest) {
+        const entries: GuestCartEntry[] = JSON.parse(localStorage.getItem("af_guest_cart") || "[]");
+        const updated = entries.filter(e => e.variant_id !== item.variant_id);
+        localStorage.setItem("af_guest_cart", JSON.stringify(updated));
+        setCart(updated.length > 0 ? buildGuestCart(updated) : null);
+        window.dispatchEvent(new Event("af_guest_cart_updated"));
+      } else {
+        const updated = await cartService.removeItem(item.id);
+        if (updated) setCart(updated);
+        else setCart(await cartService.getCart());
+        window.dispatchEvent(new Event("cart_updated"));
+      }
+    } catch (err) { console.error(err); }
+  }
+
+  async function handleUpdateItemQty(item: CartItem, quantity: number) {
+    if (quantity <= 0) { await handleRemoveItem(item); return; }
+    try {
+      if (isGuest) {
+        const entries: GuestCartEntry[] = JSON.parse(localStorage.getItem("af_guest_cart") || "[]");
+        const idx = entries.findIndex(e => e.variant_id === item.variant_id);
+        if (idx >= 0) entries[idx]!.quantity = quantity;
+        localStorage.setItem("af_guest_cart", JSON.stringify(entries));
+        setCart(buildGuestCart(entries));
+        window.dispatchEvent(new Event("af_guest_cart_updated"));
+      } else {
+        const updated = await cartService.updateItem(item.id, quantity);
+        if (updated) setCart(updated);
+        window.dispatchEvent(new Event("cart_updated"));
+      }
+    } catch (err) { console.error(err); }
+  }
+
   if (isLoading) {
     return (
       <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F4F3EF" }}>
@@ -334,383 +365,236 @@ export default function CartPage() {
   const estimatedShipping = Number(cart?.validation?.estimated_shipping ?? (isGuest ? 9.99 : 0));
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F8F8F6", fontFamily: "'DM Sans', sans-serif", paddingBottom: "60px" }}>
+    <div style={{ background: "#F8F8F6", fontFamily: "'DM Sans', sans-serif", padding: "40px 24px 64px" }}>
+      <div style={{ maxWidth: "1500px", margin: "0 auto" }}>
 
-      <div style={{ maxWidth: "1500px", margin: "0 auto", padding: "40px 24px 0" }}>
-        <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: "36px", fontWeight: 600, color: "#1A1A1A", marginBottom: "32px", lineHeight: 1.15 }}>Your Cart</h1>
+        {/* Title */}
+        <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: "36px", fontWeight: 600, color: "#1A1A1A", marginBottom: "28px" }}>
+          Your Cart
+        </h1>
+
         {isEmpty ? (
           /* ── Empty state ── */
-          <div style={{ textAlign: "center", padding: "80px 24px", background: "#FFFFFF", border: "1px solid #E2E2DE" }}>
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ddd" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" style={{ margin: "0 auto 16px" }}>
-              <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
-              <path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.66a2 2 0 001.99-1.78L23 6H6" />
-            </svg>
-            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "15px", color: "#1A1A1A", marginBottom: "8px" }}>Your cart is empty.</p>
-            <Link href="/products" style={{ fontFamily: "'DM Sans', sans-serif", color: "#1C3557", fontSize: "14px", textDecoration: "none", fontWeight: 500 }}>
-              Shop All →
-            </Link>
-          </div>
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "15px", color: "#6B6B6B" }}>
+            Your cart is empty.{" "}
+            <Link href="/products" style={{ color: "#1C3557", fontWeight: 500, textDecoration: "none" }}>Shop All →</Link>
+          </p>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 360px", gap: "48px", alignItems: "flex-start" }} className="cart-grid-responsive">
+          <div className="cart-grid" style={{ display: "grid", gridTemplateColumns: "1fr 360px", gap: "48px", alignItems: "start" }}>
 
-            {/* ── Items column ── */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-
+            {/* ── LEFT: Cart table ── */}
+            <div>
               {/* MOV warning */}
               {cart?.validation?.mov_violation && (
-                <div style={{ background: "rgba(232,36,42,.07)", border: "1.5px solid rgba(232,36,42,.25)", borderRadius: "8px", padding: "12px 16px", fontSize: "13px", color: "#E8242A", fontWeight: 600 }}>
-                  Minimum order value not met —&nbsp;
-                  <span style={{ fontWeight: 400, color: "#2A2830" }}>
+                <div style={{ background: "rgba(232,36,42,.07)", border: "1.5px solid rgba(232,36,42,.25)", padding: "12px 16px", fontSize: "13px", color: "#E8242A", fontWeight: 600, marginBottom: "16px" }}>
+                  Minimum order value not met —{" "}
+                  <span style={{ fontWeight: 400, color: "#1A1A1A" }}>
                     current {formatCurrency(Number(cart.validation.mov_current))}, need {formatCurrency(Number(cart.validation.mov_required))}
                   </span>
                 </div>
               )}
 
-              {groups.map((group) => {
-                const isRemoving = removingProductId === group.productId;
-                const firstColor = group.colorGroups[0]?.color;
-                const groupImageUrl = (firstColor
-                  ? (group.items.find(i => i.color === firstColor)?.product_image_url ?? group.items[0]?.product_image_url)
-                  : group.items[0]?.product_image_url) ?? null;
-                return (
-                  <div
-                    key={group.productId}
-                    style={{
-                      background: "#fff",
-                      borderRadius: "12px",
-                      border: "1.5px solid #E2E0DA",
-                      padding: "20px 22px",
-                      opacity: isRemoving ? 0.5 : 1,
-                      transition: "opacity .2s",
-                    }}
-                  >
-                    {/* ── Product header (image + title) ── */}
-                    <div style={{ display: "flex", gap: "14px", marginBottom: "4px", alignItems: "flex-start" }}>
-                      {/* Product image — color-matched: use image from first color group's item */}
-                      <div style={{ width: "72px", height: "72px", borderRadius: "8px", overflow: "hidden", background: "#F4F3EF", border: "1px solid #E2E0DA", flexShrink: 0 }}>
-                        {groupImageUrl ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={groupImageUrl}
-                            alt={group.productName}
-                            style={{ width: "100%", height: "100%", objectFit: "contain" }}
+              {/* Mobile scroll hint */}
+              <p className="block md:hidden" style={{ fontSize: "11px", color: "#6B6B6B", fontFamily: "'DM Sans', sans-serif", marginBottom: "8px", textAlign: "center" }}>
+                ← Scroll to see all →
+              </p>
+
+              <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+                <table style={{ width: "100%", minWidth: "600px", borderCollapse: "collapse", fontFamily: "'DM Sans', sans-serif", fontSize: "14px" }}>
+                  <thead>
+                    <tr>
+                      {(["Product","Color","Size"] as const).map(h => (
+                        <th key={h} style={{ fontSize: "11px", letterSpacing: "0.08em", textTransform: "uppercase", color: "#6B6B6B", fontWeight: 600, padding: "0 12px 12px", borderBottom: "1px solid #E2E2DE", textAlign: "left" }}>{h}</th>
+                      ))}
+                      {(["Qty","Price","Total"] as const).map(h => (
+                        <th key={h} style={{ fontSize: "11px", letterSpacing: "0.08em", textTransform: "uppercase", color: "#6B6B6B", fontWeight: 600, padding: "0 12px 12px", borderBottom: "1px solid #E2E2DE", textAlign: "right" }}>{h}</th>
+                      ))}
+                      <th style={{ padding: "0 12px 12px", borderBottom: "1px solid #E2E2DE" }}></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {cart.items.map(item => (
+                      <tr key={item.id} style={{ borderBottom: "1px solid #E2E2DE" }}>
+                        {/* Product */}
+                        <td style={{ padding: "18px 12px", verticalAlign: "middle", color: "#1A1A1A", width: "40%" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+                            <div style={{ width: "64px", height: "64px", border: "1px solid #E2E2DE", flexShrink: 0, overflow: "hidden", background: "#F8F8F6" }}>
+                              {item.product_image_url ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img src={item.product_image_url} alt={item.product_name} style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                              ) : (
+                                <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ccc" strokeWidth={1.5}><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z" /></svg>
+                                </div>
+                              )}
+                            </div>
+                            <div style={{ minWidth: 0 }}>
+                              <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 500, color: "#1A1A1A", lineHeight: 1.3 }}>
+                                {item.product_name}
+                              </div>
+                              {item.sku && (
+                                <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: "11px", color: "#6B6B6B", marginTop: "3px" }}>
+                                  {item.sku}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </td>
+                        {/* Color */}
+                        <td style={{ padding: "18px 12px", verticalAlign: "middle", color: "#1A1A1A", fontSize: "14px" }}>
+                          {item.color ?? "—"}
+                        </td>
+                        {/* Size */}
+                        <td style={{ padding: "18px 12px", verticalAlign: "middle", color: "#1A1A1A", fontSize: "14px" }}>
+                          {item.size ?? "—"}
+                        </td>
+                        {/* Qty */}
+                        <td style={{ padding: "18px 12px", verticalAlign: "middle", textAlign: "right" }}>
+                          <input
+                            type="number"
+                            min={1}
+                            value={item.quantity}
+                            onChange={e => handleUpdateItemQty(item, parseInt(e.target.value, 10) || 1)}
+                            className="cart-qty-input"
+                            style={{ width: "56px", border: "1px solid #E2E2DE", padding: "6px 8px", textAlign: "center", fontFamily: "'DM Sans', sans-serif", fontSize: "13px", outline: "none" }}
                           />
-                        ) : (
-                          <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ccc" strokeWidth={1.5}><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z" /></svg>
-                          </div>
-                        )}
-                      </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <h2 style={{ fontSize: "15px", fontWeight: 800, color: "#2A2830", marginBottom: "4px", lineHeight: 1.2 }}>
-                          {group.productName}
-                        </h2>
-                        <div style={{ fontSize: "12px", color: "#7A7880", display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
-                          {group.sku && <span style={{ fontFamily: "monospace", background: "#F4F3EF", padding: "1px 6px", borderRadius: "3px", fontSize: "11px" }}>#{group.sku}</span>}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* ── Units + price/unit ── */}
-                    {(() => {
-                      const retailPrice = Number(group.items[0]?.retail_price ?? 0);
-                      const hasDiscount = retailPrice > 0 && retailPrice > group.unitPrice + 0.001;
-                      return (
-                        <div style={{ marginTop: "10px", fontSize: "13px", color: "#7A7880", display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
-                          <span style={{ fontWeight: 700, color: "#2A2830", fontSize: "14px" }}>{group.totalUnits.toLocaleString()} total units</span>
-                          <span style={{ color: "#ccc" }}>·</span>
-                          {hasDiscount ? (
-                            <>
-                              <span style={{ textDecoration: "line-through", color: "#7A7880" }}>{formatCurrency(retailPrice)}</span>
-                              <span style={{ fontWeight: 700, color: "#059669" }}>{formatCurrency(group.unitPrice)}/unit</span>
-                            </>
-                          ) : (
-                            <span>{formatCurrency(group.unitPrice)}/unit</span>
-                          )}
-                        </div>
-                      );
-                    })()}
-
-                    {divider}
-
-                    {/* ── Color breakdown rows ── */}
-                    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                      {group.colorGroups.map(({ color, sizes, units }) => {
-                        const hex = colorHex(color);
-                        const light = isLight(hex);
-                        return (
-                          <div key={color} style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "13px", flexWrap: "wrap" }}>
-                            {/* Color swatch */}
-                            <div style={{
-                              width: "16px", height: "16px", borderRadius: "3px", flexShrink: 0,
-                              background: hex, border: light ? "1.5px solid #E2E0DA" : "1.5px solid rgba(0,0,0,.15)",
-                            }} />
-                            {/* Color name */}
-                            <span style={{ fontWeight: 700, color: "#2A2830", minWidth: "64px" }}>{color}</span>
-                            <span style={{ color: "#7A7880" }}>—</span>
-                            {/* Sizes */}
-                            <span style={{ color: "#7A7880", flex: 1 }}>
-                              {sizes.map(({ size, qty }) => `${size}:${qty}`).join(" / ")}
-                            </span>
-                            <span style={{ color: "#7A7880" }}>—</span>
-                            {/* Color units */}
-                            <span style={{ fontWeight: 700, color: "#2A2830", whiteSpace: "nowrap" }}>{units} units</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-
-                    {divider}
-
-                    {/* ── Footer: Remove + Total ── */}
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                      <button
-                        onClick={() => handleRemoveProduct(group)}
-                        disabled={isRemoving}
-                        style={{ fontSize: "12px", fontWeight: 700, color: "#E8242A", background: "rgba(232,36,42,.06)", border: "1px solid rgba(232,36,42,.2)", borderRadius: "6px", padding: "6px 14px", cursor: isRemoving ? "not-allowed" : "pointer", transition: "all .15s" }}
-                      >
-                        {isRemoving ? "Removing…" : "Remove"}
-                      </button>
-                      <div style={{ textAlign: "right" }}>
-                        <div style={{ fontFamily: "var(--font-bebas)", fontSize: "22px", color: "#2A2830", lineHeight: 1 }}>
-                          {formatCurrency(group.totalPrice)}
-                        </div>
-                        <div style={{ fontSize: "11px", color: "#7A7880" }}>product total</div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-
-              {/* Save as template — wholesale only */}
-              {!isGuest && (
-                <div style={{ display: "flex", justifyContent: "flex-end", paddingTop: "4px" }}>
-                  <button
-                    onClick={() => setShowTemplateDialog(true)}
-                    style={{ fontSize: "12px", fontWeight: 600, color: "#7A7880", background: "none", border: "none", cursor: "pointer", textDecoration: "underline", textUnderlineOffset: "3px" }}
-                  >
-                    Save as Template
-                  </button>
-                </div>
-              )}
+                        </td>
+                        {/* Price */}
+                        <td style={{ padding: "18px 12px", verticalAlign: "middle", color: "#1A1A1A", textAlign: "right" }}>
+                          {formatCurrency(Number(item.unit_price))}
+                        </td>
+                        {/* Total */}
+                        <td style={{ padding: "18px 12px", verticalAlign: "middle", color: "#1A1A1A", textAlign: "right" }}>
+                          {formatCurrency(Number(item.line_total))}
+                        </td>
+                        {/* Remove */}
+                        <td style={{ padding: "18px 12px", verticalAlign: "middle", textAlign: "right" }}>
+                          <button
+                            onClick={() => handleRemoveItem(item)}
+                            className="cart-remove-btn"
+                            style={{ fontSize: "18px", color: "#6B6B6B", background: "none", border: "none", cursor: "pointer", padding: 0, lineHeight: 1 }}
+                          >
+                            ×
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
 
-            {/* ── Order Summary sidebar ── */}
-            <div style={{ position: "sticky", top: "88px" }}>
-              <OrderSummary
-                subtotal={subtotal}
-                estimatedShipping={estimatedShipping}
-                hasShippingTier={hasShippingTier}
-                discountPercent={discountPercent}
-                isValid={isCheckoutEnabled}
-                disabledReason={disabledReason}
-                isGuest={isGuest}
-                onCheckout={() => router.push("/checkout/address")}
-                couponInput={couponInput}
-                onCouponInputChange={setCouponInput}
-                appliedCoupon={isGuest ? null : appliedCoupon}
-                couponError={couponError}
-                applyingCoupon={applyingCoupon}
-                onApplyCoupon={handleApplyCoupon}
-                onRemoveCoupon={handleRemoveCoupon}
-              />
-            </div>
+            {/* ── RIGHT: Order summary ── */}
+            <OrderSummary
+              subtotal={subtotal}
+              appliedCoupon={isGuest ? null : appliedCoupon}
+              onRemoveCoupon={handleRemoveCoupon}
+              isValid={isCheckoutEnabled}
+              disabledReason={disabledReason}
+              isGuest={isGuest}
+              onCheckout={() => router.push("/checkout/address")}
+            />
           </div>
         )}
       </div>
 
-      {/* Save Template Dialog */}
+      {/* Save Template Dialog (functionality kept) */}
       {showTemplateDialog && (
         <div style={{ position: "fixed", inset: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,.4)", padding: "16px" }}>
           <div style={{ background: "#fff", borderRadius: "12px", padding: "24px", width: "100%", maxWidth: "380px", boxShadow: "0 20px 60px rgba(0,0,0,.2)" }}>
-            <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "22px", letterSpacing: ".04em", color: "#2A2830", marginBottom: "16px" }}>
-              Save as Template
-            </h2>
+            <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "22px", letterSpacing: ".04em", color: "#2A2830", marginBottom: "16px" }}>Save as Template</h2>
             <input
               type="text"
               placeholder="Template name"
               value={templateName}
               onChange={(e) => setTemplateName(e.target.value)}
-              style={{ width: "100%", padding: "10px 12px", border: "1.5px solid #E2E0DA", borderRadius: "7px", fontSize: "13px", fontFamily: "var(--font-jakarta)", outline: "none", boxSizing: "border-box" }}
+              style={{ width: "100%", padding: "10px 12px", border: "1.5px solid #E2E0DA", borderRadius: "7px", fontSize: "13px", outline: "none", boxSizing: "border-box" }}
               autoFocus
             />
             <div style={{ display: "flex", gap: "10px", marginTop: "16px", justifyContent: "flex-end" }}>
               <button onClick={() => setShowTemplateDialog(false)} style={{ padding: "9px 16px", border: "1px solid #E2E0DA", borderRadius: "7px", background: "#fff", fontSize: "13px", fontWeight: 600, cursor: "pointer", color: "#7A7880" }}>
                 Cancel
               </button>
-              <button
-                onClick={handleSaveTemplate}
-                disabled={savingTemplate || !templateName.trim()}
-                style={{ padding: "9px 20px", background: "#1A5CFF", color: "#fff", border: "none", borderRadius: "7px", fontSize: "13px", fontWeight: 700, cursor: !templateName.trim() ? "not-allowed" : "pointer", opacity: !templateName.trim() ? 0.4 : 1 }}
-              >
+              <button onClick={handleSaveTemplate} disabled={savingTemplate || !templateName.trim()}
+                style={{ padding: "9px 20px", background: "#1C3557", color: "#fff", border: "none", borderRadius: "7px", fontSize: "13px", fontWeight: 700, cursor: !templateName.trim() ? "not-allowed" : "pointer", opacity: !templateName.trim() ? 0.4 : 1 }}>
                 {savingTemplate ? "Saving…" : "Save"}
               </button>
             </div>
           </div>
         </div>
       )}
+
+      <style>{`
+        .cart-qty-input:focus { outline: 1px solid #1C3557 !important; }
+        .cart-remove-btn:hover { color: #1A1A1A !important; }
+        @media (max-width: 900px) {
+          .cart-grid { display: block !important; }
+        }
+      `}</style>
     </div>
   );
 }
 
 // ── Order Summary sidebar component ──────────────────────────────────────────
 function OrderSummary({
-  subtotal, estimatedShipping, hasShippingTier, discountPercent, isValid, disabledReason, isGuest, onCheckout,
-  couponInput, onCouponInputChange, appliedCoupon, couponError, applyingCoupon, onApplyCoupon, onRemoveCoupon,
+  subtotal, appliedCoupon, onRemoveCoupon, isValid, disabledReason, isGuest, onCheckout,
 }: {
   subtotal: number;
-  estimatedShipping: number;
-  hasShippingTier: boolean;
-  discountPercent: number;
+  appliedCoupon: AppliedCoupon | null;
+  onRemoveCoupon: () => void;
   isValid: boolean;
   disabledReason?: string;
   isGuest?: boolean;
   onCheckout: () => void;
-  couponInput: string;
-  onCouponInputChange: (v: string) => void;
-  appliedCoupon: AppliedCoupon | null;
-  couponError: string | null;
-  applyingCoupon: boolean;
-  onApplyCoupon: () => void;
-  onRemoveCoupon: () => void;
 }) {
-  const tax = 0;
   const couponDiscount = appliedCoupon?.discount_amount ?? 0;
-  const total = subtotal + tax - couponDiscount;
-
-  const usp: { icon: ReactNode; text: string }[] = [
-    { icon: <TruckIcon size={14} color="currentColor" />, text: "Orders before 12 PM CT ship same day" },
-    { icon: <LockIcon size={14} color="currentColor" />, text: "Secure checkout — SSL encrypted" },
-    { icon: <PhoneIcon size={14} color="currentColor" />, text: "+1 (469) 367-9753" },
-    { icon: <MailIcon size={14} color="currentColor" />, text: "info@afblanks.com" },
-  ];
+  const total = subtotal - couponDiscount;
+  const row: React.CSSProperties = { display: "flex", justifyContent: "space-between", fontFamily: "'DM Sans', sans-serif", fontSize: "14px", color: "#6B6B6B", marginBottom: "12px" };
 
   return (
-    <div style={{ background: "#fff", borderRadius: "12px", border: "1.5px solid #E2E0DA", overflow: "hidden" }}>
-      {/* Title */}
-      <div style={{ padding: "18px 20px 0", borderBottom: "none" }}>
-        <h2 style={{ fontFamily: "var(--font-bebas)", fontSize: "20px", letterSpacing: ".04em", color: "#2A2830" }}>Order Summary</h2>
+    <div style={{ alignSelf: "start", padding: "28px 0", borderTop: "1px solid #E2E2DE" }}>
+      <div style={row}>
+        <span>Subtotal</span>
+        <span>{formatCurrency(subtotal)}</span>
       </div>
-
-      {/* Line items */}
-      <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: "10px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#7A7880" }}>
-          <span>Subtotal</span>
-          <span style={{ fontWeight: 600, color: "#2A2830" }}>{formatCurrency(subtotal)}</span>
-        </div>
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#7A7880" }}>
-          <span>Shipping</span>
-          <span style={{ color: "#7A7880", fontWeight: 400 }}>Calculated at checkout</span>
-        </div>
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#7A7880" }}>
-          <span>Tax</span>
-          <span style={{ color: "#7A7880" }}>Calculated at checkout</span>
-        </div>
-
-        {/* Coupon discount line */}
-        {appliedCoupon && (
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#059669" }}>
-            <span style={{ fontWeight: 600 }}>
-              Coupon ({appliedCoupon.code})
-              <button onClick={onRemoveCoupon} style={{ marginLeft: "8px", fontSize: "10px", color: "#E8242A", background: "none", border: "none", cursor: "pointer", fontWeight: 700, padding: 0 }}>✕</button>
-            </span>
-            <span style={{ fontWeight: 700 }}>-{formatCurrency(couponDiscount)}</span>
-          </div>
-        )}
-
-        {/* Divider */}
-        <div style={{ borderTop: "1.5px solid #F0EEE9", margin: "4px 0" }} />
-
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "15px", fontWeight: 800, color: "#2A2830" }}>
-          <span>Total</span>
-          <span style={{ fontFamily: "var(--font-bebas)", fontSize: "22px", letterSpacing: ".02em" }}>{formatCurrency(total)}</span>
-        </div>
+      <div style={row}>
+        <span>Shipping</span>
+        <span>Calculated at checkout</span>
       </div>
-
-      {/* Coupon input — wholesale only */}
-      {!isGuest && <div style={{ padding: "0 20px 16px" }}>
-        <div style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", color: "#7A7880", marginBottom: "8px" }}>Discount Code</div>
-        {appliedCoupon ? (
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "9px 12px", background: "rgba(5,150,105,.06)", border: "1px solid rgba(5,150,105,.3)", borderRadius: "7px", fontSize: "13px" }}>
-            <span style={{ flex: 1, fontWeight: 700, color: "#059669" }}>{appliedCoupon.code}</span>
-            <button onClick={onRemoveCoupon} style={{ fontSize: "12px", color: "#E8242A", background: "none", border: "none", cursor: "pointer", fontWeight: 700 }}>Remove</button>
-          </div>
-        ) : (
-          <>
-            <div style={{ display: "flex", gap: "6px" }}>
-              <input
-                type="text"
-                value={couponInput}
-                onChange={e => onCouponInputChange(e.target.value)}
-                onKeyDown={e => { if (e.key === "Enter") onApplyCoupon(); }}
-                placeholder="Enter code"
-                style={{ flex: 1, padding: "9px 12px", border: `1.5px solid ${couponError ? "#E8242A" : "#E2E0DA"}`, borderRadius: "7px", fontSize: "13px", fontFamily: "var(--font-jakarta)", outline: "none" }}
-              />
-              <button
-                onClick={onApplyCoupon}
-                disabled={applyingCoupon || !couponInput.trim()}
-                style={{ padding: "9px 14px", background: couponInput.trim() ? "#1A5CFF" : "#E2E0DA", color: couponInput.trim() ? "#fff" : "#aaa", border: "none", borderRadius: "7px", fontSize: "12px", fontWeight: 700, cursor: couponInput.trim() ? "pointer" : "not-allowed", transition: "background .15s", whiteSpace: "nowrap" }}
-              >
-                {applyingCoupon ? "…" : "Apply"}
-              </button>
-            </div>
-            {couponError && <p style={{ fontSize: "11px", color: "#E8242A", marginTop: "5px" }}>{couponError}</p>}
-          </>
-        )}
-      </div>}
-
-      {/* CTA */}
-      <div style={{ padding: "0 20px 18px" }}>
-        <button
-          onClick={onCheckout}
-          disabled={!isValid}
-          title={disabledReason}
-          style={{
-            width: "100%", padding: "14px", background: isValid ? "#E8242A" : "#E2E0DA",
-            color: isValid ? "#fff" : "#aaa", border: "none", borderRadius: "8px",
-            fontFamily: "var(--font-bebas)", fontSize: "17px", letterSpacing: ".08em",
-            cursor: isValid ? "pointer" : "not-allowed", transition: "background .2s",
-          }}
-          onMouseEnter={e => { if (isValid) (e.currentTarget as HTMLButtonElement).style.background = "#c91e23"; }}
-          onMouseLeave={e => { if (isValid) (e.currentTarget as HTMLButtonElement).style.background = "#E8242A"; }}
-        >
-          Proceed to Checkout
-        </button>
-        {disabledReason && (
-          <p style={{ fontSize: "11px", color: "#E8242A", textAlign: "center", marginTop: "8px" }}>{disabledReason}</p>
-        )}
+      <div style={row}>
+        <span>Tax</span>
+        <span>Calculated at checkout</span>
       </div>
-
-      {/* Divider */}
-      <div style={{ borderTop: "1.5px solid #F0EEE9" }} />
-
-      {/* USPs */}
-      <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: "9px" }}>
-        {usp.map(({ icon, text }) => (
-          <div key={text} style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "12px", color: "#7A7880" }}>
-            <span style={{ flexShrink: 0, display: "flex" }}>{icon}</span>
-            <span>{text}</span>
-          </div>
-        ))}
-      </div>
-
-      {/* Divider + accepted cards */}
-      <div style={{ borderTop: "1.5px solid #F0EEE9" }} />
-      <div style={{ padding: "14px 20px" }}>
-        <p style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".08em", color: "#7A7880", marginBottom: "10px" }}>Accepted Payment</p>
-        <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
-          {[
-            { label: "VISA", bg: "#1A1F71", color: "#fff", font: "800" },
-            { label: "MC", bg: "#252525", color: "#F79E1B", font: "800" },
-            { label: "AMEX", bg: "#2E77BC", color: "#fff", font: "700" },
-            { label: "DISC", bg: "#fff", color: "#231F20", font: "700", border: "1px solid #E2E0DA" },
-          ].map(card => (
-            <div key={card.label} style={{ padding: "4px 8px", background: card.bg, color: card.color, fontWeight: card.font, fontSize: "9px", letterSpacing: ".04em", borderRadius: "4px", border: card.border ?? "none", fontFamily: "Arial,sans-serif" }}>
-              {card.label}
-            </div>
-          ))}
+      {appliedCoupon && (
+        <div style={{ ...row, color: "#059669" }}>
+          <span>
+            Coupon ({appliedCoupon.code})
+            <button onClick={onRemoveCoupon} style={{ marginLeft: "8px", fontSize: "10px", color: "#E8242A", background: "none", border: "none", cursor: "pointer", fontWeight: 700, padding: 0 }}>✕</button>
+          </span>
+          <span>-{formatCurrency(couponDiscount)}</span>
         </div>
+      )}
+      <div style={{ display: "flex", justifyContent: "space-between", fontFamily: "'DM Sans', sans-serif", fontSize: "16px", fontWeight: 600, color: "#1A1A1A", paddingTop: "14px", borderTop: "1px solid #E2E2DE", marginTop: "14px" }}>
+        <span>Total</span>
+        <span>{formatCurrency(total)}</span>
       </div>
+      <button
+        onClick={onCheckout}
+        disabled={!isValid}
+        title={disabledReason}
+        style={{ width: "100%", marginTop: "16px", padding: "14px", background: isValid ? "#1C3557" : "#E2E2DE", color: isValid ? "#fff" : "#aaa", border: "none", cursor: isValid ? "pointer" : "not-allowed", fontFamily: "'DM Sans', sans-serif", fontSize: "15px", fontWeight: 500, transition: "background .2s" }}
+      >
+        Proceed to Checkout →
+      </button>
+      {disabledReason && (
+        <p style={{ fontSize: "11px", color: "#E8242A", textAlign: "center", marginTop: "8px" }}>{disabledReason}</p>
+      )}
+      {!isGuest && (
+        <p style={{ marginTop: "14px", fontSize: "12px", color: "#6B6B6B", fontFamily: "'DM Sans', sans-serif" }}>
+          Need a wholesale account?{" "}
+          <Link href="/wholesale/register" style={{ color: "#1C3557", fontWeight: 500, textDecoration: "none" }}>Apply here →</Link>
+        </p>
+      )}
     </div>
   );
 }
