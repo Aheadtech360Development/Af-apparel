@@ -673,7 +673,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
 
       {/* Breadcrumb */}
       <div style={{ background: "#FFFFFF", borderBottom: "1px solid #E2E2DE", padding: "12px 24px" }}>
-        <div style={{ maxWidth: "1160px", margin: "0 auto", display: "flex", alignItems: "center", gap: "6px", fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#6B6B6B", flexWrap: "wrap" }}>
+        <div style={{ maxWidth: "1500px", margin: "0 auto", display: "flex", alignItems: "center", gap: "6px", fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#6B6B6B", flexWrap: "wrap" }}>
           <Link href="/" style={{ color: "#6B6B6B", textDecoration: "none" }}>Home</Link>
           <span>›</span>
           <Link href="/products" style={{ color: "#6B6B6B", textDecoration: "none" }}>Collections</Link>
@@ -691,7 +691,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
       </div>
 
       {/* Main content */}
-      <div style={{ maxWidth: "1160px", margin: "0 auto", padding: "0 24px 64px" }}>
+      <div style={{ maxWidth: "1500px", margin: "0 auto", padding: "0 24px 64px" }}>
         <div className="pdp-main-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "56px", paddingTop: "32px" }}>
 
           {/* ── LEFT: Image Gallery ─────────────────────────────────────── */}
