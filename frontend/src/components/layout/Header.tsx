@@ -184,7 +184,7 @@ export function Header() {
           {/* Right Actions */}
           <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
             {/* US flag */}
-            <span style={{ fontSize: "20px", lineHeight: 1, display: "flex", alignItems: "center", marginRight: "8px" }}>🇺🇸</span>
+            <img src="https://flagcdn.com/w40/us.png" alt="US" width={28} height={18} style={{ objectFit: "cover", borderRadius: "2px", display: "block", marginRight: "8px" }} />
             {/* Cart */}
             {!isAdmin() && (
               <Link href="/cart" style={{ position: "relative", background: "transparent", border: "1px solid #E2E2DE", color: "#1C3557", padding: "8px 12px", cursor: "pointer", fontSize: "18px", transition: "all .2s", display: "flex", alignItems: "center" }}>

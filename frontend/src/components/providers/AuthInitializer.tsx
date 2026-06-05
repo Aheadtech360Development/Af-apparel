@@ -2,9 +2,8 @@
 
 import { useEffect } from "react";
 import { useAuthStore } from "@/stores/auth.store";
-import { apiClient, setAccessToken } from "@/lib/api-client";
+import { apiClient, setAccessToken, setTokenRefreshCallback, setAuthExpiredCallback } from "@/lib/api-client";
 import type { UserProfile } from "@/types/user.types";
-import { setTokenRefreshCallback } from "@/lib/api-client";
 
 function decodeJwtPayload(token: string): Record<string, unknown> {
   try {
@@ -22,7 +21,15 @@ export function AuthInitializer() {
     setTokenRefreshCallback((newToken) => {
       const store = useAuthStore.getState();
       if (store.user) {
-        store.setAuth(newToken, store.user); // sessionStorage bhi update hogi
+        store.setAuth(newToken, store.user);
+      }
+    });
+
+    setAuthExpiredCallback(() => {
+      const store = useAuthStore.getState();
+      if (store.user) {
+        store.clearAuth();
+        window.location.href = "/login";
       }
     });
     const found = useAuthStore.getState().initAuth();

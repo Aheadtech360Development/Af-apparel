@@ -22,6 +22,13 @@ export function setTokenRefreshCallback(cb: (token: string) => void) {
   onTokenRefreshed = cb;
 }
 
+// Callback fired when refresh fails — used to trigger clean logout + redirect
+let onAuthExpired: (() => void) | null = null;
+
+export function setAuthExpiredCallback(cb: () => void) {
+  onAuthExpired = cb;
+}
+
 // ── Refresh logic ─────────────────────────────────────────────────────────────
 
 let refreshPromise: Promise<string | null> | null = null;
@@ -36,6 +43,7 @@ async function refreshAccessToken(): Promise<string | null> {
     .then(async (res) => {
       if (!res.ok) {
         setAccessToken(null);
+        if (onAuthExpired) onAuthExpired();
         return null;
       }
       const data = (await res.json()) as { access_token: string };
