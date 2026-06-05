@@ -840,36 +840,57 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                   ← Scroll to see all sizes →
                 </p>
                 <div className="bulk-table-wrapper" style={{ overflowX: "auto", WebkitOverflowScrolling: "touch", marginLeft: "-16px", marginRight: "-16px", paddingLeft: "16px", paddingRight: "16px" }}>
-                  <table style={{ minWidth: "700px", width: "100%", borderCollapse: "collapse", fontFamily: "'DM Sans', sans-serif", fontSize: "13px" }}>
-                    <thead>
-                      <tr>
-                        <th style={{ fontSize: "11px", color: "#6B6B6B", fontWeight: 500, padding: "6px 8px", textAlign: "left", borderBottom: "1px solid #E2E2DE", minWidth: "120px", width: "120px" }}>Color</th>
-                        {uniqueSizes.map(size => (
-                          <th key={size} style={{ fontSize: "11px", color: "#6B6B6B", fontWeight: 500, padding: "6px 8px", textAlign: "center", borderBottom: "1px solid #E2E2DE", minWidth: "80px", width: "80px" }}>{size}</th>
-                        ))}
-                        <th style={{ fontSize: "11px", color: "#6B6B6B", fontWeight: 500, padding: "6px 8px", textAlign: "center", borderBottom: "1px solid #E2E2DE", minWidth: "80px", width: "80px" }}>Total</th>
-                        <th style={{ fontSize: "11px", color: "#6B6B6B", fontWeight: 500, padding: "6px 8px", borderBottom: "1px solid #E2E2DE", minWidth: "90px", width: "90px" }}></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {colorGroups.map(group => {
-                        const hex = COLOR_MAP[group.color] ?? "#E2E2DE";
-                        const isLight = ["#FFFFFF", "#fffff0", "#fef3c7", "#f5f0e8"].includes(hex);
-                        const rowQty = group.variants.reduce((s, v) => s + (quantities[v.id] ?? 0), 0);
-                        const rowTotal = group.variants.reduce((s, v) => s + (quantities[v.id] ?? 0) * Number(v.effective_price ?? v.retail_price ?? 0), 0);
-                        const allRowOOS = group.variants.every(v => isOutOfStock(v.stock_quantity));
-                        return (
-                          <tr key={group.color}>
-                            <td style={{ padding: "10px 8px", borderBottom: "1px solid #E2E2DE", verticalAlign: "top", minWidth: "120px", width: "120px" }}>
-                              <div style={{ display: "flex", alignItems: "center", gap: "6px", whiteSpace: "nowrap" }}>
-                                <div style={{ width: "14px", height: "14px", borderRadius: "50%", background: hex, border: isLight ? "1px solid #E2E2DE" : "1px solid rgba(0,0,0,.08)", flexShrink: 0 }} />
-                                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#1A1A1A" }}>{group.color}</span>
-                              </div>
-                            </td>
+                  <div style={{ minWidth: `${uniqueSizes.length * 80 + 170}px` }}>
+
+                    {/* Size headers — shown once */}
+                    <div style={{ display: "grid", gridTemplateColumns: `repeat(${uniqueSizes.length}, 1fr) 80px 90px`, gap: "4px", borderBottom: "1px solid #E2E2DE" }}>
+                      {uniqueSizes.map(size => (
+                        <div key={size} style={{ textAlign: "center", fontFamily: "'DM Sans', sans-serif", fontSize: "11px", color: "#6B6B6B", fontWeight: 500, padding: "6px 8px" }}>{size}</div>
+                      ))}
+                      <div style={{ textAlign: "center", fontFamily: "'DM Sans', sans-serif", fontSize: "11px", color: "#6B6B6B", fontWeight: 500, padding: "6px 8px" }}>Total</div>
+                      <div />
+                    </div>
+
+                    {/* One section per color */}
+                    {colorGroups.map((group, groupIdx) => {
+                      const hex = COLOR_MAP[group.color] ?? "#E2E2DE";
+                      const isLight = ["#FFFFFF", "#fffff0", "#fef3c7", "#f5f0e8"].includes(hex);
+                      const rowQty = group.variants.reduce((s, v) => s + (quantities[v.id] ?? 0), 0);
+                      const rowTotal = group.variants.reduce((s, v) => s + (quantities[v.id] ?? 0) * Number(v.effective_price ?? v.retail_price ?? 0), 0);
+                      const allRowOOS = group.variants.every(v => isOutOfStock(v.stock_quantity));
+                      return (
+                        <div key={group.color}>
+                          {/* Color header row */}
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0 8px", borderTop: groupIdx === 0 ? "none" : "1px solid #E2E2DE", flexWrap: "wrap", gap: "8px" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                              <div style={{ width: "14px", height: "14px", borderRadius: "50%", background: hex, border: isLight ? "1px solid #E2E2DE" : "1px solid rgba(0,0,0,.08)", flexShrink: 0 }} />
+                              <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", fontWeight: 500, color: "#1A1A1A" }}>{group.color}</span>
+                            </div>
+                            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                              <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#6B6B6B", whiteSpace: "nowrap" }}>Qty: {rowQty}</span>
+                              <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#6B6B6B", whiteSpace: "nowrap" }}>${rowTotal.toFixed(2)}</span>
+                              <button
+                                onClick={() => handleRowAddToCart(group)}
+                                disabled={rowQty === 0 || allRowOOS}
+                                style={{ background: "transparent", color: (rowQty > 0 && !allRowOOS) ? "#1C3557" : "#ccc", border: `1px solid ${(rowQty > 0 && !allRowOOS) ? "#1C3557" : "#E2E2DE"}`, padding: "5px 10px", fontSize: "11px", fontFamily: "'DM Sans', sans-serif", cursor: (rowQty > 0 && !allRowOOS) ? "pointer" : "not-allowed", whiteSpace: "nowrap" }}
+                              >
+                                Add to Cart
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Size inputs row */}
+                          <div style={{ display: "grid", gridTemplateColumns: `repeat(${uniqueSizes.length}, 1fr) 80px 90px`, gap: "4px", marginBottom: "4px" }}>
                             {uniqueSizes.map(size => {
                               const variant = group.variants.find(v => v.size === size);
                               if (!variant) {
-                                return <td key={size} style={{ padding: "10px 8px", borderBottom: "1px solid #E2E2DE", textAlign: "center", color: "#ccc", verticalAlign: "top", minWidth: "80px", width: "80px" }}>—</td>;
+                                return (
+                                  <div key={size} style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "8px 4px", textAlign: "center" }}>
+                                    <span style={{ display: "block", fontSize: "11px", color: "#ccc", fontFamily: "'DM Sans', sans-serif", marginBottom: "2px" }}>—</span>
+                                    <span style={{ display: "block", fontSize: "11px", color: "#ccc", fontFamily: "'DM Sans', sans-serif", marginBottom: "4px" }}>&nbsp;</span>
+                                    <div style={{ width: "52px", height: "28px" }} />
+                                  </div>
+                                );
                               }
                               const qty = quantities[variant.id] ?? 0;
                               const isOOS = isOutOfStock(variant.stock_quantity);
@@ -877,7 +898,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                               const stockLabel = isOOS ? "Out of Stock" : stockNum >= 9999 ? "In Stock" : `${stockNum} in stock`;
                               const price = Number(variant.effective_price ?? variant.retail_price ?? 0);
                               return (
-                                <td key={size} style={{ padding: "10px 8px", borderBottom: "1px solid #E2E2DE", textAlign: "center", verticalAlign: "top", background: isOOS ? "#fafafa" : "transparent", minWidth: "80px", width: "80px" }}>
+                                <div key={size} style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "8px 4px", textAlign: "center", background: isOOS ? "#fafafa" : "transparent" }}>
                                   <span style={{ display: "block", fontSize: "11px", color: isOOS ? "#cc0000" : "#6B6B6B", fontWeight: isOOS ? 500 : 400, fontFamily: "'DM Sans', sans-serif", marginBottom: "2px", whiteSpace: "nowrap" }}>{stockLabel}</span>
                                   <span style={{ display: "block", fontSize: "11px", color: isOOS ? "#aaaaaa" : "#6B6B6B", fontFamily: "'DM Sans', sans-serif", marginBottom: "4px", whiteSpace: "nowrap" }}>${price.toFixed(2)}</span>
                                   <input
@@ -898,27 +919,21 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                                     }}
                                     style={{ width: "52px", border: `1px solid ${isOOS ? "#e0e0e0" : qty > 0 ? "#1C3557" : "#E2E2DE"}`, padding: "5px 6px", textAlign: "center", fontFamily: "'DM Sans', sans-serif", fontSize: "13px", outline: "none", cursor: isOOS ? "not-allowed" : "text", background: isOOS ? "#f0f0f0" : "#FFFFFF", color: isOOS ? "#aaaaaa" : "#1A1A1A" }}
                                   />
-                                </td>
+                                </div>
                               );
                             })}
-                            <td style={{ padding: "10px 8px", borderBottom: "1px solid #E2E2DE", textAlign: "center", verticalAlign: "middle", minWidth: "80px", width: "80px" }}>
-                              <span style={{ display: "block", fontSize: "12px", color: "#6B6B6B", whiteSpace: "nowrap" }}>Qty: {rowQty}</span>
-                              <span style={{ display: "block", fontSize: "12px", color: "#6B6B6B", whiteSpace: "nowrap" }}>${rowTotal.toFixed(2)}</span>
-                            </td>
-                            <td style={{ padding: "10px 8px", borderBottom: "1px solid #E2E2DE", textAlign: "center", verticalAlign: "middle", minWidth: "90px", width: "90px" }}>
-                              <button
-                                onClick={() => handleRowAddToCart(group)}
-                                disabled={rowQty === 0 || allRowOOS}
-                                style={{ background: "transparent", color: (rowQty > 0 && !allRowOOS) ? "#1C3557" : "#ccc", border: `1px solid ${(rowQty > 0 && !allRowOOS) ? "#1C3557" : "#E2E2DE"}`, padding: "5px 10px", fontSize: "11px", fontFamily: "'DM Sans', sans-serif", cursor: (rowQty > 0 && !allRowOOS) ? "pointer" : "not-allowed", whiteSpace: "nowrap" }}
-                              >
-                                Add to Cart
-                              </button>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                            {/* Total cell */}
+                            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", padding: "8px 4px" }}>
+                              <span style={{ display: "block", fontSize: "12px", color: "#6B6B6B", whiteSpace: "nowrap", fontFamily: "'DM Sans', sans-serif" }}>Qty: {rowQty}</span>
+                              <span style={{ display: "block", fontSize: "12px", color: "#6B6B6B", whiteSpace: "nowrap", fontFamily: "'DM Sans', sans-serif" }}>${rowTotal.toFixed(2)}</span>
+                            </div>
+                            {/* Action spacer */}
+                            <div />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
 
                 {/* Grand total row */}
