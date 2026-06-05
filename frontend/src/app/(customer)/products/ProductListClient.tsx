@@ -662,13 +662,13 @@ export function ProductListClient({
               return (
                 <div key={product.id} style={{ position: "relative" }}>
                   {/* Bulk select checkbox */}
-                  <input
+                  {/* <input
                     type="checkbox"
                     checked={selected.has(product.id)}
                     onChange={() => toggleSelect(product.id)}
                     onClick={(e) => e.stopPropagation()}
                     style={{ position: "absolute", top: "12px", left: "12px", zIndex: 10, width: "16px", height: "16px", cursor: "pointer" }}
-                  />
+                  /> */}
 
                   <Link
                     href={`/products/${product.slug}`}
