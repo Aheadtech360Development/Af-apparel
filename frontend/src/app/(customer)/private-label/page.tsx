@@ -84,14 +84,16 @@ export default function PrivateLabelPage() {
             <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
               {["Custom woven or printed labels", "Custom hang tags", "Custom packaging", "Multiple fabric options"].map(item => (
                 <li key={item} style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", color: "#1A1A1A", padding: "8px 0", borderBottom: "1px solid #E2E2DE", display: "flex", alignItems: "center", gap: "10px" }}>
-                  {/* <span style={{ color: "#1C3557" }}>—</span> {item} */}
+                  {/* <span style={{ color: "#1C3557" }}>—</span>  */}
+                  {item}
                 </li>
               ))}
             </ul>
             <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
               {["Full size range XS–5XL", "Oeko-Tex and GOTS certified fabrics available", "Full compliance paperwork", "One dedicated contact for your account"].map(item => (
                 <li key={item} style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", color: "#1A1A1A", padding: "8px 0", borderBottom: "1px solid #E2E2DE", display: "flex", alignItems: "center", gap: "10px" }}>
-                  <span style={{ color: "#1C3557" }}>—</span> {item}
+                  {/* <span style={{ color: "#1C3557" }}>—</span>  */}
+                  {item}
                 </li>
               ))}
             </ul>
