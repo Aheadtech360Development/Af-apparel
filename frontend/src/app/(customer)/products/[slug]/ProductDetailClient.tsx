@@ -922,12 +922,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                                 </div>
                               );
                             })}
-                            {/* Total cell */}
-                            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", padding: "8px 4px" }}>
-                              <span style={{ display: "block", fontSize: "12px", color: "#6B6B6B", whiteSpace: "nowrap", fontFamily: "'DM Sans', sans-serif" }}>Qty: {rowQty}</span>
-                              <span style={{ display: "block", fontSize: "12px", color: "#6B6B6B", whiteSpace: "nowrap", fontFamily: "'DM Sans', sans-serif" }}>${rowTotal.toFixed(2)}</span>
-                            </div>
-                            {/* Action spacer */}
+                            <div />
                             <div />
                           </div>
                         </div>
