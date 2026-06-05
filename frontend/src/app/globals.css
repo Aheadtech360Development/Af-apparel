@@ -1,6 +1,5 @@
 /* Tailwind CSS v4 */
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,300&family=DM+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
 /* Load existing JS-based config (theme.extend, plugins) for backward compat */
 @config "../../tailwind.config.ts";
@@ -32,6 +31,11 @@
   html { scroll-behavior: smooth; }
 
   h1, h2, h3, h4, h5, h6 { font-weight: 700; }
+  h1, h2, h3 {
+    font-family: 'Fraunces', serif;
+    font-feature-settings: "kern" 1;
+    -webkit-font-smoothing: antialiased;
+  }
 
   body {
     font-family: 'DM Sans', system-ui, sans-serif;
@@ -108,7 +112,7 @@
 
 /* Homepage grids */
 @media (max-width: 900px) {
-  .hero-inner-grid   { grid-template-columns: 1fr !important; padding: 48px 20px 40px !important; gap: 32px !important; }
+  .hero-inner-grid   { grid-template-columns: 1fr !important; gap: 32px !important; }
   .cat-grid-responsive { grid-template-columns: repeat(2,1fr) !important; }
   .steps-grid-responsive { grid-template-columns: 1fr 1fr !important; }
   .serve-grid-responsive { grid-template-columns: repeat(2,1fr) !important; }
@@ -296,17 +300,25 @@
 }
 
 /* ── Hero section responsive ────────────────────────────────────────── */
+.hero-section { padding: 72px 24px; }
+.hero-headline { font-size: 52px; }
+.hero-sub { font-size: 17px; }
+
 /* Image column: show on all screen sizes */
 .hero-img-col { display: flex; }
 @media (max-width: 1024px) {
-  /* On medium screens, show image as first item in the flex wrap */
   .hero-img-col { order: -1; width: 100%; }
-  .hero-img-col > div { height: 220px !important; }
-  .hero-inner { padding: 32px 20px 32px !important; gap: 24px !important; }
+  .hero-img-col > div { height: 280px !important; }
+}
+@media (max-width: 900px) {
+  .hero-section { padding: 48px 24px !important; }
+  .hero-headline { font-size: 40px !important; }
+  .hero-sub { font-size: 15px !important; }
 }
 @media (max-width: 640px) {
-  .hero-img-col > div { height: 180px !important; }
-  .hero-inner { padding: 24px 16px 24px !important; }
+  .hero-section { padding: 32px 16px !important; }
+  .hero-headline { font-size: 32px !important; }
+  .hero-img-col > div { height: 220px !important; }
 }
 
 /* Hero stats: 2-column grid on narrow screens */

@@ -9,14 +9,14 @@ export default function HeroSection() {
   const loggedIn = isAuthenticated();
 
   return (
-    <section style={{ background: "#FFFFFF", padding: "72px 24px" }}>
+    <section className="hero-section" style={{ background: "#FFFFFF" }}>
       <div style={{ maxWidth: "1500px", margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "64px", alignItems: "center" }} className="hero-inner-grid">
         {/* Left — text */}
         <div>
-          <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: "52px", fontWeight: 600, color: "#1A1A1A", lineHeight: 1.1, marginBottom: "18px", letterSpacing: "-0.01em" }}>
+          <h1 className="hero-headline" style={{ fontFamily: "'Fraunces', serif", fontWeight: 600, color: "#1A1A1A", lineHeight: 1.1, marginBottom: "18px", letterSpacing: "-0.01em" }}>
             Premium Blank Apparel. Wholesale Prices. Ships Same Day.
           </h1>
-          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "17px", color: "#6B6B6B", lineHeight: 1.65, marginBottom: "32px" }}>
+          <p className="hero-sub" style={{ fontFamily: "'DM Sans', sans-serif", color: "#6B6B6B", lineHeight: 1.65, marginBottom: "32px" }}>
             No minimums. No markups. Delivered fast from Dallas, TX.
           </p>
           <div className="hero-cta-row" style={{ display: "flex", gap: "12px", marginBottom: "0px", flexWrap: "wrap" }}>

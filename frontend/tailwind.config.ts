@@ -40,6 +40,8 @@ const config: Config = {
         sans: ["var(--font-jakarta)", "system-ui", "sans-serif"],
         bebas: ["var(--font-bebas)", "sans-serif"],
         jakarta: ["var(--font-jakarta)", "system-ui", "sans-serif"],
+        fraunces: ["'Fraunces'", "serif"],
+        'dm-sans': ["'DM Sans'", "sans-serif"],
       },
       screens: {
         xs: "375px",
