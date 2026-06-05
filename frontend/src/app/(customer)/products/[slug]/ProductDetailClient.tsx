@@ -65,7 +65,7 @@ const COLOR_MAP: Record<string, string> = {
   "Powder Blue": "#B0E0E6",
 };
 
-const TABS = ["Description", "Specifications", "Print Guide", "Size Chart", "Reviews"] as const;
+const TABS = ["Description", "Specifications", "Size Chart", "Reviews"] as const;
 type Tab = (typeof TABS)[number];
 
 // ── Reviews Tab ───────────────────────────────────────────────────────────────
@@ -720,7 +720,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
         <div className="pdp-main-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "56px", paddingTop: "32px" }}>
 
           {/* ── LEFT: Image Gallery ─────────────────────────────────────── */}
-          <div>
+          <div className="pdp-gallery-col" style={{ position: "sticky", top: "24px", alignSelf: "start" }}>
             {/* Main image */}
             <div className="pdp-main-img" style={{ width: "100%", height: "480px", border: "1px solid #E2E2DE", display: "flex", alignItems: "center", justifyContent: "center", background: "#FFFFFF", overflow: "hidden" }}>
               {displayImages[activeImageIdx] ? (
@@ -753,13 +753,13 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
             )}
 
             {/* Gallery links */}
-            <div className="pdp-gallery-links" style={{ marginTop: "14px", display: "flex", flexDirection: "column", gap: "6px" }}>
+            <div className="pdp-gallery-links" style={{ marginTop: "14px", display: "flex", flexDirection: "row", gap: "20px" }}>
               <a
                 href="#"
-                onClick={e => { e.preventDefault(); handleDownloadStyleSheet(); }}
+                onClick={e => { e.preventDefault(); handleEmailFlyer(); }}
                 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#1C3557", textDecoration: "none", cursor: "pointer" }}
               >
-                ↓ Download Style Sheet
+                ↓ Email Flyer
               </a>
               {product.images && product.images.length > 0 && (
                 <a
@@ -1016,36 +1016,6 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                     <p style={{ fontSize: "14px", color: "#2A2830", lineHeight: 1.7, margin: 0, whiteSpace: "pre-wrap" }}>{(product as any).care_instructions}</p>
                   </div>
                 )}
-              </div>
-            )}
-
-            {activeTab === "Print Guide" && (
-              <div style={{ maxWidth: "720px" }}>
-                {(() => {
-                  const methods: string[] = ((product as any).print_guide as any)?.methods ?? [];
-                  if (methods.length === 0) {
-                    return (
-                      <div style={{ background: "#F4F3EF", border: "1px solid #E2E0DA", borderRadius: "10px", padding: "32px", textAlign: "center", color: "#7A7880", fontSize: "14px" }}>
-                        Print compatibility information coming soon.
-                      </div>
-                    );
-                  }
-                  return (
-                    <div style={{ background: "#F4F3EF", border: "1px solid #E2E0DA", borderRadius: "10px", padding: "24px" }}>
-                      <h3 style={{ fontFamily: "var(--font-bebas)", fontSize: "18px", letterSpacing: ".04em", color: "#2A2830", marginBottom: "16px" }}>Print Compatibility</h3>
-                      <div className="pd-print-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "12px" }}>
-                        {methods.map(method => (
-                          <div key={method} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: "#2A2830" }}>
-                            <span style={{ width: "18px", height: "18px", borderRadius: "50%", background: "#E8242A", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                            </span>
-                            {method}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })()}
               </div>
             )}
 

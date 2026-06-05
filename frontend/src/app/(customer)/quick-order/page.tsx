@@ -272,16 +272,16 @@ export default function QuickOrderPage() {
   // ── Render ──────────────────────────────────────────────────────────────
   return (
     <div
-      style={{ minHeight: "100vh", background: "#F4F3EF", fontFamily: "var(--font-jakarta)", display: "flex", flexDirection: "column" }}
+      style={{ minHeight: "100vh", background: "#F8F8F6", fontFamily: "'DM Sans', sans-serif", display: "flex", flexDirection: "column" }}
       onClick={() => setRows((prev) => prev.map((r) => ({ ...r, showDropdown: false })))}
     >
       {/* ══ PAGE HEADER ══════════════════════════════════════════════════ */}
-      <div className="qo-header-pad" style={{ background: "#1B3A5C", padding: "32px 32px 28px", borderBottom: "3px solid #E8242A" }}>
+      <div className="qo-header-pad" style={{ background: "#FFFFFF", padding: "32px 32px 28px", borderBottom: "1px solid #E2E2DE" }}>
         <div style={{ maxWidth: "1500px", margin: "0 auto" }}>
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "24px", flexWrap: "wrap" }}>
             <div>
-              <div style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".14em", color: "rgba(255,255,255,.5)", marginBottom: "6px" }}>Wholesale</div>
-              <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(28px,4vw,48px)", color: "#fff", letterSpacing: ".02em", lineHeight: 1, marginBottom: "10px" }}>
+              <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".14em", color: "#6B6B6B", marginBottom: "6px" }}>Wholesale</div>
+              <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: "clamp(28px,4vw,40px)", fontWeight: 600, color: "#1A1A1A", lineHeight: 1.1, marginBottom: "10px" }}>
                 Quick Order
               </h1>
               {/* How it works strip */}
@@ -294,10 +294,10 @@ export default function QuickOrderPage() {
                 ].map((step, i, arr) => (
                   <div key={step.n} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                      <span style={{ width: "20px", height: "20px", borderRadius: "50%", background: "#1A5CFF", color: "#fff", fontSize: "10px", fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{step.n}</span>
-                      <span style={{ fontSize: "12px", color: "#7A7880", fontWeight: 500 }}>{step.label}</span>
+                      <span style={{ width: "20px", height: "20px", borderRadius: "50%", background: "#1C3557", color: "#fff", fontSize: "10px", fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{step.n}</span>
+                      <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#6B6B6B", fontWeight: 500 }}>{step.label}</span>
                     </div>
-                    {i < arr.length - 1 && <span style={{ color: "#333", fontSize: "12px", marginLeft: "2px" }}>→</span>}
+                    {i < arr.length - 1 && <span style={{ color: "#6B6B6B", fontSize: "12px", marginLeft: "2px" }}>→</span>}
                   </div>
                 ))}
               </div>
@@ -306,21 +306,22 @@ export default function QuickOrderPage() {
             {/* Header CTA */}
             <div style={{ display: "flex", alignItems: "center", gap: "12px", flexShrink: 0, paddingTop: "4px" }}>
               {grandTotals.units > 0 && (
-                <div style={{ padding: "8px 14px", background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", borderRadius: "7px", fontSize: "13px", color: "#7A7880", whiteSpace: "nowrap", textAlign: "center" }}>
-                  <div style={{ fontFamily: "var(--font-bebas)", fontSize: "22px", color: "#C9A84C", lineHeight: 1 }}>{formatCurrency(grandTotals.price)}</div>
-                  <div style={{ fontSize: "11px", color: "#7A7880" }}>{grandTotals.units} unit{grandTotals.units !== 1 ? "s" : ""}</div>
+                <div style={{ padding: "8px 14px", background: "#F8F8F6", border: "1px solid #E2E2DE", fontSize: "13px", color: "#6B6B6B", whiteSpace: "nowrap", textAlign: "center" }}>
+                  <div style={{ fontFamily: "'Fraunces', serif", fontSize: "22px", fontWeight: 700, color: "#1C3557", lineHeight: 1 }}>{formatCurrency(grandTotals.price)}</div>
+                  <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", color: "#6B6B6B" }}>{grandTotals.units} unit{grandTotals.units !== 1 ? "s" : ""}</div>
                 </div>
               )}
               <button
                 onClick={(e) => { e.stopPropagation(); handleAddToCart(); }}
                 disabled={isAddingToCart || grandTotals.units === 0}
                 style={{
-                  background: grandTotals.units === 0 ? "#1a1a1a" : "#1A5CFF",
-                  color: grandTotals.units === 0 ? "#444" : "#fff",
-                  padding: "13px 28px", fontSize: "13px", fontWeight: 700,
-                  borderRadius: "7px", border: "none",
+                  background: grandTotals.units === 0 ? "#E2E2DE" : "#1C3557",
+                  color: grandTotals.units === 0 ? "#6B6B6B" : "#fff",
+                  padding: "13px 28px", fontSize: "13px", fontWeight: 600,
+                  fontFamily: "'DM Sans', sans-serif",
+                  border: "none",
                   cursor: grandTotals.units === 0 ? "not-allowed" : "pointer",
-                  textTransform: "uppercase", letterSpacing: ".08em", whiteSpace: "nowrap",
+                  letterSpacing: ".04em", whiteSpace: "nowrap",
                   transition: "background .2s",
                 }}
               >
@@ -332,7 +333,7 @@ export default function QuickOrderPage() {
       </div>
 
       {/* ══ TOOLBAR ══════════════════════════════════════════════════════ */}
-      <div className="qo-toolbar-pad" style={{ background: "#fff", borderBottom: "1px solid #E2E0DA", padding: "0 32px" }}>
+      <div className="qo-toolbar-pad" style={{ background: "#FFFFFF", borderBottom: "1px solid #E2E2DE", padding: "0 32px" }}>
         <div style={{ maxWidth: "1500px", margin: "0 auto", height: "44px", display: "flex", alignItems: "center", gap: "16px" }}>
           <span style={{ fontSize: "12px", fontWeight: 600, color: "#7A7880" }}>
             {rows.length} line{rows.length !== 1 ? "s" : ""}
@@ -367,7 +368,7 @@ export default function QuickOrderPage() {
       </div>
 
       {/* ══ COLUMN HEADERS ═══════════════════════════════════════════════ */}
-      <div className="qo-col-header-pad" style={{ background: "#F4F3EF", padding: "0 32px" }}>
+      <div className="qo-col-header-pad" style={{ background: "#F8F8F6", padding: "0 32px" }}>
         <div style={{ maxWidth: "1500px", margin: "0 auto" }}>
           <div style={{ display: "grid", gridTemplateColumns: "28px 28px 1fr 220px 40px", gap: "0", padding: "8px 12px 6px", alignItems: "center" }}>
             <div />

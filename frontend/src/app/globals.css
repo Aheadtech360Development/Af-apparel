@@ -164,6 +164,8 @@
   .product-detail-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
   .pd-breadcrumb { padding-left: 16px !important; padding-right: 16px !important; }
   .pd-main-pad { padding: 24px 16px !important; }
+  .pdp-gallery-col { position: static !important; top: auto !important; }
+  .pdp-gallery-links { flex-direction: row !important; gap: 20px !important; }
 }
 @media (max-width: 600px) {
   .pd-main-pad { padding: 20px 12px !important; }

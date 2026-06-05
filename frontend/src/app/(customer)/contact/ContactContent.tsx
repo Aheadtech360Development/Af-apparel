@@ -164,9 +164,18 @@ export default function ContactPage() {
               ))}
             </div>
 
-            {/* Map placeholder */}
-            <div style={{ height: "220px", border: "1px dashed #E2E2DE", background: "#F8F8F6", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "24px" }}>
-              <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#6B6B6B" }}>Dallas, TX</span>
+            {/* Map */}
+            <div style={{ height: "220px", border: "1px solid #E2E2DE", overflow: "hidden", marginBottom: "24px" }}>
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3349.8234567890!2d-96.65432109876543!3d32.94567890123456!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x864c1f1234567890%3A0xabcdef1234567890!2s10719+Turbeville+Rd%2C+Dallas%2C+TX+75243!5e0!3m2!1sen!2sus!4v1680000000000!5m2!1sen!2sus"
+                width="100%"
+                height="220"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="AF Apparels Location"
+              />
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>

@@ -513,8 +513,8 @@ export function ProductListClient({
       {/* ── Main content ── */}
       <div className="prod-content-pad" style={{ flex: 1, padding: "24px 28px", minWidth: 0 }}>
 
-        {/* Top bar: count + sort + mobile filter button */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexWrap: "wrap", gap: "10px" }}>
+        {/* Top bar: filter button + count + bulk download */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px", flexWrap: "wrap", gap: "10px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             {/* Mobile filter button */}
             <button
@@ -532,41 +532,50 @@ export function ProductListClient({
             </span>
           </div>
 
-          {/* Right side: Sort By + Bulk download */}
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-            {/* Sort By */}
-            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-              <span style={{ fontSize: "12px", fontWeight: 600, color: "#7A7880", whiteSpace: "nowrap" }}>Sort By:</span>
-              <select
-                value={sortBy}
-                onChange={e => setSortBy(e.target.value)}
-                style={{ padding: "7px 10px", border: "1.5px solid #E2E0DA", borderRadius: "6px", fontSize: "12px", color: "#2A2830", background: "#fff", outline: "none", cursor: "pointer" }}
+          {/* Bulk download toolbar */}
+          {selected.size > 0 && (
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <span style={{ fontSize: "12px", color: "#7A7880" }}>{selected.size} selected</span>
+              <button
+                onClick={handleBulkDownload}
+                disabled={bulkDownloading}
+                style={{ padding: "7px 16px", background: "#1A5CFF", color: "#fff", borderRadius: "5px", fontSize: "12px", fontWeight: 700, border: "none", cursor: "pointer", opacity: bulkDownloading ? 0.5 : 1 }}
               >
-                <option value="featured">Featured</option>
-                <option value="price_asc">Price: Low to High</option>
-                <option value="price_desc">Price: High to Low</option>
-                <option value="name_asc">Name: A – Z</option>
-                <option value="name_desc">Name: Z – A</option>
-              </select>
+                {bulkDownloading ? "Queuing…" : "Bulk Download"}
+              </button>
+              <button onClick={() => setSelected(new Set())} style={{ fontSize: "12px", color: "#7A7880", background: "none", border: "none", cursor: "pointer" }}>
+                Clear
+              </button>
             </div>
+          )}
+        </div>
 
-            {/* Bulk download toolbar */}
-            {selected.size > 0 && (
-              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <span style={{ fontSize: "12px", color: "#7A7880" }}>{selected.size} selected</span>
-                <button
-                  onClick={handleBulkDownload}
-                  disabled={bulkDownloading}
-                  style={{ padding: "7px 16px", background: "#1A5CFF", color: "#fff", borderRadius: "5px", fontSize: "12px", fontWeight: 700, border: "none", cursor: "pointer", opacity: bulkDownloading ? 0.5 : 1 }}
-                >
-                  {bulkDownloading ? "Queuing…" : "Bulk Download"}
-                </button>
-                <button onClick={() => setSelected(new Set())} style={{ fontSize: "12px", color: "#7A7880", background: "none", border: "none", cursor: "pointer" }}>
-                  Clear
-                </button>
-              </div>
-            )}
-          </div>
+        {/* Sort bar */}
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", borderBottom: "1px solid #E2E2DE", padding: "8px 0 12px", marginBottom: "20px", flexWrap: "wrap" }}>
+          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#6B6B6B", whiteSpace: "nowrap" }}>Sort:</span>
+          {[
+            { label: "Featured", value: "featured" },
+            { label: "Price: Low–High", value: "price_asc" },
+            { label: "Price: High–Low", value: "price_desc" },
+            { label: "New Arrivals", value: "new_arrivals" },
+          ].map(opt => (
+            <button
+              key={opt.value}
+              onClick={() => setSortBy(opt.value)}
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: "13px",
+                color: sortBy === opt.value ? "#1C3557" : "#6B6B6B",
+                fontWeight: sortBy === opt.value ? 600 : 400,
+                padding: "2px 4px",
+              }}
+            >
+              {opt.label}
+            </button>
+          ))}
         </div>
 
         {bulkMessage && (
