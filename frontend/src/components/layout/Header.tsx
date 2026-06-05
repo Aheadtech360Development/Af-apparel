@@ -87,7 +87,7 @@ export function Header() {
 
   const navLinkStyle: React.CSSProperties = {
     color: "#1C3557",
-    fontSize: "13px",
+    fontSize: "20px",
     fontWeight: 500,
     textDecoration: "none",
     letterSpacing: ".01em",
@@ -102,7 +102,7 @@ export function Header() {
 
       {/* Main header */}
       <header style={{ background: "#FFFFFF", borderBottom: "1px solid #E2E2DE", position: "sticky", top: 0, zIndex: 1 }}>
-        <div className="header-inner" style={{ maxWidth: "1500px", margin: "0 auto", padding: "0 32px", display: "flex", alignItems: "center", justifyContent: "space-between", height: "64px", gap: "24px" }}>
+        <div className="header-inner" style={{ maxWidth: "1500px", margin: "0 auto", padding: "0 32px", display: "flex", alignItems: "center", justifyContent: "space-between", height: "90px", gap: "24px" }}>
 
           {/* Logo */}
           <Link href="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
@@ -144,7 +144,7 @@ export function Header() {
                       key={href}
                       href={href}
                       onClick={() => setResourcesOpen(false)}
-                      style={{ display: "block", padding: "9px 12px", color: "#1C3557", fontSize: "13px", fontWeight: 500, textDecoration: "none", fontFamily: "'DM Sans', sans-serif", transition: "background .15s" }}
+                      style={{ display: "block", padding: "9px 12px", color: "#1C3557", fontSize: "20px", fontWeight: 500, textDecoration: "none", fontFamily: "'DM Sans', sans-serif", transition: "background .15s" }}
                       onMouseEnter={e => (e.currentTarget.style.background = "#F8F8F6")}
                       onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                     >
@@ -198,23 +198,23 @@ export function Header() {
             <div className="hidden md:flex" style={{ gap: "8px", alignItems: "center" }}>
               {isAuthenticated() ? (
                 <>
-                  <span style={{ fontSize: "13px", color: "#1C3557", fontFamily: "'DM Sans', sans-serif" }}>
+                  <span style={{ fontSize: "20px", color: "#1C3557", fontFamily: "'DM Sans', sans-serif" }}>
                     {user?.first_name}
                     {isAdmin() && <span style={{ marginLeft: "6px", fontSize: "10px", background: "rgba(28,53,87,.1)", color: "#1C3557", padding: "2px 8px", fontWeight: 600 }}>Admin</span>}
                   </span>
                   <button
                     onClick={handleLogout}
-                    style={{ background: "transparent", color: "#1C3557", padding: "8px 16px", fontSize: "13px", border: "1px solid #1C3557", cursor: "pointer", fontWeight: 500, transition: "all .2s", fontFamily: "'DM Sans', sans-serif" }}
+                    style={{ background: "transparent", color: "#1C3557", padding: "8px 16px", fontSize: "20px", border: "1px solid #1C3557", cursor: "pointer", fontWeight: 500, transition: "all .2s", fontFamily: "'DM Sans', sans-serif" }}
                   >
                     Sign out
                   </button>
                 </>
               ) : (
                 <>
-                  <Link href="/login" style={{ background: "transparent", color: "#1C3557", padding: "8px 16px", fontSize: "13px", border: "1px solid #1C3557", fontWeight: 500, textDecoration: "none", transition: "all .2s", fontFamily: "'DM Sans', sans-serif" }}>
+                  <Link href="/login" style={{ background: "transparent", color: "#1C3557", padding: "8px 16px", fontSize: "20px", border: "1px solid #1C3557", fontWeight: 500, textDecoration: "none", transition: "all .2s", fontFamily: "'DM Sans', sans-serif" }}>
                     Log In
                   </Link>
-                  <Link href="/wholesale/register" style={{ background: "#1C3557", color: "#fff", padding: "8px 18px", fontSize: "13px", fontWeight: 500, textDecoration: "none", transition: "all .2s", fontFamily: "'DM Sans', sans-serif" }}>
+                  <Link href="/wholesale/register" style={{ background: "#1C3557", color: "#fff", padding: "8px 18px", fontSize: "20px", fontWeight: 500, textDecoration: "none", transition: "all .2s", fontFamily: "'DM Sans', sans-serif" }}>
                     Apply Now
                   </Link>
                 </>
@@ -257,7 +257,7 @@ export function Header() {
           }}>
             {/* Drawer header */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 24px", borderBottom: "1px solid #E2E2DE" }}>
-              <Image src="/Af-apparel logo.png" alt="AF Blanks" height={40} width={130} style={{ objectFit: "contain" }} />
+              <Image src="/Af-apparel logo.png" alt="AF Blanks" height={40} width={60} style={{ objectFit: "contain" }} />
               <button
                 onClick={() => setMenuOpen(false)}
                 style={{ background: "none", border: "none", cursor: "pointer", color: "#6B6B6B", fontSize: "20px", lineHeight: 1, padding: "4px" }}
@@ -303,17 +303,17 @@ export function Header() {
                     Cart {cartCount > 0 && `(${cartCount})`}
                   </Link>
                   <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "10px" }}>
-                    <Link href="/wholesale/register" onClick={() => setMenuOpen(false)} style={{ display: "block", background: "#1C3557", color: "#fff", padding: "12px 20px", fontWeight: 500, fontSize: "13px", textDecoration: "none", textAlign: "center", fontFamily: "'DM Sans', sans-serif" }}>
+                    <Link href="/wholesale/register" onClick={() => setMenuOpen(false)} style={{ display: "block", background: "#1C3557", color: "#fff", padding: "12px 20px", fontWeight: 500, fontSize: "20px", textDecoration: "none", textAlign: "center", fontFamily: "'DM Sans', sans-serif" }}>
                       Apply for Wholesale Account
                     </Link>
-                    <Link href="/login" onClick={() => setMenuOpen(false)} style={{ display: "block", background: "transparent", color: "#1C3557", border: "1px solid #1C3557", padding: "12px 20px", fontWeight: 500, fontSize: "13px", textDecoration: "none", textAlign: "center", fontFamily: "'DM Sans', sans-serif" }}>
+                    <Link href="/login" onClick={() => setMenuOpen(false)} style={{ display: "block", background: "transparent", color: "#1C3557", border: "1px solid #1C3557", padding: "12px 20px", fontWeight: 500, fontSize: "20px", textDecoration: "none", textAlign: "center", fontFamily: "'DM Sans', sans-serif" }}>
                       Log In
                     </Link>
                   </div>
                 </>
               )}
               {isAuthenticated() && (
-                <button onClick={handleLogout} style={{ marginTop: "20px", display: "block", width: "100%", textAlign: "center", padding: "12px", color: "#1C3557", fontSize: "13px", fontWeight: 500, background: "transparent", border: "1px solid #E2E2DE", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>
+                <button onClick={handleLogout} style={{ marginTop: "20px", display: "block", width: "100%", textAlign: "center", padding: "12px", color: "#1C3557", fontSize: "20px", fontWeight: 500, background: "transparent", border: "1px solid #E2E2DE", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>
                   Sign Out
                 </button>
               )}

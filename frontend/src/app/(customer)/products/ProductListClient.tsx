@@ -477,7 +477,7 @@ export function ProductListClient({
   });
 
   return (
-    <div style={{ display: "flex", alignItems: "flex-start", minHeight: "600px", maxWidth: "1500px", margin: "0 auto" }}>
+    <div style={{ display: "flex", alignItems: "flex-start", minHeight: "600px", maxWidth: "1500px", margin: "0 auto", padding: "0 32px"}}>
 
       {/* ── Desktop sidebar ── */}
       <aside
