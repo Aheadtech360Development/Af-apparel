@@ -19,14 +19,15 @@ export default function TrustStrip() {
             </div>
           ))}
         </div>
-        <div style={{ textAlign: "center", marginTop: "24px", paddingTop: "24px", borderTop: "1px solid #E2E2DE" }}>
-          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", color: "#6B6B6B", marginBottom: "12px" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", flexWrap: "wrap", gap: "12px", marginTop: "20px", paddingTop: "18px", borderTop: "1px solid #E2E2DE" }}>
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", color: "#6B6B6B", margin: 0 }}>
             Create a wholesale account to get better prices on everything.
           </p>
-          <Link href="/wholesale/register" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#1C3557", border: "1px solid #1C3557", padding: "8px 18px", textDecoration: "none", fontWeight: 500, display: "inline-block" }}>
+          <Link href="/wholesale/register" className="trust-apply-btn" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#1C3557", border: "1px solid #1C3557", padding: "5px 12px", textDecoration: "none", fontWeight: 500, display: "inline-block", transition: "all .15s" }}>
             Apply for Wholesale Account →
           </Link>
         </div>
+        <style>{`.trust-apply-btn:hover { background: #1C3557 !important; color: #ffffff !important; }`}</style>
       </div>
     </div>
   );

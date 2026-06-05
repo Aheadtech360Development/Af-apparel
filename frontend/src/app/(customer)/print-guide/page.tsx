@@ -24,25 +24,27 @@ const METHODS = [
 ];
 
 const COMPAT_TABLE = [
-  { material: "100% Cotton", dtf: "Works Great", screen: "Works Great", emb: "Works Great", sub: "Not Recommended" },
-  { material: "50/50 Blend", dtf: "Works Great", screen: "Works Well", emb: "Works Great", sub: "Test First" },
-  { material: "100% Polyester", dtf: "Works Well", screen: "Test First", emb: "Works Great", sub: "Works Great" },
-  { material: "Tri-Blend", dtf: "Works Great", screen: "Test First", emb: "Works Well", sub: "Test First" },
-  { material: "Performance/Moisture Wick", dtf: "Works Well", screen: "Test First", emb: "Works Well", sub: "Works Great" },
+  { material: "100% Heavyweight Cotton", dtf: "Works Great", screen: "Works Great", emb: "Works Well", sub: "Not Recommended" },
+  { material: "100% Ring-Spun Cotton", dtf: "Works Great", screen: "Works Great", emb: "Works Well", sub: "Not Recommended" },
+  { material: "CVC 52/48", dtf: "Works Well", screen: "Works Well", emb: "Works Well", sub: "Low Poly — Test First" },
+  { material: "CVC 60/40", dtf: "Works Well", screen: "Works Well", emb: "Works Well", sub: "Low Poly — Test First" },
+  { material: "CVC 65/35", dtf: "Works Well", screen: "Test First", emb: "Works Well", sub: "Low Poly — Test First" },
+  { material: "Fleece 70/30", dtf: "Works Well", screen: "Test First", emb: "Works Great", sub: "Not Recommended" },
+  { material: "Fleece 80/20", dtf: "Works Well", screen: "Test First", emb: "Works Great", sub: "Not Recommended" },
 ];
 
 const TIPS = [
-  "Wash and dry garments before decorating to remove sizing agents and shrinkage.",
-  "Pre-press for 3–5 seconds to remove moisture before applying transfers.",
-  "Always run a test on a sample garment before full production.",
-  "Follow your ink or transfer supplier's cure temps — our blanks are standard.",
-  "For a softer feel on heavier fabrics, look at DTF or water-based inks.",
+  "Wash and dry garments before decorating. Fabric can shrink slightly after first wash.",
+  "Pre-press for 3–5 seconds before applying any transfer. Removes moisture.",
+  "Always run a test on one piece before a full production run.",
+  "Follow your ink or transfer supplier's cure temps — those take priority over fabric type.",
+  "For a softer feel on heavier fabrics, use water-based inks or thin-adhesive DTF.",
 ];
 
 function cellColor(val: string): React.CSSProperties {
   if (val === "Works Great") return { color: "#2d6a4f", fontWeight: 500 };
   if (val === "Not Recommended") return { color: "#9b2335" };
-  if (val === "Test First") return { color: "#8a6000" };
+  if (val.includes("Test First")) return { color: "#8a6000" };
   return {};
 }
 
@@ -68,7 +70,7 @@ export default function PrintGuidePage() {
           </p>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "24px" }} className="cert-grid-responsive">
             {METHODS.map(m => (
-              <div key={m.name} style={{ background: "#FFFFFF", border: "1px solid #E2E2DE", padding: "24px" }}>
+              <div key={m.name}>
                 <h4 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 600, color: "#1A1A1A", marginBottom: "8px" }}>{m.name}</h4>
                 <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#6B6B6B", lineHeight: 1.6 }}>{m.desc}</p>
               </div>
@@ -116,8 +118,8 @@ export default function PrintGuidePage() {
           </p>
           <ol style={{ paddingLeft: 0, listStyle: "none", maxWidth: "680px" }}>
             {TIPS.map((tip, i) => (
-              <li key={i} style={{ display: "flex", gap: "16px", marginBottom: "16px", alignItems: "flex-start" }}>
-                <span style={{ fontFamily: "'Fraunces', serif", fontSize: "18px", fontWeight: 600, color: "#1C3557", minWidth: "24px", lineHeight: 1.4 }}>{i + 1}.</span>
+              <li key={i} style={{ display: "flex", gap: "16px", padding: "14px 0", borderBottom: "1px solid #E2E2DE", alignItems: "flex-start" }}>
+                <span style={{ fontFamily: "'Fraunces', serif", fontSize: "20px", fontWeight: 700, color: "#1C3557", minWidth: "24px", lineHeight: 1.4 }}>{i + 1}.</span>
                 <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", color: "#6B6B6B", lineHeight: 1.65, margin: 0 }}>{tip}</p>
               </li>
             ))}

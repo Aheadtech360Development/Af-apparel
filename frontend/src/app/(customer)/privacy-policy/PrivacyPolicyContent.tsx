@@ -76,90 +76,120 @@ export default function PrivacyPolicyPage() {
           {active === "shipping" && (
             <div>
               <h2 style={sectionStyle}>Shipping</h2>
-              <p style={bodyStyle}>We ship from our Dallas, TX warehouse. Standard ground shipping is available to all 50 states. Expedited (2-day) shipping is available for an additional fee. Orders placed before 2PM CT typically ship same day.</p>
+              <p style={bodyStyle}>Orders placed before 1:00PM CT ship the same day from our Dallas, TX warehouse.</p>
+              <p style={bodyStyle}>We ship via USPS, UPS, FedEx, or OnTrac ground. If you have your own UPS or FedEx account number, include it when ordering and we will use it.</p>
+              <p style={bodyStyle}>Free shipping on orders $300 and above.</p>
+              <p style={bodyStyle}>Shipping rates are calculated at checkout based on weight and destination.</p>
 
               <h2 style={sectionStyle}>Will Call (Local Pickup)</h2>
-              <p style={bodyStyle}>Will Call pickup is available from our Dallas, TX location during business hours (Mon–Fri, 8AM–5PM CT). Select &lsquo;Will Call&rsquo; at checkout. You will receive an email when your order is ready for pickup.</p>
+              <p style={bodyStyle}>Available Monday–Friday, 8:30AM–4:30PM CT from our Dallas warehouse.</p>
+              <p style={bodyStyle}>Allow at least 3 hours from when you place the order before coming in.</p>
+              <p style={bodyStyle}>Cutoff for same-day pickup is 1:00PM CT. Orders placed after that may not be ready until the next business day.</p>
+              <p style={bodyStyle}>Wait for your &lsquo;Ready for Pickup&rsquo; email before coming in.</p>
+              <p style={bodyStyle}>We can hold will call orders for 5 business days. After that, items may be restocked and a 10% restocking fee applies.</p>
 
               <h2 style={sectionStyle}>Returns & Claims</h2>
-              <p style={bodyStyle}>All claims for shortages, damages, or defects must be reported within 7 days of delivery. Email info@afblanks.com with your order number and a description of the issue. Returns are accepted for defective merchandise only. Non-defective items cannot be returned.</p>
+              <p style={bodyStyle}>Inspect all items before washing, printing, or making any changes to the garment.</p>
+              <p style={bodyStyle}>All claims must be made within 5 days of receiving your order. Email info@afblanks.com with your order number.</p>
+              <p style={bodyStyle}>We cannot accept returns on anything that has been washed, printed, or altered in any way.</p>
+              <p style={bodyStyle}>All returns require a Return Authorization (RA). We will email you one once your claim is approved. Returns sent without an RA will be refused.</p>
+              <p style={bodyStyle}>RA numbers are valid for 14 days. If we do not receive the items within that time, you will need to submit a new request.</p>
+              <p style={bodyStyle}>A 10% restocking fee applies to all returns that are not a result of our error.</p>
+              <p style={bodyStyle}>Return shipping costs are the customer&rsquo;s responsibility unless the return is due to our mistake.</p>
+              <p style={bodyStyle}>If you received damaged items, we will replace or refund them. Contact us within 5 days of delivery.</p>
+              <p style={bodyStyle}>If you received the wrong style, color, or size, contact us within 5 days before making any changes to the garment.</p>
             </div>
           )}
 
           {active === "ordering" && (
             <div>
               <h2 style={sectionStyle}>Placing an Order</h2>
-              <p style={bodyStyle}>Orders can be placed online at any time. Wholesale accounts are required for wholesale pricing. Guest checkout is available at standard retail pricing.</p>
+              <p style={bodyStyle}>You do not need an account to place an order. Wholesale account holders get access to lower wholesale pricing.</p>
+              <p style={bodyStyle}>There is no minimum order quantity on in-stock items.</p>
+              <p style={bodyStyle}>For large orders over 1,000 units or custom configurations, use the &lsquo;Request a Quote&rsquo; option on any product page. We respond within 2 business hours.</p>
+              <p style={bodyStyle}>To submit a PO, email it to info@afblanks.com</p>
 
               <h2 style={sectionStyle}>Order Confirmation</h2>
-              <p style={bodyStyle}>You will receive an order confirmation email after placing your order. If you do not receive a confirmation within 1 hour, check your spam folder or contact us.</p>
+              <p style={bodyStyle}>You will receive a confirmation email right after checkout. Check it carefully — it shows exactly what you ordered. If anything looks wrong, email info@afblanks.com within 24 hours.</p>
 
               <h2 style={sectionStyle}>Changes & Cancellations</h2>
-              <p style={bodyStyle}>Order changes and cancellations must be requested within 1 hour of placing the order. Once an order has been picked or packed, changes cannot be made.</p>
+              <p style={bodyStyle}>You can change or cancel an order within 2 hours of placing it. Email info@afblanks.com with your order number.</p>
+              <p style={bodyStyle}>Once an order is being picked and packed it cannot be changed or cancelled.</p>
+              <p style={bodyStyle}>Same-day orders cannot be changed after confirmation.</p>
 
               <h2 style={sectionStyle}>Stock & Availability</h2>
-              <p style={bodyStyle}>All orders are subject to stock availability. In the event of a stock shortage, we will contact you to discuss alternatives or issue a refund.</p>
+              <p style={bodyStyle}>Stock counts shown on product pages are updated in near real time.</p>
+              <p style={bodyStyle}>If something goes out of stock after you order, we will contact you within 4 hours with three options: a backorder date, a substitute, or a full refund for those items.</p>
 
               <h2 style={sectionStyle}>Payment</h2>
-              <p style={bodyStyle}>We accept all major credit cards, ACH/bank transfer, and Net 30 terms (for approved wholesale accounts). Payment is due at time of order unless Net 30 terms are in place.</p>
+              <p style={bodyStyle}>Credit or Debit Card — Visa, Mastercard, Amex. Charged at checkout.</p>
+              <p style={bodyStyle}>ACH Bank Transfer — 1–2 business days to process.</p>
+              <p style={bodyStyle}>Wire Transfer — We send wire details after the order is placed. Ships when funds are received.</p>
+              <p style={bodyStyle}>NET 30 — Available to accounts with 3 or more orders over 90 days. Apply through your account.</p>
+              <p style={bodyStyle}>Cash — Accepted for will call orders only.</p>
 
               <h2 style={sectionStyle}>Sales Tax</h2>
-              <p style={bodyStyle}>Sales tax is collected in states where we have nexus, in accordance with applicable laws. Tax-exempt customers must provide a valid exemption certificate.</p>
+              <p style={bodyStyle}>We collect sales tax in states where required by law.</p>
+              <p style={bodyStyle}>If your business has a sales tax exemption certificate, email it to info@afblanks.com before your first order. We will apply it to your account within 1 business day.</p>
             </div>
           )}
 
           {active === "terms" && (
             <div>
               <h2 style={sectionStyle}>Payment Methods</h2>
-              <p style={bodyStyle}>We accept Visa, Mastercard, American Express, Discover, ACH bank transfer, and Net 30 (approved wholesale accounts only).</p>
+              <p style={bodyStyle}>We accept cash (will call only), credit cards, approved company or personal checks, and cashier&rsquo;s checks. NET terms are available for accounts approved by our credit department or that have built sufficient order history with us. For more information contact 469-367-9753.</p>
 
               <h2 style={sectionStyle}>No Minimums</h2>
-              <p style={bodyStyle}>There is no minimum order quantity. Order as few or as many units as you need.</p>
+              <p style={bodyStyle}>We do not have any minimum order quantities on standard in-stock items.</p>
 
               <h2 style={sectionStyle}>Order Processing</h2>
-              <p style={bodyStyle}>Orders are processed Monday through Friday. Orders placed after 2PM CT or on weekends will be processed the next business day.</p>
+              <p style={bodyStyle}>Most orders placed before 1:00PM CT are completed same day. If you need an order rushed, email info@afblanks.com or call 469-367-9753.</p>
 
               <h2 style={sectionStyle}>Wholesale Accounts</h2>
-              <p style={bodyStyle}>Wholesale pricing is available to approved wholesale accounts only. To apply, complete the wholesale application on our website.</p>
+              <p style={bodyStyle}>All wholesale accounts are for business-to-business use only. You must hold a valid resale certificate to maintain a wholesale account. We reserve the right to approve, suspend, or close any account at our discretion.</p>
 
               <h2 style={sectionStyle}>Pricing</h2>
-              <p style={bodyStyle}>Prices are subject to change without notice. Your order will be billed at the price shown at time of checkout.</p>
+              <p style={bodyStyle}>All prices are in USD and subject to change without notice. Wholesale pricing is only available to approved account holders.</p>
 
               <h2 style={sectionStyle}>Claims & Returns</h2>
-              <p style={bodyStyle}>All claims must be made within 7 days of delivery. We are not responsible for damage caused after delivery. Returns accepted for defective merchandise only.</p>
+              <p style={bodyStyle}>All claims must be made within 5 days of receiving goods. Items must be unaltered. Returns require a Return Authorization. Items returned without one will be refused. A 10% restocking fee applies. Customers are responsible for return shipping unless the return is our fault.</p>
 
               <h2 style={sectionStyle}>Cancellations</h2>
-              <p style={bodyStyle}>Orders may be cancelled within 1 hour of placement. After that, cancellations are not guaranteed.</p>
+              <p style={bodyStyle}>Once you receive an order confirmation, the order cannot be cancelled. Call customer service to request any changes: 469-367-9753, Monday–Friday 8:30AM–5:00PM CT.</p>
 
               <h2 style={sectionStyle}>Liability</h2>
-              <p style={bodyStyle}>AF Apparels is not liable for any indirect, incidental, or consequential damages arising from the use of our products.</p>
+              <p style={bodyStyle}>AF Apparels is not responsible for delays caused by shipping carriers or events outside our control. Our liability is limited to the value of the order placed.</p>
             </div>
           )}
 
           {active === "privacy" && (
             <div>
-              <p style={{ ...bodyStyle, color: "#9B9B9B", fontSize: "12px" }}>Last updated: January 30, 2025</p>
+              <p style={{ ...bodyStyle, color: "#9B9B9B", fontSize: "12px", marginBottom: "24px" }}>Last updated: January 30, 2025</p>
 
               <h2 style={sectionStyle}>What We Collect</h2>
-              <p style={bodyStyle}>We collect information you provide when placing orders, creating an account, or contacting us. This includes name, email, shipping address, payment information, and order history.</p>
+              <p style={bodyStyle}>When you use our site or place an order, we collect your name, address, phone number, email, and order details. Payment information is processed securely through our payment provider — we do not store card details on our servers. We also collect basic usage data through cookies to help the site work properly.</p>
 
               <h2 style={sectionStyle}>How We Use It</h2>
-              <p style={bodyStyle}>We use your information to process orders, communicate about your account, and improve our service. We do not sell your personal information.</p>
+              <p style={bodyStyle}>To process and fulfill your orders.</p>
+              <p style={bodyStyle}>To send you updates about your order or account.</p>
+              <p style={bodyStyle}>To send promotional emails if you have opted in. You can unsubscribe at any time using the link in any email.</p>
+              <p style={bodyStyle}>To improve how our site works.</p>
 
               <h2 style={sectionStyle}>Who We Share It With</h2>
-              <p style={bodyStyle}>We share your information with shipping carriers (to fulfill orders), payment processors (to process payments), and service providers who assist our operations. All are bound by confidentiality agreements.</p>
+              <p style={bodyStyle}>We share information with third parties only as needed to run the business — shipping carriers, payment processors, and our platform provider. We do not sell your personal information to third parties for their own marketing.</p>
 
               <h2 style={sectionStyle}>Cookies</h2>
-              <p style={bodyStyle}>We use cookies to maintain your session, remember your cart, and understand how our site is used. You can disable cookies in your browser settings, but some features may not work correctly.</p>
+              <p style={bodyStyle}>We use cookies to keep the site running and to understand how people use it. You can turn cookies off in your browser settings, though some parts of the site may not work as expected.</p>
 
               <h2 style={sectionStyle}>Your Rights</h2>
-              <p style={bodyStyle}>You may request access to, correction of, or deletion of your personal data at any time by contacting info@afblanks.com.</p>
+              <p style={bodyStyle}>Depending on where you live, you may have the right to access, correct, delete, or export your personal information. To make a request, email info.afapparel@gmail.com</p>
 
               <h2 style={sectionStyle}>Children</h2>
-              <p style={bodyStyle}>Our services are not directed to children under 13. We do not knowingly collect information from children.</p>
+              <p style={bodyStyle}>This site is not intended for anyone under 18. We do not knowingly collect information from children.</p>
 
               <h2 style={sectionStyle}>Contact</h2>
-              <p style={bodyStyle}>For privacy questions, contact us at info@afblanks.com or (214) 272-7213.</p>
+              <p style={bodyStyle}>Privacy questions: info.afapparel@gmail.com</p>
+              <p style={bodyStyle}>Address: 10719 Turbeville Road, Dallas, TX 75243</p>
             </div>
           )}
 
