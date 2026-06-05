@@ -219,20 +219,20 @@ export default function WholesaleRegisterPage() {
   return (
     <div style={{ minHeight: "100vh", background: "#F8F8F6", fontFamily: "'DM Sans', sans-serif" }}>
       {/* Page header */}
-      <div style={{ maxWidth: "760px", margin: "0 auto", padding: "56px 24px 0", textAlign: "center" }}>
+      <div className="register-header" style={{ maxWidth: "760px", margin: "0 auto", padding: "56px 24px 0", textAlign: "center" }}>
         <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: "38px", fontWeight: 600, color: "#1A1A1A", lineHeight: 1.2, marginBottom: "12px" }}>
           Apply for a Wholesale Account
         </h1>
-        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "15px", color: "#6B6B6B", maxWidth: "460px", margin: "0 auto 40px" }}>
+        <p className="register-sub" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "15px", color: "#6B6B6B", maxWidth: "460px", margin: "0 auto 40px" }}>
           Apply once. Get lower prices, better terms, and faster fulfillment.
         </p>
       </div>
 
       {/* Content */}
-      <div style={{ maxWidth: "760px", margin: "0 auto", padding: "32px 24px 64px" }}>
+      <div className="register-content-wrap" style={{ maxWidth: "760px", margin: "0 auto", padding: "32px 24px 64px" }}>
 
         {/* Form card */}
-        <div style={{ background: "#fff", border: "1px solid #E2E2DE", padding: "40px" }}>
+        <div className="register-form-card" style={{ background: "#fff", border: "1px solid #E2E2DE", padding: "40px" }}>
           <form onSubmit={handleSubmit}>
             {error && (
               <div style={{ background: "#FFF0F0", border: "1px solid #fcc", borderRadius: "6px", padding: "12px 16px", fontSize: "13px", color: "#c0392b", marginBottom: "24px" }}>
@@ -491,11 +491,6 @@ export default function WholesaleRegisterPage() {
           </form>
         </div>
       </div>
-      <style>{`
-        @media (max-width: 600px) {
-          .register-form-row { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
     </div>
   );
 }
