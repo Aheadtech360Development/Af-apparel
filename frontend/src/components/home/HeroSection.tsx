@@ -14,7 +14,7 @@ export default function HeroSection() {
         {/* Left — text */}
         <div>
           <h1 className="hero-headline" style={{ fontFamily: "'Fraunces', serif", fontWeight: 600, color: "#1A1A1A", lineHeight: 1.1, marginBottom: "18px", letterSpacing: "-0.01em" }}>
-            Premium Blank Apparel. Wholesale Prices. Ships Same Day.
+            Premium Apparel Blanks | Factory Direct Wholesale & Distribution
           </h1>
           <p className="hero-sub" style={{ fontFamily: "'DM Sans', sans-serif", color: "#6B6B6B", lineHeight: 1.65, marginBottom: "32px" }}>
             No minimums. No markups. Delivered fast from Dallas, TX.
