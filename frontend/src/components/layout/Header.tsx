@@ -303,10 +303,10 @@ export function Header() {
                     Cart {cartCount > 0 && `(${cartCount})`}
                   </Link>
                   <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "10px" }}>
-                    <Link href="/wholesale/register" onClick={() => setMenuOpen(false)} style={{ display: "block", background: "#1C3557", color: "#fff", padding: "12px 20px", fontWeight: 500, fontSize: "18px", textDecoration: "none", textAlign: "center", fontFamily: "'DM Sans', sans-serif" }}>
+                    <Link href="/wholesale/register" onClick={() => setMenuOpen(false)} style={{ display: "block", background: "#1C3557", color: "#fff", padding: "12px 20px", fontWeight: 500, fontSize: "13px", textDecoration: "none", textAlign: "center", fontFamily: "'DM Sans', sans-serif" }}>
                       Apply for Wholesale Account
                     </Link>
-                    <Link href="/login" onClick={() => setMenuOpen(false)} style={{ display: "block", background: "transparent", color: "#1C3557", border: "1px solid #1C3557", padding: "12px 20px", fontWeight: 500, fontSize: "18px", textDecoration: "none", textAlign: "center", fontFamily: "'DM Sans', sans-serif" }}>
+                    <Link href="/login" onClick={() => setMenuOpen(false)} style={{ display: "block", background: "transparent", color: "#1C3557", border: "1px solid #1C3557", padding: "12px 20px", fontWeight: 500, fontSize: "13px", textDecoration: "none", textAlign: "center", fontFamily: "'DM Sans', sans-serif" }}>
                       Log In
                     </Link>
                   </div>

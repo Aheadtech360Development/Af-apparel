@@ -76,7 +76,7 @@ export default function PrivacyPolicyPage() {
           {active === "shipping" && (
             <div>
               <h2 style={sectionStyle}>Shipping</h2>
-              <p style={bodyStyle}>Orders placed before 1:00PM CT ship the same day from our Dallas, TX warehouse.</p>
+              <p style={bodyStyle}>Orders placed before 12:00PM CT ship the same day from our Dallas, TX warehouse.</p>
               <p style={bodyStyle}>We ship via USPS, UPS, FedEx, or OnTrac ground. If you have your own UPS or FedEx account number, include it when ordering and we will use it.</p>
               <p style={bodyStyle}>Free shipping on orders $300 and above.</p>
               <p style={bodyStyle}>Shipping rates are calculated at checkout based on weight and destination.</p>
@@ -84,7 +84,7 @@ export default function PrivacyPolicyPage() {
               <h2 style={sectionStyle}>Will Call (Local Pickup)</h2>
               <p style={bodyStyle}>Available Monday–Friday, 8:30AM–4:30PM CT from our Dallas warehouse.</p>
               <p style={bodyStyle}>Allow at least 3 hours from when you place the order before coming in.</p>
-              <p style={bodyStyle}>Cutoff for same-day pickup is 1:00PM CT. Orders placed after that may not be ready until the next business day.</p>
+              <p style={bodyStyle}>Cutoff for same-day pickup is 12:00PM CT. Orders placed after that may not be ready until the next business day.</p>
               <p style={bodyStyle}>Wait for your &lsquo;Ready for Pickup&rsquo; email before coming in.</p>
               <p style={bodyStyle}>We can hold will call orders for 5 business days. After that, items may be restocked and a 10% restocking fee applies.</p>
 
@@ -143,7 +143,7 @@ export default function PrivacyPolicyPage() {
               <p style={bodyStyle}>We do not have any minimum order quantities on standard in-stock items.</p>
 
               <h2 style={sectionStyle}>Order Processing</h2>
-              <p style={bodyStyle}>Most orders placed before 1:00PM CT are completed same day. If you need an order rushed, email info@afblanks.com or call 469-367-9753.</p>
+              <p style={bodyStyle}>Most orders placed before 12:00PM CT are completed same day. If you need an order rushed, email info@afblanks.com or call 469-367-9753.</p>
 
               <h2 style={sectionStyle}>Wholesale Accounts</h2>
               <p style={bodyStyle}>All wholesale accounts are for business-to-business use only. You must hold a valid resale certificate to maintain a wholesale account. We reserve the right to approve, suspend, or close any account at our discretion.</p>

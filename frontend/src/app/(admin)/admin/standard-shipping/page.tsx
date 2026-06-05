@@ -317,7 +317,7 @@ export default function StandardShippingPage() {
                     <label style={labelStyle}>Order Cutoff Time</label>
                     <input
                       value={cutoffTime} onChange={e => setCutoffTime(e.target.value)}
-                      placeholder="e.g. 2PM CT" style={{ ...inputStyle, width: "130px" }}
+                      placeholder="e.g. 12PM CT" style={{ ...inputStyle, width: "130px" }}
                     />
                     <div style={{ fontSize: "11px", color: "#aaa", marginTop: "4px" }}>Shown to customers at checkout.</div>
                   </div>

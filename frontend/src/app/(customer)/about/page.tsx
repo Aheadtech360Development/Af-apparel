@@ -40,7 +40,7 @@ export default function AboutPage() {
               { n: "2,000+", l: "Wholesale Accounts" },
               { n: "15", l: "Years in Business" },
               { n: "Dallas, TX", l: "Warehouse & HQ" },
-              { n: "Same-Day", l: "Fulfillment by 2PM CT" },
+              { n: "Same-Day", l: "Fulfillment by 12PM CT" },
             ].map((s, i) => (
               <div key={s.l} style={{ textAlign: "center", padding: "12px 24px", borderLeft: i > 0 ? "1px solid #E2E2DE" : "none" }}>
                 <div style={{ fontFamily: "'Fraunces', serif", fontSize: "22px", fontWeight: 700, color: "#1A1A1A", lineHeight: 1, marginBottom: "4px" }}>{s.n}</div>
