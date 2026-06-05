@@ -87,7 +87,7 @@ export function Header() {
 
   const navLinkStyle: React.CSSProperties = {
     color: "#1C3557",
-    fontSize: "20px",
+    fontSize: "18px",
     fontWeight: 500,
     textDecoration: "none",
     letterSpacing: ".01em",
@@ -106,7 +106,7 @@ export function Header() {
 
           {/* Logo */}
           <Link href="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
-            <Image src="/Af-apparel logo.png" alt="AF Blanks" height={52} width={60} className="af-logo" style={{ objectFit: "contain", display: "block" }} />
+            <Image src="/Af-apparel logo.png" alt="AF Blanks" height={52} width={75} className="af-logo" style={{ objectFit: "contain", display: "block" }} />
           </Link>
 
           {/* Desktop Nav */}
@@ -118,7 +118,7 @@ export function Header() {
               { href: "/products", label: "New" },
             ] as { href: string; label: string }[]).map(({ href, label }) => (
               <Link key={label} href={href} style={navLinkStyle}
-                onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#E8242A"; }}
+                onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#1c3557"; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#1C3557"; }}>
                 {label}
               </Link>
@@ -129,7 +129,7 @@ export function Header() {
               <button
                 onClick={() => setResourcesOpen(o => !o)}
                 style={{ ...navLinkStyle, background: "transparent", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px" } as React.CSSProperties}
-                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = "#E8242A"; }}
+                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = "#1c3557"; }}
                 onMouseLeave={e => { if (!resourcesOpen) { (e.currentTarget as HTMLButtonElement).style.color = "#1C3557"; } }}
               >
                 Resources
@@ -144,7 +144,7 @@ export function Header() {
                       key={href}
                       href={href}
                       onClick={() => setResourcesOpen(false)}
-                      style={{ display: "block", padding: "9px 12px", color: "#1C3557", fontSize: "20px", fontWeight: 500, textDecoration: "none", fontFamily: "'DM Sans', sans-serif", transition: "background .15s" }}
+                      style={{ display: "block", padding: "9px 12px", color: "#1C3557", fontSize: "18px", fontWeight: 500, textDecoration: "none", fontFamily: "'DM Sans', sans-serif", transition: "background .15s" }}
                       onMouseEnter={e => (e.currentTarget.style.background = "#F8F8F6")}
                       onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                     >
@@ -158,7 +158,7 @@ export function Header() {
             {/* Admin link */}
             {isAdmin() && (
               <Link href="/admin/dashboard" style={navLinkStyle}
-                onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#E8242A"; }}
+                onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#1c3557"; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#1C3557"; }}>
                 Admin Panel
               </Link>
@@ -168,12 +168,12 @@ export function Header() {
             {isAuthenticated() && !isAdmin() && (
               <>
                 <Link href="/quick-order" style={navLinkStyle}
-                  onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#E8242A"; }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#1c3557"; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#1C3557"; }}>
                   Quick Order
                 </Link>
                 <Link href="/account" style={navLinkStyle}
-                  onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#E8242A"; }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#1c3557"; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#1C3557"; }}>
                   My Account
                 </Link>
@@ -198,23 +198,23 @@ export function Header() {
             <div className="hidden md:flex" style={{ gap: "8px", alignItems: "center" }}>
               {isAuthenticated() ? (
                 <>
-                  <span style={{ fontSize: "20px", color: "#1C3557", fontFamily: "'DM Sans', sans-serif" }}>
+                  <span style={{ fontSize: "18px", color: "#1C3557", fontFamily: "'DM Sans', sans-serif" }}>
                     {user?.first_name}
                     {isAdmin() && <span style={{ marginLeft: "6px", fontSize: "10px", background: "rgba(28,53,87,.1)", color: "#1C3557", padding: "2px 8px", fontWeight: 600 }}>Admin</span>}
                   </span>
                   <button
                     onClick={handleLogout}
-                    style={{ background: "transparent", color: "#1C3557", padding: "8px 16px", fontSize: "20px", border: "1px solid #1C3557", cursor: "pointer", fontWeight: 500, transition: "all .2s", fontFamily: "'DM Sans', sans-serif" }}
+                    style={{ background: "transparent", color: "#1C3557", padding: "8px 16px", fontSize: "18px", border: "1px solid #1C3557", cursor: "pointer", fontWeight: 500, transition: "all .2s", fontFamily: "'DM Sans', sans-serif" }}
                   >
                     Sign out
                   </button>
                 </>
               ) : (
                 <>
-                  <Link href="/login" style={{ background: "transparent", color: "#1C3557", padding: "8px 16px", fontSize: "20px", border: "1px solid #1C3557", fontWeight: 500, textDecoration: "none", transition: "all .2s", fontFamily: "'DM Sans', sans-serif" }}>
+                  <Link href="/login" style={{ background: "transparent", color: "#1C3557", padding: "8px 16px", fontSize: "18px", border: "1px solid #1C3557", fontWeight: 500, textDecoration: "none", transition: "all .2s", fontFamily: "'DM Sans', sans-serif" }}>
                     Log In
                   </Link>
-                  <Link href="/wholesale/register" style={{ background: "#1C3557", color: "#fff", padding: "8px 18px", fontSize: "20px", fontWeight: 500, textDecoration: "none", transition: "all .2s", fontFamily: "'DM Sans', sans-serif" }}>
+                  <Link href="/wholesale/register" style={{ background: "#1C3557", color: "#fff", padding: "8px 18px", fontSize: "18px", fontWeight: 500, textDecoration: "none", transition: "all .2s", fontFamily: "'DM Sans', sans-serif" }}>
                     Apply Now
                   </Link>
                 </>
@@ -260,7 +260,7 @@ export function Header() {
               <Image src="/Af-apparel logo.png" alt="AF Blanks" height={40} width={60} style={{ objectFit: "contain" }} />
               <button
                 onClick={() => setMenuOpen(false)}
-                style={{ background: "none", border: "none", cursor: "pointer", color: "#6B6B6B", fontSize: "20px", lineHeight: 1, padding: "4px" }}
+                style={{ background: "none", border: "none", cursor: "pointer", color: "#6B6B6B", fontSize: "13px", lineHeight: 1, padding: "4px" }}
               >
                 ✕
               </button>
@@ -303,17 +303,17 @@ export function Header() {
                     Cart {cartCount > 0 && `(${cartCount})`}
                   </Link>
                   <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "10px" }}>
-                    <Link href="/wholesale/register" onClick={() => setMenuOpen(false)} style={{ display: "block", background: "#1C3557", color: "#fff", padding: "12px 20px", fontWeight: 500, fontSize: "20px", textDecoration: "none", textAlign: "center", fontFamily: "'DM Sans', sans-serif" }}>
+                    <Link href="/wholesale/register" onClick={() => setMenuOpen(false)} style={{ display: "block", background: "#1C3557", color: "#fff", padding: "12px 20px", fontWeight: 500, fontSize: "18px", textDecoration: "none", textAlign: "center", fontFamily: "'DM Sans', sans-serif" }}>
                       Apply for Wholesale Account
                     </Link>
-                    <Link href="/login" onClick={() => setMenuOpen(false)} style={{ display: "block", background: "transparent", color: "#1C3557", border: "1px solid #1C3557", padding: "12px 20px", fontWeight: 500, fontSize: "20px", textDecoration: "none", textAlign: "center", fontFamily: "'DM Sans', sans-serif" }}>
+                    <Link href="/login" onClick={() => setMenuOpen(false)} style={{ display: "block", background: "transparent", color: "#1C3557", border: "1px solid #1C3557", padding: "12px 20px", fontWeight: 500, fontSize: "18px", textDecoration: "none", textAlign: "center", fontFamily: "'DM Sans', sans-serif" }}>
                       Log In
                     </Link>
                   </div>
                 </>
               )}
               {isAuthenticated() && (
-                <button onClick={handleLogout} style={{ marginTop: "20px", display: "block", width: "100%", textAlign: "center", padding: "12px", color: "#1C3557", fontSize: "20px", fontWeight: 500, background: "transparent", border: "1px solid #E2E2DE", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>
+                <button onClick={handleLogout} style={{ marginTop: "20px", display: "block", width: "100%", textAlign: "center", padding: "12px", color: "#1C3557", fontSize: "18px", fontWeight: 500, background: "transparent", border: "1px solid #E2E2DE", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>
                   Sign Out
                 </button>
               )}
