@@ -37,7 +37,7 @@ export default function CategoryGrid({ categories }: CategoryGridProps) {
               onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "#1C3557"; }}
               onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "#E2E2DE"; }}
             >
-              <div style={{ height: "240px", display: "flex", alignItems: "center", justifyContent: "center", background: "#F8F8F6", position: "relative", overflow: "hidden" }}>
+              <div style={{ height: "550px", display: "flex", alignItems: "center", justifyContent: "center", background: "#F8F8F6", position: "relative", overflow: "hidden" }}>
                 {(cat as { image_url?: string | null }).image_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
