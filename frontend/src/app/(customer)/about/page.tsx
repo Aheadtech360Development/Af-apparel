@@ -52,7 +52,7 @@ export default function AboutPage() {
       </div>
 
       {/* OUR STORY */}
-      <div style={{ background: "#F8F8F6", padding: "72px 24px" }}>
+      <div style={{ background: "#F8F8F6", padding: "72px 24px", maxWidth: "1500px", margin: "0 auto" }}>
         <div style={{ margin: "0 auto" }}>
           <div className="about-story-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "48px", alignItems: "flex-start" }}>
             <div>
