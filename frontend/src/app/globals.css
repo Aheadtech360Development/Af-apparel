@@ -117,6 +117,7 @@
   .steps-grid-responsive { grid-template-columns: 1fr 1fr !important; }
   .serve-grid-responsive { grid-template-columns: repeat(2,1fr) !important; }
   .why-grid-responsive { grid-template-columns: 1fr !important; gap: 32px !important; }
+  .pl-img-wrap img { height: 240px !important; }
   .cert-grid-responsive { grid-template-columns: repeat(2,1fr) !important; }
   .footer-grid-responsive { grid-template-columns: 1fr 1fr !important; gap: 24px !important; }
 }

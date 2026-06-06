@@ -27,7 +27,7 @@ export default function CategoryGrid({ categories }: CategoryGridProps) {
   return (
     <section style={{ padding: "72px 24px", background: "#F8F8F6" }}>
       <div style={{ maxWidth: "1500px", margin: "0 auto" }}>
-        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.12em", color: "#6B6B6B", marginBottom: "20px" }}>
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", textTransform: "uppercase", letterSpacing: "0.12em", color: "#6B6B6B", marginBottom: "20px", textAlign: "center" }}>
           Shop by Category
         </p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "16px" }} className="cat-grid-responsive">

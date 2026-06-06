@@ -94,6 +94,7 @@ export default function CheckoutAddressPage() {
   const [cartItemsForShipping, setCartItemsForShipping] = useState<Array<{ variant_id: string; quantity: number }>>([]);
   const [cartDisplayItems, setCartDisplayItems] = useState<Array<{ name: string; color: string | null; size: string | null; qty: number; lineTotal: number; imageUrl?: string | null }>>([]);
   const ratesDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const streetInputRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState({
     company: companyName || "",
@@ -314,6 +315,48 @@ export default function CheckoutAddressPage() {
         setTaxInfo(null, 0, 0);
       });
   }, [activeState, activeZip, subtotal, selectedAddressId, couponDiscount]);
+
+  // Google Places autocomplete — fills City, State, ZIP from street selection
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const w = window as typeof window & { google?: { maps?: { places?: unknown; event?: { clearInstanceListeners: (t: unknown) => void } } } };
+    if (!w.google?.maps?.places) return;
+    if (!streetInputRef.current) return;
+    const gm = w.google.maps as any;
+    const autocomplete = new gm.places.Autocomplete(streetInputRef.current, {
+      componentRestrictions: { country: "us" },
+      fields: ["address_components"],
+      types: ["address"],
+    });
+    const listener = autocomplete.addListener("place_changed", () => {
+      const place = autocomplete.getPlace();
+      if (!place?.address_components) return;
+      let streetNumber = "";
+      let streetName = "";
+      let city = "";
+      let state = "";
+      let zip = "";
+      for (const c of place.address_components) {
+        if (c.types.includes("street_number")) streetNumber = c.long_name;
+        if (c.types.includes("route")) streetName = c.long_name;
+        if (c.types.includes("locality")) city = c.long_name;
+        if (c.types.includes("administrative_area_level_1")) state = c.short_name;
+        if (c.types.includes("postal_code")) zip = c.long_name;
+      }
+      setForm(prev => ({
+        ...prev,
+        street: `${streetNumber} ${streetName}`.trim() || prev.street,
+        city: city || prev.city,
+        state: state || prev.state,
+        zip: zip || prev.zip,
+      }));
+    });
+    return () => {
+      w.google?.maps?.event?.clearInstanceListeners(autocomplete);
+      if (listener && gm.event) gm.event.removeListener(listener);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showNewForm]);
 
   const taxableBase = Math.max(0, subtotal - couponDiscount); // shipping not taxed
   const taxAmount = apiTaxAmount > 0 ? apiTaxAmount : (taxRate ? Math.round(taxableBase * taxRate.rate / 100 * 100) / 100 : 0);
@@ -572,6 +615,7 @@ export default function CheckoutAddressPage() {
                   <div style={{ gridColumn: "1 / -1" }}>
                     <label style={lbl}>Street Address <span style={{ color: "#E8242A" }}>*</span></label>
                     <input
+                      ref={streetInputRef}
                       style={{ ...inp, borderColor: errors.street ? "#E8242A" : "#E2E2DE" }}
                       value={form.street}
                       onChange={e => setForm(p => ({ ...p, street: e.target.value }))}

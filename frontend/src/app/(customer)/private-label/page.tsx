@@ -41,8 +41,13 @@ export default function PrivateLabelPage() {
       <div style={{ background: "#F8F8F6", padding: "64px 24px", borderBottom: "1px solid #E2E2DE" }}>
         <div style={{ maxWidth: "1500px", margin: "0 auto" }}>
           <div className="why-grid-responsive" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "64px", alignItems: "center" }}>
-            <div style={{ height: "360px", background: "#E2E2DE", border: "1px dashed #ccc", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#6B6B6B" }}>Private Label Samples</span>
+            <div className="pl-img-wrap" style={{ overflow: "hidden" }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/Private Lable.webp"
+                alt="Private Label Samples"
+                style={{ width: "100%", height: "360px", objectFit: "cover", display: "block" }}
+              />
             </div>
             <div>
               <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: "32px", fontWeight: 600, color: "#1A1A1A", marginBottom: "16px", lineHeight: 1.2 }}>

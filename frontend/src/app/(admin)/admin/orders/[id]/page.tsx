@@ -229,7 +229,6 @@ export default function AdminOrderDetailPage() {
 
   const [isVerifyingAch, setIsVerifyingAch] = useState(false);
   const [isResendingInvoice, setIsResendingInvoice] = useState(false);
-  const [paymentTerms, setPaymentTerms] = useState('net_30');
   const [isMarkingPaid, setIsMarkingPaid] = useState(false);
 
   // Notes state
@@ -261,7 +260,6 @@ export default function AdminOrderDetailPage() {
         if (o.courier) setSelectedCourier(o.courier);
         if (o.courier_service) setSelectedService(o.courier_service);
         if (o.tracking_number) setTrackingNumber(o.tracking_number);
-        if (o.payment_terms) setPaymentTerms(o.payment_terms);
         const _cMap: Record<string, string> = { USPS: "usps", UPS: "ups", FedEx: "fedex" };
         if (o.tracking_number && o.label_url) {
           setLabelResult({
@@ -309,7 +307,7 @@ export default function AdminOrderDetailPage() {
     e.preventDefault();
     setIsSaving(true); setMsg(null);
     try {
-      await adminService.updateOrder(order?.id ?? id, { status, payment_terms: paymentTerms });
+      await adminService.updateOrder(order?.id ?? id, { status });
       setMsg({ text: "Order updated successfully.", ok: true });
       setOrder(prev => prev ? { ...prev, status, tracking_number: tracking || null } : prev);
     } catch {
@@ -412,7 +410,7 @@ export default function AdminOrderDetailPage() {
   async function handleResendInvoice() {
     setIsResendingInvoice(true); setMsg(null);
     try {
-      await apiClient.post(`/api/v1/admin/orders/${order?.id ?? id}/send-invoice`, { payment_terms: paymentTerms });
+      await apiClient.post(`/api/v1/admin/orders/${order?.id ?? id}/send-invoice`, {});
       setMsg({ text: "Invoice emailed to customer.", ok: true });
       setOrder(prev => prev ? { ...prev, invoice_sent_at: new Date().toISOString() } : prev);
     } catch {
@@ -717,15 +715,6 @@ export default function AdminOrderDetailPage() {
                   {getAvailableStatuses(order.status).filter(s => !(s === "shipped" && order.shipping_method === "will_call")).map(s => (
                     <option key={s} value={s}>{STATUS_LABEL[s] ?? s}</option>
                   ))}
-                </select>
-              </div>
-              <div>
-                <label style={LabelStyle}>Payment Terms</label>
-                <select value={paymentTerms} onChange={e => setPaymentTerms(e.target.value)}
-                  style={{ padding: "10px 14px", border: "1.5px solid #E2E0DA", borderRadius: "6px", fontSize: "14px", fontFamily: "var(--font-jakarta)", background: "#fff" }}>
-                  <option value="net_30">Net 30</option>
-                  <option value="net_15">Net 15</option>
-                  <option value="due_on_receipt">Due on Receipt</option>
                 </select>
               </div>
               {/* Tracking is managed via Shipping & Courier section above */}

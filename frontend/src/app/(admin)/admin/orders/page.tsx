@@ -161,7 +161,6 @@ export default function AdminOrdersPage() {
               <th className="text-left px-4 py-3 text-gray-600 font-medium">Order #</th>
               <th className="text-left px-4 py-3 text-gray-600 font-medium">Company</th>
               <th className="text-left px-4 py-3 text-gray-600 font-medium">Status</th>
-              <th className="text-left px-4 py-3 text-gray-600 font-medium">PO #</th>
               <th className="text-right px-4 py-3 text-gray-600 font-medium">Total</th>
               <th className="text-left px-4 py-3 text-gray-600 font-medium">Date</th>
               <th className="px-4 py-3" />
@@ -169,9 +168,9 @@ export default function AdminOrdersPage() {
           </thead>
           <tbody>
             {isLoading && orders.length === 0 ? (
-              <tr><td colSpan={7} style={{ padding: "40px", textAlign: "center", color: "#bbb", fontSize: "14px" }}>Loading…</td></tr>
+              <tr><td colSpan={6} style={{ padding: "40px", textAlign: "center", color: "#bbb", fontSize: "14px" }}>Loading…</td></tr>
             ) : orders.length === 0 ? (
-              <tr><td colSpan={7} className="py-8 text-center text-gray-400">No orders found</td></tr>
+              <tr><td colSpan={6} className="py-8 text-center text-gray-400">No orders found</td></tr>
             ) : orders.map((o) => (
               <tr key={o.id} className="border-b border-gray-100 last:border-0 hover:bg-gray-50">
                 <td className="px-4 py-3 font-mono text-xs font-medium text-gray-800">
@@ -191,7 +190,6 @@ export default function AdminOrdersPage() {
                     {o.status}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-gray-500">{o.po_number ?? "—"}</td>
                 <td className="px-4 py-3 text-right text-gray-700 font-medium">${Number(o.total).toFixed(2)}</td>
                 <td className="px-4 py-3 text-gray-500">{new Date(o.created_at).toLocaleDateString()}</td>
                 <td className="px-4 py-3">
