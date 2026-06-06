@@ -44,7 +44,7 @@ export default function PrivateLabelPage() {
             <div className="pl-img-wrap" style={{ overflow: "hidden" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/Private Lable.webp"
+                src="/Private-label.png"
                 alt="Private Label Samples"
                 style={{ width: "100%", height: "360px", objectFit: "cover", display: "block" }}
               />
