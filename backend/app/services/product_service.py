@@ -108,12 +108,19 @@ class ProductService:
                 ProductVariant.status == "active",
             )
         if params.gender:
-            if params.gender in ("Men's", "Women's"):
+            _GENDER_NORM = {
+                "mens": "Men's", "men": "Men's",
+                "womens": "Women's", "women": "Women's",
+                "youth": "Youth", "kids": "Youth",
+                "unisex": "Unisex",
+            }
+            normalized_gender = _GENDER_NORM.get(params.gender.lower().replace("'", ""), params.gender)
+            if normalized_gender in ("Men's", "Women's"):
                 query = query.where(
-                    or_(Product.gender == params.gender, Product.gender == "Unisex")
+                    or_(Product.gender == normalized_gender, Product.gender == "Unisex")
                 )
             else:
-                query = query.where(Product.gender == params.gender)
+                query = query.where(Product.gender == normalized_gender)
 
         if params.fabric:
             query = query.where(Product.fabric.ilike(f"%{params.fabric}%"))

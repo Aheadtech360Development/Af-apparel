@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { apiClient } from "@/lib/api-client";
 import { useAuthStore } from "@/stores/auth.store";
+import { useAddressAutocomplete } from "@/hooks/useAddressAutocomplete";
 
 interface Address {
   id: string;
@@ -173,6 +174,17 @@ export default function AddressBookPage() {
     }
   }
 
+  const handleAddressAutofill = useCallback((addr: { street: string; city: string; state: string; zipCode: string }) => {
+    setForm(prev => ({
+      ...prev,
+      line1: addr.street || prev.line1,
+      city: addr.city || prev.city,
+      state: addr.state || prev.state,
+      postal_code: addr.zipCode || prev.postal_code,
+    }));
+  }, []);
+  const streetInputRef = useAddressAutocomplete(handleAddressAutofill);
+
   if (loading && !message) return <div className="py-12 text-center text-gray-400">Loading...</div>;
 
   return (
@@ -244,6 +256,7 @@ export default function AddressBookPage() {
               Address Line 1 <span className="text-red-500">*</span>
             </label>
             <input
+              ref={streetInputRef}
               type="text"
               value={form.line1}
               onChange={(e) => setForm((p) => ({ ...p, line1: e.target.value }))}

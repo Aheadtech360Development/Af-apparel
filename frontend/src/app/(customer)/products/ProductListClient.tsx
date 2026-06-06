@@ -82,6 +82,7 @@ export function ProductListClient({
   const currentPriceMin = searchParams.get("price_min") ?? "";
   const currentPriceMax = searchParams.get("price_max") ?? "";
   const currentProductCode = searchParams.get("product_code") ?? "";
+  const currentQ = searchParams.get("q") ?? "";
 
   // Client-side product state — initialized from SSR data (guest prices),
   // re-fetched with auth token on every navigation so wholesale prices appear.
@@ -108,12 +109,14 @@ export function ProductListClient({
     if (currentInStock) params.in_stock = currentInStock;
     if (currentPriceMin) params.price_min = currentPriceMin;
     if (currentPriceMax) params.price_max = currentPriceMax;
+    if (currentProductCode) params.product_code = currentProductCode;
+    if (currentQ) params.q = currentQ;
     const qs = new URLSearchParams({ ...params, page_size: "24" }).toString();
     apiClient.get<{ items: ProductListItem[] }>(`/api/v1/products?${qs}`)
       .then((res) => { if (!cancelled && res?.items?.length) setProducts(res.items); })
       .catch(() => { });
     return () => { cancelled = true; };
-  }, [isAuthenticated, currentCategory, currentSize, currentColor, currentGender, currentInStock, currentPriceMin, currentPriceMax]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, currentCategory, currentSize, currentColor, currentGender, currentInStock, currentPriceMin, currentPriceMax, currentProductCode, currentQ]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Filter drawer state (mobile)
   const [filterOpen, setFilterOpen] = useState(false);
@@ -247,10 +250,10 @@ export function ProductListClient({
       <div style={filterGroupStyle}>
         <h4 style={filterHeaderStyle}>Gender</h4>
         {[
-          { label: "Men's", value: "mens" },
-          { label: "Women's", value: "womens" },
-          { label: "Youth", value: "youth" },
-          { label: "Unisex", value: "unisex" },
+          { label: "Men's", value: "Men's" },
+          { label: "Women's", value: "Women's" },
+          { label: "Youth", value: "Youth" },
+          { label: "Unisex", value: "Unisex" },
         ].map(g => (
           <label key={g.value} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: "#1A1A1A", marginBottom: "8px", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>
             <input
