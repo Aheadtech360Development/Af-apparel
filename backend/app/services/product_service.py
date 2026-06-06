@@ -109,10 +109,10 @@ class ProductService:
             )
         if params.gender:
             _GENDER_NORM = {
-                "mens": "Men's", "men": "Men's",
-                "womens": "Women's", "women": "Women's",
-                "youth": "Youth", "kids": "Youth",
-                "unisex": "Unisex",
+                "mens": "mens", "men": "men",
+                "womens": "womens", "women": "women",
+                "youth": "youth", "kids": "kids",
+                "unisex": "unisex",
             }
             normalized_gender = _GENDER_NORM.get(params.gender.lower().replace("'", ""), params.gender)
             if normalized_gender in ("Men's", "Women's"):
