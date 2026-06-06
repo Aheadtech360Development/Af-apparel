@@ -36,11 +36,11 @@ interface ProductBlock {
   // Existing product
   product_id: string | null;
   product_name: string;
+  search_variant_rows: VariantRow[];   // loaded from selected product
   // New product
   new_product_name: string;
   new_sku_prefix: string;
-  // Variants
-  variant_rows: VariantRow[];
+  new_variant_rows: VariantRow[];      // manually added
   // Search state
   search_query: string;
   search_results: SearchProduct[];
@@ -66,9 +66,10 @@ function blankBlock(): ProductBlock {
     mode: "existing",
     product_id: null,
     product_name: "",
+    search_variant_rows: [],
     new_product_name: "",
     new_sku_prefix: "",
-    variant_rows: [],
+    new_variant_rows: [],
     search_query: "",
     search_results: [],
     loading_variants: false,
@@ -120,34 +121,42 @@ export default function CreatePOPage() {
     setBlocks(bs => bs.filter(b => b.key !== key));
   }
 
+  function activeRows(b: ProductBlock) {
+    return b.mode === "existing" ? b.search_variant_rows : b.new_variant_rows;
+  }
+
+  function setActiveRows(b: ProductBlock, rows: VariantRow[]): Partial<ProductBlock> {
+    return b.mode === "existing" ? { search_variant_rows: rows } : { new_variant_rows: rows };
+  }
+
   function updateRow(blockKey: number, rowKey: number, patch: Partial<VariantRow>) {
-    setBlocks(bs => bs.map(b => b.key === blockKey
-      ? { ...b, variant_rows: b.variant_rows.map(r => r.key === rowKey ? { ...r, ...patch } : r) }
-      : b
-    ));
+    setBlocks(bs => bs.map(b => {
+      if (b.key !== blockKey) return b;
+      return { ...b, ...setActiveRows(b, activeRows(b).map(r => r.key === rowKey ? { ...r, ...patch } : r)) };
+    }));
   }
 
   function removeRow(blockKey: number, rowKey: number) {
-    setBlocks(bs => bs.map(b => b.key === blockKey
-      ? { ...b, variant_rows: b.variant_rows.filter(r => r.key !== rowKey) }
-      : b
-    ));
+    setBlocks(bs => bs.map(b => {
+      if (b.key !== blockKey) return b;
+      return { ...b, ...setActiveRows(b, activeRows(b).filter(r => r.key !== rowKey)) };
+    }));
   }
 
   function addNewVariantRow(blockKey: number) {
-    const block = blocks.find(b => b.key === blockKey);
-    const defaultCost = block?.variant_rows.find(r => r.unit_cost_expected > 0)?.unit_cost_expected ?? 0;
-    setBlocks(bs => bs.map(b => b.key === blockKey
-      ? { ...b, variant_rows: [...b.variant_rows, blankRow({ unit_cost_expected: defaultCost })] }
-      : b
-    ));
+    setBlocks(bs => bs.map(b => {
+      if (b.key !== blockKey) return b;
+      const rows = activeRows(b);
+      const defaultCost = rows.find(r => r.unit_cost_expected > 0)?.unit_cost_expected ?? 0;
+      return { ...b, ...setActiveRows(b, [...rows, blankRow({ unit_cost_expected: defaultCost })]) };
+    }));
   }
 
   function applyCostToAll(blockKey: number, cost: number) {
-    setBlocks(bs => bs.map(b => b.key === blockKey
-      ? { ...b, variant_rows: b.variant_rows.map(r => ({ ...r, unit_cost_expected: cost })) }
-      : b
-    ));
+    setBlocks(bs => bs.map(b => {
+      if (b.key !== blockKey) return b;
+      return { ...b, ...setActiveRows(b, activeRows(b).map(r => ({ ...r, unit_cost_expected: cost }))) };
+    }));
   }
 
   // ── Product search & variant load ────────────────────────────────────────────
@@ -157,7 +166,7 @@ export default function CreatePOPage() {
   const searchProducts = useCallback((blockKey: number, q: string) => {
     updateBlock(blockKey, { search_query: q, search_results: [] });
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
-    if (q.length < 2) return;
+    if (q.length < 1) return;
     searchTimerRef.current = setTimeout(async () => {
       try {
         const data = await apiClient.get<SearchProduct[]>(
@@ -178,7 +187,7 @@ export default function CreatePOPage() {
       product_id: product.id,
       product_name: product.name,
       loading_variants: true,
-      variant_rows: [],
+      search_variant_rows: [],
     });
     try {
       const detail = await apiClient.get<{ variants: FullVariant[] }>(
@@ -195,7 +204,7 @@ export default function CreatePOPage() {
           unit_cost_expected: parseFloat(v.cost_per_item ?? "0") || 0,
           is_new_variant: false,
         }));
-      updateBlock(blockKey, { variant_rows: rows, loading_variants: false });
+      updateBlock(blockKey, { search_variant_rows: rows, loading_variants: false });
     } catch {
       updateBlock(blockKey, { loading_variants: false });
     }
@@ -217,8 +226,8 @@ export default function CreatePOPage() {
   function buildLineItems() {
     const items: object[] = [];
     for (const block of blocks) {
-      const activeRows = block.variant_rows.filter(r => r.qty_ordered > 0);
-      for (const row of activeRows) {
+      const rows = (block.mode === "existing" ? block.search_variant_rows : block.new_variant_rows).filter(r => r.qty_ordered > 0);
+      for (const row of rows) {
         if (block.mode === "existing" && !row.is_new_variant && row.variant_id) {
           items.push({
             product_variant_id: row.variant_id,
@@ -266,7 +275,8 @@ export default function CreatePOPage() {
         );
         return;
       }
-      const hasQty = block.variant_rows.some(r => r.qty_ordered > 0);
+      const rows = block.mode === "existing" ? block.search_variant_rows : block.new_variant_rows;
+    const hasQty = rows.some(r => r.qty_ordered > 0);
       if (!hasQty) {
         const label = block.mode === "new" ? (block.new_product_name || "a product") : block.product_name;
         setStepError(`Please enter at least one quantity for "${label}".`);
@@ -334,14 +344,16 @@ export default function CreatePOPage() {
 
   // ── Running total ─────────────────────────────────────────────────────────────
 
-  const total = blocks.reduce((sum, b) =>
-    sum + b.variant_rows.reduce((s, r) => s + r.qty_ordered * r.unit_cost_expected, 0), 0
-  );
+  const total = blocks.reduce((sum, b) => {
+    const rows = b.mode === "existing" ? b.search_variant_rows : b.new_variant_rows;
+    return sum + rows.reduce((s, r) => s + r.qty_ordered * r.unit_cost_expected, 0);
+  }, 0);
 
   const reviewRows: Array<{ productLabel: string; color: string; size: string; qty: number; cost: number }> = [];
   for (const block of blocks) {
     const productLabel = block.mode === "new" ? (block.new_product_name || "Unnamed product") : (block.product_name || "Unknown product");
-    for (const row of block.variant_rows.filter(r => r.qty_ordered > 0)) {
+    const rows = (block.mode === "existing" ? block.search_variant_rows : block.new_variant_rows).filter(r => r.qty_ordered > 0);
+    for (const row of rows) {
       reviewRows.push({ productLabel, color: row.color, size: row.size, qty: row.qty_ordered, cost: row.unit_cost_expected });
     }
   }
@@ -355,16 +367,17 @@ export default function CreatePOPage() {
         <h1 style={{ fontSize: "22px", fontWeight: 700, color: "#1B3A5C", letterSpacing: ".04em" }}>CREATE PURCHASE ORDER</h1>
       </div>
 
-      {/* Step tabs */}
+      {/* Step tabs — display only, not clickable */}
       <div style={{ display: "flex", gap: "4px", marginBottom: "28px" }}>
         {[1, 2, 3].map(s => (
-          <button key={s} onClick={() => setStep(s)} style={{
-            padding: "8px 20px", borderRadius: "8px", border: "none", cursor: "pointer", fontSize: "13px", fontWeight: 600,
+          <div key={s} style={{
+            padding: "8px 20px", borderRadius: "8px", fontSize: "13px", fontWeight: 600,
+            cursor: "default", pointerEvents: "none", userSelect: "none",
             background: step === s ? "#1B3A5C" : "#F3F4F6",
             color: step === s ? "#fff" : "#6B7280",
           }}>
             Step {s}: {["PO Info", "Line Items", "Review"][s - 1]}
-          </button>
+          </div>
         ))}
       </div>
 
@@ -436,7 +449,7 @@ export default function CreatePOPage() {
 
           {/* Running total */}
           <div style={{ padding: "16px 20px", background: "#F0F4FF", borderRadius: "10px", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-            <span style={{ fontSize: "14px", color: "#374151" }}>Running Total ({blocks.reduce((n, b) => n + b.variant_rows.filter(r => r.qty_ordered > 0).length, 0)} line items):</span>
+            <span style={{ fontSize: "14px", color: "#374151" }}>Running Total ({blocks.reduce((n, b) => n + (b.mode === "existing" ? b.search_variant_rows : b.new_variant_rows).filter(r => r.qty_ordered > 0).length, 0)} line items):</span>
             <span style={{ fontSize: "22px", fontWeight: 700, color: "#1B3A5C" }}>${total.toFixed(2)}</span>
           </div>
 
@@ -533,6 +546,7 @@ function ProductBlockEditor({
   onUpdateRow, onRemoveRow, onAddNewVariant, onApplyCostToAll,
 }: BlockEditorProps) {
   const [applyCostVal, setApplyCostVal] = useState("");
+  const variantRows = block.mode === "existing" ? block.search_variant_rows : block.new_variant_rows;
 
   return (
     <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: "10px", padding: "24px", marginBottom: "16px" }}>
@@ -563,7 +577,7 @@ function ProductBlockEditor({
           {block.product_id ? (
             <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px", padding: "10px 14px", background: "#F0F4FF", borderRadius: "8px" }}>
               <span style={{ flex: 1, fontWeight: 600, fontSize: "14px" }}>{block.product_name}</span>
-              <button onClick={() => onUpdate({ product_id: null, product_name: "", variant_rows: [], search_query: "" })}
+              <button onClick={() => onUpdate({ product_id: null, product_name: "", search_variant_rows: [], search_query: "" })}
                 style={{ background: "none", border: "none", cursor: "pointer", fontSize: "12px", color: "#6B7280" }}>
                 Change product
               </button>
@@ -611,7 +625,7 @@ function ProductBlockEditor({
               placeholder="e.g. 1001 Premium Unisex Tee" style={INPUT} />
           </div>
           <div>
-            <label style={LBL}>Style / SKU Prefix</label>
+            <label style={LBL}>Style Number</label>
             <input value={block.new_sku_prefix} onChange={e => onUpdate({ new_sku_prefix: e.target.value })}
               placeholder="e.g. 1001" style={INPUT} />
           </div>
@@ -619,7 +633,7 @@ function ProductBlockEditor({
       )}
 
       {/* ── Variant table ─────────────────────────────────────────────────── */}
-      {(block.variant_rows.length > 0 || block.mode === "new") && (
+      {(variantRows.length > 0 || block.mode === "new") && (
         <>
           {/* Apply cost to all */}
           <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
@@ -644,7 +658,7 @@ function ProductBlockEditor({
               </tr>
             </thead>
             <tbody>
-              {block.variant_rows.map(row => (
+              {variantRows.map(row => (
                 <tr key={row.key} style={{ borderBottom: "1px solid #F3F4F6" }}>
                   <td style={{ padding: "8px 12px" }}>
                     {row.is_new_variant ? (
@@ -702,7 +716,7 @@ function ProductBlockEditor({
       )}
 
       {/* Prompt to search if no variants yet */}
-      {block.mode === "existing" && !block.product_id && block.variant_rows.length === 0 && (
+      {block.mode === "existing" && !block.product_id && variantRows.length === 0 && (
         <div style={{ padding: "20px", textAlign: "center", color: "#9CA3AF", fontSize: "13px" }}>
           Search and select a product above to see its variants.
         </div>

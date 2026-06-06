@@ -250,10 +250,10 @@ export function ProductListClient({
       <div style={filterGroupStyle}>
         <h4 style={filterHeaderStyle}>Gender</h4>
         {[
-          { label: "Men's", value: "Men's" },
-          { label: "Women's", value: "Women's" },
-          { label: "Youth", value: "Youth" },
-          { label: "Unisex", value: "Unisex" },
+          { label: "Men's", value: "mens" },
+          { label: "Women's", value: "womens" },
+          { label: "Youth", value: "youth" },
+          { label: "Unisex", value: "unisex" },
         ].map(g => (
           <label key={g.value} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: "#1A1A1A", marginBottom: "8px", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>
             <input
