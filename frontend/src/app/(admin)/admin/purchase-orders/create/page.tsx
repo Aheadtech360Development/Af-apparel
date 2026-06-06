@@ -8,7 +8,7 @@ import { apiClient, ApiClientError } from "@/lib/api-client";
 
 interface Manufacturer { id: string; name: string; }
 
-interface SearchProduct { id: string; name: string; slug: string; }
+interface SearchProduct { id: string; name: string; slug: string; product_code?: string | null; }
 
 interface FullVariant {
   id: string;
@@ -103,6 +103,7 @@ export default function CreatePOPage() {
   const [emailSending, setEmailSending] = useState(false);
   const [showNewMfr, setShowNewMfr] = useState(false);
   const [newMfrName, setNewMfrName] = useState("");
+  const [stepError, setStepError] = useState<string | null>(null);
 
   useEffect(() => {
     apiClient.get<Manufacturer[]>("/api/v1/admin/purchase-orders/manufacturers")
@@ -241,6 +242,45 @@ export default function CreatePOPage() {
     return items;
   }
 
+  // ── Step navigation with validation ─────────────────────────────────────────
+
+  function handleStep1Next() {
+    if (!manufacturerId) {
+      setStepError("Please select a manufacturer before continuing.");
+      return;
+    }
+    setStepError(null);
+    setStep(2);
+  }
+
+  function handleStep2Next() {
+    for (const block of blocks) {
+      const hasIdentity = block.mode === "new"
+        ? block.new_product_name.trim() !== ""
+        : block.product_id !== null;
+      if (!hasIdentity) {
+        setStepError(
+          block.mode === "new"
+            ? "Please enter a product name for all products."
+            : "Please select a product for all product blocks."
+        );
+        return;
+      }
+      const hasQty = block.variant_rows.some(r => r.qty_ordered > 0);
+      if (!hasQty) {
+        const label = block.mode === "new" ? (block.new_product_name || "a product") : block.product_name;
+        setStepError(`Please enter at least one quantity for "${label}".`);
+        return;
+      }
+    }
+    if (blocks.length === 0) {
+      setStepError("Add at least one product before continuing.");
+      return;
+    }
+    setStepError(null);
+    setStep(3);
+  }
+
   // ── Save helpers ──────────────────────────────────────────────────────────────
 
   async function savePO(): Promise<{ id: string } | null> {
@@ -338,7 +378,8 @@ export default function CreatePOPage() {
               <select value={manufacturerId} onChange={e => {
                 if (e.target.value === "__new__") { setShowNewMfr(true); return; }
                 setManufacturerId(e.target.value);
-              }} style={SELECT}>
+                if (e.target.value) setStepError(null);
+              }} style={{ ...SELECT, borderColor: stepError && !manufacturerId ? "#EF4444" : "#D1D5DB" }}>
                 <option value="">Select manufacturer…</option>
                 {manufacturers.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
                 <option value="__new__">+ Add New Manufacturer</option>
@@ -360,8 +401,11 @@ export default function CreatePOPage() {
               <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={3} style={{ ...INPUT, resize: "vertical" }} placeholder="Optional notes…" />
             </div>
           </div>
-          <div style={{ marginTop: "24px", display: "flex", justifyContent: "flex-end" }}>
-            <button onClick={() => setStep(2)} style={BTN_PRIMARY}>Next: Add Line Items →</button>
+          {stepError && (
+            <p style={{ color: "#CC0000", fontSize: "13px", marginTop: "12px" }}>{stepError}</p>
+          )}
+          <div style={{ marginTop: "16px", display: "flex", justifyContent: "flex-end" }}>
+            <button onClick={handleStep1Next} style={BTN_PRIMARY}>Next: Add Line Items →</button>
           </div>
         </div>
       )}
@@ -396,9 +440,12 @@ export default function CreatePOPage() {
             <span style={{ fontSize: "22px", fontWeight: 700, color: "#1B3A5C" }}>${total.toFixed(2)}</span>
           </div>
 
+          {stepError && (
+            <p style={{ color: "#CC0000", fontSize: "13px", marginBottom: "12px" }}>{stepError}</p>
+          )}
           <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <button onClick={() => setStep(1)} style={{ ...BTN_SM, background: "#F3F4F6", color: "#374151" }}>← Back</button>
-            <button onClick={() => setStep(3)} style={BTN_PRIMARY}>Next: Review →</button>
+            <button onClick={() => { setStepError(null); setStep(1); }} style={{ ...BTN_SM, background: "#F3F4F6", color: "#374151" }}>← Back</button>
+            <button onClick={handleStep2Next} style={BTN_PRIMARY}>Next: Review →</button>
           </div>
         </div>
       )}
@@ -498,7 +545,7 @@ function ProductBlockEditor({
       {/* Mode toggle */}
       <div style={{ display: "flex", gap: "6px", marginBottom: "16px" }}>
         {(["existing", "new"] as const).map(m => (
-          <button key={m} onClick={() => onUpdate({ mode: m, variant_rows: [], product_id: null, search_query: "", search_results: [] })}
+          <button key={m} onClick={() => onUpdate({ mode: m })}
             style={{
               padding: "6px 16px", borderRadius: "6px", border: "1px solid", fontSize: "12px", fontWeight: 600, cursor: "pointer",
               background: block.mode === m ? "#1B3A5C" : "#fff",
@@ -526,18 +573,21 @@ function ProductBlockEditor({
               <input
                 value={block.search_query}
                 onChange={e => onSearchChange(e.target.value)}
-                placeholder="Search by product name or SKU…"
+                placeholder="Search by product name or product code…"
                 style={INPUT}
               />
               {block.search_results.length > 0 && (
                 <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "#fff", border: "1px solid #E5E7EB", borderRadius: "8px", zIndex: 20, maxHeight: "220px", overflowY: "auto", boxShadow: "0 4px 16px rgba(0,0,0,.12)" }}>
                   {block.search_results.map(p => (
                     <button key={p.id} onClick={() => onSelectProduct(p)}
-                      style={{ display: "block", width: "100%", textAlign: "left", padding: "11px 14px", border: "none", background: "none", cursor: "pointer", fontSize: "13px", borderBottom: "1px solid #F3F4F6" }}
+                      style={{ display: "block", width: "100%", textAlign: "left", padding: "10px 14px", border: "none", background: "none", cursor: "pointer", borderBottom: "1px solid #F3F4F6" }}
                       onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = "#F9FAFB"}
                       onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = "transparent"}
                     >
-                      {p.name}
+                      <div style={{ fontSize: "13px", fontWeight: 500, color: "#111827" }}>{p.name}</div>
+                      {p.product_code && (
+                        <div style={{ fontSize: "11px", color: "#9CA3AF", fontFamily: "'IBM Plex Mono', monospace", marginTop: "2px" }}>{p.product_code}</div>
+                      )}
                     </button>
                   ))}
                 </div>

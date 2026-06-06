@@ -174,8 +174,13 @@ export default function AdminOrdersPage() {
             ) : orders.map((o) => (
               <tr key={o.id} className="border-b border-gray-100 last:border-0 hover:bg-gray-50">
                 <td className="px-4 py-3 font-mono text-xs font-medium text-gray-800">
-                  {o.order_number}
-                  {o.is_guest_order && <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium" style={{ background: '#E8F4FD', color: '#1A6FA8', fontSize: '11px', fontWeight: 600, padding: '2px 8px', borderRadius: '20px' }}>Retail</span>}
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
+                    {o.order_number}
+                    {o.is_guest_order && <span style={{ background: '#E8F4FD', color: '#1A6FA8', fontSize: '11px', fontWeight: 600, padding: '2px 8px', borderRadius: '20px' }}>Retail</span>}
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${STATUS_COLORS[o.status] ?? "bg-gray-100 text-gray-600"}`} style={{ fontSize: "11px" }}>
+                      {o.status}
+                    </span>
+                  </div>
                 </td>
                 <td className="px-4 py-3 text-gray-700">
                   {o.is_guest_order ? (
