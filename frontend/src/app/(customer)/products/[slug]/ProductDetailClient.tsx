@@ -461,6 +461,13 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
     () => Object.values(quantities).reduce((s, q) => s + (q || 0), 0),
     [quantities]
   );
+  const orderTotal = useMemo(
+    () => Object.entries(quantities).reduce((sum, [vid, qty]) => {
+      const v = product?.variants?.find(x => x.id === vid);
+      return sum + (qty || 0) * Number(v?.effective_price ?? v?.retail_price ?? 0);
+    }, 0),
+    [quantities, product?.variants]
+  );
 
   if (productLoading || !product) {
     return (
@@ -477,7 +484,6 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
   const displayColorGroups = showAllColors ? colorGroups : colorGroups.slice(0, 4);
   const filteredGroups = showAllColors ? colorGroups : colorGroups.slice(0, 4);
   const pricePerUnit = Number(primaryVariant?.effective_price ?? primaryVariant?.retail_price ?? 0);
-  const orderTotal = totalUnits * pricePerUnit;
   const anyInStock = (product.variants ?? []).some(v => !isOutOfStock(v.stock_quantity));
 
   // Color-filtered images for gallery: when a swatch is selected, show only that color's images
