@@ -142,6 +142,11 @@ export const accountService = {
     return apiClient.post("/api/v1/account/rma", data);
   },
 
+  // QB Invoices
+  async getInvoices() {
+    return apiClient.get("/api/v1/account/invoices");
+  },
+
   // Inventory report
   async getInventoryReport(params?: { q?: string; stock_level?: string; page?: number }) {
     const qs = new URLSearchParams();

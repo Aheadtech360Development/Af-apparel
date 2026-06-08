@@ -17,6 +17,7 @@ const NAV_ITEMS = [
   { href: "/account/payment-methods", label: "Manage Payment Methods" },
   { href: "/account/orders", label: "Orders Status" },
   { href: "/account/statements", label: "Statements" },
+  { href: "/account/invoices", label: "Invoices" },
   { href: "/account/sales-history", label: "Purchase History" },
   { href: "/account/inventory", label: "Inventory Listing Report" },
   { href: "/account/price-list", label: "Price List" },
