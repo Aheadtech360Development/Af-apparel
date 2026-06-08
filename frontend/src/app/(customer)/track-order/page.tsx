@@ -6,14 +6,14 @@ import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
 import { apiClient } from "@/lib/api-client";
 
-const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  pending: { label: "Order Received", color: "#f59e0b" },
-  confirmed: { label: "Confirmed", color: "#3b82f6" },
-  processing: { label: "Processing", color: "#8b5cf6" },
-  shipped: { label: "Shipped", color: "#059669" },
-  delivered: { label: "Delivered", color: "#059669" },
-  cancelled: { label: "Cancelled", color: "#ef4444" },
-  refunded: { label: "Refunded", color: "#6b7280" },
+const STATUS_LABELS: Record<string, { label: string; bg: string; color: string }> = {
+  pending:    { label: "Order Received", bg: "#fef3c7", color: "#92400e" },
+  confirmed:  { label: "Confirmed",      bg: "#d1fae5", color: "#065f46" },
+  processing: { label: "Processing",     bg: "#dbeafe", color: "#1e40af" },
+  shipped:    { label: "Shipped",        bg: "#ede9fe", color: "#5b21b6" },
+  delivered:  { label: "Delivered",      bg: "#d1fae5", color: "#065f46" },
+  cancelled:  { label: "Cancelled",      bg: "#fee2e2", color: "#991b1b" },
+  refunded:   { label: "Refunded",       bg: "#f3f4f6", color: "#374151" },
 };
 
 interface TrackingItem {
@@ -42,16 +42,6 @@ interface TrackingResult {
   items: TrackingItem[];
 }
 
-const inp: React.CSSProperties = {
-  width: "100%", padding: "11px 14px", border: "1.5px solid #E2E0DA",
-  borderRadius: "8px", fontSize: "14px", fontFamily: "var(--font-jakarta)",
-  outline: "none", boxSizing: "border-box", color: "#2A2830", background: "#fff",
-};
-const lbl: React.CSSProperties = {
-  display: "block", fontSize: "11px", fontWeight: 700, color: "#7A7880",
-  textTransform: "uppercase", letterSpacing: ".06em", marginBottom: "6px",
-};
-
 export default function TrackOrderPage() {
   const [orderNumber, setOrderNumber] = useState("");
   const [email, setEmail] = useState("");
@@ -78,171 +68,226 @@ export default function TrackOrderPage() {
     }
   }
 
-  const statusInfo = result ? (STATUS_LABELS[result.status] ?? { label: result.status, color: "#7A7880" }) : null;
+  const statusInfo = result
+    ? (STATUS_LABELS[result.status] ?? { label: result.status, bg: "#f3f4f6", color: "#374151" })
+    : null;
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F4F3EF", fontFamily: "var(--font-jakarta)" }}>
-      {/* Header */}
-      <div style={{ background: "#1B3A5C", borderBottom: "3px solid #E8242A", padding: "20px 32px 18px" }}>
-        <div style={{ maxWidth: "600px", margin: "0 auto" }}>
-          <div style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".14em", color: "rgba(255,255,255,.5)", marginBottom: "4px" }}>
-            AF Apparels
-          </div>
-          <h1 style={{ fontFamily: "var(--font-bebas)", fontSize: "clamp(24px,4vw,40px)", color: "#fff", letterSpacing: ".03em", lineHeight: 1 }}>
-            Track Your Order
-          </h1>
-        </div>
-      </div>
+    <>
+      <style>{`
+        .to-page { background: #F8F8F6; min-height: 70vh; padding: 64px 24px; font-family: 'DM Sans', sans-serif; }
+        .to-inner { max-width: 600px; margin: 0 auto; }
 
-      <div style={{ maxWidth: "600px", margin: "0 auto", padding: "32px 24px" }}>
-        {/* Lookup form */}
-        <div style={{ background: "#fff", border: "1.5px solid #E2E0DA", borderRadius: "12px", padding: "28px 24px", marginBottom: "20px" }}>
-          <p style={{ fontSize: "14px", color: "#7A7880", marginBottom: "20px", lineHeight: 1.6 }}>
-            Enter your order number and the email address used at checkout to track your order.
-          </p>
-          <form onSubmit={handleTrack}>
-            <div style={{ marginBottom: "16px" }}>
-              <label style={lbl}>Order Number <span style={{ color: "#E8242A" }}>*</span></label>
-              <input
-                style={inp}
-                value={orderNumber}
-                onChange={e => setOrderNumber(e.target.value)}
-                placeholder="AF-000123"
-                required
-              />
-            </div>
-            <div style={{ marginBottom: "20px" }}>
-              <label style={lbl}>Email Address <span style={{ color: "#E8242A" }}>*</span></label>
-              <input
-                type="email"
-                style={inp}
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                required
-              />
-            </div>
-            <button
-              type="submit"
-              disabled={loading || !orderNumber.trim() || !email.trim()}
-              style={{
-                width: "100%", padding: "13px", background: (loading || !orderNumber.trim() || !email.trim()) ? "#E2E0DA" : "#E8242A",
-                color: (loading || !orderNumber.trim() || !email.trim()) ? "#aaa" : "#fff",
-                border: "none", borderRadius: "8px", fontFamily: "var(--font-bebas)",
-                fontSize: "17px", letterSpacing: ".08em",
-                cursor: (loading || !orderNumber.trim() || !email.trim()) ? "not-allowed" : "pointer",
-              }}
-            >
-              {loading ? "Searching…" : "Track Order"}
-            </button>
-          </form>
-        </div>
+        .to-h1 { font-family: 'Fraunces', serif; font-size: 36px; font-weight: 600; color: #1A1A1A; margin: 0 0 8px; line-height: 1.15; }
+        .to-sub { font-size: 15px; color: #6B6B6B; margin: 0 0 32px; }
 
-        {/* Error */}
-        {error && (
-          <div style={{ padding: "14px 18px", borderRadius: "8px", background: "rgba(232,36,42,.07)", border: "1.5px solid rgba(232,36,42,.25)", color: "#E8242A", fontSize: "13px", fontWeight: 600, marginBottom: "20px" }}>
-            {error}
-          </div>
-        )}
+        .to-card { background: #FFFFFF; border: 1px solid #E2E2DE; padding: 28px; margin-bottom: 28px; }
 
-        {/* Result */}
-        {result && statusInfo && (
-          <div style={{ background: "#fff", border: "1.5px solid #E2E0DA", borderRadius: "12px", padding: "24px", marginBottom: "20px" }}>
-            {/* Header */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px" }}>
-              <div>
-                <div style={{ fontFamily: "var(--font-bebas)", fontSize: "22px", color: "#2A2830", letterSpacing: ".04em" }}>
-                  {result.order_number}
+        .to-lbl { display: block; font-size: 12px; font-family: 'DM Sans', sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: #1A1A1A; margin-bottom: 7px; }
+        .to-inp { width: 100%; border: 1px solid #E2E2DE; padding: 11px 14px; font-family: 'DM Sans', sans-serif; font-size: 14px; background: #FFFFFF; color: #1A1A1A; border-radius: 0; outline: none; box-sizing: border-box; transition: border-color 0.15s; }
+        .to-inp:focus { border-color: #1C3557; }
+
+        .to-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+
+        .to-btn { background: #1C3557; color: #FFFFFF; border: none; padding: 12px 28px; font-size: 14px; font-family: 'DM Sans', sans-serif; font-weight: 500; cursor: pointer; margin-top: 8px; transition: opacity 0.15s; }
+        .to-btn:hover:not(:disabled) { opacity: 0.88; }
+        .to-btn:disabled { background: #E2E2DE; color: #9E9E9E; cursor: not-allowed; }
+
+        .to-sec-title { font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #1A1A1A; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid #E2E2DE; }
+
+        .to-detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #E2E2DE; font-family: 'DM Sans', sans-serif; font-size: 14px; align-items: center; }
+        .to-detail-row:last-child { border-bottom: none; }
+        .to-detail-lbl { color: #6B6B6B; }
+        .to-detail-val { color: #1A1A1A; font-weight: 500; }
+
+        .to-mono { font-family: 'IBM Plex Mono', monospace; font-size: 13px; }
+        .to-track-mono { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #1C3557; }
+
+        .to-track-link { color: #1C3557; text-decoration: none; font-weight: 500; }
+        .to-track-link:hover { text-decoration: underline; }
+
+        .to-error { background: #fff5f5; border: 1px solid #fed7d7; padding: 16px; font-size: 14px; font-family: 'DM Sans', sans-serif; color: #c53030; margin-top: 16px; margin-bottom: 28px; }
+
+        .to-back { text-align: center; margin-top: 8px; }
+        .to-back a { font-size: 13px; color: #1C3557; font-weight: 500; text-decoration: none; font-family: 'DM Sans', sans-serif; }
+        .to-back a:hover { text-decoration: underline; }
+
+        @media (max-width: 600px) {
+          .to-page { padding: 32px 16px; }
+          .to-h1 { font-size: 26px; }
+          .to-card { padding: 20px 16px; }
+          .to-row { grid-template-columns: 1fr; }
+          .to-btn { width: 100%; }
+        }
+      `}</style>
+
+      <div className="to-page">
+        <div className="to-inner">
+
+          {/* Page header */}
+          <h1 className="to-h1">Track Your Order</h1>
+          <p className="to-sub">Enter your order number to get the latest status.</p>
+
+          {/* Lookup form */}
+          <div className="to-card">
+            <form onSubmit={handleTrack}>
+              <div className="to-row">
+                <div>
+                  <label className="to-lbl">Order Number</label>
+                  <input
+                    className="to-inp"
+                    value={orderNumber}
+                    onChange={e => setOrderNumber(e.target.value)}
+                    placeholder="AF-000123"
+                    required
+                  />
                 </div>
-                <div style={{ fontSize: "12px", color: "#7A7880", marginTop: "2px" }}>
-                  Placed {new Date(result.created_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+                <div>
+                  <label className="to-lbl">Email Address</label>
+                  <input
+                    type="email"
+                    className="to-inp"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    required
+                  />
                 </div>
               </div>
-              <div style={{
-                padding: "5px 12px", borderRadius: "20px", fontSize: "12px", fontWeight: 700,
-                background: `${statusInfo.color}18`,
-                color: statusInfo.color,
-                border: `1px solid ${statusInfo.color}40`,
-              }}>
-                {statusInfo.label}
-              </div>
-            </div>
+              <button
+                type="submit"
+                className="to-btn"
+                disabled={loading || !orderNumber.trim() || !email.trim()}
+              >
+                {loading ? "Searching…" : "Track Order"}
+              </button>
+            </form>
+          </div>
 
-            {/* Tracking info */}
-            {result.tracking_number && (
-              <div style={{ background: "rgba(5,150,105,.06)", border: "1px solid rgba(5,150,105,.2)", borderRadius: "8px", padding: "14px 16px", marginBottom: "20px" }}>
-                <div style={{ fontSize: "12px", fontWeight: 700, color: "#059669", marginBottom: "10px" }}>✓ Your order has shipped</div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 16px", fontSize: "13px", color: "#2A2830", marginBottom: result.tracking_url ? "12px" : "0" }}>
+          {/* Error */}
+          {error && <div className="to-error">{error}</div>}
+
+          {/* Result */}
+          {result && statusInfo && (
+            <div className="to-card" style={{ marginBottom: 28 }}>
+
+              {/* Order summary section */}
+              <div className="to-sec-title">Order Summary</div>
+
+              <div className="to-detail-row">
+                <span className="to-detail-lbl">Order Number</span>
+                <span className={`to-detail-val to-mono`}>{result.order_number}</span>
+              </div>
+
+              <div className="to-detail-row">
+                <span className="to-detail-lbl">Status</span>
+                <span style={{
+                  background: statusInfo.bg,
+                  color: statusInfo.color,
+                  padding: "3px 10px",
+                  fontSize: "12px",
+                  fontWeight: 500,
+                  fontFamily: "'DM Sans', sans-serif",
+                }}>
+                  {statusInfo.label}
+                </span>
+              </div>
+
+              <div className="to-detail-row">
+                <span className="to-detail-lbl">Placed</span>
+                <span className="to-detail-val">
+                  {new Date(result.created_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+                </span>
+              </div>
+
+              <div className="to-detail-row">
+                <span className="to-detail-lbl">Payment</span>
+                <span className="to-detail-val" style={{ textTransform: "capitalize" }}>{result.payment_status}</span>
+              </div>
+
+              {/* Shipping section */}
+              {result.tracking_number && (
+                <>
+                  <div className="to-sec-title" style={{ marginTop: 24 }}>Shipping</div>
+
                   {result.carrier && (
-                    <div>
-                      <span style={{ color: "#7A7880", fontWeight: 600, fontSize: "11px", textTransform: "uppercase", letterSpacing: ".06em" }}>Carrier </span>
-                      <div style={{ fontWeight: 600 }}>{result.carrier.toUpperCase()}{result.courier_service ? ` — ${result.courier_service}` : ""}</div>
+                    <div className="to-detail-row">
+                      <span className="to-detail-lbl">Carrier</span>
+                      <span className="to-detail-val">
+                        {result.carrier.toUpperCase()}{result.courier_service ? ` — ${result.courier_service}` : ""}
+                      </span>
                     </div>
                   )}
-                  <div>
-                    <span style={{ color: "#7A7880", fontWeight: 600, fontSize: "11px", textTransform: "uppercase", letterSpacing: ".06em" }}>Tracking # </span>
-                    <div style={{ fontFamily: "monospace", fontWeight: 600 }}>{result.tracking_number}</div>
-                  </div>
-                </div>
-                {result.tracking_url && (
-                  <a href={result.tracking_url} target="_blank" rel="noreferrer"
-                    style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "#059669", color: "#fff", padding: "8px 16px", borderRadius: "6px", fontSize: "13px", fontWeight: 700, textDecoration: "none" }}>
-                    Track Package →
-                  </a>
-                )}
-              </div>
-            )}
 
-            {/* Items */}
-            <div style={{ borderTop: "1px solid #F0EEE9", paddingTop: "16px", marginBottom: "16px" }}>
-              <div style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em", color: "#7A7880", marginBottom: "10px" }}>
-                Items
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                {result.items.map((item, idx) => (
-                  <div key={idx} style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
-                    <div>
-                      <span style={{ fontWeight: 600, color: "#2A2830" }}>{item.product_name}</span>
-                      {(item.color || item.size) && (
-                        <span style={{ color: "#7A7880", marginLeft: "6px" }}>{[item.color, item.size].filter(Boolean).join(" / ")}</span>
-                      )}
-                      <span style={{ color: "#7A7880", marginLeft: "6px" }}>x{item.quantity}</span>
+                  <div className="to-detail-row">
+                    <span className="to-detail-lbl">Tracking #</span>
+                    <span className="to-track-mono">{result.tracking_number}</span>
+                  </div>
+
+                  {result.tracking_url && (
+                    <div className="to-detail-row">
+                      <span className="to-detail-lbl">Track Package</span>
+                      <a
+                        href={result.tracking_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="to-track-link"
+                      >
+                        View Tracking →
+                      </a>
                     </div>
-                    <span style={{ fontWeight: 600, color: "#2A2830" }}>{formatCurrency(item.line_total)}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+                  )}
+                </>
+              )}
 
-            {/* Totals */}
-            <div style={{ borderTop: "1px solid #F0EEE9", paddingTop: "14px", display: "flex", flexDirection: "column", gap: "6px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#7A7880" }}>
-                <span>Subtotal</span>
-                <span style={{ fontWeight: 600, color: "#2A2830" }}>{formatCurrency(result.subtotal)}</span>
+              {/* Items section */}
+              <div className="to-sec-title" style={{ marginTop: 24 }}>Items</div>
+
+              {result.items.map((item, idx) => (
+                <div key={idx} className="to-detail-row" style={{ alignItems: "flex-start" }}>
+                  <div style={{ color: "#6B6B6B", fontSize: 14 }}>
+                    <span style={{ color: "#1A1A1A", fontWeight: 500 }}>{item.product_name}</span>
+                    {(item.color || item.size) && (
+                      <span style={{ marginLeft: 6 }}>{[item.color, item.size].filter(Boolean).join(" / ")}</span>
+                    )}
+                    <span style={{ marginLeft: 6 }}>× {item.quantity}</span>
+                  </div>
+                  <span className="to-detail-val">{formatCurrency(item.line_total)}</span>
+                </div>
+              ))}
+
+              {/* Totals section */}
+              <div className="to-sec-title" style={{ marginTop: 24 }}>Order Total</div>
+
+              <div className="to-detail-row">
+                <span className="to-detail-lbl">Subtotal</span>
+                <span className="to-detail-val">{formatCurrency(result.subtotal)}</span>
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#7A7880" }}>
-                <span>Shipping</span>
-                <span style={{ fontWeight: 600, color: result.shipping_cost === 0 ? "#059669" : "#2A2830" }}>
+
+              <div className="to-detail-row">
+                <span className="to-detail-lbl">Shipping</span>
+                <span className="to-detail-val" style={{ color: result.shipping_cost === 0 ? "#065f46" : "#1A1A1A" }}>
                   {result.shipping_cost === 0 ? "FREE" : formatCurrency(result.shipping_cost)}
                 </span>
               </div>
-              <div style={{ borderTop: "1.5px solid #E2E0DA", paddingTop: "8px", display: "flex", justifyContent: "space-between" }}>
-                <span style={{ fontSize: "15px", fontWeight: 800, color: "#2A2830" }}>Total</span>
-                <span style={{ fontFamily: "var(--font-bebas)", fontSize: "20px", color: "#E8242A", letterSpacing: ".02em" }}>
+
+              <div className="to-detail-row" style={{ borderBottom: "none" }}>
+                <span style={{ fontSize: 15, fontWeight: 700, color: "#1A1A1A", fontFamily: "'DM Sans', sans-serif" }}>Total</span>
+                <span style={{ fontSize: 15, fontWeight: 700, color: "#1C3557", fontFamily: "'DM Sans', sans-serif" }}>
                   {formatCurrency(result.total)}
                 </span>
               </div>
-            </div>
-          </div>
-        )}
 
-        {/* Back to shopping */}
-        <div style={{ textAlign: "center" }}>
-          <Link href="/products" style={{ fontSize: "13px", color: "#1A5CFF", fontWeight: 600, textDecoration: "none" }}>
-            ← Continue Shopping
-          </Link>
+            </div>
+          )}
+
+          {/* Back to shopping */}
+          <div className="to-back">
+            <Link href="/products">← Continue Shopping</Link>
+          </div>
+
         </div>
       </div>
-    </div>
+    </>
   );
 }
