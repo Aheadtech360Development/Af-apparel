@@ -16,7 +16,7 @@ interface QBInvoice {
   customer_memo: string | null;
 }
 
-const STATUS_STYLE: Record<string, { bg: string; color: string; label: string }> = {
+const STATUS_STYLE: Record<QBInvoice["status"], { bg: string; color: string; label: string }> = {
   paid:    { bg: "#DCFCE7", color: "#15803D", label: "Paid" },
   partial: { bg: "#FEF9C3", color: "#A16207", label: "Partial" },
   open:    { bg: "#FEE2E2", color: "#B91C1C", label: "Unpaid" },
