@@ -27,6 +27,7 @@ interface Order {
   subtotal: string;
   shipping_cost: string;
   amount_paid?: string | null;
+  convenience_fee?: string | null;
   po_number: string | null;
   order_notes: string | null;
   tracking_number: string | null;
@@ -473,6 +474,11 @@ export default function OrderDetailPage() {
           <p className="text-gray-500">
             Shipping: <span className="text-gray-800 font-medium">${Number(order.shipping_cost).toFixed(2)}</span>
           </p>
+          {order.convenience_fee && Number(order.convenience_fee) > 0 && (
+            <p style={{ color: "#92400e" }}>
+              Convenience Fee (3%): <span style={{ fontWeight: 600 }}>${Number(order.convenience_fee).toFixed(2)}</span>
+            </p>
+          )}
           <p className="text-base font-bold text-gray-900">
             Total: ${Number(order.total).toFixed(2)}
           </p>

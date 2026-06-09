@@ -217,7 +217,8 @@ export default function CheckoutPaymentPage() {
   const subtotal = isGuest ? guestSubtotal : Number(cart?.subtotal ?? 0);
   const shipping = shippingCost;
   const taxAmountDisplay = storedTaxAmount > 0 ? storedTaxAmount : 0;
-  const total = subtotal + shipping + taxAmountDisplay - (isGuest ? 0 : couponDiscount);
+  const convenienceFee = paymentType === "card" ? Math.round(subtotal * 0.03 * 100) / 100 : 0;
+  const total = subtotal + shipping + taxAmountDisplay - (isGuest ? 0 : couponDiscount) + convenienceFee;
 
   const SHIPPING_LABELS: Record<string, string> = {
     standard: "Standard Ground",
@@ -239,15 +240,22 @@ export default function CheckoutPaymentPage() {
                 {(["card", "ach"] as const).map(type => {
                   const isSelected = paymentType === type;
                   return (
-                    <label key={type} onClick={() => setPaymentType(type)} style={{ flex: 1, display: "flex", alignItems: "center", gap: "12px", padding: "14px 18px", border: `1px solid ${isSelected ? "#1C3557" : "#E2E2DE"}`, background: isSelected ? "rgba(28,53,87,.04)" : "#FAFAF8", cursor: "pointer", transition: "all .15s" }}>
-                      <div style={{ width: "18px", height: "18px", borderRadius: "50%", flexShrink: 0, border: `2px solid ${isSelected ? "#1C3557" : "#E2E2DE"}`, background: isSelected ? "#1C3557" : "#fff", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        {isSelected && <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#fff" }} />}
-                      </div>
-                      <div>
-                        <div style={{ fontSize: "13px", fontWeight: 700, color: "#1A1A1A" }}>{type === "card" ? "Credit / Debit Card" : "ACH / Bank Transfer"}</div>
-                        <div style={{ fontSize: "11px", color: "#6B6B6B", marginTop: "2px" }}>{type === "card" ? "Visa, Mastercard, Amex, Discover" : "Checking or savings account"}</div>
-                      </div>
-                    </label>
+                    <div key={type}>
+                      <label onClick={() => setPaymentType(type)} style={{ flex: 1, display: "flex", alignItems: "center", gap: "12px", padding: "14px 18px", border: `1px solid ${isSelected ? "#1C3557" : "#E2E2DE"}`, background: isSelected ? "rgba(28,53,87,.04)" : "#FAFAF8", cursor: "pointer", transition: "all .15s" }}>
+                        <div style={{ width: "18px", height: "18px", borderRadius: "50%", flexShrink: 0, border: `2px solid ${isSelected ? "#1C3557" : "#E2E2DE"}`, background: isSelected ? "#1C3557" : "#fff", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          {isSelected && <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#fff" }} />}
+                        </div>
+                        <div>
+                          <div style={{ fontSize: "13px", fontWeight: 700, color: "#1A1A1A" }}>{type === "card" ? "Credit / Debit Card" : "ACH / Bank Transfer"}</div>
+                          <div style={{ fontSize: "11px", color: "#6B6B6B", marginTop: "2px" }}>{type === "card" ? "Visa, Mastercard, Amex, Discover" : "Checking or savings account"}</div>
+                        </div>
+                      </label>
+                      {type === "card" && isSelected && (
+                        <div style={{ fontSize: "12px", color: "#92400e", background: "#fef3c7", padding: "6px 10px", borderRadius: "4px", marginTop: "6px" }}>
+                          ⚠ A 3% convenience fee will be added to your order total.
+                        </div>
+                      )}
+                    </div>
                   );
                 })}
                 {!isGuest && isWholesale && net30Enabled && (() => {
@@ -624,6 +632,12 @@ export default function CheckoutPaymentPage() {
                   <span>{storedTaxRegion && storedTaxRate > 0 ? `Tax (${storedTaxRegion} ${storedTaxRate}%)` : "Tax"}</span>
                   <span style={{ fontWeight: 600, color: "#1A1A1A" }}>{formatCurrency(taxAmountDisplay)}</span>
                 </div>
+                {convenienceFee > 0 && (
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#92400e", padding: "8px 0", borderBottom: "1px solid #E2E2DE" }}>
+                    <span style={{ fontWeight: 600 }}>Convenience Fee (3%)</span>
+                    <span style={{ fontWeight: 600 }}>{formatCurrency(convenienceFee)}</span>
+                  </div>
+                )}
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: "15px", fontWeight: 600, color: "#1A1A1A", padding: "14px 0 0" }}>
                   <span>Total</span>
                   <span>{formatCurrency(total)}</span>

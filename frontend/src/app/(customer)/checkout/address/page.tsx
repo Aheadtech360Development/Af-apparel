@@ -109,6 +109,7 @@ export default function CheckoutAddressPage() {
   });
   const [errors, setErrors] = useState<Partial<typeof form>>({});
   const [couponDiscount, setCouponDiscount] = useState(0);
+  const [shippingGateError, setShippingGateError] = useState(false);
 
   const handleAddressAutofill = useCallback((addr: { street: string; city: string; state: string; zipCode: string }) => {
     setForm(prev => ({
@@ -351,6 +352,12 @@ export default function CheckoutAddressPage() {
   }
 
   function handleContinue() {
+    // Block if live_shippo user hasn't selected a rate yet
+    if (shippingTypeForUser === "live_shippo" && shippingMethod === "standard" && !selectedLiveRate) {
+      setShippingGateError(true);
+      return;
+    }
+    setShippingGateError(false);
     setShippingCost(methodCost(shippingMethod));
     console.log("[Address] shippingTypeForUser:", shippingTypeForUser, "selectedLiveRate:", selectedLiveRate);
     setShippingType(shippingTypeForUser);
@@ -711,6 +718,7 @@ export default function CheckoutAddressPage() {
                                       onClick={() => {
                                         setSelectedLiveRateId(rate.rate_id);
                                         setTierShipping(rate.cost);
+                                        setShippingGateError(false);
                                       }}
                                       style={{
                                         display: "flex", alignItems: "center", justifyContent: "space-between",
@@ -769,13 +777,19 @@ export default function CheckoutAddressPage() {
             </div>
 
             {/* Continue button */}
+            {shippingGateError && (
+              <div style={{ background: "#fef3c7", border: "1px solid #fcd34d", borderRadius: "4px", padding: "8px 12px", marginBottom: "10px", fontSize: "13px", color: "#92400e", fontFamily: "'DM Sans', sans-serif" }}>
+                Please select a shipping carrier and rate before continuing.
+              </div>
+            )}
             <button
               onClick={handleContinue}
-              style={{ width: "100%", padding: "14px", background: "#1C3557", color: "#fff", border: "none", fontFamily: "'DM Sans', sans-serif", fontSize: "15px", fontWeight: 500, cursor: "pointer", transition: "opacity .15s" }}
-              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "0.88"; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}
+              disabled={shippingTypeForUser === "live_shippo" && shippingMethod === "standard" && liveRatesLoading}
+              style={{ width: "100%", padding: "14px", background: "#1C3557", color: "#fff", border: "none", fontFamily: "'DM Sans', sans-serif", fontSize: "15px", fontWeight: 500, cursor: (shippingTypeForUser === "live_shippo" && shippingMethod === "standard" && liveRatesLoading) ? "not-allowed" : "pointer", transition: "opacity .15s", opacity: (shippingTypeForUser === "live_shippo" && shippingMethod === "standard" && liveRatesLoading) ? 0.6 : 1 }}
+              onMouseEnter={e => { if (!(shippingTypeForUser === "live_shippo" && shippingMethod === "standard" && liveRatesLoading)) (e.currentTarget as HTMLButtonElement).style.opacity = "0.88"; }}
+              onMouseLeave={e => { if (!(shippingTypeForUser === "live_shippo" && shippingMethod === "standard" && liveRatesLoading)) (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}
             >
-              Continue to Payment →
+              {shippingTypeForUser === "live_shippo" && shippingMethod === "standard" && liveRatesLoading ? "Fetching rates…" : "Continue to Payment →"}
             </button>
             <a
               href="/cart"

@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const stats = [
   { n: "2,000+", l: "Wholesale Accounts" },
-  { n: "15", l: "Years in Business" },
+  { n: "22", l: "Years in Business" },
   { n: "Same-Day", l: "Fulfillment by 12PM CT" },
   { n: "No Min.", l: "Order Quantity" },
 ];

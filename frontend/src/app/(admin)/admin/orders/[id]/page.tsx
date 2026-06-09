@@ -78,6 +78,9 @@ interface AdminOrder {
   timeline?: Array<{ status: string; message: string; created_by: string; created_at: string }>;
   // Pre-calculated shipment weight from backend (used to pre-fill rate fetch)
   calculated_weight_lbs?: number;
+  // Admin edits
+  items_edited?: boolean;
+  convenience_fee?: string | null;
 }
 
 interface CustomerStats {
@@ -599,6 +602,7 @@ export default function AdminOrderDetailPage() {
         ...prev,
         subtotal: String(result.subtotal),
         total: String(result.total),
+        items_edited: true,
         items: [...prev.items, {
           id: crypto.randomUUID(),
           sku: selectedVariant.sku,
@@ -627,6 +631,7 @@ export default function AdminOrderDetailPage() {
         items: prev.items.filter(i => i.id !== itemId),
         subtotal: String(Math.max(0, Number(prev.subtotal) - Number(lineTotal))),
         total: String(Math.max(0, Number(prev.total) - Number(lineTotal))),
+        items_edited: true,
       } : prev);
     } catch {
       setMsg({ text: "Failed to remove item.", ok: false });
@@ -710,8 +715,21 @@ export default function AdminOrderDetailPage() {
             <StatusBadge status={order.payment_status} />
           </p>
         </div>
-        {/* QB Sync intentionally hidden */}
+        <button
+          onClick={() => window.print()}
+          style={{ display: "flex", alignItems: "center", gap: "6px", background: "#fff", border: "1.5px solid #E2E0DA", borderRadius: "8px", padding: "8px 16px", fontSize: "13px", fontWeight: 700, color: "#2A2830", cursor: "pointer" }}
+          className="no-print"
+        >
+          🖨️ Print
+        </button>
       </div>
+      <style>{`
+        @media print {
+          nav, header, aside, [data-sidebar], .no-print { display: none !important; }
+          body { font-size: 12px; }
+          main, .main-content { margin: 0 !important; padding: 0 !important; width: 100% !important; }
+        }
+      `}</style>
 
       {/* Feedback */}
       {msg && (
@@ -1094,6 +1112,11 @@ export default function AdminOrderDetailPage() {
                     <span>Tax</span><span>${Number(order.tax_amount).toFixed(2)}</span>
                   </div>
                 )}
+                {order.convenience_fee && Number(order.convenience_fee) > 0 && (
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px", fontSize: "14px", color: "#D97706" }}>
+                    <span>Convenience Fee (3%)</span><span>${Number(order.convenience_fee).toFixed(2)}</span>
+                  </div>
+                )}
                 <div style={{ display: "flex", justifyContent: "space-between", fontFamily: "var(--font-bebas)", fontSize: "20px", color: "#2A2830", borderTop: "1px solid #E2E0DA", paddingTop: "10px", marginTop: "4px" }}>
                   <span>Total</span><span>${Number(order.total).toFixed(2)}</span>
                 </div>
@@ -1101,7 +1124,8 @@ export default function AdminOrderDetailPage() {
             </div>
           </div>
 
-          {/* INVOICE & PAYMENT — always visible */}
+          {/* INVOICE & PAYMENT — always visible unless paid+card+no edits */}
+          {(order.payment_status !== "paid" || order.items_edited) && (
           <div style={{ background: '#f8f9fa', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '16px', marginTop: '16px', display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' as const }}>
             <div style={{ flex: 1 }}>
               <p style={{ margin: 0, fontSize: '13px', fontWeight: 600, color: '#1B3A5C' }}>Invoice &amp; Payment</p>
@@ -1133,6 +1157,7 @@ export default function AdminOrderDetailPage() {
               </button>
             )}
           </div>
+          )}
 
           {/* TIMELINE */}
           <div style={{ ...CardStyle, padding: "24px", marginBottom: 0 }}>

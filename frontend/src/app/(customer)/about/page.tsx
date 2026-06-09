@@ -38,7 +38,7 @@ export default function AboutPage() {
           <div className="about-stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "0" }}>
             {[
               { n: "2,000+", l: "Wholesale Accounts" },
-              { n: "15", l: "Years in Business" },
+              { n: "22", l: "Years in Business" },
               { n: "Dallas, TX", l: "Warehouse & HQ" },
               { n: "Same-Day", l: "Fulfillment by 12PM CT" },
             ].map((s, i) => (

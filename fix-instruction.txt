@@ -95,7 +95,7 @@ Section 1 — HERO (white background, padding 72px 24px):
 - Mobile: single column, text first then image
 
 Section 2 — TRUST STATS (#F0F0EE background, padding 40px 24px, border top+bottom 1px solid #E2E2DE):
-- 4 stats in a row: "2,000+ / Wholesale Accounts", "15 / Years in Business", "Same-Day / Fulfillment by 2PM CT", "No Min. / Order Quantity"
+- 4 stats in a row: "2,000+ / Wholesale Accounts", "22 / Years in Business", "Same-Day / Fulfillment by 2PM CT", "No Min. / Order Quantity"
 - Each stat: number in Fraunces 22px bold, label in DM Sans 13px #6B6B6B
 - Dividers between stats (1px solid #E2E2DE)
 - Below stats: "Create a wholesale account to get better prices on everything." + "Apply for Wholesale Account →" btn-outline-sm
@@ -267,7 +267,7 @@ HERO (white bg, padding 72px 24px 56px, border-bottom):
 - p DM Sans 16px #6B6B6B: "Dallas, TX. Supplying print shops and decorators across the US since 2010."
 
 STATS BAR (#F0F0EE bg, padding 28px 24px, border-bottom):
-- 4 stats: "2,000+ / Wholesale Accounts", "15 / Years in Business", "Dallas, TX / Warehouse & HQ", "Same-Day / Fulfillment by 2PM CT"
+- 4 stats: "2,000+ / Wholesale Accounts", "22 / Years in Business", "Dallas, TX / Warehouse & HQ", "Same-Day / Fulfillment by 2PM CT"
 
 OUR STORY (background #F8F8F6, padding 72px 24px, 2-col grid):
 - Left col: label "Our Story" (11px uppercase letter-spacing) + h2 Fraunces 36px: "Lower prices, direct from us."

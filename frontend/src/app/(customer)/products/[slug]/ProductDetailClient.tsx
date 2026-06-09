@@ -1162,6 +1162,9 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
                 <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#6B6B6B", margin: 0 }}>
                   All colorway images available for download.
                 </p>
+                <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#1C3557", fontStyle: "italic", margin: "4px 0 0" }}>
+                  Color may vary due to digital picture.
+                </p>
               </div>
               <button
                 onClick={() => setShowImageLibrary(false)}
