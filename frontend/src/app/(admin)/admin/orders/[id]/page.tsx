@@ -227,6 +227,9 @@ export default function AdminOrderDetailPage() {
     error?: string;
   } | null>(null);
 
+  const [manualWeight, setManualWeight] = useState<number>(1.0);
+  const [manualLabelLoading, setManualLabelLoading] = useState(false);
+
   const [isVerifyingAch, setIsVerifyingAch] = useState(false);
   const [isResendingInvoice, setIsResendingInvoice] = useState(false);
   const [isMarkingPaid, setIsMarkingPaid] = useState(false);
@@ -385,6 +388,43 @@ export default function AdminOrderDetailPage() {
     }
   }
 
+  async function handleGenerateManualLabel() {
+    if (!selectedCarrier) return;
+    setManualLabelLoading(true); setMsg(null); setLabelResult(null);
+    try {
+      const result = await apiClient.post<{
+        success?: boolean; tracking_number?: string; tracking_url?: string;
+        label_url?: string; carrier?: string; service?: string; rate?: number; error?: string;
+      }>(`/api/v1/admin/orders/${order?.id ?? id}/generate-label-manual`, {
+        carrier: selectedCarrier.toUpperCase(), weight_lbs: manualWeight,
+      });
+      setLabelResult(result);
+      if (result.success) {
+        setMsg({ text: `Label generated — ${result.carrier?.toUpperCase()} ${result.service}`, ok: true });
+        setOrder(prev => prev ? {
+          ...prev,
+          status: "shipped",
+          tracking_number: result.tracking_number ?? prev.tracking_number,
+          tracking_url: result.tracking_url ?? prev.tracking_url,
+          label_url: result.label_url ?? prev.label_url,
+          courier: result.carrier ?? prev.courier,
+          courier_service: result.service ?? prev.courier_service,
+          shipped_at: prev.shipped_at ?? new Date().toISOString(),
+        } : prev);
+        setStatus("shipped");
+        if (result.tracking_number) setTracking(result.tracking_number);
+      } else {
+        setMsg({ text: result.error ?? "Label generation failed.", ok: false });
+      }
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : "Failed to generate label.";
+      setLabelResult({ success: false, error: errMsg });
+      setMsg({ text: errMsg, ok: false });
+    } finally {
+      setManualLabelLoading(false);
+    }
+  }
+
   async function handleCapturePayment() {
     setIsCapturing(true); setMsg(null);
     try {
@@ -531,6 +571,14 @@ export default function AdminOrderDetailPage() {
   const customerCarrier = order.carrier
     ? (_carrierMap[order.carrier] ?? order.carrier.toLowerCase())
     : null;
+
+  const isWillCallPickup = !!(
+    order.shipping_method?.toLowerCase().includes("will_call") ||
+    order.shipping_method?.toLowerCase().includes("pickup")
+  );
+  const hasLiveRate = !!order.shipping_rate_id;
+  const isStandardGround = !hasLiveRate && !isWillCallPickup;
+
   const addr = order.shipping_address;
   const zip = addr?.zip_code ?? addr?.postal_code ?? "";
 
@@ -608,8 +656,8 @@ export default function AdminOrderDetailPage() {
 
         {/* ── LEFT: Main content ── */}
         <div>
-          {/* SHIPPING & COURIER — hidden for Will Call orders */}
-          {order.shipping_method !== "will_call" && <div style={{ ...CardStyle, padding: "24px" }}>
+          {/* SHIPPING & COURIER — always shown; content varies by order type */}
+          <div style={{ ...CardStyle, padding: "24px" }}>
             <h3 style={{ ...SectionHead, fontSize: "18px", letterSpacing: ".05em", marginBottom: "14px" }}>SHIPPING & COURIER</h3>
 
             {/* Already-shipped summary */}
@@ -621,88 +669,131 @@ export default function AdminOrderDetailPage() {
               </div>
             )}
 
-            {/* Shippo label generation */}
-            <div style={{ marginBottom: "16px" }}>
-              <label style={{ ...LabelStyle, marginBottom: "10px" }}>Generate Shipping Label via Shippo</label>
-              {order.carrier && order.courier_service && (
-                <div style={{ background: "rgba(26,92,255,.06)", border: "1px solid rgba(26,92,255,.2)", borderRadius: "8px", padding: "10px 14px", marginBottom: "12px" }}>
-                  <div style={{ fontSize: "12px", color: "#1A5CFF", fontWeight: 700, marginBottom: "2px" }}>Customer Selected:</div>
-                  <div style={{ fontSize: "12px", color: "#1A5CFF", fontWeight: 600 }}>
-                    {order.carrier} — {order.courier_service} — ${Number(order.shipping_cost).toFixed(2)}
-                  </div>
-                  {order.shipping_rate_id && (
-                    <div style={{ fontSize: "11px", color: "#7A7880", marginTop: "4px" }}>Rate ID: {order.shipping_rate_id}</div>
-                  )}
+            {/* CASE 3: Will Call Pickup */}
+            {isWillCallPickup ? (
+              <div style={{ background: "rgba(26,92,255,.05)", border: "1.5px solid rgba(26,92,255,.2)", borderRadius: "10px", padding: "18px 20px" }}>
+                <div style={{ fontSize: "13px", fontWeight: 700, color: "#1A5CFF", marginBottom: "10px" }}>📦 Customer selected: Will Call Pickup</div>
+                <div style={{ fontSize: "13px", color: "#2A2830", fontWeight: 600, marginBottom: "6px" }}>Warehouse Address:</div>
+                <div style={{ fontSize: "13px", color: "#7A7880", lineHeight: 1.7 }}>
+                  AF Apparels<br />
+                  10719 Turbeville Rd<br />
+                  Dallas, TX 75243<br />
+                  Mon–Fri 9am–5pm CST
                 </div>
-              )}
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "8px", marginBottom: "14px" }}>
-                {([
-                  { id: "fedex", name: "FedEx", logo: "https://shippo-static.s3.amazonaws.com/providers/75/FedEx.png" },
-                  { id: "ups",   name: "UPS",   logo: "https://shippo-static.s3.amazonaws.com/providers/75/UPS.png" },
-                  { id: "usps",  name: "USPS",  logo: "https://shippo-static.s3.amazonaws.com/providers/75/USPS.png" },
-                ]).map(carrier => {
-                  const active = selectedCarrier === carrier.id;
-                  const isCustomerChoice = customerCarrier === carrier.id;
-                  const isDisabled = !!customerCarrier && !isCustomerChoice;
-                  return (
-                    <div key={carrier.id}
-                      onClick={() => !isDisabled && setSelectedCarrier(carrier.id)}
-                      style={{
-                        border: active ? "2px solid #1A5CFF" : isDisabled ? "1.5px solid #F0EEE9" : "1.5px solid #E2E0DA",
-                        borderRadius: "8px", padding: "14px 8px", textAlign: "center" as const,
-                        cursor: isDisabled ? "not-allowed" : "pointer",
-                        background: active ? "rgba(26,92,255,.05)" : isDisabled ? "#FAFAF8" : "#fff",
-                        opacity: isDisabled ? 0.4 : 1,
-                        transition: "all .15s",
-                        display: "flex", flexDirection: "column" as const, alignItems: "center", justifyContent: "center", gap: "6px",
-                      }}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={carrier.logo} alt={carrier.name} style={{ height: "28px", width: "auto", objectFit: "contain", filter: isDisabled ? "grayscale(1)" : "none" }} />
-                      <div style={{ fontSize: "11px", fontWeight: 700, color: active ? "#1A5CFF" : "#7A7880" }}>{carrier.name}</div>
-                    </div>
-                  );
-                })}
+                <div style={{ marginTop: "12px", fontSize: "12px", color: "#059669", fontWeight: 700, background: "rgba(5,150,105,.08)", padding: "6px 10px", borderRadius: "6px", display: "inline-block" }}>
+                  ✓ No shipping label required — customer will pick up
+                </div>
               </div>
+            ) : (
+              /* CASE 1 & 2: Shippo label generation */
+              <div style={{ marginBottom: "16px" }}>
+                <label style={{ ...LabelStyle, marginBottom: "10px" }}>Generate Shipping Label via Shippo</label>
 
-              <button onClick={handleGenerateLabel} disabled={!selectedCarrier || labelLoading}
-                style={{ background: selectedCarrier ? "#1A5CFF" : "#E2E0DA", color: "#fff", border: "none", padding: "12px 24px", borderRadius: "6px", fontSize: "14px", fontWeight: 700, cursor: selectedCarrier ? "pointer" : "not-allowed", opacity: labelLoading ? .65 : 1, marginBottom: "14px" }}>
-                {labelLoading ? "Generating label…" : selectedCarrier ? `Generate ${selectedCarrier.toUpperCase()} Label` : "Select a carrier"}
-              </button>
-
-              {/* Label result */}
-              {labelResult && labelResult.success && (
-                <div style={{ background: "rgba(5,150,105,.06)", border: "1px solid rgba(5,150,105,.2)", borderRadius: "8px", padding: "14px 16px" }}>
-                  <div style={{ fontSize: "12px", fontWeight: 700, color: "#059669", marginBottom: "10px" }}>✓ Label generated</div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 16px", fontSize: "13px", color: "#2A2830", marginBottom: "12px" }}>
-                    {labelResult.carrier && <div><span style={{ color: "#7A7880", fontWeight: 600 }}>Carrier: </span>{labelResult.carrier.toUpperCase()}</div>}
-                    {labelResult.service && <div><span style={{ color: "#7A7880", fontWeight: 600 }}>Service: </span>{labelResult.service}</div>}
-                    {labelResult.tracking_number && <div style={{ gridColumn: "1 / -1" }}><span style={{ color: "#7A7880", fontWeight: 600 }}>Tracking: </span>{labelResult.tracking_number}</div>}
-                    {labelResult.rate != null && <div><span style={{ color: "#7A7880", fontWeight: 600 }}>Rate: </span>${Number(labelResult.rate).toFixed(2)}</div>}
-                  </div>
-                  <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" as const }}>
-                    {labelResult.label_url && (
-                      <a href={labelResult.label_url} target="_blank" rel="noreferrer"
-                        style={{ background: "#1A5CFF", color: "#fff", padding: "8px 16px", borderRadius: "6px", fontSize: "13px", fontWeight: 700, textDecoration: "none" }}>
-                        ↓ Download Label PDF
-                      </a>
-                    )}
-                    {labelResult.tracking_url && (
-                      <a href={labelResult.tracking_url} target="_blank" rel="noreferrer"
-                        style={{ background: "#fff", color: "#1A5CFF", padding: "8px 16px", borderRadius: "6px", fontSize: "13px", fontWeight: 700, textDecoration: "none", border: "1.5px solid #1A5CFF" }}>
-                        Track Package →
-                      </a>
+                {/* Customer selection info banner */}
+                {order.shipping_method && (
+                  <div style={{ background: "rgba(26,92,255,.06)", border: "1px solid rgba(26,92,255,.2)", borderRadius: "8px", padding: "10px 14px", marginBottom: "12px" }}>
+                    <div style={{ fontSize: "12px", color: "#1A5CFF", fontWeight: 700, marginBottom: "2px" }}>Customer Selected:</div>
+                    <div style={{ fontSize: "12px", color: "#1A5CFF", fontWeight: 600 }}>
+                      {hasLiveRate && order.carrier
+                        ? `${order.carrier} — ${order.courier_service ?? ""} — $${Number(order.shipping_cost).toFixed(2)}`
+                        : `${order.shipping_method} — Flat Rate — $${Number(order.shipping_cost).toFixed(2)}`
+                      }
+                    </div>
+                    {order.shipping_rate_id && (
+                      <div style={{ fontSize: "11px", color: "#7A7880", marginTop: "4px" }}>Rate ID: {order.shipping_rate_id}</div>
                     )}
                   </div>
-                </div>
-              )}
-              {labelResult && !labelResult.success && (
-                <div style={{ background: "rgba(232,36,42,.06)", border: "1px solid rgba(232,36,42,.2)", borderRadius: "8px", padding: "12px 16px", fontSize: "13px", color: "#E8242A", fontWeight: 600 }}>
-                  ✗ {labelResult.error ?? "Label generation failed. Check that Shippo API key and shipping address are set."}
-                </div>
-              )}
-            </div>
+                )}
 
-          </div>}
+                {/* Carrier tiles — all enabled for Standard Ground, only customer choice for Live Rate */}
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "8px", marginBottom: "14px" }}>
+                  {([
+                    { id: "fedex", name: "FedEx", logo: "https://shippo-static.s3.amazonaws.com/providers/75/FedEx.png" },
+                    { id: "ups",   name: "UPS",   logo: "https://shippo-static.s3.amazonaws.com/providers/75/UPS.png" },
+                    { id: "usps",  name: "USPS",  logo: "https://shippo-static.s3.amazonaws.com/providers/75/USPS.png" },
+                  ]).map(carrier => {
+                    const active = selectedCarrier === carrier.id;
+                    const isCustomerChoice = hasLiveRate && customerCarrier === carrier.id;
+                    const isDisabled = hasLiveRate && !!customerCarrier && !isCustomerChoice;
+                    return (
+                      <div key={carrier.id}
+                        onClick={() => !isDisabled && setSelectedCarrier(carrier.id)}
+                        style={{
+                          border: active ? "2px solid #1A5CFF" : isDisabled ? "1.5px solid #F0EEE9" : "1.5px solid #E2E0DA",
+                          borderRadius: "8px", padding: "14px 8px", textAlign: "center" as const,
+                          cursor: isDisabled ? "not-allowed" : "pointer",
+                          background: active ? "rgba(26,92,255,.05)" : isDisabled ? "#FAFAF8" : "#fff",
+                          opacity: isDisabled ? 0.4 : 1,
+                          transition: "all .15s",
+                          display: "flex", flexDirection: "column" as const, alignItems: "center", justifyContent: "center", gap: "6px",
+                        }}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={carrier.logo} alt={carrier.name} style={{ height: "28px", width: "auto", objectFit: "contain", filter: isDisabled ? "grayscale(1)" : "none" }} />
+                        <div style={{ fontSize: "11px", fontWeight: 700, color: active ? "#1A5CFF" : "#7A7880" }}>{carrier.name}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Standard Ground: weight input */}
+                {isStandardGround && (
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "14px" }}>
+                    <label style={{ ...LabelStyle, marginBottom: 0 }}>Package Weight (lbs)</label>
+                    <input
+                      type="number" min="0.1" step="0.1" value={manualWeight}
+                      onChange={e => setManualWeight(parseFloat(e.target.value) || 1.0)}
+                      style={{ width: "90px", padding: "8px 10px", border: "1.5px solid #E2E0DA", borderRadius: "6px", fontSize: "14px", fontFamily: "var(--font-jakarta)" }}
+                    />
+                  </div>
+                )}
+
+                {/* Generate button */}
+                {isStandardGround ? (
+                  <button onClick={handleGenerateManualLabel} disabled={!selectedCarrier || manualLabelLoading}
+                    style={{ background: selectedCarrier ? "#1A5CFF" : "#E2E0DA", color: "#fff", border: "none", padding: "12px 24px", borderRadius: "6px", fontSize: "14px", fontWeight: 700, cursor: selectedCarrier ? "pointer" : "not-allowed", opacity: manualLabelLoading ? .65 : 1, marginBottom: "14px" }}>
+                    {manualLabelLoading ? "Generating label…" : selectedCarrier ? `Generate ${selectedCarrier.toUpperCase()} Label` : "Select a carrier"}
+                  </button>
+                ) : (
+                  <button onClick={handleGenerateLabel} disabled={!selectedCarrier || labelLoading}
+                    style={{ background: selectedCarrier ? "#1A5CFF" : "#E2E0DA", color: "#fff", border: "none", padding: "12px 24px", borderRadius: "6px", fontSize: "14px", fontWeight: 700, cursor: selectedCarrier ? "pointer" : "not-allowed", opacity: labelLoading ? .65 : 1, marginBottom: "14px" }}>
+                    {labelLoading ? "Generating label…" : selectedCarrier ? `Generate ${selectedCarrier.toUpperCase()} Label` : "Select a carrier"}
+                  </button>
+                )}
+
+                {/* Label result */}
+                {labelResult && labelResult.success && (
+                  <div style={{ background: "rgba(5,150,105,.06)", border: "1px solid rgba(5,150,105,.2)", borderRadius: "8px", padding: "14px 16px" }}>
+                    <div style={{ fontSize: "12px", fontWeight: 700, color: "#059669", marginBottom: "10px" }}>✓ Label generated</div>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 16px", fontSize: "13px", color: "#2A2830", marginBottom: "12px" }}>
+                      {labelResult.carrier && <div><span style={{ color: "#7A7880", fontWeight: 600 }}>Carrier: </span>{labelResult.carrier.toUpperCase()}</div>}
+                      {labelResult.service && <div><span style={{ color: "#7A7880", fontWeight: 600 }}>Service: </span>{labelResult.service}</div>}
+                      {labelResult.tracking_number && <div style={{ gridColumn: "1 / -1" }}><span style={{ color: "#7A7880", fontWeight: 600 }}>Tracking: </span>{labelResult.tracking_number}</div>}
+                      {labelResult.rate != null && <div><span style={{ color: "#7A7880", fontWeight: 600 }}>Rate: </span>${Number(labelResult.rate).toFixed(2)}</div>}
+                    </div>
+                    <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" as const }}>
+                      {labelResult.label_url && (
+                        <a href={labelResult.label_url} target="_blank" rel="noreferrer"
+                          style={{ background: "#1A5CFF", color: "#fff", padding: "8px 16px", borderRadius: "6px", fontSize: "13px", fontWeight: 700, textDecoration: "none" }}>
+                          ↓ Download Label PDF
+                        </a>
+                      )}
+                      {labelResult.tracking_url && (
+                        <a href={labelResult.tracking_url} target="_blank" rel="noreferrer"
+                          style={{ background: "#fff", color: "#1A5CFF", padding: "8px 16px", borderRadius: "6px", fontSize: "13px", fontWeight: 700, textDecoration: "none", border: "1.5px solid #1A5CFF" }}>
+                          Track Package →
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                )}
+                {labelResult && !labelResult.success && (
+                  <div style={{ background: "rgba(232,36,42,.06)", border: "1px solid rgba(232,36,42,.2)", borderRadius: "8px", padding: "12px 16px", fontSize: "13px", color: "#E8242A", fontWeight: 600 }}>
+                    ✗ {labelResult.error ?? "Label generation failed. Check that Shippo API key and shipping address are set."}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
 
           {/* STATUS UPDATE */}
           <div style={{ ...CardStyle, padding: "24px" }}>
