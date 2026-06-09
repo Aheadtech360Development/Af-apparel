@@ -67,6 +67,7 @@ export default function CheckoutPaymentPage() {
   const isWholesale = user?.account_type === "wholesale";
   const [couponDiscount, setCouponDiscount] = useState(0);
   const [paymentType, setPaymentType] = useState<"card" | "ach" | "net_30">("card");
+  const [net30Enabled, setNet30Enabled] = useState(false);
 
   const [savedCards, setSavedCards] = useState<SavedCard[]>([]);
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
@@ -135,7 +136,15 @@ export default function CheckoutPaymentPage() {
         }
       })
       .catch(() => { /* no saved ACH */ });
-  }, [isLoading, isGuest, isAuthenticated]);
+
+    // Check if Net 30 is enabled for this company
+    if (isWholesale) {
+      apiClient
+        .get<{ net30_enabled?: boolean }>("/api/v1/account/net30-status")
+        .then(r => setNet30Enabled(r.net30_enabled === true))
+        .catch(() => setNet30Enabled(false));
+    }
+  }, [isLoading, isGuest, isAuthenticated, isWholesale]);
 
   // Load cart for total display (wholesale only)
   useEffect(() => {
@@ -241,7 +250,7 @@ export default function CheckoutPaymentPage() {
                     </label>
                   );
                 })}
-                {!isGuest && isWholesale && (() => {
+                {!isGuest && isWholesale && net30Enabled && (() => {
                   const isSelected = paymentType === "net_30";
                   return (
                     <label onClick={() => setPaymentType("net_30")} style={{ flex: 1, display: "flex", alignItems: "center", gap: "12px", padding: "14px 18px", border: `1px solid ${isSelected ? "#1C3557" : "#E2E2DE"}`, background: isSelected ? "rgba(28,53,87,.04)" : "#FAFAF8", cursor: "pointer", transition: "all .15s" }}>
