@@ -211,20 +211,10 @@ async def guest_checkout(
         qb_payment_status = charge_resp.get("status", "UNKNOWN")
         _payment_status = "paid" if qb_payment_status == "CAPTURED" else "pending"
 
-    # 4. Generate order number — same sequential numeric format as OrderService
-    from sqlalchemy import text as _text
-    try:
-        _num_result = await db.execute(_text(
-            "SELECT order_number FROM orders "
-            "WHERE order_number ~ '^[0-9]+$' "
-            "ORDER BY order_number::INTEGER DESC "
-            "LIMIT 1"
-        ))
-        _num_row = _num_result.fetchone()
-        order_number = str(int(_num_row[0]) + 1) if (_num_row and _num_row[0]) else "1001"
-    except Exception:
-        import random
-        order_number = str(random.randint(1001, 9999))
+    # 4. Generate order number — delegate to the single shared generator so
+    #    retail/guest and wholesale order numbers form one sequential series.
+    from app.services.order_service import OrderService as _OrderSvc
+    order_number = await _OrderSvc(db)._generate_order_number()
 
     # 5. Create Order record
     address_snapshot = json.dumps({

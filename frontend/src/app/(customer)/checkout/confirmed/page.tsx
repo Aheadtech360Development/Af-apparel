@@ -67,10 +67,6 @@ export default function CheckoutConfirmedPage() {
     );
   }
 
-  const orderNum = confirmedOrderNumber.startsWith("AF-")
-    ? confirmedOrderNumber
-    : `AF-${confirmedOrderNumber}`;
-
   const shippingLabel = SHIPPING_LABELS[confirmedShippingMethod] ?? "Standard Ground";
 
   return (
@@ -89,7 +85,7 @@ export default function CheckoutConfirmedPage() {
           Order Confirmed
         </h1>
         <p style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: "14px", color: "#6B6B6B", marginBottom: "8px" }}>
-          {orderNum}
+          {confirmedOrderNumber}
         </p>
         <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "16px", color: "#6B6B6B", marginBottom: "36px", lineHeight: 1.6 }}>
           Your order has been placed. You will receive a confirmation email shortly.
@@ -98,7 +94,7 @@ export default function CheckoutConfirmedPage() {
         {/* Details box */}
         <div style={{ border: "1px solid #E2E2DE", background: "#FFFFFF", padding: "24px", marginBottom: "28px" }}>
           {[
-            { label: "Order Number", value: orderNum, mono: true },
+            { label: "Order Number", value: confirmedOrderNumber, mono: true },
             { label: "Items", value: `${confirmedUnits} unit${confirmedUnits !== 1 ? "s" : ""}` },
             ...(confirmedProductName ? [{ label: "Product", value: confirmedProductName }] : []),
             ...(confirmedColorSummary ? [{ label: "Colors", value: confirmedColorSummary }] : []),
