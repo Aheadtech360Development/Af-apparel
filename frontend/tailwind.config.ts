@@ -25,7 +25,7 @@ const config: Config = {
           mid: "#1E1D24",
           red: "#E8242A",
           blue: "#1A5CFF",
-          gold: "#C9A84C",
+          gold: "#f69d0b",
           offwhite: "#F8F8F6",
           border: "#E2E2DE",
           text: "#1A1A1A",

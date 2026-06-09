@@ -35,12 +35,12 @@ const COLOR_MAP: Record<string, string> = {
   Grey: "#9ca3af", Gray: "#9ca3af", "Dark Grey": "#4b5563", "Dark Gray": "#4b5563",
   "Light Grey": "#d1d5db", "Light Gray": "#d1d5db", Charcoal: "#374151",
   "Sport Grey": "#9ca3af", "Heather Grey": "#b0b7c3", "Athletic Heather": "#b0b7c3",
-  Heather: "#b0b7c3", "Dark Heather": "#6b7280", Sand: "#e2c89a", Natural: "#f5f0e8",
+  Heather: "#b0b7c3", "Dark Heather": "#6b7280", Sand: "#c6a67f", Natural: "#f5f0e8",
   Tan: "#c9a96e", Brown: "#78350f", Maroon: "#7f1d1d", Burgundy: "#881337",
   Green: "#166534", Forest: "#1B4332", "Forest Green": "#14532d", "Kelly Green": "#15803d",
-  Lime: "#65a30d", Yellow: "#eab308", Gold: "#C9A84C", Mustard: "#D4A843",
+  Lime: "#65a30d", Yellow: "#eab308", Gold: "#f69d0b", Mustard: "#D4A843",
   Orange: "#ea580c", Purple: "#7c3aed", Pink: "#ec4899", "Hot Pink": "#db2777",
-  Coral: "#f87171", Teal: "#0d9488", Turquoise: "#06b6d4", Mint: "#6ee7b7",
+  Coral: "#f87171", Teal: "#0cafcc", Turquoise: "#06b6d4", Mint: "#6ee7b7",
   Olive: "#4d7c0f", Cream: "#fef3c7", Ivory: "#fffff0", "Sky Blue": "#38bdf8",
   Lavender: "#a78bfa", "Light Blue": "#7DD3FC", "Stonewash Blue": "#5b8fa8",
   "Dark Navy": "#0f1f3d", Indigo: "#3730a3", Cardinal: "#7b1520", Crimson: "#9f0712",
@@ -51,18 +51,21 @@ const COLOR_MAP: Record<string, string> = {
   "Charcoal Heather": "#4A4A4A",
   "Texas Orange": "#BF5700",
   "Baby Pink": "#F4C2C2",
-  "Moss Green": "#8A9A5B",
+  "Moss Green": "#305040",
   "Lime Green": "#32CD32",
   "Rust": "#B7410E",
   "Peach": "#FFDAB9",
   "Pacific Blue": "#1CA9C9",
-  "Dust": "#B2998A",
+  "Dust": "#ebdcc8",
   "Military Green": "#4B5320",
   "Neon Yellow": "#FFFF33",
   "Neon Orange": "#FF5F1F",
   "Denim": "#1560BD",
   "Salt & Pepper": "#8E8E8E",
   "Powder Blue": "#B0E0E6",
+  "Pure Navy": "#373f53",
+  "Sawana Brown": "#7d6c5b",
+  "Decadent Chocolate": "#723638",
 };
 
 const TABS = ["Description", "Specifications", "Size Chart", "Reviews"] as const;
@@ -80,7 +83,7 @@ function StarRow({ rating, size = 14 }: { rating: number; size?: number }) {
   return (
     <div style={{ display: "flex", gap: "2px" }}>
       {[1, 2, 3, 4, 5].map(s => (
-        <svg key={s} width={size} height={size} viewBox="0 0 24 24" fill={s <= rating ? "#C9A84C" : "#E2E0DA"}>
+        <svg key={s} width={size} height={size} viewBox="0 0 24 24" fill={s <= rating ? "#f69d0b" : "#E2E0DA"}>
           <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
         </svg>
       ))}
@@ -188,7 +191,7 @@ function ReviewsTab({ productId, isAuthenticated }: { productId: string; isAuthe
                 <div key={star} style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
                   <span style={{ fontSize: "12px", color: "#7A7880", width: "8px" }}>{star}</span>
                   <div style={{ flex: 1, height: "6px", background: "#E2E0DA", borderRadius: "3px", overflow: "hidden" }}>
-                    <div style={{ width: `${pct}%`, height: "100%", background: "#C9A84C", borderRadius: "3px" }} />
+                    <div style={{ width: `${pct}%`, height: "100%", background: "#f69d0b", borderRadius: "3px" }} />
                   </div>
                   <span style={{ fontSize: "11px", color: "#7A7880", width: "28px" }}>{pct}%</span>
                 </div>
@@ -232,7 +235,7 @@ function ReviewsTab({ productId, isAuthenticated }: { productId: string; isAuthe
             <div style={{ display: "flex", gap: "6px" }}>
               {[1, 2, 3, 4, 5].map(s => (
                 <button key={s} type="button" onClick={() => setForm(f => ({ ...f, rating: s }))} style={{ background: "none", border: "none", cursor: "pointer", padding: "2px" }}>
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill={s <= form.rating ? "#C9A84C" : "#E2E0DA"} style={{ transition: "fill .1s" }}>
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill={s <= form.rating ? "#f69d0b" : "#E2E0DA"} style={{ transition: "fill .1s" }}>
                     <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                   </svg>
                 </button>
@@ -264,7 +267,7 @@ function ReviewsTab({ productId, isAuthenticated }: { productId: string; isAuthe
           {/* Image upload */}
           <div style={{ marginBottom: "16px" }}>
             <div style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", color: "#7A7880", marginBottom: "4px" }}>Photo (optional)</div>
-            <label style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "8px 14px", border: "1.5px dashed #C9A84C", borderRadius: "7px", cursor: "pointer", fontSize: "13px", color: "#7A7880", fontWeight: 600 }}>
+            <label style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "8px 14px", border: "1.5px dashed #f69d0b", borderRadius: "7px", cursor: "pointer", fontSize: "13px", color: "#7A7880", fontWeight: 600 }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><path d="M21 15l-5-5L5 21" /></svg>
               {imageFile ? imageFile.name : "Upload a photo"}
               <input type="file" accept="image/*" onChange={handleImageChange} style={{ display: "none" }} />

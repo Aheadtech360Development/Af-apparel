@@ -22,7 +22,7 @@ function StarRow({ rating }: { rating: number }) {
   return (
     <div style={{ display: "flex", gap: "2px" }}>
       {[1, 2, 3, 4, 5].map(s => (
-        <svg key={s} width="13" height="13" viewBox="0 0 24 24" fill={s <= rating ? "#C9A84C" : "#E2E2DE"}>
+        <svg key={s} width="13" height="13" viewBox="0 0 24 24" fill={s <= rating ? "#f69d0b" : "#E2E2DE"}>
           <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
         </svg>
       ))}
@@ -61,7 +61,7 @@ export default function ReviewsPage() {
           <div style={{ textAlign: "center", padding: "60px", color: "#6B6B6B", fontFamily: "'DM Sans', sans-serif" }}>Loading reviews…</div>
         ) : reviews.length === 0 ? (
           <div style={{ textAlign: "center", padding: "60px", background: "#fff", border: "1px solid #E2E2DE" }}>
-            <div style={{ fontFamily: "'Fraunces', serif", fontSize: "40px", marginBottom: "12px", color: "#C9A84C" }}>★</div>
+            <div style={{ fontFamily: "'Fraunces', serif", fontSize: "40px", marginBottom: "12px", color: "#f69d0b" }}>★</div>
             <div style={{ fontFamily: "'Fraunces', serif", fontSize: "22px", fontWeight: 600, color: "#1A1A1A", marginBottom: "8px" }}>No reviews yet</div>
             <p style={{ fontFamily: "'DM Sans', sans-serif", color: "#6B6B6B", marginBottom: "24px" }}>Be the first to review a product you&apos;ve ordered.</p>
             <Link href="/products" style={{ background: "#1C3557", color: "#fff", padding: "12px 24px", fontWeight: 600, textDecoration: "none", fontSize: "14px", fontFamily: "'DM Sans', sans-serif" }}>
