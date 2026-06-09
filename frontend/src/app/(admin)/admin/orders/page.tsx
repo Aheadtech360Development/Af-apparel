@@ -20,12 +20,20 @@ interface AdminOrder {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  pending:    "bg-yellow-100 text-yellow-700",
-  confirmed:  "bg-blue-100 text-blue-700",
-  processing: "bg-indigo-100 text-indigo-700",
-  shipped:    "bg-purple-100 text-purple-700",
-  delivered:  "bg-green-100 text-green-700",
-  cancelled:  "bg-red-100 text-red-700",
+  pending:           "bg-yellow-100 text-yellow-700",
+  confirmed:         "bg-blue-100 text-blue-700",
+  processing:        "bg-indigo-100 text-indigo-700",
+  ready_for_pickup:  "bg-teal-100 text-teal-700",
+  shipped:           "bg-purple-100 text-purple-700",
+  delivered:         "bg-green-100 text-green-700",
+  cancelled:         "bg-red-100 text-red-700",
+};
+
+const PAYMENT_COLORS: Record<string, string> = {
+  unpaid:  "bg-red-100 text-red-700",
+  pending: "bg-orange-100 text-orange-700",
+  due:     "bg-orange-100 text-orange-700",
+  failed:  "bg-red-100 text-red-700",
 };
 
 export default function AdminOrdersPage() {
@@ -177,9 +185,6 @@ export default function AdminOrdersPage() {
                   <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
                     {o.order_number}
                     {o.is_guest_order && <span style={{ background: '#E8F4FD', color: '#1A6FA8', fontSize: '11px', fontWeight: 600, padding: '2px 8px', borderRadius: '20px' }}>Retail</span>}
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${STATUS_COLORS[o.status] ?? "bg-gray-100 text-gray-600"}`} style={{ fontSize: "11px" }}>
-                      {o.status}
-                    </span>
                   </div>
                 </td>
                 <td className="px-4 py-3 text-gray-700">
@@ -191,9 +196,16 @@ export default function AdminOrdersPage() {
                   ) : (o.company_name ?? "—")}
                 </td>
                 <td className="px-4 py-3">
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${STATUS_COLORS[o.status] ?? "bg-gray-100 text-gray-600"}`}>
-                    {o.status}
-                  </span>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${STATUS_COLORS[o.status] ?? "bg-gray-100 text-gray-600"}`}>
+                      {o.status}
+                    </span>
+                    {o.payment_status !== "paid" && PAYMENT_COLORS[o.payment_status] && (
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${PAYMENT_COLORS[o.payment_status]}`}>
+                        {o.payment_status}
+                      </span>
+                    )}
+                  </div>
                 </td>
                 <td className="px-4 py-3 text-right text-gray-700 font-medium">${Number(o.total).toFixed(2)}</td>
                 <td className="px-4 py-3 text-gray-500">{new Date(o.created_at).toLocaleDateString()}</td>

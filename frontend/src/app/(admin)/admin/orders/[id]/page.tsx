@@ -1101,48 +1101,38 @@ export default function AdminOrderDetailPage() {
             </div>
           </div>
 
-          {/* INVOICE & PAYMENT — show only for Net 30 / unpaid orders or draft status */}
-          {(() => {
-            const showInvoiceSection =
-              order.payment_status === "unpaid" ||
-              order.payment_status === "due" ||
-              order.payment_status === "pending" && order.payment_method === "net_30" ||
-              order.payment_method === "net_30" ||
-              order.status === "draft" ||
-              (order.payment_status !== "paid" && !order.is_fully_paid);
-            if (!showInvoiceSection) return null;
-            return (
-              <div style={{ background: '#f8f9fa', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '16px', marginTop: '16px', display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' as const }}>
-                <div style={{ flex: 1 }}>
-                  <p style={{ margin: 0, fontSize: '13px', fontWeight: 600, color: '#1B3A5C' }}>Invoice &amp; Payment</p>
-                  <p style={{ margin: '2px 0 0', fontSize: '12px', color: '#888' }}>
-                    {order.invoice_sent_at
-                      ? `Invoice sent ${new Date(order.invoice_sent_at).toLocaleDateString()}`
-                      : 'Invoice not yet sent'}
-                    {Number(order.amount_paid) > 0 && (
-                      <span style={{ color: '#D97706', marginLeft: '6px' }}>
-                        · ${Number(order.amount_paid).toFixed(2)} paid · ${Number(order.balance_due ?? 0).toFixed(2)} remaining
-                      </span>
-                    )}
-                  </p>
-                </div>
-                <button
-                  onClick={handleResendInvoice}
-                  disabled={isResendingInvoice}
-                  style={{ background: '#fff', color: '#1B3A5C', border: '1px solid #1B3A5C', padding: '8px 16px', borderRadius: '6px', fontSize: '13px', fontWeight: 700, cursor: isResendingInvoice ? 'not-allowed' : 'pointer', opacity: isResendingInvoice ? 0.6 : 1 }}>
-                  {isResendingInvoice ? 'Sending…' : (order.invoice_sent_at ? 'Resend Invoice' : 'Send Invoice')}
-                </button>
-                {(order.payment_status === "unpaid" || order.payment_status === "due" || order.payment_method === "net_30") && (
-                  <button
-                    onClick={handleMarkAsPaid}
-                    disabled={isMarkingPaid}
-                    style={{ background: '#10B981', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '6px', fontSize: '13px', fontWeight: 700, cursor: isMarkingPaid ? 'not-allowed' : 'pointer', opacity: isMarkingPaid ? 0.6 : 1 }}>
-                    {isMarkingPaid ? 'Saving…' : '✓ Mark as Paid'}
-                  </button>
+          {/* INVOICE & PAYMENT — always visible */}
+          <div style={{ background: '#f8f9fa', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '16px', marginTop: '16px', display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' as const }}>
+            <div style={{ flex: 1 }}>
+              <p style={{ margin: 0, fontSize: '13px', fontWeight: 600, color: '#1B3A5C' }}>Invoice &amp; Payment</p>
+              <p style={{ margin: '2px 0 0', fontSize: '12px', color: '#888' }}>
+                {order.payment_status === "paid" && !order.invoice_sent_at
+                  ? `Payment received via ${order.payment_method === "ach" ? "ACH / Bank Transfer" : "Card"}`
+                  : order.invoice_sent_at
+                    ? `Invoice sent ${new Date(order.invoice_sent_at).toLocaleDateString()}`
+                    : 'Invoice not yet sent'}
+                {Number(order.amount_paid) > 0 && order.payment_status !== "paid" && (
+                  <span style={{ color: '#D97706', marginLeft: '6px' }}>
+                    · ${Number(order.amount_paid).toFixed(2)} paid · ${Number(order.balance_due ?? 0).toFixed(2)} remaining
+                  </span>
                 )}
-              </div>
-            );
-          })()}
+              </p>
+            </div>
+            <button
+              onClick={handleResendInvoice}
+              disabled={isResendingInvoice}
+              style={{ background: '#fff', color: '#1B3A5C', border: '1px solid #1B3A5C', padding: '8px 16px', borderRadius: '6px', fontSize: '13px', fontWeight: 700, cursor: isResendingInvoice ? 'not-allowed' : 'pointer', opacity: isResendingInvoice ? 0.6 : 1 }}>
+              {isResendingInvoice ? 'Sending…' : (order.invoice_sent_at ? 'Resend Invoice' : 'Send Invoice')}
+            </button>
+            {order.payment_status !== "paid" && (
+              <button
+                onClick={handleMarkAsPaid}
+                disabled={isMarkingPaid}
+                style={{ background: '#10B981', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '6px', fontSize: '13px', fontWeight: 700, cursor: isMarkingPaid ? 'not-allowed' : 'pointer', opacity: isMarkingPaid ? 0.6 : 1 }}>
+                {isMarkingPaid ? 'Saving…' : '✓ Mark as Paid'}
+              </button>
+            )}
+          </div>
 
           {/* TIMELINE */}
           <div style={{ ...CardStyle, padding: "24px", marginBottom: 0 }}>
@@ -1432,11 +1422,21 @@ export default function AdminOrderDetailPage() {
                 </div>
               )}
               {order.payment_method !== "ach" && (
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", marginTop: "5px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "13px", marginTop: "5px" }}>
                   <span style={{ color: "#7A7880" }}>QB Invoice</span>
-                  <span style={{ fontWeight: 600, color: order.qb_invoice_id ? "#059669" : "#aaa" }}>
-                    {order.qb_invoice_id ? `#${order.qb_invoice_id}` : "Not synced"}
-                  </span>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{ fontWeight: 600, color: order.qb_invoice_id ? "#059669" : "#aaa" }}>
+                      {order.qb_invoice_id ? `#${order.qb_invoice_id}` : "Not synced"}
+                    </span>
+                    {!order.qb_invoice_id && (
+                      <button
+                        onClick={handleSyncQB}
+                        disabled={isSyncing}
+                        style={{ background: "#1B3A5C", color: "#fff", border: "none", padding: "3px 10px", borderRadius: "5px", fontSize: "11px", fontWeight: 700, cursor: isSyncing ? "not-allowed" : "pointer", opacity: isSyncing ? 0.6 : 1 }}>
+                        {isSyncing ? "Syncing…" : "Sync Now"}
+                      </button>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
