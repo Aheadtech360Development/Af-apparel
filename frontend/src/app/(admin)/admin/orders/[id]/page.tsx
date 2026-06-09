@@ -76,6 +76,8 @@ interface AdminOrder {
   is_fully_paid?: boolean;
   // Timeline
   timeline?: Array<{ status: string; message: string; created_by: string; created_at: string }>;
+  // Pre-calculated shipment weight from backend (used to pre-fill rate fetch)
+  calculated_weight_lbs?: number;
 }
 
 interface CustomerStats {
@@ -277,6 +279,7 @@ export default function AdminOrderDetailPage() {
         const o = d as AdminOrder;
         setOrder(o);
         setStatus(o.status);
+        setManualWeight(o.calculated_weight_lbs ?? 1.0);
         setTracking(o.tracking_number ?? "");
         setNoteText(o.order_notes ?? "");
         if (o.courier) setSelectedCourier(o.courier);
@@ -318,6 +321,34 @@ export default function AdminOrderDetailPage() {
         setOrderLoading(false);
       });
   }, [id]);
+
+  // Auto-fetch Shippo rates when a Standard Ground order loads (no manual click needed)
+  useEffect(() => {
+    if (!order) return;
+    const isWillCall = !!(
+      order.shipping_method?.toLowerCase().includes("will_call") ||
+      order.shipping_method?.toLowerCase().includes("pickup")
+    );
+    if (order.shipping_rate_id || isWillCall) return;  // only Standard Ground
+
+    const weight = order.calculated_weight_lbs ?? 1.0;
+    setAdminRatesLoading(true);
+    setAdminRates([]);
+    setAdminSelectedRateId(null);
+    apiClient.post<{ rates: AdminRate[]; error?: string }>(
+      `/api/v1/admin/orders/${order.id}/fetch-rates`,
+      { weight_lbs: weight }
+    ).then(result => {
+      const rates = result.rates ?? [];
+      setAdminRates(rates);
+      if (rates.length > 0) setAdminSelectedRateId(rates[0]!.rate_id);
+    }).catch(() => {
+      setAdminRates([]);
+    }).finally(() => {
+      setAdminRatesLoading(false);
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [order?.id]);
 
   function handleCourierSelect(courierId: string) {
     setSelectedCourier(courierId);
