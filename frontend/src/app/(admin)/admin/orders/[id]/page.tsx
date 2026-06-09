@@ -896,7 +896,7 @@ export default function AdminOrderDetailPage() {
           <div style={{ ...CardStyle, padding: "24px", marginBottom: 0 }}>
             <h3 style={{ ...SectionHead, fontSize: "18px", letterSpacing: ".05em", marginBottom: "20px" }}>TIMELINE</h3>
             <div style={{ position: "relative", paddingLeft: "28px" }}>
-              <div style={{ position: "absolute", left: "8px", top: "8px", bottom: "8px", width: "2px", background: "#E2E0DA" }} />
+              <div style={{ position: "absolute", left: "23px", top: "8px", bottom: "8px", width: "2px", background: "#E2E0DA" }} />
               {timelineEvents.map((event, i) => (
                 <div key={i} style={{ display: "flex", gap: "16px", marginBottom: "20px", position: "relative", alignItems: "flex-start" }}>
                   <div style={{ width: "20px", height: "20px", borderRadius: "50%", background: event.color, border: "2px solid #fff", boxShadow: `0 0 0 2px ${event.color}`, flexShrink: 0, zIndex: 1, marginLeft: "-14px", marginTop: "2px" }} />
