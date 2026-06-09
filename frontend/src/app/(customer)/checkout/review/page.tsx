@@ -69,6 +69,7 @@ export default function CheckoutReviewPage() {
     achBankName, achAccountHolder, achRoutingNumber, achAccountLast4, achAccountType,
     shippingType,
     selectedRate,
+    convenienceFee,
   } = useCheckoutStore();
   const clearCart = useCartStore((s) => s.clearCart);
   const { isAuthenticated, isLoading: authIsLoading } = useAuthStore();
@@ -307,6 +308,7 @@ export default function CheckoutReviewPage() {
             }
           : {
               ...basePayload,
+              payment_method: "card",
               qb_token: qbToken ?? undefined,
               saved_card_id: savedCardId ?? undefined,
             }
@@ -314,7 +316,7 @@ export default function CheckoutReviewPage() {
 
       const productName = cart?.items[0]?.product_name ?? "Your Order";
       const colorSummary = cart ? buildColorSummary(cart) : "";
-      const orderTotal = subtotal + shippingCost + taxAmount - couponDiscount;
+      const orderTotal = subtotal + shippingCost + taxAmount - couponDiscount + convenienceFee;
 
       const confirmedData = {
         id: order.id,
@@ -361,7 +363,7 @@ export default function CheckoutReviewPage() {
     : freshTaxAmount > 0
       ? freshTaxAmount
       : (taxRate ? Math.round(Math.max(0, subtotal - couponDiscount) * taxRate.rate / 100 * 100) / 100 : 0); // shipping not taxed
-  const total = subtotal + shipping + taxAmount - (isGuest ? 0 : couponDiscount);
+  const total = subtotal + shipping + taxAmount - (isGuest ? 0 : couponDiscount) + convenienceFee;
   const shippingLabel = SHIPPING_LABELS[shippingMethod] ?? "Standard Ground";
 
   return (
@@ -630,6 +632,12 @@ export default function CheckoutReviewPage() {
                   {formatCurrency(taxAmount)}
                 </span>
               </div>
+              {convenienceFee > 0 && (
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#92400e", padding: "8px 0", borderBottom: "1px solid #E2E2DE" }}>
+                  <span style={{ fontWeight: 600 }}>Convenience Fee (3%)</span>
+                  <span style={{ fontWeight: 600 }}>{formatCurrency(convenienceFee)}</span>
+                </div>
+              )}
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: "15px", fontWeight: 600, color: "#1A1A1A", padding: "14px 0 0" }}>
                 <span>Total</span>
                 <span>{formatCurrency(total)}</span>

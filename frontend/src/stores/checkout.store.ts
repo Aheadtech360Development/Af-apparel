@@ -40,6 +40,9 @@ interface CheckoutState {
   taxRate: number;
   taxAmount: number;
 
+  // Convenience fee (3% for card payments, persisted so review page sees it)
+  convenienceFee: number;
+
   // Payment method selection
   paymentMethod: "card" | "ach" | "net_30";
   achBankName: string;
@@ -77,6 +80,7 @@ interface CheckoutState {
   setShippingType: (t: string) => void;
   setSelectedRate: (r: SelectedLiveRate | null) => void;
   setTaxInfo: (region: string | null, rate: number, amount?: number) => void;
+  setConvenienceFee: (fee: number) => void;
   setPaymentMethod: (m: "card" | "ach" | "net_30") => void;
   setAchInfo: (bankName: string, accountHolder: string, routingNumber: string, accountLast4: string, accountType: string) => void;
   setPoNumber: (po: string) => void;
@@ -112,6 +116,7 @@ const initialState = {
   taxRegion: null,
   taxRate: 0,
   taxAmount: 0,
+  convenienceFee: 0,
   paymentMethod: "card" as "card" | "ach" | "net_30",
   achBankName: "",
   achAccountHolder: "",
@@ -149,6 +154,7 @@ export const useCheckoutStore = create<CheckoutState>()(
       setShippingType: (t) => set({ shippingType: t }),
       setSelectedRate: (r) => set({ selectedRate: r }),
       setTaxInfo: (region, rate, amount = 0) => set({ taxRegion: region, taxRate: rate, taxAmount: amount }),
+      setConvenienceFee: (fee) => set({ convenienceFee: fee }),
       setPaymentMethod: (m) => set({ paymentMethod: m }),
       setAchInfo: (bankName, accountHolder, routingNumber, accountLast4, accountType) =>
         set({ achBankName: bankName, achAccountHolder: accountHolder, achRoutingNumber: routingNumber, achAccountLast4: accountLast4, achAccountType: accountType }),

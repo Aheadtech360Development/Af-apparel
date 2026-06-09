@@ -60,7 +60,7 @@ export default function CheckoutPaymentPage() {
   const {
     shippingAddress, shippingMethod, shippingCost, setSavedCardId, setQbToken,
     taxAmount: storedTaxAmount, taxRate: storedTaxRate, taxRegion: storedTaxRegion,
-    setPaymentMethod, setAchInfo,
+    setPaymentMethod, setAchInfo, setConvenienceFee,
   } = useCheckoutStore();
   const { isAuthenticated, isLoading, user } = useAuthStore();
   const isGuest = !isLoading && !isAuthenticated();
@@ -168,14 +168,20 @@ export default function CheckoutPaymentPage() {
   }, [isGuest]);
 
 
+  // Compute fee here (before early return) so handlers can save it to the store
+  const subtotalEarly = isGuest ? guestSubtotal : Number(cart?.subtotal ?? 0);
+  const convenienceFeeEarly = paymentType === "card" ? Math.round(subtotalEarly * 0.03 * 100) / 100 : 0;
+
   function handleContinueWithSavedCard() {
     if (!selectedCardId) return;
+    setConvenienceFee(convenienceFeeEarly);
     setPaymentMethod("card");
     setSavedCardId(selectedCardId);
     router.push("/checkout/review");
   }
 
   function handleNewCardToken(token: string) {
+    setConvenienceFee(convenienceFeeEarly);
     setPaymentMethod("card");
     setQbToken(token);
     router.push("/checkout/review");
@@ -196,12 +202,14 @@ export default function CheckoutPaymentPage() {
     else if (achForm.accountNumber.replace(/\D/g, "").length < 4) errors.accountNumber = "Account number too short";
     if (Object.keys(errors).length > 0) { setAchErrors(errors); return; }
     const last4 = achForm.accountNumber.replace(/\D/g, "").slice(-4);
+    setConvenienceFee(0);
     setPaymentMethod("ach");
     setAchInfo(achForm.bankName.trim(), achForm.accountHolder.trim(), achForm.routingNumber.trim(), last4, achForm.accountType);
     router.push("/checkout/review");
   }
 
   function handleNet30Continue() {
+    setConvenienceFee(0);
     setPaymentMethod("net_30");
     router.push("/checkout/review");
   }
