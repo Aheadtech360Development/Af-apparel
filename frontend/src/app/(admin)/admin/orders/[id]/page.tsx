@@ -103,6 +103,22 @@ interface CompanyRegistration {
   fax: string | null;
 }
 
+interface AdminRate {
+  rate_id: string;
+  carrier: string;
+  service: string;
+  cost: number;
+  currency: string;
+  days: number | null;
+}
+
+const CARRIER_LOGOS: Record<string, string> = {
+  USPS: "https://shippo-static.s3.amazonaws.com/providers/75/USPS.png",
+  UPS: "https://shippo-static.s3.amazonaws.com/providers/75/UPS.png",
+  FedEx: "https://shippo-static.s3.amazonaws.com/providers/75/FedEx.png",
+  DHL: "https://shippo-static.s3.amazonaws.com/providers/75/DHL_Express.png",
+};
+
 const STATUSES = ["pending", "confirmed", "processing", "ready_for_pickup", "shipped", "delivered", "cancelled", "refunded"];
 
 function getAvailableStatuses(currentStatus: string): string[] {
@@ -229,6 +245,9 @@ export default function AdminOrderDetailPage() {
 
   const [manualWeight, setManualWeight] = useState<number>(1.0);
   const [manualLabelLoading, setManualLabelLoading] = useState(false);
+  const [adminRates, setAdminRates] = useState<AdminRate[]>([]);
+  const [adminRatesLoading, setAdminRatesLoading] = useState(false);
+  const [adminSelectedRateId, setAdminSelectedRateId] = useState<string | null>(null);
 
   const [isVerifyingAch, setIsVerifyingAch] = useState(false);
   const [isResendingInvoice, setIsResendingInvoice] = useState(false);
@@ -388,15 +407,37 @@ export default function AdminOrderDetailPage() {
     }
   }
 
+  async function handleFetchAdminRates() {
+    setAdminRatesLoading(true);
+    setAdminRates([]);
+    setAdminSelectedRateId(null);
+    try {
+      const result = await apiClient.post<{ rates: AdminRate[]; error?: string }>(
+        `/api/v1/admin/orders/${order?.id ?? id}/fetch-rates`,
+        { weight_lbs: manualWeight }
+      );
+      const rates = result.rates ?? [];
+      setAdminRates(rates);
+      if (rates.length > 0) setAdminSelectedRateId(rates[0]!.rate_id);
+    } catch {
+      setAdminRates([]);
+    } finally {
+      setAdminRatesLoading(false);
+    }
+  }
+
   async function handleGenerateManualLabel() {
-    if (!selectedCarrier) return;
+    const selectedRate = adminRates.find(r => r.rate_id === adminSelectedRateId);
+    if (!selectedRate) return;
     setManualLabelLoading(true); setMsg(null); setLabelResult(null);
     try {
       const result = await apiClient.post<{
         success?: boolean; tracking_number?: string; tracking_url?: string;
         label_url?: string; carrier?: string; service?: string; rate?: number; error?: string;
       }>(`/api/v1/admin/orders/${order?.id ?? id}/generate-label-manual`, {
-        carrier: selectedCarrier.toUpperCase(), weight_lbs: manualWeight,
+        rate_id: selectedRate.rate_id,
+        carrier: selectedRate.carrier,
+        service: selectedRate.service,
       });
       setLabelResult(result);
       if (result.success) {
@@ -705,59 +746,119 @@ export default function AdminOrderDetailPage() {
                   </div>
                 )}
 
-                {/* Carrier tiles — all enabled for Standard Ground, only customer choice for Live Rate */}
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "8px", marginBottom: "14px" }}>
-                  {([
-                    { id: "fedex", name: "FedEx", logo: "https://shippo-static.s3.amazonaws.com/providers/75/FedEx.png" },
-                    { id: "ups",   name: "UPS",   logo: "https://shippo-static.s3.amazonaws.com/providers/75/UPS.png" },
-                    { id: "usps",  name: "USPS",  logo: "https://shippo-static.s3.amazonaws.com/providers/75/USPS.png" },
-                  ]).map(carrier => {
-                    const active = selectedCarrier === carrier.id;
-                    const isCustomerChoice = hasLiveRate && customerCarrier === carrier.id;
-                    const isDisabled = hasLiveRate && !!customerCarrier && !isCustomerChoice;
-                    return (
-                      <div key={carrier.id}
-                        onClick={() => !isDisabled && setSelectedCarrier(carrier.id)}
-                        style={{
-                          border: active ? "2px solid #1A5CFF" : isDisabled ? "1.5px solid #F0EEE9" : "1.5px solid #E2E0DA",
-                          borderRadius: "8px", padding: "14px 8px", textAlign: "center" as const,
-                          cursor: isDisabled ? "not-allowed" : "pointer",
-                          background: active ? "rgba(26,92,255,.05)" : isDisabled ? "#FAFAF8" : "#fff",
-                          opacity: isDisabled ? 0.4 : 1,
-                          transition: "all .15s",
-                          display: "flex", flexDirection: "column" as const, alignItems: "center", justifyContent: "center", gap: "6px",
-                        }}>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={carrier.logo} alt={carrier.name} style={{ height: "28px", width: "auto", objectFit: "contain", filter: isDisabled ? "grayscale(1)" : "none" }} />
-                        <div style={{ fontSize: "11px", fontWeight: 700, color: active ? "#1A5CFF" : "#7A7880" }}>{carrier.name}</div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Standard Ground: weight input */}
-                {isStandardGround && (
-                  <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "14px" }}>
-                    <label style={{ ...LabelStyle, marginBottom: 0 }}>Package Weight (lbs)</label>
-                    <input
-                      type="number" min="0.1" step="0.1" value={manualWeight}
-                      onChange={e => setManualWeight(parseFloat(e.target.value) || 1.0)}
-                      style={{ width: "90px", padding: "8px 10px", border: "1.5px solid #E2E0DA", borderRadius: "6px", fontSize: "14px", fontFamily: "var(--font-jakarta)" }}
-                    />
-                  </div>
-                )}
-
-                {/* Generate button */}
+                {/* CASE 2 (Standard Ground): live rates fetch UI */}
                 {isStandardGround ? (
-                  <button onClick={handleGenerateManualLabel} disabled={!selectedCarrier || manualLabelLoading}
-                    style={{ background: selectedCarrier ? "#1A5CFF" : "#E2E0DA", color: "#fff", border: "none", padding: "12px 24px", borderRadius: "6px", fontSize: "14px", fontWeight: 700, cursor: selectedCarrier ? "pointer" : "not-allowed", opacity: manualLabelLoading ? .65 : 1, marginBottom: "14px" }}>
-                    {manualLabelLoading ? "Generating label…" : selectedCarrier ? `Generate ${selectedCarrier.toUpperCase()} Label` : "Select a carrier"}
-                  </button>
+                  <>
+                    {/* Weight input + Fetch Rates button */}
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px", flexWrap: "wrap" as const }}>
+                      <label style={{ ...LabelStyle, marginBottom: 0, whiteSpace: "nowrap" as const }}>Package Weight (lbs)</label>
+                      <input
+                        type="number" min="0.1" step="0.1" value={manualWeight}
+                        onChange={e => setManualWeight(parseFloat(e.target.value) || 1.0)}
+                        style={{ width: "80px", padding: "8px 10px", border: "1.5px solid #E2E0DA", borderRadius: "6px", fontSize: "14px", fontFamily: "var(--font-jakarta)" }}
+                      />
+                      <button onClick={handleFetchAdminRates} disabled={adminRatesLoading}
+                        style={{ padding: "8px 18px", background: "#1A5CFF", color: "#fff", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: 700, cursor: adminRatesLoading ? "not-allowed" : "pointer", opacity: adminRatesLoading ? .65 : 1, whiteSpace: "nowrap" as const }}>
+                        {adminRatesLoading ? "Fetching…" : "Fetch Rates"}
+                      </button>
+                    </div>
+
+                    {/* Loading */}
+                    {adminRatesLoading && (
+                      <div style={{ fontSize: "12px", color: "#7A7880", padding: "6px 0", marginBottom: "10px" }}>Fetching live carrier rates…</div>
+                    )}
+
+                    {/* Rate list */}
+                    {!adminRatesLoading && adminRates.length > 0 && (
+                      <div style={{ display: "flex", flexDirection: "column" as const, gap: "6px", marginBottom: "14px" }}>
+                        {adminRates.map(rate => {
+                          const isRateSelected = adminSelectedRateId === rate.rate_id;
+                          return (
+                            <div key={rate.rate_id}
+                              onClick={() => setAdminSelectedRateId(rate.rate_id)}
+                              style={{
+                                display: "flex", alignItems: "center", justifyContent: "space-between",
+                                padding: "10px 14px", cursor: "pointer",
+                                border: `1px solid ${isRateSelected ? "#1A5CFF" : "#E2E0DA"}`,
+                                borderRadius: "6px",
+                                background: isRateSelected ? "rgba(26,92,255,.04)" : "#fff",
+                                transition: "all .1s",
+                              }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                <div style={{
+                                  width: "14px", height: "14px", borderRadius: "50%", flexShrink: 0,
+                                  border: `2px solid ${isRateSelected ? "#1A5CFF" : "#E2E0DA"}`,
+                                  background: isRateSelected ? "#1A5CFF" : "#fff",
+                                  display: "flex", alignItems: "center", justifyContent: "center",
+                                }}>
+                                  {isRateSelected && <div style={{ width: "4px", height: "4px", borderRadius: "50%", background: "#fff" }} />}
+                                </div>
+                                {CARRIER_LOGOS[rate.carrier] && (
+                                  // eslint-disable-next-line @next/next/no-img-element
+                                  <img src={CARRIER_LOGOS[rate.carrier]} alt={rate.carrier}
+                                    style={{ maxHeight: "20px", width: "auto", objectFit: "contain", flexShrink: 0 }} />
+                                )}
+                                <div>
+                                  <div style={{ fontSize: "12px", fontWeight: 700, color: "#2A2830" }}>{rate.service}</div>
+                                  {rate.days != null && <div style={{ fontSize: "11px", color: "#7A7880", marginTop: "1px" }}>{rate.days} business day{rate.days !== 1 ? "s" : ""}</div>}
+                                </div>
+                              </div>
+                              <span style={{ fontSize: "13px", fontWeight: 800, color: "#2A2830" }}>${Number(rate.cost).toFixed(2)}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {/* No rates yet */}
+                    {!adminRatesLoading && adminRates.length === 0 && (
+                      <div style={{ fontSize: "12px", color: "#7A7880", marginBottom: "14px" }}>
+                        Enter a package weight and click "Fetch Rates" to see available carrier options.
+                      </div>
+                    )}
+
+                    {/* Generate Label button */}
+                    <button onClick={handleGenerateManualLabel} disabled={!adminSelectedRateId || manualLabelLoading}
+                      style={{ background: adminSelectedRateId ? "#1A5CFF" : "#E2E0DA", color: "#fff", border: "none", padding: "12px 24px", borderRadius: "6px", fontSize: "14px", fontWeight: 700, cursor: adminSelectedRateId ? "pointer" : "not-allowed", opacity: manualLabelLoading ? .65 : 1, marginBottom: "14px" }}>
+                      {manualLabelLoading ? "Generating label…" : adminSelectedRateId ? "Generate Label" : "Select a rate first"}
+                    </button>
+                  </>
                 ) : (
-                  <button onClick={handleGenerateLabel} disabled={!selectedCarrier || labelLoading}
-                    style={{ background: selectedCarrier ? "#1A5CFF" : "#E2E0DA", color: "#fff", border: "none", padding: "12px 24px", borderRadius: "6px", fontSize: "14px", fontWeight: 700, cursor: selectedCarrier ? "pointer" : "not-allowed", opacity: labelLoading ? .65 : 1, marginBottom: "14px" }}>
-                    {labelLoading ? "Generating label…" : selectedCarrier ? `Generate ${selectedCarrier.toUpperCase()} Label` : "Select a carrier"}
-                  </button>
+                  /* CASE 1 (Live Rate): carrier tiles — only customer's chosen carrier is clickable */
+                  <>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "8px", marginBottom: "14px" }}>
+                      {([
+                        { id: "fedex", name: "FedEx", logo: "https://shippo-static.s3.amazonaws.com/providers/75/FedEx.png" },
+                        { id: "ups",   name: "UPS",   logo: "https://shippo-static.s3.amazonaws.com/providers/75/UPS.png" },
+                        { id: "usps",  name: "USPS",  logo: "https://shippo-static.s3.amazonaws.com/providers/75/USPS.png" },
+                      ]).map(carrier => {
+                        const active = selectedCarrier === carrier.id;
+                        const isCustomerChoice = customerCarrier === carrier.id;
+                        const isDisabled = !!customerCarrier && !isCustomerChoice;
+                        return (
+                          <div key={carrier.id}
+                            onClick={() => !isDisabled && setSelectedCarrier(carrier.id)}
+                            style={{
+                              border: active ? "2px solid #1A5CFF" : isDisabled ? "1.5px solid #F0EEE9" : "1.5px solid #E2E0DA",
+                              borderRadius: "8px", padding: "14px 8px", textAlign: "center" as const,
+                              cursor: isDisabled ? "not-allowed" : "pointer",
+                              background: active ? "rgba(26,92,255,.05)" : isDisabled ? "#FAFAF8" : "#fff",
+                              opacity: isDisabled ? 0.4 : 1,
+                              transition: "all .15s",
+                              display: "flex", flexDirection: "column" as const, alignItems: "center", justifyContent: "center", gap: "6px",
+                            }}>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={carrier.logo} alt={carrier.name} style={{ height: "28px", width: "auto", objectFit: "contain", filter: isDisabled ? "grayscale(1)" : "none" }} />
+                            <div style={{ fontSize: "11px", fontWeight: 700, color: active ? "#1A5CFF" : "#7A7880" }}>{carrier.name}</div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <button onClick={handleGenerateLabel} disabled={!selectedCarrier || labelLoading}
+                      style={{ background: selectedCarrier ? "#1A5CFF" : "#E2E0DA", color: "#fff", border: "none", padding: "12px 24px", borderRadius: "6px", fontSize: "14px", fontWeight: 700, cursor: selectedCarrier ? "pointer" : "not-allowed", opacity: labelLoading ? .65 : 1, marginBottom: "14px" }}>
+                      {labelLoading ? "Generating label…" : selectedCarrier ? `Generate ${selectedCarrier.toUpperCase()} Label` : "Select a carrier"}
+                    </button>
+                  </>
                 )}
 
                 {/* Label result */}
