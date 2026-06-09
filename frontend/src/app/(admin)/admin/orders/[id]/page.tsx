@@ -250,6 +250,7 @@ export default function AdminOrderDetailPage() {
   const [adminRates, setAdminRates] = useState<AdminRate[]>([]);
   const [adminRatesLoading, setAdminRatesLoading] = useState(false);
   const [adminSelectedRateId, setAdminSelectedRateId] = useState<string | null>(null);
+  const adminRatesRef = useRef<AdminRate[]>([]);
 
   const [isVerifyingAch, setIsVerifyingAch] = useState(false);
   const [isResendingInvoice, setIsResendingInvoice] = useState(false);
@@ -330,25 +331,34 @@ export default function AdminOrderDetailPage() {
       order.shipping_method?.toLowerCase().includes("pickup")
     );
     if (order.shipping_rate_id || isWillCall) return;  // only Standard Ground
+    // Skip if we already have rates loaded (prevents double-fetch in Strict Mode)
+    if (adminRatesRef.current.length > 0) return;
 
-    const weight = order.calculated_weight_lbs ?? 1.0;
+    const weight = order.calculated_weight_lbs ?? 0.5;
     setAdminRatesLoading(true);
-    setAdminRates([]);
     setAdminSelectedRateId(null);
     apiClient.post<{ rates: AdminRate[]; error?: string }>(
       `/api/v1/admin/orders/${order.id}/fetch-rates`,
       { weight_lbs: weight }
     ).then(result => {
       const rates = result.rates ?? [];
+      adminRatesRef.current = rates;
       setAdminRates(rates);
       if (rates.length > 0) setAdminSelectedRateId(rates[0]!.rate_id);
     }).catch(() => {
-      setAdminRates([]);
+      // leave existing rates intact on error
     }).finally(() => {
       setAdminRatesLoading(false);
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [order?.id]);
+
+  // Safeguard: restore rates from ref if React wipes state unexpectedly
+  useEffect(() => {
+    if (!adminRatesLoading && adminRates.length === 0 && adminRatesRef.current.length > 0) {
+      setAdminRates(adminRatesRef.current);
+    }
+  });
 
   function handleCourierSelect(courierId: string) {
     setSelectedCourier(courierId);
@@ -440,6 +450,7 @@ export default function AdminOrderDetailPage() {
 
   async function handleFetchAdminRates() {
     setAdminRatesLoading(true);
+    adminRatesRef.current = [];
     setAdminRates([]);
     setAdminSelectedRateId(null);
     try {
@@ -448,9 +459,11 @@ export default function AdminOrderDetailPage() {
         { weight_lbs: manualWeight }
       );
       const rates = result.rates ?? [];
+      adminRatesRef.current = rates;
       setAdminRates(rates);
       if (rates.length > 0) setAdminSelectedRateId(rates[0]!.rate_id);
     } catch {
+      adminRatesRef.current = [];
       setAdminRates([]);
     } finally {
       setAdminRatesLoading(false);
@@ -780,79 +793,83 @@ export default function AdminOrderDetailPage() {
                 {/* CASE 2 (Standard Ground): live rates fetch UI */}
                 {isStandardGround ? (
                   <>
-                    {/* Weight input + Fetch Rates button */}
-                    <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px", flexWrap: "wrap" as const }}>
-                      <label style={{ ...LabelStyle, marginBottom: 0, whiteSpace: "nowrap" as const }}>Package Weight (lbs)</label>
-                      <input
-                        type="number" min="0.1" step="0.1" value={manualWeight}
-                        onChange={e => setManualWeight(parseFloat(e.target.value) || 1.0)}
-                        style={{ width: "80px", padding: "8px 10px", border: "1.5px solid #E2E0DA", borderRadius: "6px", fontSize: "14px", fontFamily: "var(--font-jakarta)" }}
-                      />
-                      <button onClick={handleFetchAdminRates} disabled={adminRatesLoading}
-                        style={{ padding: "8px 18px", background: "#1A5CFF", color: "#fff", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: 700, cursor: adminRatesLoading ? "not-allowed" : "pointer", opacity: adminRatesLoading ? .65 : 1, whiteSpace: "nowrap" as const }}>
-                        {adminRatesLoading ? "Fetching…" : "Fetch Rates"}
-                      </button>
-                    </div>
+                    {!labelResult?.success && (
+                      <>
+                        {/* Weight input + Fetch Rates button */}
+                        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px", flexWrap: "wrap" as const }}>
+                          <label style={{ ...LabelStyle, marginBottom: 0, whiteSpace: "nowrap" as const }}>Package Weight (lbs)</label>
+                          <input
+                            type="number" min="0.1" step="0.1" value={manualWeight}
+                            onChange={e => setManualWeight(parseFloat(e.target.value) || 0.5)}
+                            style={{ width: "80px", padding: "8px 10px", border: "1.5px solid #E2E0DA", borderRadius: "6px", fontSize: "14px", fontFamily: "var(--font-jakarta)" }}
+                          />
+                          <button onClick={handleFetchAdminRates} disabled={adminRatesLoading}
+                            style={{ padding: "8px 18px", background: "#1A5CFF", color: "#fff", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: 700, cursor: adminRatesLoading ? "not-allowed" : "pointer", opacity: adminRatesLoading ? .65 : 1, whiteSpace: "nowrap" as const }}>
+                            {adminRatesLoading ? "Fetching…" : "Fetch Rates"}
+                          </button>
+                        </div>
 
-                    {/* Loading */}
-                    {adminRatesLoading && (
-                      <div style={{ fontSize: "12px", color: "#7A7880", padding: "6px 0", marginBottom: "10px" }}>Fetching live carrier rates…</div>
-                    )}
+                        {/* Loading */}
+                        {adminRatesLoading && (
+                          <div style={{ fontSize: "12px", color: "#7A7880", padding: "6px 0", marginBottom: "10px" }}>Fetching live carrier rates…</div>
+                        )}
 
-                    {/* Rate list */}
-                    {!adminRatesLoading && adminRates.length > 0 && (
-                      <div style={{ display: "flex", flexDirection: "column" as const, gap: "6px", marginBottom: "14px" }}>
-                        {adminRates.map(rate => {
-                          const isRateSelected = adminSelectedRateId === rate.rate_id;
-                          return (
-                            <div key={rate.rate_id}
-                              onClick={() => setAdminSelectedRateId(rate.rate_id)}
-                              style={{
-                                display: "flex", alignItems: "center", justifyContent: "space-between",
-                                padding: "10px 14px", cursor: "pointer",
-                                border: `1px solid ${isRateSelected ? "#1A5CFF" : "#E2E0DA"}`,
-                                borderRadius: "6px",
-                                background: isRateSelected ? "rgba(26,92,255,.04)" : "#fff",
-                                transition: "all .1s",
-                              }}>
-                              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                                <div style={{
-                                  width: "14px", height: "14px", borderRadius: "50%", flexShrink: 0,
-                                  border: `2px solid ${isRateSelected ? "#1A5CFF" : "#E2E0DA"}`,
-                                  background: isRateSelected ? "#1A5CFF" : "#fff",
-                                  display: "flex", alignItems: "center", justifyContent: "center",
-                                }}>
-                                  {isRateSelected && <div style={{ width: "4px", height: "4px", borderRadius: "50%", background: "#fff" }} />}
+                        {/* Rate list */}
+                        {!adminRatesLoading && adminRates.length > 0 && (
+                          <div style={{ display: "flex", flexDirection: "column" as const, gap: "6px", marginBottom: "14px" }}>
+                            {adminRates.map(rate => {
+                              const isRateSelected = adminSelectedRateId === rate.rate_id;
+                              return (
+                                <div key={rate.rate_id}
+                                  onClick={() => setAdminSelectedRateId(rate.rate_id)}
+                                  style={{
+                                    display: "flex", alignItems: "center", justifyContent: "space-between",
+                                    padding: "10px 14px", cursor: "pointer",
+                                    border: `1px solid ${isRateSelected ? "#1A5CFF" : "#E2E0DA"}`,
+                                    borderRadius: "6px",
+                                    background: isRateSelected ? "rgba(26,92,255,.04)" : "#fff",
+                                    transition: "all .1s",
+                                  }}>
+                                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                    <div style={{
+                                      width: "14px", height: "14px", borderRadius: "50%", flexShrink: 0,
+                                      border: `2px solid ${isRateSelected ? "#1A5CFF" : "#E2E0DA"}`,
+                                      background: isRateSelected ? "#1A5CFF" : "#fff",
+                                      display: "flex", alignItems: "center", justifyContent: "center",
+                                    }}>
+                                      {isRateSelected && <div style={{ width: "4px", height: "4px", borderRadius: "50%", background: "#fff" }} />}
+                                    </div>
+                                    {CARRIER_LOGOS[rate.carrier] && (
+                                      // eslint-disable-next-line @next/next/no-img-element
+                                      <img src={CARRIER_LOGOS[rate.carrier]} alt={rate.carrier}
+                                        style={{ maxHeight: "20px", width: "auto", objectFit: "contain", flexShrink: 0 }} />
+                                    )}
+                                    <div>
+                                      <div style={{ fontSize: "12px", fontWeight: 700, color: "#2A2830" }}>{rate.service}</div>
+                                      {rate.days != null && <div style={{ fontSize: "11px", color: "#7A7880", marginTop: "1px" }}>{rate.days} business day{rate.days !== 1 ? "s" : ""}</div>}
+                                    </div>
+                                  </div>
+                                  <span style={{ fontSize: "13px", fontWeight: 800, color: "#2A2830" }}>${Number(rate.cost).toFixed(2)}</span>
                                 </div>
-                                {CARRIER_LOGOS[rate.carrier] && (
-                                  // eslint-disable-next-line @next/next/no-img-element
-                                  <img src={CARRIER_LOGOS[rate.carrier]} alt={rate.carrier}
-                                    style={{ maxHeight: "20px", width: "auto", objectFit: "contain", flexShrink: 0 }} />
-                                )}
-                                <div>
-                                  <div style={{ fontSize: "12px", fontWeight: 700, color: "#2A2830" }}>{rate.service}</div>
-                                  {rate.days != null && <div style={{ fontSize: "11px", color: "#7A7880", marginTop: "1px" }}>{rate.days} business day{rate.days !== 1 ? "s" : ""}</div>}
-                                </div>
-                              </div>
-                              <span style={{ fontSize: "13px", fontWeight: 800, color: "#2A2830" }}>${Number(rate.cost).toFixed(2)}</span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
+                              );
+                            })}
+                          </div>
+                        )}
 
-                    {/* No rates yet */}
-                    {!adminRatesLoading && adminRates.length === 0 && (
-                      <div style={{ fontSize: "12px", color: "#7A7880", marginBottom: "14px" }}>
-                        Enter a package weight and click "Fetch Rates" to see available carrier options.
-                      </div>
-                    )}
+                        {/* No rates yet */}
+                        {!adminRatesLoading && adminRates.length === 0 && (
+                          <div style={{ fontSize: "12px", color: "#7A7880", marginBottom: "14px" }}>
+                            Enter a package weight and click "Fetch Rates" to see available carrier options.
+                          </div>
+                        )}
 
-                    {/* Generate Label button */}
-                    <button onClick={handleGenerateManualLabel} disabled={!adminSelectedRateId || manualLabelLoading}
-                      style={{ background: adminSelectedRateId ? "#1A5CFF" : "#E2E0DA", color: "#fff", border: "none", padding: "12px 24px", borderRadius: "6px", fontSize: "14px", fontWeight: 700, cursor: adminSelectedRateId ? "pointer" : "not-allowed", opacity: manualLabelLoading ? .65 : 1, marginBottom: "14px" }}>
-                      {manualLabelLoading ? "Generating label…" : adminSelectedRateId ? "Generate Label" : "Select a rate first"}
-                    </button>
+                        {/* Generate Label button */}
+                        <button onClick={handleGenerateManualLabel} disabled={!adminSelectedRateId || manualLabelLoading}
+                          style={{ background: adminSelectedRateId ? "#1A5CFF" : "#E2E0DA", color: "#fff", border: "none", padding: "12px 24px", borderRadius: "6px", fontSize: "14px", fontWeight: 700, cursor: adminSelectedRateId ? "pointer" : "not-allowed", opacity: manualLabelLoading ? .65 : 1, marginBottom: "14px" }}>
+                          {manualLabelLoading ? "Generating label…" : adminSelectedRateId ? "Generate Label" : "Select a rate first"}
+                        </button>
+                      </>
+                    )}
                   </>
                 ) : (
                   /* CASE 1 (Live Rate): carrier tiles — only customer's chosen carrier is clickable */
