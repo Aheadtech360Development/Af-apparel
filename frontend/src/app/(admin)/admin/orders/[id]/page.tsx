@@ -328,18 +328,21 @@ export default function AdminOrderDetailPage() {
 
   // Auto-fetch Shippo rates when a Standard Ground order loads (no manual click needed)
   useEffect(() => {
-    if (!order) return;
+    if (!order?.id) return;
     const isWillCall = !!(
       order.shipping_method?.toLowerCase().includes("will_call") ||
       order.shipping_method?.toLowerCase().includes("pickup")
     );
-    if (order.shipping_rate_id || isWillCall) return;  // only Standard Ground
-    // Skip if we already have rates loaded (prevents double-fetch in Strict Mode)
-    if (adminRatesRef.current.length > 0) return;
+    const hasLiveRate = !!order.shipping_rate_id;
+    const hasExistingLabel = !!(order.tracking_number && order.label_url);
+    if (hasLiveRate || isWillCall || hasExistingLabel) return;  // only Standard Ground without a label
 
-    const weight = order.calculated_weight_lbs ?? 0.5;
-    setAdminRatesLoading(true);
+    // Standard Ground: reset state and auto-fetch rates immediately on load
+    const weight = order.calculated_weight_lbs ?? 1.0;
+    adminRatesRef.current = [];
+    setAdminRates([]);
     setAdminSelectedRateId(null);
+    setAdminRatesLoading(true);
     apiClient.post<{ rates: AdminRate[]; error?: string }>(
       `/api/v1/admin/orders/${order.id}/fetch-rates`,
       { weight_lbs: weight }
@@ -349,7 +352,7 @@ export default function AdminOrderDetailPage() {
       setAdminRates(rates);
       if (rates.length > 0) setAdminSelectedRateId(rates[0]!.rate_id);
     }).catch(() => {
-      // leave existing rates intact on error
+      adminRatesRef.current = [];
     }).finally(() => {
       setAdminRatesLoading(false);
     });
@@ -823,7 +826,7 @@ export default function AdminOrderDetailPage() {
                           />
                           <button onClick={handleFetchAdminRates} disabled={adminRatesLoading}
                             style={{ padding: "8px 18px", background: "#1A5CFF", color: "#fff", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: 700, cursor: adminRatesLoading ? "not-allowed" : "pointer", opacity: adminRatesLoading ? .65 : 1, whiteSpace: "nowrap" as const }}>
-                            {adminRatesLoading ? "Fetching…" : "Fetch Rates"}
+                            {adminRatesLoading ? "Fetching…" : "Refresh Rates"}
                           </button>
                         </div>
 
@@ -877,7 +880,7 @@ export default function AdminOrderDetailPage() {
                         {/* No rates yet */}
                         {!adminRatesLoading && adminRates.length === 0 && (
                           <div style={{ fontSize: "12px", color: "#7A7880", marginBottom: "14px" }}>
-                            Enter a package weight and click "Fetch Rates" to see available carrier options.
+                            Enter a package weight and click "Refresh Rates" to load available carrier options.
                           </div>
                         )}
 
