@@ -170,7 +170,7 @@ export default function CheckoutPaymentPage() {
 
   // Compute fee here (before early return) so handlers can save it to the store
   const subtotalEarly = isGuest ? guestSubtotal : Number(cart?.subtotal ?? 0);
-  const convenienceFeeEarly = paymentType === "card" ? Math.round(subtotalEarly * 0.03 * 100) / 100 : 0;
+  const convenienceFeeEarly = (isWholesale && paymentType === "card") ? Math.round(subtotalEarly * 0.03 * 100) / 100 : 0;
 
   function handleContinueWithSavedCard() {
     if (!selectedCardId) return;
@@ -225,7 +225,7 @@ export default function CheckoutPaymentPage() {
   const subtotal = isGuest ? guestSubtotal : Number(cart?.subtotal ?? 0);
   const shipping = shippingCost;
   const taxAmountDisplay = storedTaxAmount > 0 ? storedTaxAmount : 0;
-  const convenienceFee = paymentType === "card" ? Math.round(subtotal * 0.03 * 100) / 100 : 0;
+  const convenienceFee = (isWholesale && paymentType === "card") ? Math.round(subtotal * 0.03 * 100) / 100 : 0;
   const total = subtotal + shipping + taxAmountDisplay - (isGuest ? 0 : couponDiscount) + convenienceFee;
 
   const SHIPPING_LABELS: Record<string, string> = {
@@ -258,7 +258,7 @@ export default function CheckoutPaymentPage() {
                           <div style={{ fontSize: "11px", color: "#6B6B6B", marginTop: "2px" }}>{type === "card" ? "Visa, Mastercard, Amex, Discover" : "Checking or savings account"}</div>
                         </div>
                       </label>
-                      {type === "card" && isSelected && (
+                      {type === "card" && isSelected && isWholesale && (
                         <div style={{ fontSize: "12px", color: "#92400e", background: "#fef3c7", padding: "6px 10px", borderRadius: "4px", marginTop: "6px" }}>
                           ⚠ A 3% convenience fee will be added to your order total.
                         </div>
