@@ -16,7 +16,7 @@ export default function Certifications() {
           {certs.map(cert => (
             <div key={cert.h}>
               <h5 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 600, marginBottom: "8px", color: "#1A1A1A" }}>{cert.h}</h5>
-              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#6B6B6B", lineHeight: 1.6 }}>{cert.p}</p>
+              {/* <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#6B6B6B", lineHeight: 1.6 }}>{cert.p}</p> */}
             </div>
           ))}
         </div>
