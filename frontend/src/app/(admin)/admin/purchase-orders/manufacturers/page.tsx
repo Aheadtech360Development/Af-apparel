@@ -35,7 +35,10 @@ export default function ManufacturersPage() {
   function openEdit(m: Manufacturer) { setEditing(m); setForm({ name: m.name, contact_name: m.contact_name || "", email: m.email || "", phone: m.phone || "", address: m.address || "", notes: m.notes || "" }); setShowModal(true); }
 
   async function save() {
-    if (!form.name.trim()) { alert("Name is required"); return; }
+    if (!form.name.trim() || !form.contact_name?.trim() || !form.email?.trim() || !form.phone?.trim() || !form.address?.trim()) {
+      alert("Please fill all required fields: Name, Contact Name, Email, Phone, and Address");
+      return;
+    }
     setSaving(true);
     try {
       if (editing) {
@@ -111,12 +114,12 @@ export default function ManufacturersPage() {
             <div style={{ display: "grid", gap: "14px" }}>
               {(["name", "contact_name", "email", "phone"] as const).map(field => (
                 <div key={field}>
-                  <label style={LBL}>{field === "contact_name" ? "Contact Name" : field.charAt(0).toUpperCase() + field.slice(1)}{field === "name" ? " *" : ""}</label>
+                  <label style={LBL}>{field === "contact_name" ? "Contact Name" : field.charAt(0).toUpperCase() + field.slice(1)} *</label>
                   <input value={form[field] || ""} onChange={e => setForm(f => ({ ...f, [field]: e.target.value }))} style={INPUT} />
                 </div>
               ))}
               <div>
-                <label style={LBL}>Address</label>
+                <label style={LBL}>Address *</label>
                 <textarea value={form.address || ""} onChange={e => setForm(f => ({ ...f, address: e.target.value }))} rows={2} style={{ ...INPUT, resize: "vertical" }} />
               </div>
               <div>

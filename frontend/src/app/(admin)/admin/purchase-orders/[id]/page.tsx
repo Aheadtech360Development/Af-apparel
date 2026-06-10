@@ -75,7 +75,6 @@ export default function PODetailPage() {
   const router = useRouter();
   const [po, setPo] = useState<PO | null>(null);
   const [loading, setLoading] = useState(true);
-  const [syncing, setSyncing] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [emailSending, setEmailSending] = useState(false);
 
@@ -115,19 +114,6 @@ export default function PODetailPage() {
     }
   }
 
-  async function syncQB() {
-    setSyncing(true);
-    try {
-      const data = await apiClient.post<{ qb_id: string }>(`/api/v1/admin/purchase-orders/${id}/sync-qb`);
-      alert(`Synced to QB! ID: ${data.qb_id}`);
-      await load();
-    } catch (err) {
-      alert(err instanceof ApiClientError ? err.message : "QB sync failed");
-    } finally {
-      setSyncing(false);
-    }
-  }
-
   if (loading) return <div style={{ padding: "32px", color: "#9CA3AF" }}>Loading…</div>;
   if (!po) return <div style={{ padding: "32px", color: "#EF4444" }}>PO not found.</div>;
 
@@ -161,9 +147,6 @@ export default function PODetailPage() {
               </button>
             </>
           )}
-          <button onClick={syncQB} disabled={syncing} style={{ padding: "9px 18px", borderRadius: "8px", background: "#1D4ED8", color: "#fff", border: "none", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}>
-            {syncing ? "Syncing…" : "Sync to QB"}
-          </button>
           {canReceive && (
             <Link href={`/admin/purchase-orders/${po.id}/receive`} style={{ padding: "9px 18px", borderRadius: "8px", background: "#059669", color: "#fff", textDecoration: "none", fontSize: "13px", fontWeight: 600 }}>
               Receive Items

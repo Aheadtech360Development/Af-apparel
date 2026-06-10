@@ -6,7 +6,7 @@ import { apiClient, ApiClientError } from "@/lib/api-client";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-interface Manufacturer { id: string; name: string; }
+interface Manufacturer { id: string; name: string; contact_name?: string; email?: string; phone?: string; address?: string; notes?: string; }
 
 interface SearchProduct { id: string; name: string; slug: string; product_code?: string | null; }
 
@@ -103,7 +103,7 @@ export default function CreatePOPage() {
   const [saving, setSaving] = useState(false);
   const [emailSending, setEmailSending] = useState(false);
   const [showNewMfr, setShowNewMfr] = useState(false);
-  const [newMfrName, setNewMfrName] = useState("");
+  const [newMfrForm, setNewMfrForm] = useState({ name: "", contact_name: "", email: "", phone: "", address: "", notes: "" });
   const [stepError, setStepError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -156,6 +156,26 @@ export default function CreatePOPage() {
     setBlocks(bs => bs.map(b => {
       if (b.key !== blockKey) return b;
       return { ...b, ...setActiveRows(b, activeRows(b).map(r => ({ ...r, unit_cost_expected: cost }))) };
+    }));
+  }
+
+  function applyQtyToAll(blockKey: number, qty: number) {
+    setBlocks(bs => bs.map(b => {
+      if (b.key !== blockKey) return b;
+      return { ...b, ...setActiveRows(b, activeRows(b).map(r => ({ ...r, qty_ordered: qty }))) };
+    }));
+  }
+
+  function duplicateRow(blockKey: number, rowKey: number) {
+    setBlocks(bs => bs.map(b => {
+      if (b.key !== blockKey) return b;
+      const rows = activeRows(b);
+      const idx = rows.findIndex(r => r.key === rowKey);
+      if (idx === -1) return b;
+      const src = rows[idx]!;
+      const newRow = blankRow({ color: src.color, size: src.size, qty_ordered: src.qty_ordered, unit_cost_expected: src.unit_cost_expected });
+      const newRows = [...rows.slice(0, idx + 1), newRow, ...rows.slice(idx + 1)];
+      return { ...b, ...setActiveRows(b, newRows) };
     }));
   }
 
@@ -213,12 +233,20 @@ export default function CreatePOPage() {
   // ── Manufacturer add ──────────────────────────────────────────────────────────
 
   async function addManufacturer() {
-    if (!newMfrName.trim()) return;
-    const data = await apiClient.post<Manufacturer>("/api/v1/admin/purchase-orders/manufacturers", { name: newMfrName });
-    setManufacturers(m => [...m, data]);
-    setManufacturerId(data.id);
-    setNewMfrName("");
-    setShowNewMfr(false);
+    if (!newMfrForm.name.trim() || !newMfrForm.contact_name.trim() || !newMfrForm.email.trim() || !newMfrForm.phone.trim() || !newMfrForm.address.trim()) {
+      setStepError("Please fill all required manufacturer fields: Name, Contact Name, Email, Phone, Address");
+      return;
+    }
+    try {
+      const data = await apiClient.post<Manufacturer>("/api/v1/admin/purchase-orders/manufacturers", newMfrForm);
+      setManufacturers(m => [...m, data]);
+      setManufacturerId(data.id);
+      setNewMfrForm({ name: "", contact_name: "", email: "", phone: "", address: "", notes: "" });
+      setShowNewMfr(false);
+      setStepError(null);
+    } catch (err) {
+      setStepError(err instanceof ApiClientError ? err.message : "Failed to add manufacturer");
+    }
   }
 
   // ── Build final line items ───────────────────────────────────────────────────
@@ -226,26 +254,24 @@ export default function CreatePOPage() {
   function buildLineItems() {
     const items: object[] = [];
     for (const block of blocks) {
-      const rows = (block.mode === "existing" ? block.search_variant_rows : block.new_variant_rows).filter(r => r.qty_ordered > 0);
-      for (const row of rows) {
-        if (block.mode === "existing" && !row.is_new_variant && row.variant_id) {
-          items.push({
-            product_variant_id: row.variant_id,
-            qty_ordered: row.qty_ordered,
-            unit_cost_expected: row.unit_cost_expected,
-          });
+      // Existing product rows (including custom new-variant rows added to an existing product)
+      for (const row of block.search_variant_rows.filter(r => r.qty_ordered > 0)) {
+        if (!row.is_new_variant && row.variant_id) {
+          items.push({ product_variant_id: row.variant_id, qty_ordered: row.qty_ordered, unit_cost_expected: row.unit_cost_expected });
         } else {
-          items.push({
-            new_product_name: block.mode === "new" ? block.new_product_name : block.product_name,
-            new_product_sku: block.mode === "new" && block.new_sku_prefix
-              ? `${block.new_sku_prefix}-${row.color}-${row.size}`.toUpperCase()
-              : null,
-            new_product_color: row.color || null,
-            new_product_size: row.size || null,
-            qty_ordered: row.qty_ordered,
-            unit_cost_expected: row.unit_cost_expected,
-          });
+          items.push({ new_product_name: block.product_name, new_product_sku: null, new_product_color: row.color || null, new_product_size: row.size || null, qty_ordered: row.qty_ordered, unit_cost_expected: row.unit_cost_expected });
         }
+      }
+      // New product rows
+      for (const row of block.new_variant_rows.filter(r => r.qty_ordered > 0)) {
+        items.push({
+          new_product_name: block.new_product_name,
+          new_product_sku: block.new_sku_prefix ? `${block.new_sku_prefix}-${row.color}-${row.size}`.toUpperCase() : null,
+          new_product_color: row.color || null,
+          new_product_size: row.size || null,
+          qty_ordered: row.qty_ordered,
+          unit_cost_expected: row.unit_cost_expected,
+        });
       }
     }
     return items;
@@ -264,18 +290,17 @@ export default function CreatePOPage() {
 
   function handleStep2Next() {
     for (const block of blocks) {
-      const hasIdentity = block.mode === "new"
-        ? block.new_product_name.trim() !== ""
-        : block.product_id !== null;
-      if (!hasIdentity) {
+      const hasExistingIdentity = block.product_id !== null && block.search_variant_rows.some(r => r.qty_ordered > 0);
+      const hasNewIdentity = block.new_product_name.trim() !== "" && block.new_variant_rows.some(r => r.qty_ordered > 0);
+      if (!hasExistingIdentity && !hasNewIdentity) {
         setStepError(
-          block.mode === "new"
-            ? "Please enter a product name for all products."
-            : "Please select a product for all product blocks."
+          block.new_product_name.trim() !== "" || block.product_id !== null
+            ? `Please enter at least one quantity for "${block.new_product_name || block.product_name || "a product"}".`
+            : "Please select or name a product for all product blocks."
         );
         return;
       }
-      const rows = block.mode === "existing" ? block.search_variant_rows : block.new_variant_rows;
+      const rows = [...block.search_variant_rows, ...block.new_variant_rows];
     const hasQty = rows.some(r => r.qty_ordered > 0);
       if (!hasQty) {
         const label = block.mode === "new" ? (block.new_product_name || "a product") : block.product_name;
@@ -345,16 +370,18 @@ export default function CreatePOPage() {
   // ── Running total ─────────────────────────────────────────────────────────────
 
   const total = blocks.reduce((sum, b) => {
-    const rows = b.mode === "existing" ? b.search_variant_rows : b.new_variant_rows;
-    return sum + rows.reduce((s, r) => s + r.qty_ordered * r.unit_cost_expected, 0);
+    const searchSum = b.search_variant_rows.reduce((s, r) => s + r.qty_ordered * r.unit_cost_expected, 0);
+    const newSum = b.new_variant_rows.reduce((s, r) => s + r.qty_ordered * r.unit_cost_expected, 0);
+    return sum + searchSum + newSum;
   }, 0);
 
-  const reviewRows: Array<{ productLabel: string; color: string; size: string; qty: number; cost: number }> = [];
+  const reviewRows: Array<{ productLabel: string; color: string; size: string; qty: number; cost: number; isNew: boolean }> = [];
   for (const block of blocks) {
-    const productLabel = block.mode === "new" ? (block.new_product_name || "Unnamed product") : (block.product_name || "Unknown product");
-    const rows = (block.mode === "existing" ? block.search_variant_rows : block.new_variant_rows).filter(r => r.qty_ordered > 0);
-    for (const row of rows) {
-      reviewRows.push({ productLabel, color: row.color, size: row.size, qty: row.qty_ordered, cost: row.unit_cost_expected });
+    for (const row of block.search_variant_rows.filter(r => r.qty_ordered > 0)) {
+      reviewRows.push({ productLabel: block.product_name || "Unknown product", color: row.color, size: row.size, qty: row.qty_ordered, cost: row.unit_cost_expected, isNew: row.is_new_variant });
+    }
+    for (const row of block.new_variant_rows.filter(r => r.qty_ordered > 0)) {
+      reviewRows.push({ productLabel: block.new_product_name || "Unnamed product", color: row.color, size: row.size, qty: row.qty_ordered, cost: row.unit_cost_expected, isNew: true });
     }
   }
 
@@ -398,10 +425,19 @@ export default function CreatePOPage() {
                 <option value="__new__">+ Add New Manufacturer</option>
               </select>
               {showNewMfr && (
-                <div style={{ marginTop: "8px", display: "flex", gap: "8px" }}>
-                  <input value={newMfrName} onChange={e => setNewMfrName(e.target.value)} placeholder="Manufacturer name" style={{ ...INPUT, flex: 1 }} />
-                  <button onClick={addManufacturer} style={BTN_SM}>Add</button>
-                  <button onClick={() => setShowNewMfr(false)} style={{ ...BTN_SM, background: "#F3F4F6", color: "#374151" }}>Cancel</button>
+                <div style={{ marginTop: "10px", border: "1px solid #E5E7EB", borderRadius: "8px", padding: "16px", background: "#F9FAFB" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "10px" }}>
+                    <div><label style={LBL}>Name *</label><input value={newMfrForm.name} onChange={e => setNewMfrForm(f => ({ ...f, name: e.target.value }))} placeholder="Manufacturer name" style={INPUT} /></div>
+                    <div><label style={LBL}>Contact Name *</label><input value={newMfrForm.contact_name} onChange={e => setNewMfrForm(f => ({ ...f, contact_name: e.target.value }))} placeholder="Contact person" style={INPUT} /></div>
+                    <div><label style={LBL}>Email *</label><input type="email" value={newMfrForm.email} onChange={e => setNewMfrForm(f => ({ ...f, email: e.target.value }))} placeholder="email@example.com" style={INPUT} /></div>
+                    <div><label style={LBL}>Phone *</label><input value={newMfrForm.phone} onChange={e => setNewMfrForm(f => ({ ...f, phone: e.target.value }))} placeholder="+1 (555) 000-0000" style={INPUT} /></div>
+                    <div style={{ gridColumn: "1 / -1" }}><label style={LBL}>Address *</label><input value={newMfrForm.address} onChange={e => setNewMfrForm(f => ({ ...f, address: e.target.value }))} placeholder="Full address" style={INPUT} /></div>
+                    <div style={{ gridColumn: "1 / -1" }}><label style={LBL}>Notes</label><input value={newMfrForm.notes} onChange={e => setNewMfrForm(f => ({ ...f, notes: e.target.value }))} placeholder="Optional notes" style={INPUT} /></div>
+                  </div>
+                  <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
+                    <button onClick={addManufacturer} style={BTN_SM}>Add Manufacturer</button>
+                    <button onClick={() => { setShowNewMfr(false); setNewMfrForm({ name: "", contact_name: "", email: "", phone: "", address: "", notes: "" }); }} style={{ ...BTN_SM, background: "#F3F4F6", color: "#374151" }}>Cancel</button>
+                  </div>
                 </div>
               )}
             </div>
@@ -437,8 +473,10 @@ export default function CreatePOPage() {
               onSelectProduct={p => selectProduct(block.key, p)}
               onUpdateRow={(rk, patch) => updateRow(block.key, rk, patch)}
               onRemoveRow={rk => removeRow(block.key, rk)}
+              onDuplicateRow={rk => duplicateRow(block.key, rk)}
               onAddNewVariant={() => addNewVariantRow(block.key)}
               onApplyCostToAll={cost => applyCostToAll(block.key, cost)}
+              onApplyQtyToAll={qty => applyQtyToAll(block.key, qty)}
             />
           ))}
 
@@ -449,7 +487,7 @@ export default function CreatePOPage() {
 
           {/* Running total */}
           <div style={{ padding: "16px 20px", background: "#F0F4FF", borderRadius: "10px", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-            <span style={{ fontSize: "14px", color: "#374151" }}>Running Total ({blocks.reduce((n, b) => n + (b.mode === "existing" ? b.search_variant_rows : b.new_variant_rows).filter(r => r.qty_ordered > 0).length, 0)} line items):</span>
+            <span style={{ fontSize: "14px", color: "#374151" }}>Running Total ({blocks.reduce((n, b) => n + b.search_variant_rows.filter(r => r.qty_ordered > 0).length + b.new_variant_rows.filter(r => r.qty_ordered > 0).length, 0)} line items):</span>
             <span style={{ fontSize: "22px", fontWeight: 700, color: "#1B3A5C" }}>${total.toFixed(2)}</span>
           </div>
 
@@ -536,16 +574,19 @@ interface BlockEditorProps {
   onSelectProduct: (p: SearchProduct) => void;
   onUpdateRow: (rowKey: number, patch: Partial<VariantRow>) => void;
   onRemoveRow: (rowKey: number) => void;
+  onDuplicateRow: (rowKey: number) => void;
   onAddNewVariant: () => void;
   onApplyCostToAll: (cost: number) => void;
+  onApplyQtyToAll: (qty: number) => void;
 }
 
 function ProductBlockEditor({
   block, blockIndex, onUpdate, onRemove,
   onSearchChange, onSelectProduct,
-  onUpdateRow, onRemoveRow, onAddNewVariant, onApplyCostToAll,
+  onUpdateRow, onRemoveRow, onDuplicateRow, onAddNewVariant, onApplyCostToAll, onApplyQtyToAll,
 }: BlockEditorProps) {
   const [applyCostVal, setApplyCostVal] = useState("");
+  const [applyQtyVal, setApplyQtyVal] = useState("");
   const variantRows = block.mode === "existing" ? block.search_variant_rows : block.new_variant_rows;
 
   return (
@@ -635,18 +676,19 @@ function ProductBlockEditor({
       {/* ── Variant table ─────────────────────────────────────────────────── */}
       {(variantRows.length > 0 || block.mode === "new") && (
         <>
-          {/* Apply cost to all */}
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
-            <span style={{ fontSize: "12px", color: "#6B7280" }}>Apply cost to all:</span>
-            <input
-              type="number" min={0} step={0.01}
-              value={applyCostVal}
-              onChange={e => setApplyCostVal(e.target.value)}
-              placeholder="$0.00"
-              style={{ ...INPUT, width: "90px" }}
-            />
-            <button onClick={() => { onApplyCostToAll(parseFloat(applyCostVal) || 0); }}
-              style={{ ...BTN_SM, padding: "6px 12px", fontSize: "11px" }}>Apply</button>
+          {/* Apply to all */}
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px", flexWrap: "wrap" as const }}>
+            <span style={{ fontSize: "12px", color: "#6B7280", fontWeight: 600 }}>Apply to all:</span>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <span style={{ fontSize: "11px", color: "#6B7280" }}>Cost</span>
+              <input type="number" min={0} step={0.01} value={applyCostVal} onChange={e => setApplyCostVal(e.target.value)} placeholder="$0.00" style={{ ...INPUT, width: "80px" }} />
+              <button onClick={() => onApplyCostToAll(parseFloat(applyCostVal) || 0)} style={{ ...BTN_SM, padding: "5px 10px", fontSize: "11px" }}>Apply Cost</button>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <span style={{ fontSize: "11px", color: "#6B7280" }}>Qty</span>
+              <input type="number" min={0} value={applyQtyVal} onChange={e => setApplyQtyVal(e.target.value)} placeholder="0" style={{ ...INPUT, width: "70px" }} />
+              <button onClick={() => onApplyQtyToAll(parseInt(applyQtyVal) || 0)} style={{ ...BTN_SM, padding: "5px 10px", fontSize: "11px" }}>Apply Qty</button>
+            </div>
           </div>
 
           <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: "8px" }}>
@@ -698,10 +740,14 @@ function ProductBlockEditor({
                     />
                   </td>
                   <td style={{ padding: "8px 12px" }}>
-                    {row.is_new_variant && (
-                      <button onClick={() => onRemoveRow(row.key)}
-                        style={{ background: "none", border: "none", cursor: "pointer", color: "#EF4444", fontSize: "16px" }}>×</button>
-                    )}
+                    <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
+                      <button onClick={() => onDuplicateRow(row.key)} title="Duplicate row"
+                        style={{ background: "none", border: "1px solid #D1D5DB", borderRadius: "4px", cursor: "pointer", color: "#6B7280", fontSize: "12px", padding: "2px 6px" }}>⧉</button>
+                      {row.is_new_variant && (
+                        <button onClick={() => onRemoveRow(row.key)}
+                          style={{ background: "none", border: "none", cursor: "pointer", color: "#EF4444", fontSize: "16px" }}>×</button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}

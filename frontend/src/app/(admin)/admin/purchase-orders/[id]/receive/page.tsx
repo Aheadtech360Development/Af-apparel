@@ -82,10 +82,6 @@ export default function ReceiveItemsPage() {
           unit_cost_actual: row.unit_cost_actual,
         })),
       });
-      const syncQB = window.confirm("Items received and inventory updated! Sync to QuickBooks now?");
-      if (syncQB) {
-        await apiClient.post(`/api/v1/admin/purchase-orders/${id}/sync-qb`);
-      }
       router.push(`/admin/purchase-orders/${id}`);
     } catch (err) {
       alert(err instanceof ApiClientError ? err.message : "Failed to record receiving");
