@@ -890,39 +890,11 @@ export default function AdminOrderDetailPage() {
                     )}
                   </>
                 ) : (
-                  /* CASE 1 (Live Rate): carrier tiles — only customer's chosen carrier is clickable */
+                  /* CASE 1 (Live Rate): customer's rate already known — generate label directly */
                   <>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "8px", marginBottom: "14px" }}>
-                      {([
-                        { id: "fedex", name: "FedEx", logo: "https://shippo-static.s3.amazonaws.com/providers/75/FedEx.png" },
-                        { id: "ups",   name: "UPS",   logo: "https://shippo-static.s3.amazonaws.com/providers/75/UPS.png" },
-                        { id: "usps",  name: "USPS",  logo: "https://shippo-static.s3.amazonaws.com/providers/75/USPS.png" },
-                      ]).map(carrier => {
-                        const active = selectedCarrier === carrier.id;
-                        const isCustomerChoice = customerCarrier === carrier.id;
-                        const isDisabled = !!customerCarrier && !isCustomerChoice;
-                        return (
-                          <div key={carrier.id}
-                            onClick={() => !isDisabled && setSelectedCarrier(carrier.id)}
-                            style={{
-                              border: active ? "2px solid #1A5CFF" : isDisabled ? "1.5px solid #F0EEE9" : "1.5px solid #E2E0DA",
-                              borderRadius: "8px", padding: "14px 8px", textAlign: "center" as const,
-                              cursor: isDisabled ? "not-allowed" : "pointer",
-                              background: active ? "rgba(26,92,255,.05)" : isDisabled ? "#FAFAF8" : "#fff",
-                              opacity: isDisabled ? 0.4 : 1,
-                              transition: "all .15s",
-                              display: "flex", flexDirection: "column" as const, alignItems: "center", justifyContent: "center", gap: "6px",
-                            }}>
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={carrier.logo} alt={carrier.name} style={{ height: "28px", width: "auto", objectFit: "contain", filter: isDisabled ? "grayscale(1)" : "none" }} />
-                            <div style={{ fontSize: "11px", fontWeight: 700, color: active ? "#1A5CFF" : "#7A7880" }}>{carrier.name}</div>
-                          </div>
-                        );
-                      })}
-                    </div>
                     <button onClick={handleGenerateLabel} disabled={!selectedCarrier || labelLoading}
                       style={{ background: selectedCarrier ? "#1A5CFF" : "#E2E0DA", color: "#fff", border: "none", padding: "12px 24px", borderRadius: "6px", fontSize: "14px", fontWeight: 700, cursor: selectedCarrier ? "pointer" : "not-allowed", opacity: labelLoading ? .65 : 1, marginBottom: "14px" }}>
-                      {labelLoading ? "Generating label…" : selectedCarrier ? `Generate ${selectedCarrier.toUpperCase()} Label` : "Select a carrier"}
+                      {labelLoading ? "Generating label…" : `Generate ${(order.carrier ?? selectedCarrier ?? "").toUpperCase()} Label`}
                     </button>
                   </>
                 )}

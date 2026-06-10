@@ -109,7 +109,7 @@ export default function AboutPage() {
             ].map(c => (
               <div key={c.h}>
                 <h5 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 600, marginBottom: "6px", color: "#1A1A1A" }}>{c.h}</h5>
-                <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#6B6B6B", lineHeight: 1.6 }}>{c.p}</p>
+                <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#6B6B6B", lineHeight: 1.6 }}></p>
               </div>
             ))}
           </div>
