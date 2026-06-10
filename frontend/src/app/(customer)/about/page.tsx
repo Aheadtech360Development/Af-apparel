@@ -76,9 +76,9 @@ export default function AboutPage() {
           <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.12em", color: "#6B6B6B", marginBottom: 0 }}>History</p>
           <div style={{ maxWidth: "680px", margin: "32px auto 0" }}>
             {[
-              { year: "2010", title: "Founded in Dallas", body: "First warehouse opened. Started with cotton tees for the Texas print market." },
               { year: "2015", title: "ISO 9000 Certified", body: "Quality standards locked in. GOTS and Oeko-Tex certifications followed." },
               { year: "2019", title: "500+ Active Accounts", body: "Expanded to hoodies, sweatshirts, and polos. Started shipping nationwide." },
+              { year: "2020", title: "Founded in Dallas", body: "First warehouse opened. Started with cotton tees for the Texas print market." },
               { year: "2023", title: "Private Label Program", body: "Started making custom-label apparel for brands. Min 2,500 pcs/style/color." },
               { year: "2025", title: "2,000+ Accounts Nationwide", body: "Serving print shops, decorators, brands, and corporate buyers in all 50 states." },
             ].map((item, i, arr) => (
@@ -102,10 +102,10 @@ export default function AboutPage() {
           <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "15px", color: "#6B6B6B", marginBottom: "32px" }}>Every AF product is tested and certified.</p>
           <div className="about-cert-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "24px" }}>
             {[
-              { h: "ISO 9000", p: "Consistent production standards, run to run." },
-              { h: "Oeko-Tex Standard 100", p: "Every component tested. Safe for sensitive skin." },
-              { h: "GOTS Certified", p: "Organic cotton verified field to finished product." },
-              { h: "WRAP Certified", p: "Ethical labor, legal compliance, safe working conditions." },
+              { h: "ISO 9000" },
+              { h: "Oeko-Tex Standard 100" },
+              { h: "GOTS Certified" },
+              { h: "WRAP Certified" },
             ].map(c => (
               <div key={c.h}>
                 <h5 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 600, marginBottom: "6px", color: "#1A1A1A" }}>{c.h}</h5>

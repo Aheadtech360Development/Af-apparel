@@ -34,7 +34,6 @@ const COMPAT_TABLE = [
 ];
 
 const TIPS = [
-  "Wash and dry garments before decorating. Fabric can shrink slightly after first wash.",
   "Pre-press for 3–5 seconds before applying any transfer. Removes moisture.",
   "Always run a test on one piece before a full production run.",
   "Follow your ink or transfer supplier's cure temps — those take priority over fabric type.",
